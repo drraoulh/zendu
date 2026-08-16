@@ -1,0 +1,22 @@
+# Dependencies / env
+node_modules/
+.env
+.env*.local
+web/.env
+web/.env*.local
+
+# Supabase local temp
+supabase/.temp/
+web/supabase/.temp/
+.supabase/
+
+# Next / Prisma
+web/.next/
+web/out/
+web/prisma/*.db
+web/prisma/*.db-journal
+
+# OS / IDE
+.DS_Store
+*.pem
+.vercel
