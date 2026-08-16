@@ -3,8 +3,9 @@ generator client {
 }
 
 datasource db {
-  provider = "sqlite"
-  url      = env("DATABASE_URL")
+  provider  = "postgresql"
+  url       = env("DATABASE_URL")
+  directUrl = env("DIRECT_URL")
 }
 
 model Beneficiary {
@@ -33,14 +34,14 @@ model Quote {
 }
 
 model Transfer {
-  id               String      @id @default(cuid())
-  reference        String      @unique
-  status           String      @default("awaiting_payment")
-  corridorId       String      @default("CA-CM")
-  sourceCountry    String      @default("CA")
-  destCountry      String      @default("CM")
-  sendCurrency     String      @default("CAD")
-  receiveCurrency  String      @default("XAF")
+  id               String          @id @default(cuid())
+  reference        String          @unique
+  status           String          @default("awaiting_payment")
+  corridorId       String          @default("CA-CM")
+  sourceCountry    String          @default("CA")
+  destCountry      String          @default("CM")
+  sendCurrency     String          @default("CAD")
+  receiveCurrency  String          @default("XAF")
   senderName       String
   senderEmail      String
   sendAmountCad    Float
@@ -48,27 +49,33 @@ model Transfer {
   rate             Float
   feeCad           Float
   totalCad         Float
-  payInProvider    String      @default("mock")
+  payInProvider    String          @default("mock")
   payInRef         String?
-  payoutProvider   String      @default("mock_momo")
+  payoutProvider   String          @default("mock_momo")
   payoutRef        String?
   failureReason    String?
-  quoteId          String?     @unique
-  quote            Quote?      @relation(fields: [quoteId], references: [id])
+  quoteId          String?         @unique
+  quote            Quote?          @relation(fields: [quoteId], references: [id])
   beneficiaryId    String
-  beneficiary      Beneficiary @relation(fields: [beneficiaryId], references: [id])
+  beneficiary      Beneficiary     @relation(fields: [beneficiaryId], references: [id])
   events           TransferEvent[]
-  createdAt        DateTime    @default(now())
-  updatedAt        DateTime    @updatedAt
+  createdAt        DateTime        @default(now())
+  updatedAt        DateTime        @updatedAt
   paidAt           DateTime?
   deliveredAt      DateTime?
+
+  @@index([senderEmail])
+  @@index([status])
+  @@index([createdAt])
 }
 
 model TransferEvent {
   id         String   @id @default(cuid())
   transferId String
-  transfer   Transfer @relation(fields: [transferId], references: [id])
+  transfer   Transfer @relation(fields: [transferId], references: [id], onDelete: Cascade)
   type       String
   message    String
   createdAt  DateTime @default(now())
+
+  @@index([transferId])
 }

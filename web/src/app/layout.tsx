@@ -19,11 +19,36 @@ const dmSans = DM_Sans({
 });
 
 const appName = process.env.NEXT_PUBLIC_APP_NAME ?? "Zendu";
+const appUrl = process.env.NEXT_PUBLIC_APP_URL ?? "http://localhost:3000";
 
 export const metadata: Metadata = {
-  title: `${appName} — International money transfer`,
+  metadataBase: new URL(appUrl),
+  title: {
+    default: `${appName} — International money transfer`,
+    template: `%s · ${appName}`,
+  },
   description:
-    "Send money worldwide with live rates, fees, flags, receipts and multi-language support.",
+    "Send money worldwide with live rates, clear fees, mobile money delivery, and multi-language support.",
+  openGraph: {
+    title: `${appName} — International money transfer`,
+    description:
+      "Send money worldwide with live rates, clear fees, and mobile money delivery.",
+    url: appUrl,
+    siteName: appName,
+    images: [{ url: "/hero-zendu.jpg", width: 1200, height: 630 }],
+    locale: "fr_FR",
+    type: "website",
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: `${appName} — International money transfer`,
+    description:
+      "Send money worldwide with live rates, clear fees, and mobile money delivery.",
+    images: ["/hero-zendu.jpg"],
+  },
+  icons: {
+    icon: "/favicon.ico",
+  },
 };
 
 export default function RootLayout({

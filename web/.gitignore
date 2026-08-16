@@ -35,6 +35,8 @@ npm-*.log
 # env files (can opt-in for committing if needed)
 .env
 .env*.local
+.db-pass.tmp
+.db-pass-body.json
 
 # supabase
 supabase/.temp
