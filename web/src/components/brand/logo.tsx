@@ -16,7 +16,16 @@ export function LogoEmblem({ className = "h-10 w-auto", priority = false }: { cl
 }
 
 /** Emblème + nom, pour l'en-tête et le pied de page. */
-export function LogoWordmark({ light = false, priority = false }: { light?: boolean; priority?: boolean }) {
+export function LogoWordmark({
+  light = false,
+  priority = false,
+  compact = false,
+}: {
+  light?: boolean;
+  priority?: boolean;
+  /** Masque le nom complet sur les écrans xl où la navigation prend la place. */
+  compact?: boolean;
+}) {
   return (
     <span className="inline-flex items-center gap-2.5">
       <span className={`inline-flex items-center rounded-xl ${light ? "bg-white px-1.5 py-1" : ""}`}>
@@ -31,7 +40,7 @@ export function LogoWordmark({ light = false, priority = false }: { light?: bool
           {appName}
         </span>
         <span
-          className={`mt-1 hidden text-[0.6rem] font-semibold uppercase tracking-[0.14em] sm:block ${
+          className={`mt-1 hidden max-w-[15rem] text-[0.6rem] font-semibold uppercase leading-snug tracking-[0.14em] sm:block ${compact ? "xl:hidden 2xl:block" : ""} ${
             light ? "text-white/60" : "text-muted"
           }`}
         >

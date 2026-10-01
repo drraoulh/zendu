@@ -53,17 +53,17 @@ export function SiteHeader() {
         scrolled ? "border-line shadow-[0_6px_20px_-12px_rgba(10,24,56,0.25)]" : "border-transparent"
       }`}
     >
-      <div className="mx-auto flex h-[4.5rem] max-w-7xl items-center justify-between gap-4 px-5 sm:px-6">
+      <div className="mx-auto flex h-[4.5rem] max-w-7xl items-center justify-between gap-3 px-5 sm:px-6">
         <Link href="/" aria-label="PWFINTECH" className="shrink-0">
-          <LogoWordmark priority />
+          <LogoWordmark priority compact />
         </Link>
 
-        <nav className="hidden items-center gap-1 xl:flex">
+        <nav className="hidden items-center gap-0.5 xl:flex">
           {NAV.map((item) => (
             <Link
               key={item.href}
               href={item.href}
-              className={`rounded-full px-3.5 py-2 text-sm font-semibold transition ${
+              className={`whitespace-nowrap rounded-full px-3 py-2 text-sm font-semibold transition 2xl:px-3.5 ${
                 isActive(item.href) ? "bg-brand-soft text-brand-strong" : "text-ink/75 hover:bg-surface-soft hover:text-ink"
               }`}
             >
@@ -98,15 +98,17 @@ export function SiteHeader() {
           ) : (
             <Link
               href="/login"
-              className="hidden rounded-full px-4 py-2 text-sm font-semibold text-ink hover:bg-surface-soft lg:inline-flex"
+              className="hidden whitespace-nowrap rounded-full px-3 py-2 text-sm font-semibold text-ink hover:bg-surface-soft lg:inline-flex"
             >
               {t("logIn")}
             </Link>
           )}
-          <ButtonLink href="/send" size="sm" className="hidden sm:inline-flex">
-            {t("sendMoney")}
-            <Icon name="arrowRight" className="h-4 w-4" />
-          </ButtonLink>
+          <div className="hidden sm:block">
+            <ButtonLink href="/send" size="sm" className="whitespace-nowrap">
+              {t("sendMoney")}
+              <Icon name="arrowRight" className="h-4 w-4" />
+            </ButtonLink>
+          </div>
           <button
             type="button"
             className="inline-flex h-10 w-10 items-center justify-center rounded-xl border border-line text-ink xl:hidden"

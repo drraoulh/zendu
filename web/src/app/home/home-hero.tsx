@@ -53,7 +53,7 @@ export function HomeHero() {
         <circle cx="200" cy="200" r="130" stroke="rgba(201,211,230,0.2)" strokeDasharray="2 8" />
       </svg>
 
-      <Container className="relative grid items-center gap-12 pb-16 pt-12 sm:pt-16 lg:grid-cols-[1.1fr_minmax(0,0.9fr)] lg:gap-14 lg:pb-24 lg:pt-20">
+      <Container className="relative grid grid-cols-1 items-center gap-12 pb-16 pt-12 sm:pt-16 lg:grid-cols-[1.1fr_minmax(0,0.9fr)] lg:gap-14 lg:pb-24 lg:pt-20">
         <div className="animate-rise min-w-0">
           <p className="inline-flex max-w-full items-center gap-2 rounded-full border border-white/15 bg-white/5 px-3 py-1.5 text-[0.7rem] font-semibold uppercase tracking-[0.14em] text-sky backdrop-blur sm:text-xs">
             <Icon name="maple" className="h-3.5 w-3.5 shrink-0 text-maple" />

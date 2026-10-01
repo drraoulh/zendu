@@ -19,7 +19,7 @@ export function CountryFlag({ code, size = 24, className = "", title }: Props) {
       height={Math.round(size * 0.75)}
       alt={title ?? code}
       title={title ?? code}
-      className={`inline-block rounded-sm object-cover shadow-sm ${className}`}
+      className={`inline-block overflow-hidden rounded-sm bg-surface-soft object-cover text-[0px] shadow-sm ${className}`}
       loading="lazy"
     />
   );
