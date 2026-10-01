@@ -1,54 +1,59 @@
 @import "tailwindcss";
 
+/* PWFINTECH — couleurs tirées du logo : bleu électrique, bleu nuit, ciel, argent, érable. */
 :root {
-  --bg: #f4f6fb;
-  --bg-elevated: #ffffff;
-  --bg-soft: #e9eef8;
-  --ink: #0b1630;
-  --ink-muted: #5b6785;
-  --accent: #1f5bff;
-  --accent-strong: #1543c7;
-  --accent-soft: #e2eaff;
-  --night: #0a1633;
-  --gold: #f5b83d;
-  --line: rgba(11, 22, 48, 0.09);
-  --success: #0d9f74;
-  --danger: #d14343;
-  --warn: #c47f17;
-  --font-display: "Sora", sans-serif;
-  --font-body: "DM Sans", sans-serif;
+  --bg: #f5f8ff;
+  --surface: #ffffff;
+  --surface-soft: #eef3ff;
+  --ink: #0a1838;
+  --muted: #56627f;
+  --line: rgba(10, 24, 56, 0.1);
+  --brand: #0b4dff;
+  --brand-strong: #0637c9;
+  --brand-soft: #e6edff;
+  --navy: #061a52;
+  --navy-deep: #040f33;
+  --sky: #3fa0ff;
+  --silver: #c9d3e6;
+  --maple: #e11d2b;
+  --success: #12a46a;
+  --warn: #c98a12;
+  --danger: #d33a3a;
 }
 
 @theme inline {
   --color-bg: var(--bg);
-  --color-bg-elevated: var(--bg-elevated);
-  --color-bg-soft: var(--bg-soft);
+  --color-surface: var(--surface);
+  --color-surface-soft: var(--surface-soft);
   --color-ink: var(--ink);
-  --color-ink-muted: var(--ink-muted);
-  --color-accent: var(--accent);
-  --color-accent-strong: var(--accent-strong);
-  --color-accent-soft: var(--accent-soft);
+  --color-muted: var(--muted);
   --color-line: var(--line);
-  --color-night: var(--night);
-  --color-gold: var(--gold);
+  --color-brand: var(--brand);
+  --color-brand-strong: var(--brand-strong);
+  --color-brand-soft: var(--brand-soft);
+  --color-navy: var(--navy);
+  --color-navy-deep: var(--navy-deep);
+  --color-sky: var(--sky);
+  --color-silver: var(--silver);
+  --color-maple: var(--maple);
   --color-success: var(--success);
-  --color-danger: var(--danger);
   --color-warn: var(--warn);
-  --font-display: var(--font-display);
-  --font-body: var(--font-body);
+  --color-danger: var(--danger);
+  --font-display: var(--font-montserrat), "Montserrat", system-ui, sans-serif;
+  --font-sans: var(--font-inter), "Inter", system-ui, sans-serif;
 }
 
 @layer base {
-  html,
-  body {
-    min-height: 100%;
+  html {
+    scroll-behavior: smooth;
   }
 
   body {
     margin: 0;
+    min-height: 100%;
     color: var(--ink);
-    font-family: var(--font-body);
     background: #ffffff;
+    font-family: var(--font-sans);
     -webkit-font-smoothing: antialiased;
   }
 
@@ -58,14 +63,57 @@
   }
 
   ::selection {
-    background: rgba(31, 91, 255, 0.2);
+    background: rgba(11, 77, 255, 0.18);
   }
+
+  :focus-visible {
+    outline: 2px solid var(--brand);
+    outline-offset: 2px;
+  }
+}
+
+/* Dégradé « chrome » du logo, pour les titres et les fonds de marque. */
+.text-gradient-brand {
+  background: linear-gradient(100deg, var(--navy) 0%, var(--brand) 45%, var(--sky) 100%);
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+}
+
+.bg-brand-gradient {
+  background: linear-gradient(135deg, var(--brand) 0%, var(--brand-strong) 55%, var(--navy) 100%);
+}
+
+.bg-navy-gradient {
+  background:
+    radial-gradient(70% 60% at 85% 10%, rgba(63, 160, 255, 0.28), transparent 70%),
+    radial-gradient(50% 50% at 0% 100%, rgba(11, 77, 255, 0.35), transparent 70%),
+    linear-gradient(160deg, var(--navy) 0%, var(--navy-deep) 100%);
+}
+
+.bg-grid {
+  background-image:
+    linear-gradient(rgba(255, 255, 255, 0.06) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(255, 255, 255, 0.06) 1px, transparent 1px);
+  background-size: 44px 44px;
+}
+
+.shadow-card {
+  box-shadow:
+    0 1px 2px rgba(10, 24, 56, 0.05),
+    0 12px 32px -12px rgba(10, 24, 56, 0.18);
+}
+
+.shadow-float {
+  box-shadow:
+    0 30px 60px -20px rgba(4, 15, 51, 0.45),
+    0 2px 6px rgba(4, 15, 51, 0.08);
 }
 
 @keyframes rise {
   from {
     opacity: 0;
-    transform: translateY(16px);
+    transform: translateY(14px);
   }
   to {
     opacity: 1;
@@ -73,33 +121,21 @@
   }
 }
 
-@keyframes fade-in {
-  from {
-    opacity: 0;
-  }
+@keyframes orbit {
   to {
-    opacity: 1;
+    transform: rotate(360deg);
   }
 }
 
-@keyframes live-pulse {
+@keyframes pulse-dot {
   0%,
   100% {
     transform: scale(1);
     opacity: 1;
   }
   50% {
-    transform: scale(1.4);
-    opacity: 0.45;
-  }
-}
-
-@keyframes shimmer {
-  0% {
-    background-position: 200% 0;
-  }
-  100% {
-    background-position: -200% 0;
+    transform: scale(1.5);
+    opacity: 0.4;
   }
 }
 
@@ -107,45 +143,35 @@
   animation: rise 0.6s ease-out both;
 }
 
-.animate-rise-delay {
-  animation: rise 0.6s ease-out 0.1s both;
+.animate-rise-1 {
+  animation: rise 0.6s ease-out 0.08s both;
+}
+
+.animate-rise-2 {
+  animation: rise 0.6s ease-out 0.16s both;
+}
+
+.animate-orbit {
+  animation: orbit 40s linear infinite;
 }
 
 .live-dot {
   width: 8px;
   height: 8px;
   border-radius: 999px;
-  background: var(--accent);
-  animation: live-pulse 1.5s ease-in-out infinite;
-}
-
-.glass-card {
-  background: #ffffff;
-  border: 1px solid rgba(11, 22, 48, 0.08);
-  box-shadow:
-    0 18px 50px rgba(11, 22, 48, 0.14),
-    0 2px 8px rgba(11, 22, 48, 0.04);
-}
-
-.sandbox-banner {
-  background: linear-gradient(90deg, #fff6e5, #ffe8c2);
-  color: #7a4e0b;
-}
-
-.brand-mark {
-  background: linear-gradient(135deg, var(--accent) 0%, #4f7dff 55%, var(--gold) 140%);
-  letter-spacing: -0.02em;
-}
-
-.hero-glow {
-  background:
-    radial-gradient(60% 60% at 85% 20%, rgba(31, 91, 255, 0.35), transparent 70%),
-    radial-gradient(40% 50% at 10% 90%, rgba(245, 184, 61, 0.18), transparent 70%);
+  background: var(--success);
+  animation: pulse-dot 1.6s ease-in-out infinite;
 }
 
 @media (prefers-reduced-motion: reduce) {
+  html {
+    scroll-behavior: auto;
+  }
+
   .animate-rise,
-  .animate-rise-delay,
+  .animate-rise-1,
+  .animate-rise-2,
+  .animate-orbit,
   .live-dot {
     animation: none;
   }
