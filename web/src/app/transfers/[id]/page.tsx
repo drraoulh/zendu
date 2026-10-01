@@ -3,6 +3,7 @@ import { notFound } from "next/navigation";
 import { prisma } from "@/lib/prisma";
 import { getPayInMode } from "@/lib/providers/payin";
 import { getCorridor } from "@/lib/corridors";
+import { deliveryEstimateFor, publicTransfer } from "@/lib/bank";
 import type { TransferDTO } from "@/components/transfer-app/types";
 import { TransferTracker } from "./transfer-tracker";
 
@@ -29,7 +30,8 @@ export default async function TransferPage({ params, searchParams }: Props) {
       where: { id },
       include: { beneficiary: true, events: { orderBy: { createdAt: "asc" } } },
     });
-    if (transfer) initial = JSON.parse(JSON.stringify(transfer)) as TransferDTO;
+    // Numéro de compte masqué : la page de suivi est accessible par simple lien.
+    if (transfer) initial = JSON.parse(JSON.stringify(publicTransfer(transfer))) as TransferDTO;
   } catch (error) {
     console.error("Transfer: impossible de charger le transfert", error);
     dbFailed = true;
@@ -37,7 +39,11 @@ export default async function TransferPage({ params, searchParams }: Props) {
 
   if (!dbFailed && !initial) notFound();
 
-  const deliveryEstimate = getCorridor(initial?.corridorId ?? "CA-CM")?.deliveryEstimate ?? "A few minutes";
+  const deliveryEstimate = deliveryEstimateFor(
+    getCorridor(initial?.corridorId ?? "CA-CM")?.deliveryEstimate ?? "A few minutes",
+    initial?.beneficiary.network,
+    initial?.beneficiary.country,
+  );
 
   return (
     <TransferTracker

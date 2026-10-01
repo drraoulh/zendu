@@ -16,7 +16,7 @@ export function formatMoney(n: number, currency: string, locale = "fr-CA"): stri
   }
 }
 
-export function createReference(prefix = "ZEN"): string {
+export function createReference(prefix = "PW"): string {
   const alphabet = "ABCDEFGHJKLMNPQRSTUVWXYZ23456789";
   let code = "";
   for (let i = 0; i < 6; i += 1) {

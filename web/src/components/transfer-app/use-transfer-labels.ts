@@ -42,6 +42,7 @@ export function useTransferLabels() {
     (estimate: string) => {
       if (estimate === "A few minutes") return t("etaMinutes");
       if (estimate === "Under 24h") return t("etaDay");
+      if (estimate === "1-2 business days") return t("etaBank");
       return estimate;
     },
     [t],

@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { prisma } from "@/lib/prisma";
 import { getPayInMode } from "@/lib/providers/payin";
 import { getPayoutMode } from "@/lib/providers/payout";
+import { isBankNetwork, maskAccount } from "@/lib/bank";
 import { AdminDashboard, type AdminTransferRow } from "./admin-dashboard";
 
 export const dynamic = "force-dynamic";
@@ -31,6 +32,11 @@ async function loadTransfers(): Promise<AdminTransferRow[] | null> {
         recipientName: t.beneficiary.fullName,
         recipientPhone: t.beneficiary.phone,
         recipientNetwork: t.beneficiary.network,
+        isBank: isBankNetwork(t.beneficiary.network, t.beneficiary.country),
+        recipientBankName: t.beneficiary.bankName,
+        // Page sans authentification : numéro masqué, le complet passe par le jeton opérateur.
+        recipientAccountMasked: maskAccount(t.beneficiary.accountNumber),
+        payoutProvider: t.payoutProvider,
         createdAt: t.createdAt.toISOString(),
       })),
     )

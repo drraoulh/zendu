@@ -14,6 +14,12 @@ model Beneficiary {
   phone     String
   network   String     @default("MTN")
   country   String     @default("CM")
+  /// Virement bancaire uniquement (réseau de type "bank") — null pour mobile money / retrait.
+  bankName      String?
+  /// IBAN / RIB / numéro de compte, sans espaces, en majuscules.
+  accountNumber String?
+  /// Code SWIFT/BIC ou code banque/agence (facultatif).
+  bankCode      String?
   createdAt DateTime   @default(now())
   transfers Transfer[]
 }

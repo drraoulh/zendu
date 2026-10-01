@@ -159,7 +159,18 @@ export function ReceiptView({
             <div>
               <h2 className="text-xs font-bold uppercase tracking-[0.16em] text-muted">{t("recipient")}</h2>
               <p className="mt-2 font-semibold text-ink">{receipt.recipient.name}</p>
-              <p className="text-sm text-muted">+{receipt.recipient.phone}</p>
+              {receipt.recipient.bankName && (
+                <p className="text-sm text-muted">
+                  {receipt.recipient.bankName}
+                  {receipt.recipient.accountMasked ? ` · ${receipt.recipient.accountMasked}` : ""}
+                </p>
+              )}
+              {receipt.recipient.bankCode && (
+                <p className="text-sm text-muted">
+                  {t("bankCode")} : {receipt.recipient.bankCode}
+                </p>
+              )}
+              {receipt.recipient.phone && <p className="text-sm text-muted">+{receipt.recipient.phone}</p>}
               <p className="mt-1 text-sm text-muted">
                 {network(receipt.recipient.network)} · {country(receipt.destCountry)}
               </p>

@@ -73,7 +73,7 @@ export const transferPage = defineMessages({
       "Envoi direct vers les portefeuilles MTN Mobile Money, Orange Money et d'autres réseaux disponibles selon le pays de destination.",
     offer2Title: "Virement bancaire",
     offer2Text:
-      "Versement sur le compte bancaire du bénéficiaire lorsque cette option est proposée pour le pays choisi.",
+      "Versement directement sur le compte bancaire du bénéficiaire (IBAN, RIB ou numéro de compte), au Cameroun et dans de nombreux autres pays. Comptez généralement 1 à 2 jours ouvrables.",
     offer3Title: "Retrait en espèces",
     offer3Text:
       "Dans certains pays, votre proche peut retirer les fonds en espèces. Les options disponibles sont indiquées lors de l'envoi.",
@@ -128,7 +128,7 @@ export const transferPage = defineMessages({
 
     faq1Q: "Combien de temps prend un transfert ?",
     faq1A:
-      "Les envois vers un portefeuille mobile money sont généralement traités rapidement après la confirmation du paiement. Les virements bancaires peuvent prendre davantage de temps selon la banque du bénéficiaire. Le délai estimé vous est indiqué avant de confirmer.",
+      "Les envois vers un portefeuille mobile money sont généralement traités rapidement après la confirmation du paiement. Les virements bancaires prennent généralement 1 à 2 jours ouvrables selon la banque du bénéficiaire. Le délai estimé vous est indiqué avant de confirmer.",
     faq2Q: "Quels sont les frais ?",
     faq2A:
       "Les frais et le taux de change dépendent du pays et du montant. Ils sont affichés dans le simulateur et récapitulés avant le paiement : vous savez exactement ce que vous payez et ce que votre proche reçoit.",
@@ -138,7 +138,7 @@ export const transferPage = defineMessages({
     faq4Q: "Comment suivre mon transfert ?",
     faq4A:
       "Rendez-vous dans « Mes transferts » : chaque envoi y affiche sa référence, son statut et son reçu. Gardez la référence à portée de main si vous nous contactez.",
-    faq5Q: "Je me suis trompé de numéro, que faire ?",
+    faq5Q: "Je me suis trompé de numéro ou de compte, que faire ?",
     faq5A:
       "Contactez-nous au plus vite en indiquant la référence du transfert. Si les fonds n'ont pas encore été versés, nous ferons notre possible pour corriger ou annuler l'envoi.",
 
@@ -170,7 +170,8 @@ export const transferPage = defineMessages({
     offer1Text:
       "Direct delivery to MTN Mobile Money, Orange Money and other networks available in the destination country.",
     offer2Title: "Bank transfer",
-    offer2Text: "Payout to the recipient's bank account when this option is available for the chosen country.",
+    offer2Text:
+      "Payout straight to the recipient's bank account (IBAN, RIB or account number), in Cameroon and many other countries. Usually 1–2 business days.",
     offer3Title: "Cash pickup",
     offer3Text:
       "In some countries, your recipient can collect the funds in cash. Available options are shown when you send.",
@@ -222,7 +223,7 @@ export const transferPage = defineMessages({
 
     faq1Q: "How long does a transfer take?",
     faq1A:
-      "Transfers to a mobile money wallet are usually processed quickly once payment is confirmed. Bank transfers may take longer depending on the recipient's bank. The estimated delivery time is shown before you confirm.",
+      "Transfers to a mobile money wallet are usually processed quickly once payment is confirmed. Bank transfers usually take 1–2 business days depending on the recipient's bank. The estimated delivery time is shown before you confirm.",
     faq2Q: "What are the fees?",
     faq2A:
       "Fees and exchange rate depend on the country and the amount. They are shown in the calculator and summarized before payment: you know exactly what you pay and what your recipient gets.",
@@ -232,7 +233,7 @@ export const transferPage = defineMessages({
     faq4Q: "How do I track my transfer?",
     faq4A:
       "Go to “My transfers”: each transfer shows its reference, status and receipt. Keep the reference handy if you contact us.",
-    faq5Q: "I entered the wrong number, what should I do?",
+    faq5Q: "I entered the wrong number or account, what should I do?",
     faq5A:
       "Contact us as soon as possible with the transfer reference. If the funds have not been paid out yet, we will do our best to correct or cancel the transfer.",
 

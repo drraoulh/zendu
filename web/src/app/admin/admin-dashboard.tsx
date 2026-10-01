@@ -8,6 +8,8 @@ import { Icon, type IconName } from "@/components/ui/icon";
 import { useT } from "@/i18n/define";
 import { adminMessages } from "@/i18n/admin";
 import { formatMoney } from "@/lib/money";
+import { MANUAL_BANK_PROVIDER } from "@/lib/bank";
+import { BankQueue } from "./bank-queue";
 
 export type AdminTransferRow = {
   id: string;
@@ -21,6 +23,10 @@ export type AdminTransferRow = {
   recipientName: string;
   recipientPhone: string;
   recipientNetwork: string;
+  isBank: boolean;
+  recipientBankName: string | null;
+  recipientAccountMasked: string | null;
+  payoutProvider: string;
   createdAt: string;
 };
 
@@ -69,6 +75,16 @@ export function AdminDashboard({
     new Intl.DateTimeFormat(nl, { dateStyle: "medium", timeStyle: "short" }).format(new Date(iso));
 
   const rows = transfers ?? [];
+  const bankQueue = rows.filter(
+    (r) =>
+      r.isBank &&
+      r.payoutProvider === MANUAL_BANK_PROVIDER &&
+      (r.status === "payout_queued" || r.status === "payout_sent"),
+  );
+  const recipientLine = (r: AdminTransferRow) =>
+    r.isBank
+      ? [r.recipientBankName, r.recipientAccountMasked].filter(Boolean).join(" ") || r.recipientNetwork
+      : `${r.recipientPhone} · ${r.recipientNetwork}`;
   const count = (s: string) => rows.filter((r) => r.status === s).length;
   const counts = Object.entries(
     rows.reduce<Record<string, number>>((acc, r) => {
@@ -166,7 +182,11 @@ export function AdminDashboard({
             <div className="mt-8 grid gap-6 lg:grid-cols-[minmax(0,1fr)_18rem]">
               {/* Transferts */}
               <section aria-labelledby="admin-recent" className="min-w-0">
-                <h2 id="admin-recent" className="font-display text-xl font-bold text-ink">
+                {(bankQueue.length > 0 || payoutMode === "momo") && (
+                  <BankQueue rows={bankQueue} nl={nl} date={date} />
+                )}
+
+                <h2 id="admin-recent" className={`font-display text-xl font-bold text-ink ${bankQueue.length > 0 || payoutMode === "momo" ? "mt-8" : ""}`}>
                   {t("recent")}
                 </h2>
 
@@ -213,7 +233,7 @@ export function AdminDashboard({
                               <td className="px-4 py-3 align-top">
                                 <span className="font-medium text-ink">{r.recipientName}</span>
                                 <span className="mt-0.5 block text-xs text-muted">
-                                  {r.recipientPhone} · {r.recipientNetwork}
+                                  {recipientLine(r)}
                                 </span>
                               </td>
                               <td className="px-4 py-3 text-right align-top">
@@ -252,7 +272,7 @@ export function AdminDashboard({
                               <div className="min-w-0">
                                 <p className="truncate text-sm font-medium text-ink">{r.recipientName}</p>
                                 <p className="truncate text-xs text-muted">
-                                  {r.recipientPhone} · {r.recipientNetwork}
+                                  {recipientLine(r)}
                                 </p>
                               </div>
                               <div className="shrink-0 text-right">

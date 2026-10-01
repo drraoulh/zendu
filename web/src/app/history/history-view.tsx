@@ -25,6 +25,8 @@ export type HistoryItem = {
   sendCurrency: string;
   recipientName: string;
   network: string;
+  /** Virement bancaire : « •••• 1234 ». */
+  accountMasked?: string | null;
 };
 
 type Filter = "all" | StatusGroup;
@@ -232,7 +234,8 @@ export function HistoryView({ transfers, unavailable }: { transfers: HistoryItem
                           <p className="mt-2 truncate font-semibold text-ink">{item.recipientName}</p>
                           <p className="truncate text-xs text-muted">
                             <span className="font-display font-bold tracking-wider">{item.reference}</span> ·{" "}
-                            {L.network(item.network)} · {L.dateTime(item.createdAt)}
+                            {L.network(item.network)}
+                            {item.accountMasked ? ` ${item.accountMasked}` : ""} · {L.dateTime(item.createdAt)}
                           </p>
                         </div>
                         <div className="shrink-0 text-right">

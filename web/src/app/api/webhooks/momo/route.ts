@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
+import { MANUAL_BANK_PROVIDER } from "@/lib/bank";
 import { assertTransition } from "@/lib/transfer-machine";
 
 /**
@@ -24,6 +25,10 @@ export async function POST(request: Request) {
       where: { reference },
     });
     if (!transfer) {
+      return NextResponse.json({ received: true, matched: false });
+    }
+    // Un virement bancaire manuel n'est jamais versé par MoMo : seul un opérateur le clôture.
+    if (transfer.payoutProvider === MANUAL_BANK_PROVIDER) {
       return NextResponse.json({ received: true, matched: false });
     }
 

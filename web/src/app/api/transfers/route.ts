@@ -7,12 +7,9 @@ import { getPayInMode } from "@/lib/providers/payin";
 import { mockPayIn } from "@/lib/providers/mock-payin";
 import { createStripePayIn } from "@/lib/providers/stripe";
 import { getPayoutMode } from "@/lib/providers/payout";
-import {
-  getCorridor,
-  getCountry,
-  normalizePhone,
-  validatePhone,
-} from "@/lib/corridors";
+import { getCorridor } from "@/lib/corridors";
+import { isBankNetwork, MANUAL_BANK_PROVIDER, MOCK_BANK_PROVIDER, publicTransfer } from "@/lib/bank";
+import { beneficiaryInputSchema, normalizeBeneficiary } from "@/lib/beneficiary-input";
 
 const createSchema = z.object({
   corridorId: z.string().default("CA-CM"),
@@ -20,11 +17,7 @@ const createSchema = z.object({
   sendAmountCad: z.number().positive().optional(),
   senderName: z.string().min(2),
   senderEmail: z.string().email(),
-  beneficiary: z.object({
-    fullName: z.string().min(2),
-    phone: z.string().min(8),
-    network: z.string().min(2),
-  }),
+  beneficiary: beneficiaryInputSchema,
 });
 
 export async function GET() {
@@ -33,7 +26,7 @@ export async function GET() {
     orderBy: { createdAt: "desc" },
     take: 50,
   });
-  return NextResponse.json(transfers);
+  return NextResponse.json(transfers.map(publicTransfer));
 }
 
 export async function POST(request: Request) {
@@ -53,24 +46,12 @@ export async function POST(request: Request) {
       );
     }
 
-    const dest = getCountry(corridor.destination);
-    const networkOk = dest.networks.some((n) => n.id === data.beneficiary.network);
-    if (!networkOk) {
-      return NextResponse.json(
-        { error: "Réseau de réception invalide pour ce pays" },
-        { status: 400 },
-      );
+    const normalized = await normalizeBeneficiary(data.beneficiary, corridor.destination);
+    if (!normalized.ok) {
+      return NextResponse.json({ error: normalized.error }, { status: 400 });
     }
+    const bank = isBankNetwork(normalized.data.network, corridor.destination);
 
-    const phoneError = validatePhone(
-      data.beneficiary.phone,
-      corridor.destination,
-    );
-    if (phoneError) {
-      return NextResponse.json({ error: phoneError }, { status: 400 });
-    }
-
-    const phone = normalizePhone(data.beneficiary.phone, corridor.destination);
     const quoteData = await buildQuote({
       corridorId: data.corridorId,
       sendAmount,
@@ -79,12 +60,7 @@ export async function POST(request: Request) {
     const appUrl = process.env.NEXT_PUBLIC_APP_URL ?? "http://localhost:3000";
 
     const beneficiary = await prisma.beneficiary.create({
-      data: {
-        fullName: data.beneficiary.fullName,
-        phone,
-        network: data.beneficiary.network,
-        country: corridor.destination,
-      },
+      data: normalized.data,
     });
 
     const quote = await prisma.quote.create({
@@ -118,7 +94,12 @@ export async function POST(request: Request) {
         feeCad: quoteData.fee,
         totalCad: quoteData.total,
         payInProvider: getPayInMode(),
-        payoutProvider: getPayoutMode(),
+        // MoMo ne paie pas de comptes bancaires : simulation en démo, traitement manuel sinon.
+        payoutProvider: bank
+          ? getPayoutMode() === "momo"
+            ? MANUAL_BANK_PROVIDER
+            : MOCK_BANK_PROVIDER
+          : getPayoutMode(),
         quoteId: quote.id,
         beneficiaryId: beneficiary.id,
         events: {
@@ -149,7 +130,7 @@ export async function POST(request: Request) {
     });
 
     return NextResponse.json({
-      transfer,
+      transfer: publicTransfer(transfer),
       payIn: session,
     });
   } catch (error) {

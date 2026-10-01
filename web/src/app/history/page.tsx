@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import { prisma } from "@/lib/prisma";
+import { maskAccount } from "@/lib/bank";
 import { HistoryView, type HistoryItem } from "./history-view";
 
 export const dynamic = "force-dynamic";
@@ -35,6 +36,7 @@ export default async function HistoryPage() {
     sendCurrency: t.sendCurrency || "CAD",
     recipientName: t.beneficiary.fullName,
     network: t.beneficiary.network,
+    accountMasked: maskAccount(t.beneficiary.accountNumber),
   }));
 
   return <HistoryView transfers={items} unavailable={failed} />;

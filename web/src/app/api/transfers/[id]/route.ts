@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
+import { publicTransfer } from "@/lib/bank";
 
 type Params = { params: Promise<{ id: string }> };
 
@@ -17,5 +18,5 @@ export async function GET(_request: Request, { params }: Params) {
     return NextResponse.json({ error: "Introuvable" }, { status: 404 });
   }
 
-  return NextResponse.json(transfer);
+  return NextResponse.json(publicTransfer(transfer));
 }

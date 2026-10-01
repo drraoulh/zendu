@@ -45,7 +45,7 @@ export function statusLabel(status: string): string {
     awaiting_payment: "En attente de paiement",
     payment_detected: "Paiement reçu",
     payout_queued: "Payout en file",
-    payout_sent: "Envoi MoMo en cours",
+    payout_sent: "Versement en cours",
     delivered: "Livré",
     payment_mismatch: "Paiement non conforme",
     payout_failed: "Échec payout",

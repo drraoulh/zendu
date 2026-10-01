@@ -13,6 +13,13 @@ import { SummaryRow } from "@/components/transfer-app/summary-row";
 import { useTransferLabels } from "@/components/transfer-app/use-transfer-labels";
 import { useT } from "@/i18n/define";
 import { sendMessages } from "@/i18n/send";
+import {
+  BANK_SUGGESTIONS,
+  deliveryEstimateFor,
+  isValidAccountNumber,
+  isValidBankCode,
+  normalizeAccountNumber,
+} from "@/lib/bank";
 
 type Quote = {
   corridorId: string;
@@ -32,6 +39,10 @@ type SavedBeneficiary = {
   phone: string;
   network: string;
   country: string;
+  bankName?: string | null;
+  /** « •••• 1234 » — l'API ne renvoie jamais le numéro complet. */
+  accountMasked?: string | null;
+  bankCode?: string | null;
 };
 
 const DEFAULT_CORRIDOR = "CA-CM";
@@ -48,6 +59,11 @@ function parseAmount(raw: string): number {
 
 function digits(value: string) {
   return value.replace(/[^\d]/g, "");
+}
+
+/** Numéro de compte groupé par 4 pour la relecture (« CM21 1000 5000 … »). */
+function groupAccount(value: string) {
+  return normalizeAccountNumber(value).replace(/(.{4})(?=.)/g, "$1 ");
 }
 
 export function SendFlow() {
@@ -74,6 +90,10 @@ export function SendFlow() {
   const [network, setNetwork] = useState("");
   const [fullName, setFullName] = useState("");
   const [phone, setPhone] = useState("");
+  const [bankName, setBankName] = useState("");
+  const [accountNumber, setAccountNumber] = useState("");
+  const [bankCode, setBankCode] = useState("");
+  const [savedBankId, setSavedBankId] = useState<string | null>(null);
   const [senderName, setSenderName] = useState("");
   const [senderEmail, setSenderEmail] = useState("");
   const [saved, setSaved] = useState<SavedBeneficiary[]>([]);
@@ -88,6 +108,8 @@ export function SendFlow() {
   const dest = COUNTRIES[corridor.destination];
   const networks = dest.networks;
   const activeNetwork = networks.some((n) => n.id === network) ? network : (networks[0]?.id ?? "");
+  const isBank = networks.find((n) => n.id === activeNetwork)?.type === "bank";
+  const bankSuggestions = BANK_SUGGESTIONS[dest.code] ?? [];
 
   const sourceOptions = useMemo(() => [...new Set(CORRIDORS.map((c) => c.source))], []);
   const destOptions = useMemo(
@@ -160,16 +182,33 @@ export function SendFlow() {
     if (!d) return "";
     return d.startsWith(dest.dialCode) ? d : `${dest.dialCode}${d.replace(/^0+/, "")}`;
   }, [phone, dest.dialCode]);
+  // Compte d'un bénéficiaire enregistré (numéro conservé côté serveur, affiché masqué).
+  const savedBank = isBank
+    ? saved.find((b) => b.id === savedBankId && b.country === dest.code && !!b.accountMasked)
+    : undefined;
+  const phoneInvalid = digits(phone).length < 8 || !dest.phoneRegex.test(normalizedPhone);
   const errors = {
     fullName: fullName.trim().length < 2 ? t("nameInvalid") : null,
+    // Virement bancaire : téléphone facultatif, mais validé s'il est saisi.
     phone:
-      digits(phone).length < 8 || !dest.phoneRegex.test(normalizedPhone)
+      (isBank ? phone.trim() !== "" && phoneInvalid : phoneInvalid)
         ? t("phoneInvalid", { country: L.country(dest.code) })
         : null,
+    bankName: isBank && bankName.trim().length < 2 ? t("bankNameInvalid") : null,
+    accountNumber: isBank && !savedBank && !isValidAccountNumber(accountNumber) ? t("accountInvalid") : null,
+    bankCode: isBank && !isValidBankCode(bankCode) ? t("bankCodeInvalid") : null,
     senderName: senderName.trim().length < 2 ? t("nameInvalid") : null,
     senderEmail: /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(senderEmail.trim()) ? null : t("emailInvalid"),
   };
-  const recipientValid = !errors.fullName && !errors.phone && !errors.senderName && !errors.senderEmail && !!activeNetwork;
+  const recipientValid =
+    !errors.fullName &&
+    !errors.phone &&
+    !errors.bankName &&
+    !errors.accountNumber &&
+    !errors.bankCode &&
+    !errors.senderName &&
+    !errors.senderEmail &&
+    !!activeNetwork;
   const canAmount = !!currentQuote && quoteState !== "loading";
 
   const savedForDest = saved.filter((b) => b.country === dest.code && networks.some((n) => n.id === b.network));
@@ -213,7 +252,18 @@ export function SendFlow() {
           sendAmount: currentQuote.sendAmount,
           senderName: senderName.trim(),
           senderEmail: senderEmail.trim(),
-          beneficiary: { fullName: fullName.trim(), phone: phone.trim(), network: activeNetwork },
+          beneficiary: {
+            fullName: fullName.trim(),
+            phone: phone.trim(),
+            network: activeNetwork,
+            ...(isBank
+              ? {
+                  bankName: bankName.trim(),
+                  bankCode: bankCode.trim() || undefined,
+                  ...(savedBank ? { savedId: savedBank.id } : { accountNumber: accountNumber.trim() }),
+                }
+              : {}),
+          },
         }),
       });
       const data = await res.json();
@@ -237,6 +287,8 @@ export function SendFlow() {
     : exampleNumber;
   const steps = [t("stepAmount"), t("stepRecipient"), t("stepReview")];
   const networkLabel = L.network(activeNetwork);
+  const etaCode = (corridorEstimate: string) => deliveryEstimateFor(corridorEstimate, activeNetwork, dest.code);
+  const accountDisplay = savedBank?.accountMasked ?? (accountNumber.trim() ? groupAccount(accountNumber) : "");
 
   return (
     <div className="bg-bg pb-16">
@@ -407,7 +459,7 @@ export function SendFlow() {
 
                 <div className="flex items-center gap-2 rounded-2xl bg-surface-soft px-4 py-3 text-sm text-muted">
                   <Icon name="clock" className="h-4 w-4 text-brand" />
-                  {t("delivery")} : <strong className="font-semibold text-ink">{L.eta(corridor.deliveryEstimate)}</strong>
+                  {t("delivery")} : <strong className="font-semibold text-ink">{L.eta(etaCode(corridor.deliveryEstimate))}</strong>
                 </div>
 
                 <Button type="button" size="lg" className="w-full" disabled={!canAmount} onClick={() => goTo(1)}>
@@ -458,6 +510,12 @@ export function SendFlow() {
                       );
                     })}
                   </div>
+                  {isBank && (
+                    <p className="mt-3 flex items-start gap-2 rounded-2xl bg-surface-soft px-4 py-3 text-sm text-muted">
+                      <Icon name="clock" className="mt-0.5 h-4 w-4 shrink-0 text-brand" />
+                      {t("bankEtaNote", { eta: L.eta(etaCode(corridor.deliveryEstimate)) })}
+                    </p>
+                  )}
                 </fieldset>
 
                 {savedForDest.length > 0 && (
@@ -465,15 +523,27 @@ export function SendFlow() {
                     <p className="text-sm font-semibold text-ink">{t("savedRecipients")}</p>
                     <div className="-mx-1 mt-2 flex gap-2 overflow-x-auto px-1 pb-1">
                       {savedForDest.slice(0, 8).map((b) => {
-                        const selected = b.phone === normalizedPhone && b.network === activeNetwork;
+                        const bankEntry = !!b.accountMasked;
+                        const selected = bankEntry
+                          ? savedBank?.id === b.id && b.network === activeNetwork
+                          : b.phone === normalizedPhone && b.network === activeNetwork;
                         return (
                           <button
                             key={b.id}
                             type="button"
+                            aria-pressed={selected}
                             onClick={() => {
                               setFullName(b.fullName);
                               setPhone(b.phone.startsWith(dest.dialCode) ? b.phone.slice(dest.dialCode.length) : b.phone);
                               setNetwork(b.network);
+                              if (bankEntry) {
+                                setSavedBankId(b.id);
+                                setBankName(b.bankName ?? "");
+                                setBankCode(b.bankCode ?? "");
+                                setAccountNumber("");
+                              } else {
+                                setSavedBankId(null);
+                              }
                             }}
                             className={`flex min-w-[11rem] items-center gap-3 rounded-2xl border px-3 py-2.5 text-left transition ${
                               selected ? "border-brand bg-brand-soft" : "border-line bg-white hover:border-brand/40"
@@ -485,7 +555,9 @@ export function SendFlow() {
                             <span className="min-w-0">
                               <span className="block truncate text-sm font-semibold text-ink">{b.fullName}</span>
                               <span className="block truncate text-xs text-muted">
-                                {L.network(b.network)} · +{b.phone}
+                                {bankEntry
+                                  ? `${b.bankName || L.network(b.network)} · ${b.accountMasked}`
+                                  : `${L.network(b.network)} · +${b.phone}`}
                               </span>
                             </span>
                           </button>
@@ -506,9 +578,83 @@ export function SendFlow() {
                     autoComplete="off"
                     error={showErrors ? errors.fullName : null}
                   />
+                  {isBank && (
+                    <>
+                      <Field
+                        id="recipient-bank"
+                        label={t("bankName")}
+                        value={bankName}
+                        onChange={setBankName}
+                        placeholder={bankSuggestions[0] ? t("bankNamePh", { bank: bankSuggestions[0] }) : undefined}
+                        autoComplete="off"
+                        list={bankSuggestions.length > 0 ? "recipient-bank-list" : undefined}
+                        maxLength={80}
+                        hint={t("bankNameHint")}
+                        error={showErrors ? errors.bankName : null}
+                      />
+                      {bankSuggestions.length > 0 && (
+                        <datalist id="recipient-bank-list">
+                          {bankSuggestions.map((b) => (
+                            <option key={b} value={b} />
+                          ))}
+                        </datalist>
+                      )}
+                      {savedBank ? (
+                        <div>
+                          <p className="mb-1.5 text-sm font-medium text-muted">{t("accountNumber")}</p>
+                          <div className="flex items-center justify-between gap-3 rounded-2xl border border-line bg-surface-soft px-3.5 py-3">
+                            <span className="min-w-0">
+                              <span className="block text-[11px] font-semibold uppercase tracking-[0.12em] text-muted">
+                                {t("savedAccount")}
+                              </span>
+                              <span className="block font-mono font-semibold text-ink">{savedBank.accountMasked}</span>
+                            </span>
+                            <button
+                              type="button"
+                              onClick={() => setSavedBankId(null)}
+                              className="shrink-0 text-sm font-semibold text-brand hover:text-brand-strong"
+                            >
+                              {t("changeAccount")}
+                            </button>
+                          </div>
+                        </div>
+                      ) : (
+                        <Field
+                          id="recipient-account"
+                          label={t("accountNumber")}
+                          value={accountNumber}
+                          onChange={(v) => setAccountNumber(v.replace(/[^A-Za-z0-9\s.\-]/g, ""))}
+                          placeholder={t("accountPh")}
+                          autoComplete="off"
+                          autoCapitalize="characters"
+                          spellCheck={false}
+                          maxLength={50}
+                          hint={t("accountHint")}
+                          error={showErrors ? errors.accountNumber : null}
+                        />
+                      )}
+                      <Field
+                        id="recipient-bank-code"
+                        label={t("bankCode")}
+                        value={bankCode}
+                        onChange={(v) => setBankCode(v.replace(/[^A-Za-z0-9\s.\-]/g, ""))}
+                        placeholder={t("bankCodePh")}
+                        autoComplete="off"
+                        autoCapitalize="characters"
+                        spellCheck={false}
+                        maxLength={20}
+                        hint={t("bankCodeHint")}
+                        error={showErrors ? errors.bankCode : null}
+                      />
+                    </>
+                  )}
                   <Field
                     id="recipient-phone"
-                    label={t("recipientPhone", { country: L.country(dest.code) })}
+                    label={
+                      isBank
+                        ? t("recipientPhoneOptional", { country: L.country(dest.code) })
+                        : t("recipientPhone", { country: L.country(dest.code) })
+                    }
                     value={phone}
                     onChange={setPhone}
                     placeholder={phonePlaceholder}
@@ -516,7 +662,11 @@ export function SendFlow() {
                     inputMode="tel"
                     autoComplete="off"
                     prefix={`+${dest.dialCode}`}
-                    hint={t("phoneHint", { dial: dest.dialCode, hint: dest.phoneHint })}
+                    hint={
+                      isBank
+                        ? t("phoneOptionalHint", { dial: dest.dialCode })
+                        : t("phoneHint", { dial: dest.dialCode, hint: dest.phoneHint })
+                    }
                     error={showErrors ? errors.phone : null}
                   />
                 </fieldset>
@@ -584,9 +734,36 @@ export function SendFlow() {
 
                 <ReviewBlock title={t("recipientSection")} onEdit={() => goTo(1)} editLabel={t("edit")}>
                   <p className="font-semibold text-ink">{fullName}</p>
-                  <p className="text-sm text-muted">
-                    {networkLabel} · +{normalizedPhone}
-                  </p>
+                  {isBank ? (
+                    <dl className="mt-1 space-y-0.5 text-sm text-muted">
+                      <div>
+                        <dt className="sr-only">{t("deliveryMethod")}</dt>
+                        <dd>
+                          {networkLabel} · {bankName.trim()}
+                        </dd>
+                      </div>
+                      <div className="flex flex-wrap gap-x-1.5">
+                        <dt>{t("accountShort")} :</dt>
+                        <dd className="break-all font-mono font-semibold text-ink">{accountDisplay}</dd>
+                      </div>
+                      {bankCode.trim() && (
+                        <div className="flex flex-wrap gap-x-1.5">
+                          <dt>{t("bankCodeShort")} :</dt>
+                          <dd className="font-mono text-ink">{bankCode.trim().toUpperCase()}</dd>
+                        </div>
+                      )}
+                      {phone.trim() && (
+                        <div>
+                          <dt className="sr-only">{t("recipientPhone", { country: L.country(dest.code) })}</dt>
+                          <dd>+{normalizedPhone}</dd>
+                        </div>
+                      )}
+                    </dl>
+                  ) : (
+                    <p className="text-sm text-muted">
+                      {networkLabel} · +{normalizedPhone}
+                    </p>
+                  )}
                   <p className="mt-1 inline-flex items-center gap-1.5 text-sm text-muted">
                     <CountryFlag code={dest.code} size={16} title={L.country(dest.code)} /> {L.country(dest.code)}
                   </p>
@@ -681,7 +858,7 @@ export function SendFlow() {
                   value={L.money(currentQuote.receiveAmount, currentQuote.receiveCurrency)}
                   emphasis="highlight"
                 />
-                <SummaryRow label={t("delivery")} value={L.eta(currentQuote.deliveryEstimate)} />
+                <SummaryRow label={t("delivery")} value={L.eta(etaCode(currentQuote.deliveryEstimate))} />
               </dl>
             ) : (
               <div className="mt-4 space-y-2" aria-hidden>
@@ -699,7 +876,15 @@ export function SendFlow() {
                   <p className="truncate text-sm font-semibold text-ink">{fullName}</p>
                   <p className="truncate text-xs text-muted">
                     {networkLabel}
-                    {phone ? ` · +${normalizedPhone}` : ""}
+                    {isBank
+                      ? savedBank?.accountMasked
+                        ? ` · ${savedBank.accountMasked}`
+                        : accountNumber.trim().length >= 4
+                          ? ` · •••• ${normalizeAccountNumber(accountNumber).slice(-4)}`
+                          : ""
+                      : phone
+                        ? ` · +${normalizedPhone}`
+                        : ""}
                   </p>
                 </div>
               </div>
@@ -777,6 +962,10 @@ function Field({
   prefix,
   hint,
   error,
+  list,
+  maxLength,
+  autoCapitalize,
+  spellCheck,
 }: {
   id: string;
   label: string;
@@ -789,6 +978,10 @@ function Field({
   prefix?: string;
   hint?: string;
   error?: string | null;
+  list?: string;
+  maxLength?: number;
+  autoCapitalize?: string;
+  spellCheck?: boolean;
 }) {
   const describedBy = error ? `${id}-error` : hint ? `${id}-hint` : undefined;
   return (
@@ -811,6 +1004,10 @@ function Field({
           type={type}
           inputMode={inputMode}
           autoComplete={autoComplete}
+          list={list}
+          maxLength={maxLength}
+          autoCapitalize={autoCapitalize}
+          spellCheck={spellCheck}
           value={value}
           onChange={(e) => onChange(e.target.value)}
           placeholder={placeholder}

@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 import { markPaymentDetected } from "@/lib/transfer-service";
 import { prisma } from "@/lib/prisma";
+import { publicTransfer } from "@/lib/bank";
 
 type Params = { params: Promise<{ id: string }> };
 
@@ -25,7 +26,7 @@ export async function POST(_request: Request, { params }: Params) {
       id,
       transfer.payInRef ?? `demo_pay_${id}`,
     );
-    return NextResponse.json(updated);
+    return NextResponse.json(updated ? publicTransfer(updated) : updated);
   } catch (error) {
     const message = error instanceof Error ? error.message : "Erreur paiement";
     return NextResponse.json({ error: message }, { status: 400 });

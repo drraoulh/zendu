@@ -158,7 +158,7 @@ export const COUNTRIES: Record<string, Country> = {
     phoneRegex: /^(237)?6\d{8}$/,
     phoneHint: "Ex: 2376XXXXXXXX",
     role: "destination",
-    networks: [MM.mtn, MM.orange, MM.cash],
+    networks: [MM.mtn, MM.orange, MM.bank, MM.cash],
   },
   SN: {
     code: "SN",
@@ -169,7 +169,7 @@ export const COUNTRIES: Record<string, Country> = {
     phoneRegex: /^(221)?7\d{8}$/,
     phoneHint: "Ex: 2217XXXXXXXX",
     role: "destination",
-    networks: [MM.orange, MM.wave, MM.cash],
+    networks: [MM.orange, MM.wave, MM.bank, MM.cash],
   },
   CI: {
     code: "CI",
@@ -180,7 +180,7 @@ export const COUNTRIES: Record<string, Country> = {
     phoneRegex: /^(225)?0?\d{9,10}$/,
     phoneHint: "Ex: 22507XXXXXXXX",
     role: "destination",
-    networks: [MM.mtn, MM.orange, MM.wave, MM.cash],
+    networks: [MM.mtn, MM.orange, MM.wave, MM.bank, MM.cash],
   },
   NG: {
     code: "NG",
@@ -202,7 +202,7 @@ export const COUNTRIES: Record<string, Country> = {
     phoneRegex: /^(233)?0?\d{9}$/,
     phoneHint: "Ex: 23324XXXXXXX",
     role: "destination",
-    networks: [MM.mtn, MM.vodafone, MM.cash],
+    networks: [MM.mtn, MM.vodafone, MM.bank, MM.cash],
   },
   KE: {
     code: "KE",
@@ -224,7 +224,7 @@ export const COUNTRIES: Record<string, Country> = {
     phoneRegex: /^(256)?7\d{8}$/,
     phoneHint: "Ex: 2567XXXXXXXX",
     role: "destination",
-    networks: [MM.mtn, MM.airtel, MM.cash],
+    networks: [MM.mtn, MM.airtel, MM.bank, MM.cash],
   },
   TZ: {
     code: "TZ",
@@ -235,7 +235,7 @@ export const COUNTRIES: Record<string, Country> = {
     phoneRegex: /^(255)?[67]\d{8}$/,
     phoneHint: "Ex: 2557XXXXXXXX",
     role: "destination",
-    networks: [MM.mpesa, MM.airtel, MM.cash],
+    networks: [MM.mpesa, MM.airtel, MM.bank, MM.cash],
   },
   ZA: {
     code: "ZA",
@@ -257,7 +257,7 @@ export const COUNTRIES: Record<string, Country> = {
     phoneRegex: /^(243)?0?\d{9}$/,
     phoneHint: "Ex: 2438XXXXXXXX",
     role: "destination",
-    networks: [MM.orange, MM.airtel, MM.cash],
+    networks: [MM.orange, MM.airtel, MM.bank, MM.cash],
   },
   ML: {
     code: "ML",
@@ -268,7 +268,7 @@ export const COUNTRIES: Record<string, Country> = {
     phoneRegex: /^(223)?\d{8}$/,
     phoneHint: "Ex: 2237XXXXXXX",
     role: "destination",
-    networks: [MM.orange, MM.wave, MM.cash],
+    networks: [MM.orange, MM.wave, MM.bank, MM.cash],
   },
   BF: {
     code: "BF",
@@ -279,7 +279,7 @@ export const COUNTRIES: Record<string, Country> = {
     phoneRegex: /^(226)?\d{8}$/,
     phoneHint: "Ex: 2267XXXXXXX",
     role: "destination",
-    networks: [MM.orange, MM.wave, MM.cash],
+    networks: [MM.orange, MM.wave, MM.bank, MM.cash],
   },
   TG: {
     code: "TG",
@@ -290,7 +290,7 @@ export const COUNTRIES: Record<string, Country> = {
     phoneRegex: /^(228)?\d{8}$/,
     phoneHint: "Ex: 2289XXXXXXX",
     role: "destination",
-    networks: [MM.mtn, MM.wave, MM.cash],
+    networks: [MM.mtn, MM.wave, MM.bank, MM.cash],
   },
   BJ: {
     code: "BJ",
@@ -301,7 +301,7 @@ export const COUNTRIES: Record<string, Country> = {
     phoneRegex: /^(229)?\d{8,10}$/,
     phoneHint: "Ex: 2299XXXXXXX",
     role: "destination",
-    networks: [MM.mtn, MM.orange, MM.cash],
+    networks: [MM.mtn, MM.orange, MM.bank, MM.cash],
   },
   GA: {
     code: "GA",
@@ -312,7 +312,7 @@ export const COUNTRIES: Record<string, Country> = {
     phoneRegex: /^(241)?0?\d{7,8}$/,
     phoneHint: "Ex: 2410XXXXXXX",
     role: "destination",
-    networks: [MM.airtel, MM.cash],
+    networks: [MM.airtel, MM.bank, MM.cash],
   },
   CG: {
     code: "CG",
@@ -323,7 +323,7 @@ export const COUNTRIES: Record<string, Country> = {
     phoneRegex: /^(242)?0?\d{8,9}$/,
     phoneHint: "Ex: 2420XXXXXXX",
     role: "destination",
-    networks: [MM.mtn, MM.airtel, MM.cash],
+    networks: [MM.mtn, MM.airtel, MM.bank, MM.cash],
   },
   RW: {
     code: "RW",
@@ -334,7 +334,7 @@ export const COUNTRIES: Record<string, Country> = {
     phoneRegex: /^(250)?7\d{8}$/,
     phoneHint: "Ex: 2507XXXXXXXX",
     role: "destination",
-    networks: [MM.mtn, MM.airtel, MM.cash],
+    networks: [MM.mtn, MM.airtel, MM.bank, MM.cash],
   },
   MA: {
     code: "MA",

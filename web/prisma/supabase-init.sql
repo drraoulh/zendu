@@ -7,6 +7,9 @@ CREATE TABLE IF NOT EXISTS "Beneficiary" (
   "phone" TEXT NOT NULL,
   "network" TEXT NOT NULL DEFAULT 'MTN',
   "country" TEXT NOT NULL DEFAULT 'CM',
+  "bankName" TEXT,
+  "accountNumber" TEXT,
+  "bankCode" TEXT,
   "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP
 );
 
@@ -68,3 +71,8 @@ CREATE INDEX IF NOT EXISTS "Transfer_senderEmail_idx" ON "Transfer"("senderEmail
 CREATE INDEX IF NOT EXISTS "Transfer_status_idx" ON "Transfer"("status");
 CREATE INDEX IF NOT EXISTS "Transfer_createdAt_idx" ON "Transfer"("createdAt");
 CREATE INDEX IF NOT EXISTS "TransferEvent_transferId_idx" ON "TransferEvent"("transferId");
+
+-- Installations existantes : colonnes ajoutées après coup (idempotent)
+ALTER TABLE "Beneficiary" ADD COLUMN IF NOT EXISTS "bankName" TEXT;
+ALTER TABLE "Beneficiary" ADD COLUMN IF NOT EXISTS "accountNumber" TEXT;
+ALTER TABLE "Beneficiary" ADD COLUMN IF NOT EXISTS "bankCode" TEXT;

@@ -23,6 +23,7 @@ export type TransferDTO = {
   feeCad: number;
   totalCad: number;
   payInProvider?: string;
+  payoutProvider?: string;
   payoutRef: string | null;
   failureReason: string | null;
   createdAt: string;
@@ -33,6 +34,11 @@ export type TransferDTO = {
     phone: string;
     network: string;
     country?: string;
+    /** Virement bancaire uniquement. */
+    bankName?: string | null;
+    /** « •••• 1234 » (les API publiques ne renvoient jamais le numéro complet). */
+    accountMasked?: string | null;
+    bankCode?: string | null;
   };
   events?: TransferEventDTO[];
 };

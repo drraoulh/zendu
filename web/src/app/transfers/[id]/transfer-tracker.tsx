@@ -3,6 +3,7 @@
 import { useCallback, useEffect, useRef, useState, type ReactNode } from "react";
 import Link from "next/link";
 import { contact } from "@/lib/brand";
+import { isBankNetwork, MANUAL_BANK_PROVIDER } from "@/lib/bank";
 import { Button, ButtonLink } from "@/components/ui/button";
 import { Container } from "@/components/ui/layout";
 import { Icon } from "@/components/ui/icon";
@@ -129,6 +130,10 @@ export function TransferTracker({
   const failed = isFailure(status);
   const live = !TERMINAL.includes(status);
   const events = [...(transfer.events ?? [])].reverse();
+  const ben = transfer.beneficiary;
+  const bank = isBankNetwork(ben.network, ben.country ?? to);
+  // Virement bancaire en mode réel : traité par un opérateur, pas de bouton « Lancer le versement ».
+  const manualBank = bank && transfer.payoutProvider === MANUAL_BANK_PROVIDER;
 
   return (
     <div className="bg-bg pb-16">
@@ -167,7 +172,8 @@ export function TransferTracker({
                 {money(transfer.receiveAmountXaf, recvCur)}
               </h1>
               <p className="mt-2 truncate text-sm text-white/75">
-                {transfer.beneficiary.fullName} · {network(transfer.beneficiary.network)}
+                {ben.fullName} · {network(ben.network)}
+                {bank && ben.accountMasked ? ` · ${ben.accountMasked}` : ""}
               </p>
             </div>
             <div className="rounded-2xl bg-white/10 px-4 py-3 text-sm ring-1 ring-white/15 backdrop-blur">
@@ -205,7 +211,11 @@ export function TransferTracker({
               </ActionCard>
             )}
 
-            {payoutReady && (
+            {payoutReady && manualBank && (
+              <ActionCard tone="brand" icon="info" title={t("bankManualTitle")} body={t("bankManualBody")} />
+            )}
+
+            {payoutReady && !manualBank && (
               <ActionCard tone="brand" icon="transfer" title={t("payoutTitle")} body={t("payoutHint")}>
                 <Button size="lg" className="w-full sm:w-auto" disabled={busy} onClick={() => void runAction("payout")}>
                   {busy ? t("processing") : t("triggerPayout")}
@@ -287,7 +297,10 @@ export function TransferTracker({
             <dl className="mt-3">
               <SummaryRow label={t("recipient")} value={transfer.beneficiary.fullName} />
               <SummaryRow label={t("deliveryMethod")} value={network(transfer.beneficiary.network)} />
-              <SummaryRow label={t("phone")} value={`+${transfer.beneficiary.phone}`} />
+              {bank && ben.bankName && <SummaryRow label={t("bankName")} value={ben.bankName} />}
+              {bank && ben.accountMasked && <SummaryRow label={t("bankAccount")} value={ben.accountMasked} />}
+              {bank && ben.bankCode && <SummaryRow label={t("bankCode")} value={ben.bankCode} />}
+              {ben.phone && <SummaryRow label={t("phone")} value={`+${ben.phone}`} />}
               <SummaryRow label={t("estimate")} value={eta(deliveryEstimate)} />
               <SummaryRow label={t("sourceCountry")} value={country(from)} />
             </dl>

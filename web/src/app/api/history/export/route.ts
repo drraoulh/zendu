@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { statusLabel } from "@/lib/transfer-machine";
+import { maskAccount } from "@/lib/bank";
 
 export const dynamic = "force-dynamic";
 
@@ -22,6 +23,10 @@ export async function GET() {
     "destinataire",
     "telephone",
     "reseau",
+    "banque",
+    "compte",
+    "code_banque",
+    "fournisseur_versement",
     "devise_envoi",
     "montant_envoye",
     "frais",
@@ -42,6 +47,11 @@ export async function GET() {
       csv(t.beneficiary.fullName),
       t.beneficiary.phone,
       t.beneficiary.network,
+      csv(t.beneficiary.bankName ?? ""),
+      // Export accessible sans authentification : numéro de compte masqué.
+      maskAccount(t.beneficiary.accountNumber) ?? "",
+      csv(t.beneficiary.bankCode ?? ""),
+      t.payoutProvider,
       t.sendCurrency,
       t.sendAmountCad,
       t.feeCad,

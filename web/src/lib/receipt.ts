@@ -1,8 +1,9 @@
 import { prisma } from "@/lib/prisma";
 import { formatMoney } from "@/lib/money";
 import { statusLabel } from "@/lib/transfer-machine";
-import { getCountry } from "@/lib/corridors";
+import { getCorridor, getCountry } from "@/lib/corridors";
 import { appName } from "@/lib/brand";
+import { deliveryEstimateFor, isBankNetwork, maskAccount } from "@/lib/bank";
 
 export type ReceiptData = {
   brand: string;
@@ -37,9 +38,15 @@ export type ReceiptData = {
     phone: string;
     network: string;
     country: string;
+    /** Virement bancaire uniquement. */
+    bankName: string | null;
+    /** « •••• 1234 » — le numéro complet n'apparaît jamais sur le reçu. */
+    accountMasked: string | null;
+    bankCode: string | null;
   };
   payoutRef: string | null;
   deliveryMethod: string;
+  /** Code du délai : délai du corridor, ou "1-2 business days" pour un virement bancaire. */
   deliveryEstimate: string;
   supportNote: string;
 };
@@ -106,6 +113,9 @@ export async function getReceiptByTransferId(
       phone: transfer.beneficiary.phone,
       network: transfer.beneficiary.network,
       country: transfer.beneficiary.country,
+      bankName: transfer.beneficiary.bankName,
+      accountMasked: maskAccount(transfer.beneficiary.accountNumber),
+      bankCode: transfer.beneficiary.bankCode,
     },
     payoutRef: transfer.payoutRef,
     deliveryMethod:
@@ -113,8 +123,14 @@ export async function getReceiptByTransferId(
         ? "Orange Money"
         : transfer.beneficiary.network === "MTN"
           ? "MTN Mobile Money"
-          : transfer.beneficiary.network,
-    deliveryEstimate: "Quelques minutes",
+          : isBankNetwork(transfer.beneficiary.network, transfer.beneficiary.country)
+            ? "Virement bancaire"
+            : transfer.beneficiary.network,
+    deliveryEstimate: deliveryEstimateFor(
+      getCorridor(transfer.corridorId)?.deliveryEstimate ?? "A few minutes",
+      transfer.beneficiary.network,
+      transfer.beneficiary.country,
+    ),
     supportNote:
       "Conservez ce reçu pour vos dossiers. En cas de question, citez le numéro de confirmation.",
   };
