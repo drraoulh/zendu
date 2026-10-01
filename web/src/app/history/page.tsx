@@ -1,38 +1,41 @@
+import type { Metadata } from "next";
 import { prisma } from "@/lib/prisma";
-import { SandboxBanner } from "@/components/sandbox-banner";
-import { HistoryContent } from "@/app/history/history-content";
+import { HistoryView, type HistoryItem } from "./history-view";
 
 export const dynamic = "force-dynamic";
 
+export const metadata: Metadata = {
+  title: "Mes transferts",
+  robots: { index: false },
+};
+
 export default async function HistoryPage() {
+  let failed = false;
   const transfers = await prisma.transfer
     .findMany({
       include: { beneficiary: true },
       orderBy: { createdAt: "desc" },
-      take: 50,
+      take: 100,
     })
     .catch((error) => {
       console.error("History: impossible de charger les transferts", error);
+      failed = true;
       return [];
     });
 
-  return (
-    <div>
-      <SandboxBanner />
-      <HistoryContent
-        transfers={transfers.map((t) => ({
-          id: t.id,
-          reference: t.reference,
-          corridorId: t.corridorId ?? "CA-CM",
-          status: t.status,
-          createdAt: t.createdAt.toISOString(),
-          receiveAmountXaf: t.receiveAmountXaf,
-          receiveCurrency: t.receiveCurrency,
-          sendAmountCad: t.sendAmountCad,
-          sendCurrency: t.sendCurrency,
-          beneficiary: { fullName: t.beneficiary.fullName },
-        }))}
-      />
-    </div>
-  );
+  const items: HistoryItem[] = transfers.map((t) => ({
+    id: t.id,
+    reference: t.reference,
+    corridorId: t.corridorId || "CA-CM",
+    status: t.status,
+    createdAt: t.createdAt.toISOString(),
+    receiveAmount: t.receiveAmountXaf,
+    receiveCurrency: t.receiveCurrency || "XAF",
+    sendAmount: t.sendAmountCad,
+    sendCurrency: t.sendCurrency || "CAD",
+    recipientName: t.beneficiary.fullName,
+    network: t.beneficiary.network,
+  }));
+
+  return <HistoryView transfers={items} unavailable={failed} />;
 }
