@@ -5,6 +5,7 @@ import { useRouter } from "next/navigation";
 import { formatMoney } from "@/lib/money";
 import { CountryFlag } from "@/components/country-flag";
 import { useI18n } from "@/components/i18n-provider";
+import { etaLabel } from "@/lib/i18n";
 
 type CorridorMeta = {
   id: string;
@@ -350,7 +351,7 @@ export function RemittanceCalculator() {
             </div>
             <div className="flex justify-between">
               <span>{t("delivery")}</span>
-              <span className="font-medium text-ink">{quote.deliveryEstimate}</span>
+              <span className="font-medium text-ink">{etaLabel(quote.deliveryEstimate, t)}</span>
             </div>
           </div>
         )}

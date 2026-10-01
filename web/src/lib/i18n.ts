@@ -14,6 +14,8 @@ export const LOCALES: {
 
 const dict = {
   fr: {
+    etaMinutes: "Quelques minutes",
+    etaDay: "Moins de 24 h",
     home: "Accueil",
     sendMoney: "Envoyer de l'argent",
     transferHistory: "Historique",
@@ -151,6 +153,8 @@ const dict = {
     secureCheckout: "Paiement sécurisé · frais visibles · suivi inclus",
   },
   en: {
+    etaMinutes: "A few minutes",
+    etaDay: "Under 24h",
     home: "Home",
     sendMoney: "Send money",
     transferHistory: "Transfer history",
@@ -288,6 +292,8 @@ const dict = {
     secureCheckout: "Secure checkout · clear fees · tracking included",
   },
   es: {
+    etaMinutes: "Unos minutos",
+    etaDay: "Menos de 24 h",
     home: "Inicio",
     sendMoney: "Enviar dinero",
     transferHistory: "Historial",
@@ -425,6 +431,8 @@ const dict = {
     secureCheckout: "Pago seguro · comisiones claras · seguimiento incluido",
   },
   zh: {
+    etaMinutes: "几分钟",
+    etaDay: "24 小时内",
     home: "首页",
     sendMoney: "汇款",
     transferHistory: "转账记录",
@@ -567,4 +575,11 @@ export function t(locale: Locale, key: DictKey): string {
 
 export function getDictionary(locale: Locale) {
   return dict[locale] ?? dict.en;
+}
+
+/** Traduit les délais de livraison renvoyés par l'API (corridors). */
+export function etaLabel(estimate: string, translate: (key: DictKey) => string) {
+  if (estimate === "A few minutes") return translate("etaMinutes");
+  if (estimate === "Under 24h") return translate("etaDay");
+  return estimate;
 }

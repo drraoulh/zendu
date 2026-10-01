@@ -1,6 +1,7 @@
 "use client";
 
 import Link from "next/link";
+import { BrandMark } from "@/components/brand-mark";
 import { FormEvent, useState } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { useAuth } from "@/components/auth-provider";
@@ -60,9 +61,7 @@ export function AuthForm({ mode }: { mode: "login" | "signup" }) {
     <div className="bg-bg">
       <div className="mx-auto w-full max-w-md px-5 py-10 lg:py-14">
         <div className="mb-8 text-center">
-          <div className="mx-auto mb-4 flex h-12 w-12 items-center justify-center rounded-2xl bg-accent font-bold text-white">
-            PW
-          </div>
+          <BrandMark className="mb-4 h-12 w-12 rounded-2xl text-base" />
           <h1 className="font-display text-3xl font-bold tracking-tight">
             {mode === "login" ? t("authWelcome") : t("authCreate")}
           </h1>

@@ -1,6 +1,7 @@
 "use client";
 
 import Link from "next/link";
+import { BrandMark } from "@/components/brand-mark";
 import { AppStoreBadges } from "@/components/app-store-badges";
 import { LanguageFlagButtons } from "@/components/language-switcher";
 import { CountryFlag } from "@/components/country-flag";
@@ -14,14 +15,12 @@ export function SiteFooter() {
   const destinations = getDestinationCountries().slice(0, 8);
 
   return (
-    <footer className="bg-[#0c1f18] text-white">
+    <footer className="bg-night text-white">
       <div className="mx-auto max-w-6xl px-5 py-14">
         <div className="grid gap-10 md:grid-cols-2 lg:grid-cols-4">
           <div>
             <div className="flex items-center gap-2.5">
-              <span className="inline-flex h-9 w-9 items-center justify-center rounded-xl bg-accent text-sm font-bold">
-                PW
-              </span>
+              <BrandMark />
               <span className="font-display text-xl font-bold">{appName}</span>
             </div>
             <p className="mt-2 text-xs font-medium uppercase tracking-wider text-white/50">

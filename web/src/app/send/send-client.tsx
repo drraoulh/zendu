@@ -7,6 +7,7 @@ import { formatMoney } from "@/lib/money";
 import { SandboxBanner } from "@/components/sandbox-banner";
 import { CountryFlag } from "@/components/country-flag";
 import { useI18n } from "@/components/i18n-provider";
+import { etaLabel } from "@/lib/i18n";
 import { displayName, useAuth } from "@/components/auth-provider";
 
 type CorridorMeta = {
@@ -212,7 +213,7 @@ export default function SendPage() {
             label={t("total")}
             value={formatMoney(quote.total, quote.sendCurrency)}
           />
-          <Row label={t("delivery")} value={quote.deliveryEstimate} />
+          <Row label={t("delivery")} value={etaLabel(quote.deliveryEstimate, t)} />
           {step >= 1 && fullName && (
             <div className="mt-3 border-t border-line pt-3">
               <p className="font-medium">{fullName}</p>

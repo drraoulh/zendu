@@ -1,6 +1,7 @@
 "use client";
 
 import Link from "next/link";
+import { BrandMark } from "@/components/brand-mark";
 import { usePathname } from "next/navigation";
 import { useEffect, useState } from "react";
 import { useI18n } from "@/components/i18n-provider";
@@ -48,13 +49,11 @@ export function SiteHeader() {
   }
 
   return (
-    <header className="sticky top-0 z-50 border-b border-line bg-white/95 shadow-[0_1px_0_rgba(12,31,24,0.04)] backdrop-blur-md">
+    <header className="sticky top-0 z-50 border-b border-line bg-white/95 shadow-[0_1px_0_rgba(11,22,48,0.05)] backdrop-blur-md">
       <div className="mx-auto flex h-16 max-w-6xl items-center justify-between gap-4 px-5">
         <div className="flex items-center gap-8">
           <Link href="/" className="group flex items-center gap-2.5" title={appFullName}>
-            <span className="inline-flex h-9 w-9 items-center justify-center rounded-xl bg-accent text-sm font-bold text-white transition group-hover:bg-accent-strong">
-              PW
-            </span>
+            <BrandMark />
             <span className="font-display text-[1.35rem] font-bold tracking-tight text-ink">
               {appName}
             </span>

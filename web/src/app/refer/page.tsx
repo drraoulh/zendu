@@ -51,7 +51,7 @@ export default function ReferPage() {
           </button>
         </div>
 
-        <div className="mt-10 rounded-[1.75rem] bg-[#0c1f18] px-6 py-8 text-white">
+        <div className="mt-10 rounded-[1.75rem] bg-night px-6 py-8 text-white">
           <h2 className="font-display text-2xl font-bold">{t("getTheApp")}</h2>
           <p className="mt-2 text-sm text-white/70">{t("getTheAppSub")}</p>
           <div className="mt-5">

@@ -27,18 +27,19 @@ export function HomeContent({ recent }: { recent: Recent[] }) {
   return (
     <>
       {/* Hero Remitly-style: copy left + calculator right */}
-      <section className="relative isolate overflow-hidden bg-[#0c1f18]">
+      <section className="relative isolate overflow-hidden bg-night">
         {/* eslint-disable-next-line @next/next/no-img-element */}
         <img
           src="/hero-pwfintech.jpg"
           alt=""
           className="absolute inset-0 h-full w-full object-cover opacity-45"
         />
-        <div className="absolute inset-0 bg-gradient-to-r from-[#0c1f18] via-[#0c1f18]/85 to-[#0c1f18]/35" />
+        <div className="absolute inset-0 bg-gradient-to-r from-night via-night/85 to-night/35" />
+        <div className="hero-glow absolute inset-0" />
 
         <div className="relative mx-auto grid max-w-6xl gap-10 px-5 pb-16 pt-12 lg:grid-cols-[1.05fr_0.95fr] lg:items-center lg:pb-20 lg:pt-16">
           <div>
-            <p className="animate-rise font-display text-xs font-semibold uppercase tracking-[0.2em] text-accent">
+            <p className="animate-rise font-display text-xs font-semibold uppercase tracking-[0.2em] text-gold">
               {appName} · {appFullName}
             </p>
             <h1 className="animate-rise mt-3 max-w-xl font-display text-4xl font-extrabold leading-[1.08] tracking-tight text-white sm:text-5xl lg:text-[3.25rem]">
@@ -140,9 +141,9 @@ export function HomeContent({ recent }: { recent: Recent[] }) {
             {t("whyBrand")}
           </h2>
           <div className="mt-10 grid gap-5 md:grid-cols-3">
-            <Feature title={t("secureTitle")} text={t("secureText")} />
-            <Feature title={t("priceTitle")} text={t("priceText")} />
-            <Feature title={t("momoTitle")} text={t("momoText")} />
+            <Feature icon="shield" title={t("secureTitle")} text={t("secureText")} />
+            <Feature icon="tag" title={t("priceTitle")} text={t("priceText")} />
+            <Feature icon="phone" title={t("momoTitle")} text={t("momoText")} />
           </div>
         </div>
       </section>
@@ -153,23 +154,24 @@ export function HomeContent({ recent }: { recent: Recent[] }) {
             {t("whereSendQuestion")}
           </h2>
           <p className="mt-2 text-ink-muted">{t("whereSendSub")}</p>
-          <div className="mt-8 grid gap-3 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
+          <div className="mt-8 grid grid-cols-2 gap-3 lg:grid-cols-3 xl:grid-cols-4">
             {destinations.map((d) => (
               <Link
                 key={d.code}
                 href={`/send?corridor=CA-${d.code}`}
-                className="group flex items-center gap-3 rounded-2xl border border-line bg-bg px-4 py-4 transition hover:border-accent hover:bg-accent-soft/50"
+                className="group flex items-center gap-3 rounded-2xl border border-line bg-bg px-3 py-3 transition hover:-translate-y-0.5 hover:border-accent hover:bg-accent-soft/50 hover:shadow-md sm:px-4 sm:py-4"
               >
-                <CountryFlag code={d.code} size={36} title={d.name} />
+                <CountryFlag code={d.code} size={28} title={d.name} className="shrink-0" />
                 <div className="min-w-0 flex-1">
-                  <p className="font-semibold group-hover:text-accent-strong">
+                  <p className="text-sm font-semibold leading-tight group-hover:text-accent-strong sm:text-base">
                     {d.name}
                   </p>
-                  <p className="text-sm text-ink-muted">
-                    {d.currency} · {t("available")}
+                  <p className="text-xs text-ink-muted sm:text-sm">
+                    {d.currency}
+                    <span className="hidden sm:inline"> · {t("available")}</span>
                   </p>
                 </div>
-                <span className="text-accent opacity-0 transition group-hover:opacity-100">
+                <span className="hidden text-accent opacity-0 transition group-hover:opacity-100 sm:inline">
                   →
                 </span>
               </Link>
@@ -178,7 +180,7 @@ export function HomeContent({ recent }: { recent: Recent[] }) {
         </div>
       </section>
 
-      <section className="overflow-hidden bg-[#0c1f18] py-16 text-white">
+      <section className="overflow-hidden bg-night py-16 text-white">
         <div className="mx-auto grid max-w-6xl items-center gap-10 px-5 lg:grid-cols-2">
           <div>
             <h2 className="font-display text-3xl font-bold tracking-tight sm:text-4xl">
@@ -257,10 +259,38 @@ function TrustItem({ title }: { title: string }) {
   );
 }
 
-function Feature({ title, text }: { title: string; text: string }) {
+const FEATURE_ICONS = {
+  shield: "M12 3l7 3v6c0 4.5-3 8-7 9-4-1-7-4.5-7-9V6l7-3zm-3 9l2 2 4-4",
+  tag: "M3 12V4h8l10 10-8 8L3 12zm5-4.5a1.5 1.5 0 100 3 1.5 1.5 0 000-3z",
+  phone: "M8 2h8a2 2 0 012 2v16a2 2 0 01-2 2H8a2 2 0 01-2-2V4a2 2 0 012-2zm3 17h2",
+};
+
+function Feature({
+  title,
+  text,
+  icon,
+}: {
+  title: string;
+  text: string;
+  icon: keyof typeof FEATURE_ICONS;
+}) {
   return (
-    <div className="rounded-2xl border border-line bg-white p-6 shadow-sm">
-      <h3 className="font-display text-lg font-semibold">{title}</h3>
+    <div className="rounded-2xl border border-line bg-white p-6 shadow-sm transition hover:-translate-y-0.5 hover:shadow-md">
+      <span className="inline-flex h-11 w-11 items-center justify-center rounded-xl bg-accent-soft text-accent-strong">
+        <svg
+          viewBox="0 0 24 24"
+          className="h-5 w-5"
+          fill="none"
+          stroke="currentColor"
+          strokeWidth="1.8"
+          strokeLinecap="round"
+          strokeLinejoin="round"
+          aria-hidden
+        >
+          <path d={FEATURE_ICONS[icon]} />
+        </svg>
+      </span>
+      <h3 className="mt-4 font-display text-lg font-semibold">{title}</h3>
       <p className="mt-2 text-sm leading-relaxed text-ink-muted">{text}</p>
     </div>
   );
