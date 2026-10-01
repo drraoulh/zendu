@@ -1,3 +1,5 @@
+import Link from "next/link";
+
 export default function NotFound() {
   return (
     <div className="mx-auto flex min-h-[50vh] max-w-lg flex-col items-center justify-center px-5 text-center">
@@ -6,12 +8,12 @@ export default function NotFound() {
       <p className="mt-2 text-ink-muted">
         Cette page n&apos;existe pas ou a été déplacée.
       </p>
-      <a
+      <Link
         href="/"
         className="mt-6 rounded-full bg-accent px-5 py-2.5 text-sm font-semibold text-white hover:bg-accent-strong"
       >
         Retour à l&apos;accueil
-      </a>
+      </Link>
     </div>
   );
 }

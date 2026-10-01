@@ -5,11 +5,16 @@ import { HistoryContent } from "@/app/history/history-content";
 export const dynamic = "force-dynamic";
 
 export default async function HistoryPage() {
-  const transfers = await prisma.transfer.findMany({
-    include: { beneficiary: true },
-    orderBy: { createdAt: "desc" },
-    take: 50,
-  });
+  const transfers = await prisma.transfer
+    .findMany({
+      include: { beneficiary: true },
+      orderBy: { createdAt: "desc" },
+      take: 50,
+    })
+    .catch((error) => {
+      console.error("History: impossible de charger les transferts", error);
+      return [];
+    });
 
   return (
     <div>
