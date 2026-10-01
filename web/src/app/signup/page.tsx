@@ -1,14 +1,14 @@
+import type { Metadata } from "next";
 import { Suspense } from "react";
-import { AuthForm } from "@/components/auth-form";
-import { SandboxBanner } from "@/components/sandbox-banner";
+import { AuthScreen } from "@/components/auth/auth-screen";
+import { AuthFallback } from "@/components/auth/auth-fallback";
+
+export const metadata: Metadata = { title: "Créer un compte" };
 
 export default function SignupPage() {
   return (
-    <div>
-      <SandboxBanner />
-      <Suspense fallback={<div className="p-10 text-center">…</div>}>
-        <AuthForm mode="signup" />
-      </Suspense>
-    </div>
+    <Suspense fallback={<AuthFallback />}>
+      <AuthScreen mode="signup" />
+    </Suspense>
   );
 }

@@ -1,14 +1,14 @@
+import type { Metadata } from "next";
 import { Suspense } from "react";
-import { AuthForm } from "@/components/auth-form";
-import { SandboxBanner } from "@/components/sandbox-banner";
+import { AuthScreen } from "@/components/auth/auth-screen";
+import { AuthFallback } from "@/components/auth/auth-fallback";
+
+export const metadata: Metadata = { title: "Connexion" };
 
 export default function LoginPage() {
   return (
-    <div>
-      <SandboxBanner />
-      <Suspense fallback={<div className="p-10 text-center">…</div>}>
-        <AuthForm mode="login" />
-      </Suspense>
-    </div>
+    <Suspense fallback={<AuthFallback />}>
+      <AuthScreen mode="login" />
+    </Suspense>
   );
 }
