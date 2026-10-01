@@ -7,7 +7,7 @@ import { CountryFlag } from "@/components/country-flag";
 import { useI18n } from "@/components/i18n-provider";
 import { getDestinationCountries } from "@/lib/corridors";
 
-const appName = process.env.NEXT_PUBLIC_APP_NAME ?? "Zendu";
+import { appFullName, appName } from "@/lib/brand";
 
 export function SiteFooter() {
   const { t } = useI18n();
@@ -20,10 +20,13 @@ export function SiteFooter() {
           <div>
             <div className="flex items-center gap-2.5">
               <span className="inline-flex h-9 w-9 items-center justify-center rounded-xl bg-accent text-sm font-bold">
-                Z
+                PW
               </span>
               <span className="font-display text-xl font-bold">{appName}</span>
             </div>
+            <p className="mt-2 text-xs font-medium uppercase tracking-wider text-white/50">
+              {appFullName}
+            </p>
             <p className="mt-4 max-w-xs text-sm leading-relaxed text-white/65">
               {t("heroSubtitle")}
             </p>
@@ -103,7 +106,7 @@ export function SiteFooter() {
       <div className="border-t border-white/10">
         <div className="mx-auto flex max-w-6xl flex-col gap-2 px-5 py-5 text-xs text-white/50 sm:flex-row sm:items-center sm:justify-between">
           <p>
-            © {new Date().getFullYear()} {appName}. {t("licensedNote")}
+            © {new Date().getFullYear()} {appName} — {appFullName}. {t("licensedNote")}
           </p>
           <p>{t("trustSecure")}</p>
         </div>

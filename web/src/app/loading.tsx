@@ -3,7 +3,7 @@ export default function Loading() {
     <div className="flex min-h-[50vh] items-center justify-center px-5">
       <div className="flex items-center gap-3 text-ink-muted">
         <span className="live-dot" />
-        <span className="text-sm font-medium">Zendu…</span>
+        <span className="text-sm font-medium">PWFINTECH…</span>
       </div>
     </div>
   );

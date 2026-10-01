@@ -18,33 +18,33 @@ const dmSans = DM_Sans({
   weight: ["400", "500", "600", "700"],
 });
 
-const appName = process.env.NEXT_PUBLIC_APP_NAME ?? "Zendu";
+import { appFullName, appName } from "@/lib/brand";
 const appUrl = process.env.NEXT_PUBLIC_APP_URL ?? "http://localhost:3000";
 
 export const metadata: Metadata = {
   metadataBase: new URL(appUrl),
   title: {
-    default: `${appName} — International money transfer`,
+    default: `${appName} — ${appFullName}`,
     template: `%s · ${appName}`,
   },
   description:
     "Send money worldwide with live rates, clear fees, mobile money delivery, and multi-language support.",
   openGraph: {
-    title: `${appName} — International money transfer`,
+    title: `${appName} — ${appFullName}`,
     description:
       "Send money worldwide with live rates, clear fees, and mobile money delivery.",
     url: appUrl,
-    siteName: appName,
-    images: [{ url: "/hero-zendu.jpg", width: 1200, height: 630 }],
+    siteName: `${appName} — ${appFullName}`,
+    images: [{ url: "/hero-pwfintech.jpg", width: 1200, height: 630 }],
     locale: "fr_FR",
     type: "website",
   },
   twitter: {
     card: "summary_large_image",
-    title: `${appName} — International money transfer`,
+    title: `${appName} — ${appFullName}`,
     description:
       "Send money worldwide with live rates, clear fees, and mobile money delivery.",
-    images: ["/hero-zendu.jpg"],
+    images: ["/hero-pwfintech.jpg"],
   },
   icons: {
     icon: "/favicon.ico",

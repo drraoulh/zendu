@@ -24,7 +24,7 @@ type AuthContextValue = {
 };
 
 const AuthContext = createContext<AuthContextValue | null>(null);
-const DEMO_KEY = "zendu_demo_user";
+const DEMO_KEY = "pwfintech_demo_user";
 
 export function AuthProvider({ children }: { children: React.ReactNode }) {
   const configured = isSupabaseConfigured();

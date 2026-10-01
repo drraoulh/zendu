@@ -167,8 +167,8 @@ export function createMomoPayout(): PayoutProvider {
             partyIdType: "MSISDN",
             partyId: msisdn,
           },
-          payerMessage: "Zendu",
-          payeeNote: `Zendu ${fullName}`.slice(0, 50),
+          payerMessage: "PWFINTECH",
+          payeeNote: `PWFINTECH ${fullName}`.slice(0, 50),
         }),
       });
 

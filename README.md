@@ -1,4 +1,4 @@
-# Zendu
+# PWFINTECH — Paul World Finances and Technologies
 
 Transfert d'argent **Canada → Cameroun** (web d'abord).
 

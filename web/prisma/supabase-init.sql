@@ -1,4 +1,4 @@
--- Zendu schema for Supabase Postgres
+-- PWFINTECH (Paul World Finances and Technologies) schema for Supabase Postgres
 -- Run in SQL Editor: https://supabase.com/dashboard/project/xfjhzohooeppjimvtlzu/sql
 
 CREATE TABLE IF NOT EXISTS "Beneficiary" (

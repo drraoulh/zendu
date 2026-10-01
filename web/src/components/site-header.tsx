@@ -7,7 +7,7 @@ import { useI18n } from "@/components/i18n-provider";
 import { LanguageSwitcher } from "@/components/language-switcher";
 import { displayName, useAuth } from "@/components/auth-provider";
 
-const appName = process.env.NEXT_PUBLIC_APP_NAME ?? "Zendu";
+import { appFullName, appName } from "@/lib/brand";
 
 export function SiteHeader() {
   const { t } = useI18n();
@@ -51,9 +51,9 @@ export function SiteHeader() {
     <header className="sticky top-0 z-50 border-b border-line bg-white/95 shadow-[0_1px_0_rgba(12,31,24,0.04)] backdrop-blur-md">
       <div className="mx-auto flex h-16 max-w-6xl items-center justify-between gap-4 px-5">
         <div className="flex items-center gap-8">
-          <Link href="/" className="group flex items-center gap-2.5">
+          <Link href="/" className="group flex items-center gap-2.5" title={appFullName}>
             <span className="inline-flex h-9 w-9 items-center justify-center rounded-xl bg-accent text-sm font-bold text-white transition group-hover:bg-accent-strong">
-              Z
+              PW
             </span>
             <span className="font-display text-[1.35rem] font-bold tracking-tight text-ink">
               {appName}

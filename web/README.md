@@ -1,4 +1,4 @@
-# Zendu — Transfert Canada → Cameroun (web)
+# PWFINTECH (Paul World Finances and Technologies) — Transfert Canada → Cameroun (web)
 
 Application web de transfert d'argent (MVP démo) :
 

@@ -31,7 +31,7 @@ export function createStripePayIn(): PayInProvider {
               currency: "cad",
               unit_amount: Math.round(amountCad * 100),
               product_data: {
-                name: `Transfert Zendu ${reference}`,
+                name: `Transfert PWFINTECH ${reference}`,
                 description: "Envoi d'argent Canada → Cameroun",
               },
             },

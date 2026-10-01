@@ -4,10 +4,10 @@ import { useI18n } from "@/components/i18n-provider";
 
 const appStoreUrl =
   process.env.NEXT_PUBLIC_APP_STORE_URL ||
-  "https://apps.apple.com/app/zendu";
+  "https://apps.apple.com/app/pwfintech";
 const playStoreUrl =
   process.env.NEXT_PUBLIC_PLAY_STORE_URL ||
-  "https://play.google.com/store/apps/details?id=com.zendu.app";
+  "https://play.google.com/store/apps/details?id=com.pwfintech.app";
 
 export function AppStoreBadges({
   variant = "light",

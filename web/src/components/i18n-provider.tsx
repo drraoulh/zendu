@@ -27,7 +27,7 @@ export function I18nProvider({ children }: { children: React.ReactNode }) {
   const [locale, setLocaleState] = useState<Locale>("fr");
 
   useEffect(() => {
-    const saved = window.localStorage.getItem("zendu_locale") as Locale | null;
+    const saved = window.localStorage.getItem("pwfintech_locale") as Locale | null;
     if (saved && ["fr", "en", "es", "zh"].includes(saved)) {
       setLocaleState(saved);
       document.documentElement.lang = saved;
@@ -36,7 +36,7 @@ export function I18nProvider({ children }: { children: React.ReactNode }) {
 
   const setLocale = useCallback((next: Locale) => {
     setLocaleState(next);
-    window.localStorage.setItem("zendu_locale", next);
+    window.localStorage.setItem("pwfintech_locale", next);
     document.documentElement.lang = next;
   }, []);
 

@@ -6,8 +6,8 @@ import { SandboxBanner } from "@/components/sandbox-banner";
 import { AppStoreBadges } from "@/components/app-store-badges";
 import { useI18n } from "@/components/i18n-provider";
 
-const appName = process.env.NEXT_PUBLIC_APP_NAME ?? "Zendu";
-const CODE = "ZENDU-FRIEND";
+import { appName } from "@/lib/brand";
+const CODE = "PWFINTECH-FRIEND";
 
 export default function ReferPage() {
   const { t } = useI18n();

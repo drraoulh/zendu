@@ -9,7 +9,7 @@ import { formatMoney } from "@/lib/money";
 import { statusLabel } from "@/lib/transfer-machine";
 import { getDestinationCountries } from "@/lib/corridors";
 
-const appName = process.env.NEXT_PUBLIC_APP_NAME ?? "Zendu";
+import { appFullName, appName } from "@/lib/brand";
 
 type Recent = {
   id: string;
@@ -30,7 +30,7 @@ export function HomeContent({ recent }: { recent: Recent[] }) {
       <section className="relative isolate overflow-hidden bg-[#0c1f18]">
         {/* eslint-disable-next-line @next/next/no-img-element */}
         <img
-          src="/hero-zendu.jpg"
+          src="/hero-pwfintech.jpg"
           alt=""
           className="absolute inset-0 h-full w-full object-cover opacity-45"
         />
@@ -39,7 +39,7 @@ export function HomeContent({ recent }: { recent: Recent[] }) {
         <div className="relative mx-auto grid max-w-6xl gap-10 px-5 pb-16 pt-12 lg:grid-cols-[1.05fr_0.95fr] lg:items-center lg:pb-20 lg:pt-16">
           <div>
             <p className="animate-rise font-display text-xs font-semibold uppercase tracking-[0.2em] text-accent">
-              {appName}
+              {appName} · {appFullName}
             </p>
             <h1 className="animate-rise mt-3 max-w-xl font-display text-4xl font-extrabold leading-[1.08] tracking-tight text-white sm:text-5xl lg:text-[3.25rem]">
               {t("heroTitle")}
@@ -137,7 +137,7 @@ export function HomeContent({ recent }: { recent: Recent[] }) {
       <section className="border-y border-line bg-bg py-16">
         <div className="mx-auto max-w-6xl px-5">
           <h2 className="text-center font-display text-3xl font-bold tracking-tight">
-            {t("whyZendu")}
+            {t("whyBrand")}
           </h2>
           <div className="mt-10 grid gap-5 md:grid-cols-3">
             <Feature title={t("secureTitle")} text={t("secureText")} />

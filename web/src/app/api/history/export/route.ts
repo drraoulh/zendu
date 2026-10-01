@@ -57,7 +57,7 @@ export async function GET() {
   return new NextResponse(csvBody, {
     headers: {
       "Content-Type": "text/csv; charset=utf-8",
-      "Content-Disposition": `attachment; filename="zendu-historique-${new Date()
+      "Content-Disposition": `attachment; filename="pwfintech-historique-${new Date()
         .toISOString()
         .slice(0, 10)}.csv"`,
     },

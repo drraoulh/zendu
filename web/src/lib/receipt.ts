@@ -2,6 +2,7 @@ import { prisma } from "@/lib/prisma";
 import { formatMoney } from "@/lib/money";
 import { statusLabel } from "@/lib/transfer-machine";
 import { getCountry } from "@/lib/corridors";
+import { appName } from "@/lib/brand";
 
 export type ReceiptData = {
   brand: string;
@@ -66,7 +67,7 @@ export async function getReceiptByTransferId(
     /* ignore */
   }
 
-  const brand = process.env.NEXT_PUBLIC_APP_NAME ?? "Zendu";
+  const brand = appName;
 
   return {
     brand,

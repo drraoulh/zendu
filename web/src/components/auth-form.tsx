@@ -61,7 +61,7 @@ export function AuthForm({ mode }: { mode: "login" | "signup" }) {
       <div className="mx-auto w-full max-w-md px-5 py-10 lg:py-14">
         <div className="mb-8 text-center">
           <div className="mx-auto mb-4 flex h-12 w-12 items-center justify-center rounded-2xl bg-accent font-bold text-white">
-            Z
+            PW
           </div>
           <h1 className="font-display text-3xl font-bold tracking-tight">
             {mode === "login" ? t("authWelcome") : t("authCreate")}
