@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { useI18n } from "@/components/i18n-provider";
-import { Badge, Container, Eyebrow } from "@/components/ui/layout";
+import { Badge } from "@/components/ui/layout";
 import { Button, ButtonLink } from "@/components/ui/button";
 import { Icon, type IconName } from "@/components/ui/icon";
 import { useT } from "@/i18n/define";
@@ -118,30 +118,28 @@ export function AdminDashboard({
   const modePill = (label: string, mode: string) => {
     const mock = mode.startsWith("mock");
     return (
-      <span className="inline-flex items-center gap-2 rounded-full border border-white/15 bg-white/10 px-3 py-1.5 text-xs font-semibold text-white">
+      <span className="inline-flex items-center gap-2 rounded-full border border-line bg-white px-3 py-1.5 text-xs font-semibold text-ink">
         <span className={`h-2 w-2 rounded-full ${mock ? "bg-warn" : "bg-success"}`} aria-hidden />
         {label} : <code className="font-mono">{mode}</code>
-        <span className="text-white/60">({mock ? t("modeMock") : t("modeLive")})</span>
+        <span className="text-muted">({mock ? t("modeMock") : t("modeLive")})</span>
       </span>
     );
   };
 
   return (
-    <div className="bg-bg pb-16">
-      <section className="bg-navy-gradient relative overflow-hidden text-white">
-        <div className="bg-grid absolute inset-0 opacity-40 [mask-image:linear-gradient(to_bottom,black,transparent)]" />
-        <Container className="relative py-10 sm:py-14">
-          <Eyebrow light>{t("eyebrow")}</Eyebrow>
-          <h1 className="mt-3 font-display text-3xl font-extrabold tracking-tight sm:text-4xl">{t("title")}</h1>
-          <p className="mt-3 max-w-2xl text-white/70">{t("subtitle")}</p>
-          <div className="mt-6 flex flex-wrap gap-2">
-            {modePill(t("payIn"), payInMode)}
-            {modePill(t("payout"), payoutMode)}
-          </div>
-        </Container>
-      </section>
+    <div>
+      <div className="flex flex-wrap items-end justify-between gap-4">
+        <div className="min-w-0">
+          <h1 className="font-display text-2xl font-extrabold tracking-tight text-ink sm:text-3xl">{t("title")}</h1>
+          <p className="mt-1.5 max-w-2xl text-sm leading-relaxed text-muted sm:text-base">{t("subtitle")}</p>
+        </div>
+        <div className="flex flex-wrap gap-2">
+          {modePill(t("payIn"), payInMode)}
+          {modePill(t("payout"), payoutMode)}
+        </div>
+      </div>
 
-      <Container className="-mt-6 relative">
+      <div className="mt-6">
         {transfers === null ? (
           <div
             role="alert"
@@ -161,7 +159,7 @@ export function AdminDashboard({
         ) : (
           <>
             {/* KPI */}
-            <ul className="grid grid-cols-2 gap-3 sm:gap-4 lg:grid-cols-5">
+            <ul className="grid grid-cols-2 gap-3 sm:gap-4 xl:grid-cols-5">
               {kpis.map((k) => (
                 <li key={k.label} className="rounded-3xl border border-line bg-white p-4 shadow-card sm:p-5">
                   <span className={`inline-flex h-9 w-9 items-center justify-center rounded-xl ${k.tone}`}>
@@ -171,15 +169,15 @@ export function AdminDashboard({
                   <p className="mt-1 font-display text-3xl font-extrabold tracking-tight text-ink">{k.value}</p>
                 </li>
               ))}
-              <li className="bg-brand-gradient col-span-2 rounded-3xl p-4 text-white shadow-card sm:p-5 lg:col-span-5 lg:flex lg:items-center lg:justify-between">
+              <li className="bg-brand-gradient col-span-2 rounded-3xl p-4 text-white shadow-card sm:p-5 xl:col-span-5 sm:flex sm:items-center sm:justify-between">
                 <p className="text-xs font-semibold uppercase tracking-[0.14em] text-white/70">{t("kpiVolume")}</p>
-                <p className="mt-1 break-words font-display text-2xl font-extrabold tracking-tight lg:mt-0">
+                <p className="mt-1 break-words font-display text-2xl font-extrabold tracking-tight sm:mt-0">
                   {volume}
                 </p>
               </li>
             </ul>
 
-            <div className="mt-8 grid gap-6 lg:grid-cols-[minmax(0,1fr)_18rem]">
+            <div className="mt-8 grid gap-6 xl:grid-cols-[minmax(0,1fr)_18rem]">
               {/* Transferts */}
               <section aria-labelledby="admin-recent" className="min-w-0">
                 {(bankQueue.length > 0 || payoutMode === "momo") && (
@@ -354,7 +352,7 @@ export function AdminDashboard({
             </div>
           </>
         )}
-      </Container>
+      </div>
     </div>
   );
 }

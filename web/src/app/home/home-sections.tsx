@@ -2,6 +2,7 @@
 
 import Link from "next/link";
 import { WstLogo } from "@/components/brand/wst-logo";
+import { ButtonLink, buttonClass } from "@/components/ui/button";
 import { Icon, type IconName } from "@/components/ui/icon";
 import { Container, Section, SectionHeading } from "@/components/ui/layout";
 import { useT } from "@/i18n/define";
@@ -9,17 +10,61 @@ import { homeMessages } from "@/i18n/home";
 
 type HomeKey = keyof typeof homeMessages.fr;
 
-const SERVICES: { n: 1 | 2 | 3 | 4; href: string; icon: IconName; accent: string }[] = [
-  { n: 1, href: "/transfert", icon: "transfer", accent: "from-brand to-sky" },
-  { n: 2, href: "/finances", icon: "finance", accent: "from-navy to-brand" },
-  { n: 3, href: "/technologies", icon: "tech", accent: "from-brand-strong to-sky" },
-  { n: 4, href: "/shipping", icon: "ship", accent: "from-navy to-sky" },
+type Action = { href: string; key: HomeKey; icon?: IconName };
+
+const POLES: {
+  n: 1 | 2 | 3 | 4;
+  href: string;
+  icon: IconName;
+  accent: string;
+  primary: Action;
+  more: Action[];
+}[] = [
+  {
+    n: 1,
+    href: "/transfert",
+    icon: "transfer",
+    accent: "from-brand to-sky",
+    primary: { href: "#simulateur", key: "actSimulate", icon: "chart" },
+    more: [
+      { href: "/transfert", key: "actWst" },
+      { href: "/frais", key: "actFees" },
+    ],
+  },
+  {
+    n: 2,
+    href: "/finances",
+    icon: "finance",
+    accent: "from-navy to-brand",
+    primary: { href: "/finances/rendez-vous", key: "actAppointment", icon: "clock" },
+    more: [{ href: "/finances", key: "actLearn" }],
+  },
+  {
+    n: 3,
+    href: "/technologies",
+    icon: "tech",
+    accent: "from-brand-strong to-sky",
+    primary: { href: "/technologies/projet", key: "actProject", icon: "code" },
+    more: [{ href: "/technologies", key: "actLearn" }],
+  },
+  {
+    n: 4,
+    href: "/shipping",
+    icon: "ship",
+    accent: "from-navy to-sky",
+    primary: { href: "/shipping/devis", key: "actQuote", icon: "box" },
+    more: [
+      { href: "/shipping/suivi", key: "actTrack" },
+      { href: "/shipping", key: "actLearn" },
+    ],
+  },
 ];
 
+/** Les 4 pôles en cartes détaillées, chacune avec ses actions principales. */
 export function ServicesSection() {
   const t = useT(homeMessages);
   return (
-    <Section id="services" className="scroll-mt-20 bg-white">
+    <Section id="services" className="scroll-mt-20 bg-bg">
       <Container>
         <SectionHeading
           align="center"
@@ -27,30 +72,41 @@ export function ServicesSection() {
           title={t("servicesTitle")}
           subtitle={t("servicesSubtitle")}
         />
-        <div className="mt-12 grid gap-5 sm:grid-cols-2 lg:grid-cols-4">
-          {SERVICES.map((s) => {
-            const k = (suffix: string) => `s${s.n}${suffix}` as HomeKey;
+        <ul className="mt-12 grid gap-5 md:grid-cols-2">
+          {POLES.map((p) => {
+            const k = (suffix: string) => `s${p.n}${suffix}` as HomeKey;
             return (
-              <Link
-                key={s.n}
-                href={s.href}
-                className="group relative flex flex-col rounded-3xl border border-line bg-white p-6 shadow-card transition hover:-translate-y-1 hover:border-brand/30"
+              <li
+                key={p.n}
+                className="relative flex flex-col overflow-hidden rounded-3xl border border-line bg-white p-6 shadow-card sm:p-7"
               >
-                <span
-                  className={`flex h-12 w-12 items-center justify-center rounded-2xl bg-gradient-to-br ${s.accent} text-white shadow-[0_10px_24px_-10px_rgba(11,77,255,0.8)]`}
-                >
-                  <Icon name={s.icon} className="h-6 w-6" />
-                </span>
-                <h3 className="mt-5 font-display text-lg font-extrabold tracking-tight text-ink">{t(k("Title"))}</h3>
-                {s.n === 1 && (
-                  <p className="mt-1.5 inline-flex items-center gap-1.5 self-start rounded-full bg-brand-soft px-2.5 py-1 font-display text-xs font-extrabold text-navy">
-                    <span aria-hidden className="shrink-0">
-                      <WstLogo variant="symbol" className="h-4 w-4" />
-                    </span>
-                    {t("s1Brand")}
-                  </p>
-                )}
-                <p className="mt-2 text-sm leading-relaxed text-muted">{t(k("Pitch"))}</p>
+                <div
+                  aria-hidden
+                  className={`absolute -right-16 -top-16 h-40 w-40 rounded-full bg-gradient-to-br ${p.accent} opacity-[0.08]`}
+                />
+                <div className="flex items-start gap-4">
+                  <span
+                    className={`flex h-12 w-12 shrink-0 items-center justify-center rounded-2xl bg-gradient-to-br ${p.accent} text-white shadow-[0_10px_24px_-10px_rgba(11,77,255,0.8)]`}
+                  >
+                    <Icon name={p.icon} className="h-6 w-6" />
+                  </span>
+                  <div className="min-w-0">
+                    <h3 className="font-display text-xl font-extrabold tracking-tight text-ink">
+                      <Link href={p.href} className="rounded hover:text-brand focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand/40">
+                        {t(k("Title"))}
+                      </Link>
+                    </h3>
+                    {p.n === 1 && (
+                      <p className="mt-1.5 inline-flex items-center gap-1.5 rounded-full bg-brand-soft px-2.5 py-1 font-display text-xs font-extrabold text-navy">
+                        <span aria-hidden className="shrink-0">
+                          <WstLogo variant="symbol" className="h-4 w-4" />
+                        </span>
+                        {t("s1Brand")}
+                      </p>
+                    )}
+                  </div>
+                </div>
+                <p className="mt-4 text-sm leading-relaxed text-muted sm:text-base">{t(k("Pitch"))}</p>
                 <ul className="mt-5 space-y-2.5 text-sm text-ink">
                   {(["b1", "b2", "b3"] as const).map((b) => (
                     <li key={b} className="flex gap-2.5">
@@ -59,14 +115,33 @@ export function ServicesSection() {
                     </li>
                   ))}
                 </ul>
-                <span className="mt-auto inline-flex items-center gap-1.5 pt-6 text-sm font-semibold text-brand group-hover:text-brand-strong">
-                  {t("discover")}
-                  <Icon name="arrowRight" className="h-4 w-4 transition group-hover:translate-x-1" />
-                </span>
-              </Link>
+                <div className="mt-auto flex flex-col gap-3 pt-6 sm:flex-row sm:flex-wrap sm:items-center">
+                  {p.primary.href.startsWith("#") ? (
+                    <a href={p.primary.href} className={buttonClass("primary", "md")}>
+                      {p.primary.icon && <Icon name={p.primary.icon} className="h-4 w-4" />}
+                      {t(p.primary.key)}
+                    </a>
+                  ) : (
+                    <ButtonLink href={p.primary.href}>
+                      {p.primary.icon && <Icon name={p.primary.icon} className="h-4 w-4" />}
+                      {t(p.primary.key)}
+                    </ButtonLink>
+                  )}
+                  {p.more.map((a) => (
+                    <Link
+                      key={a.href}
+                      href={a.href}
+                      className="group inline-flex items-center gap-1.5 self-start rounded px-1 py-1 text-sm font-semibold text-brand hover:text-brand-strong focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand/40 sm:self-auto"
+                    >
+                      {t(a.key)}
+                      <Icon name="arrowRight" className="h-4 w-4 transition group-hover:translate-x-0.5" />
+                    </Link>
+                  ))}
+                </div>
+              </li>
             );
           })}
-        </div>
+        </ul>
       </Container>
     </Section>
   );
@@ -102,6 +177,49 @@ export function StepsSection() {
                 {t(`step${s.n}Title` as HomeKey)}
               </h3>
               <p className="mt-2 text-sm leading-relaxed text-muted">{t(`step${s.n}Text` as HomeKey)}</p>
+            </li>
+          ))}
+        </ol>
+      </Container>
+    </Section>
+  );
+}
+
+const FEES: { n: 1 | 2 | 3; icon: IconName }[] = [
+  { n: 1, icon: "receipt" },
+  { n: 2, icon: "chart" },
+  { n: 3, icon: "transfer" },
+];
+
+/** Frais transparents : la structure (sans chiffres en dur) + lien vers /frais. */
+export function FeesSection() {
+  const t = useT(homeMessages);
+  return (
+    <Section className="bg-white">
+      <Container className="grid gap-10 lg:grid-cols-[0.9fr_1.1fr] lg:items-center lg:gap-14">
+        <div>
+          <SectionHeading eyebrow={t("feesEyebrow")} title={t("feesTitle")} subtitle={t("feesSubtitle")} />
+          <div className="mt-8 flex flex-col gap-3 sm:flex-row sm:flex-wrap">
+            <ButtonLink href="/frais">
+              <Icon name="receipt" className="h-4 w-4" />
+              {t("feesAll")}
+            </ButtonLink>
+            <a href="#simulateur" className={buttonClass("secondary", "md")}>
+              {t("feesSim")}
+              <Icon name="arrowRight" className="h-4 w-4" />
+            </a>
+          </div>
+        </div>
+        <ol className="grid gap-4 sm:grid-cols-3 lg:grid-cols-1">
+          {FEES.map((f) => (
+            <li key={f.n} className="flex gap-4 rounded-3xl border border-line bg-white p-5 shadow-card">
+              <span className="grid h-11 w-11 shrink-0 place-items-center rounded-2xl bg-brand-soft text-brand">
+                <Icon name={f.icon} className="h-5 w-5" />
+              </span>
+              <span className="min-w-0">
+                <span className="block font-display font-bold text-ink">{t(`fee${f.n}Title` as HomeKey)}</span>
+                <span className="mt-1 block text-sm leading-relaxed text-muted">{t(`fee${f.n}Text` as HomeKey)}</span>
+              </span>
             </li>
           ))}
         </ol>

@@ -147,10 +147,16 @@ export function TransferContent() {
                   ))}
                 </dl>
                 <p className="mt-4 text-xs leading-relaxed text-white/60">{t("etaNote")}</p>
-                <ButtonLink href="#simulateur" variant="white" className="mt-6 w-full sm:w-auto">
-                  {t("feesCta")}
-                  <Icon name="arrowRight" className="h-4 w-4" />
-                </ButtonLink>
+                <div className="mt-6 flex flex-col gap-3 sm:flex-row sm:flex-wrap">
+                  <ButtonLink href="#simulateur" variant="white" className="w-full sm:w-auto">
+                    {t("feesCta")}
+                    <Icon name="arrowRight" className="h-4 w-4" />
+                  </ButtonLink>
+                  <ButtonLink href="/frais" variant="outline-light" className="w-full sm:w-auto">
+                    <Icon name="receipt" className="h-4 w-4" />
+                    {t("feesAll")}
+                  </ButtonLink>
+                </div>
               </div>
             </div>
           </div>
@@ -222,6 +228,12 @@ export function TransferContent() {
                 );
               })}
             </ul>
+            <div className="mt-8 flex justify-center">
+              <ButtonLink href="/pays" variant="secondary">
+                <Icon name="globe" className="h-4 w-4" />
+                {t("destAll")}
+              </ButtonLink>
+            </div>
           </div>
         </Container>
       </Section>

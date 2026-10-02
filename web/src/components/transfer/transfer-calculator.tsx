@@ -1,5 +1,6 @@
 "use client";
 
+import Link from "next/link";
 import { useCallback, useEffect, useMemo, useRef, useState, type ReactNode } from "react";
 import { AppDownloadButton } from "@/components/app/app-download-button";
 import { WstLogo } from "@/components/brand/wst-logo";
@@ -140,10 +141,13 @@ export function simulatorHref(corridorId: string): string {
 export function TransferCalculator({
   className = "",
   id,
+  compact = false,
 }: {
   className?: string;
   /** Ancre facultative (ex. « simulateur »). */
   id?: string;
+  /** Version resserrée (accueil) pour tenir au-dessus de la ligne de flottaison. */
+  compact?: boolean;
 }) {
   const t = useT(calculatorMessages);
   const { locale } = useI18n();
@@ -367,7 +371,11 @@ export function TransferCalculator({
       className={`w-full scroll-mt-24 overflow-hidden rounded-3xl border border-white/60 bg-white text-ink shadow-float ${className}`}
     >
       {/* En-tête */}
-      <div className="flex flex-wrap items-center justify-between gap-2 border-b border-line px-5 py-4 sm:px-6">
+      <div
+        className={`flex flex-wrap items-center justify-between gap-2 border-b border-line px-5 sm:px-6 ${
+          compact ? "py-3" : "py-4"
+        }`}
+      >
         <h2 className="font-display text-base font-extrabold tracking-tight">{t("title")}</h2>
         <span className="inline-flex items-center gap-2 rounded-full bg-success/10 px-2.5 py-1 text-xs font-semibold text-success">
           <span className="live-dot" aria-hidden />
@@ -395,9 +403,10 @@ export function TransferCalculator({
           <div className="h-12 animate-pulse rounded-full bg-surface-soft" />
         </div>
       ) : (
-        <div className="space-y-3 px-5 py-5 sm:px-6 sm:py-6">
+        <div className={compact ? "space-y-2.5 px-5 py-4 sm:px-6" : "space-y-3 px-5 py-5 sm:px-6 sm:py-6"}>
           {/* Vous envoyez */}
           <AmountField
+            compact={compact}
             id="calc-send"
             label={t("youSend")}
             amountLabel={t("amountSend")}
@@ -455,6 +464,7 @@ export function TransferCalculator({
 
           {/* Ils reçoivent */}
           <AmountField
+            compact={compact}
             id="calc-receive"
             label={t("theyReceive")}
             amountLabel={t("amountReceive")}
@@ -499,7 +509,9 @@ export function TransferCalculator({
           {/* Détail */}
           <dl
             aria-label={t("feeBreakdown")}
-            className="space-y-2 rounded-2xl border border-line bg-surface-soft/60 p-4 text-sm"
+            className={`rounded-2xl border border-line bg-surface-soft/60 text-sm ${
+              compact ? "space-y-1.5 px-4 py-3" : "space-y-2 p-4"
+            }`}
           >
             <Row label={t("flatFee")} value={showQuote ? formatMoney(showQuote.feeFlat, showQuote.sendCurrency, tag) : null} />
             <Row
@@ -528,6 +540,23 @@ export function TransferCalculator({
               }
             />
           </dl>
+          <p className="-mt-1 flex flex-wrap items-center justify-between gap-x-3 gap-y-1">
+            {compact ? (
+              <span className="inline-flex items-center gap-1.5 text-xs text-muted">
+                <Icon name="lock" className="h-3.5 w-3.5 shrink-0" />
+                {t("disclaimer")}
+              </span>
+            ) : (
+              <span />
+            )}
+            <Link
+              href="/frais"
+              className="inline-flex items-center gap-1 rounded text-xs font-semibold text-brand underline-offset-2 hover:text-brand-strong hover:underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand/40"
+            >
+              {t("allFees")}
+              <Icon name="arrowRight" className="h-3.5 w-3.5" />
+            </Link>
+          </p>
 
           <AppDownloadButton
             corridor={corridorId}
@@ -535,17 +564,21 @@ export function TransferCalculator({
             size="lg"
             className="w-full"
           />
-          <p className="flex items-center justify-center gap-2 text-center text-xs font-medium text-ink">
-            <span aria-hidden className="shrink-0">
-              <WstLogo variant="symbol" className="h-5 w-5" />
-            </span>
-            {t("finishInApp")}
-          </p>
+          {!compact && (
+            <p className="flex items-center justify-center gap-2 text-center text-xs font-medium text-ink">
+              <span aria-hidden className="shrink-0">
+                <WstLogo variant="symbol" className="h-5 w-5" />
+              </span>
+              {t("finishInApp")}
+            </p>
+          )}
 
-          <p className="flex items-center justify-center gap-1.5 text-center text-xs text-muted">
-            <Icon name="lock" className="h-3.5 w-3.5" />
-            {t("disclaimer")}
-          </p>
+          {!compact && (
+            <p className="flex items-center justify-center gap-1.5 text-center text-xs text-muted">
+              <Icon name="lock" className="h-3.5 w-3.5" />
+              {t("disclaimer")}
+            </p>
+          )}
         </div>
       )}
     </div>
@@ -555,6 +588,7 @@ export function TransferCalculator({
 /* ------------------------------------------------------------------ */
 
 function AmountField({
+  compact = false,
   id,
   label,
   amountLabel,
@@ -570,6 +604,7 @@ function AmountField({
   options,
   onSelect,
 }: {
+  compact?: boolean;
   id: string;
   label: string;
   amountLabel: string;
@@ -587,7 +622,9 @@ function AmountField({
 }) {
   return (
     <div
-      className={`rounded-2xl border p-4 transition focus-within:border-brand/50 focus-within:ring-4 focus-within:ring-brand/10 ${
+      className={`rounded-2xl border transition focus-within:border-brand/50 focus-within:ring-4 focus-within:ring-brand/10 ${
+        compact ? "px-4 py-3" : "p-4"
+      } ${
         highlight ? "border-brand/15 bg-brand-soft/60" : "border-line bg-white"
       }`}
     >
@@ -614,7 +651,7 @@ function AmountField({
           </select>
         </div>
       </div>
-      <div className="mt-2 flex items-baseline gap-2">
+      <div className={`flex items-baseline gap-2 ${compact ? "mt-1" : "mt-2"}`}>
         <input
           id={id}
           aria-label={`${amountLabel} (${currency})`}
@@ -623,7 +660,7 @@ function AmountField({
           value={value}
           placeholder={placeholder}
           onChange={(e) => onChange(e.target.value)}
-          className={`min-w-0 flex-1 bg-transparent font-display text-3xl font-extrabold tracking-tight outline-none transition placeholder:text-silver sm:text-4xl ${
+          className={`min-w-0 flex-1 bg-transparent font-display font-extrabold ${compact ? "text-3xl" : "text-3xl sm:text-4xl"} tracking-tight outline-none transition placeholder:text-silver ${
             highlight ? "text-brand-strong" : "text-ink"
           } ${muted ? "opacity-50" : ""}`}
         />

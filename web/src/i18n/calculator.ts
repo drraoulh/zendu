@@ -38,6 +38,7 @@ export const calculatorMessages = defineMessages({
     enterAmount: "Saisissez un montant",
     unavailable: "Ce corridor n'est pas encore disponible.",
     disclaimer: "Taux et frais indicatifs, confirmés avant paiement.",
+    allFees: "Voir tous les frais",
   },
   en: {
     title: "Simulate your transfer",
@@ -75,6 +76,7 @@ export const calculatorMessages = defineMessages({
     enterAmount: "Enter an amount",
     unavailable: "This corridor is not available yet.",
     disclaimer: "Indicative rate and fees, confirmed before payment.",
+    allFees: "See all fees",
   },
   es: {
     title: "Simule su envío",
@@ -111,6 +113,7 @@ export const calculatorMessages = defineMessages({
     enterAmount: "Ingrese un monto",
     unavailable: "Este corredor aún no está disponible.",
     disclaimer: "Tipo y comisiones indicativos, confirmados antes del pago.",
+    allFees: "Ver todas las comisiones",
   },
   zh: {
     title: "汇款试算",
@@ -147,5 +150,6 @@ export const calculatorMessages = defineMessages({
     enterAmount: "请输入金额",
     unavailable: "该线路暂未开通。",
     disclaimer: "汇率和费用仅供参考，付款前确认。",
+    allFees: "查看全部费用",
   },
 });

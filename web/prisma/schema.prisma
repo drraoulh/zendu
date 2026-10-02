@@ -95,3 +95,69 @@ model WaitlistSignup {
   source    String?
   createdAt DateTime @default(now())
 }
+
+/// Demandes de service déposées sur le site (POST /api/requests), traitées dans /admin/demandes.
+/// kind : contact | shipping_quote | finance_appointment | tech_project
+/// status : new | in_progress | answered | closed
+model ServiceRequest {
+  id        String     @id @default(cuid())
+  /// Référence publique : CT-XXXXXX, SHQ-XXXXXX, FIN-XXXXXX, TECH-XXXXXX.
+  reference String     @unique
+  kind      String
+  status    String     @default("new")
+  name      String
+  email     String
+  phone     String?
+  locale    String?
+  /// Champs propres au type (voir src/lib/requests.ts).
+  payload   Json
+  /// Note interne de l'équipe (jamais exposée au public).
+  adminNote String?
+  /// Rendez-vous Finances uniquement : "YYYY-MM-DDTHH:mm" (heure de l'Est). Unique = pas de double
+  /// réservation ; remis à null quand le rendez-vous est clos pour libérer le créneau.
+  slotKey   String?    @unique
+  shipments Shipment[]
+  createdAt DateTime   @default(now())
+  updatedAt DateTime   @updatedAt
+
+  @@index([kind])
+  @@index([status])
+  @@index([createdAt])
+}
+
+/// Colis Shipping suivis publiquement par numéro (GET /api/shipments/track).
+/// mode : air | sea — status : received | in_transit | customs | out_for_delivery | delivered | exception
+model Shipment {
+  id                String          @id @default(cuid())
+  /// Numéro public "PWS-#####".
+  number            String          @unique
+  requestId         String?
+  request           ServiceRequest? @relation(fields: [requestId], references: [id], onDelete: SetNull)
+  origin            String
+  destination       String
+  mode              String
+  status            String          @default("received")
+  weightKg          Float?
+  estimatedDelivery DateTime?
+  /// Privé : jamais renvoyé par l'API publique de suivi.
+  recipientName     String?
+  events            ShipmentEvent[]
+  createdAt         DateTime        @default(now())
+  updatedAt         DateTime        @updatedAt
+
+  @@index([requestId])
+  @@index([status])
+  @@index([createdAt])
+}
+
+model ShipmentEvent {
+  id         String   @id @default(cuid())
+  shipmentId String
+  shipment   Shipment @relation(fields: [shipmentId], references: [id], onDelete: Cascade)
+  status     String
+  label      String
+  location   String?
+  at         DateTime @default(now())
+
+  @@index([shipmentId])
+}

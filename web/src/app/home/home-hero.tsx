@@ -1,11 +1,15 @@
 "use client";
 
+import Link from "next/link";
+import { AppDownloadButton } from "@/components/app/app-download-button";
 import { TransferCalculator } from "@/components/transfer/transfer-calculator";
 import { ButtonLink } from "@/components/ui/button";
 import { Icon, type IconName } from "@/components/ui/icon";
 import { Container } from "@/components/ui/layout";
 import { useT } from "@/i18n/define";
 import { homeMessages } from "@/i18n/home";
+
+type HomeKey = keyof typeof homeMessages.fr;
 
 export function HomeHero() {
   const t = useT(homeMessages);
@@ -43,24 +47,20 @@ export function HomeHero() {
           </defs>
         </svg>
       </div>
-      <svg
-        aria-hidden
-        viewBox="0 0 400 400"
-        fill="none"
-        className="pointer-events-none absolute -left-24 bottom-0 -z-10 h-80 w-80 opacity-40 lg:hidden"
-      >
-        <circle cx="200" cy="200" r="190" stroke="rgba(63,160,255,0.4)" />
-        <circle cx="200" cy="200" r="130" stroke="rgba(201,211,230,0.2)" strokeDasharray="2 8" />
-      </svg>
 
-      <Container className="relative grid grid-cols-1 items-center gap-12 pb-16 pt-12 sm:pt-16 lg:grid-cols-[1.1fr_minmax(0,0.9fr)] lg:gap-14 lg:pb-24 lg:pt-20">
+      {/* Hauteur maîtrisée : le simulateur tient au-dessus de la ligne de flottaison à 1366×768. */}
+      <Container className="relative grid grid-cols-1 gap-8 pb-12 pt-7 sm:pt-10 lg:grid-cols-[1.08fr_minmax(0,0.92fr)] lg:items-center lg:gap-12 lg:pb-14 lg:pt-6">
         <div className="animate-rise min-w-0">
-          <p className="inline-flex max-w-full items-center gap-2 rounded-full border border-white/15 bg-white/5 px-3 py-1.5 text-[0.7rem] font-semibold uppercase tracking-[0.14em] text-sky backdrop-blur sm:text-xs">
-            <Icon name="maple" className="h-3.5 w-3.5 shrink-0 text-maple" />
-            <span className="min-w-0">{t("heroEyebrow")}</span>
+          <p className="inline-flex max-w-full flex-wrap items-center gap-x-2 gap-y-1 rounded-2xl border border-white/15 bg-white/5 px-3 py-1.5 text-xs backdrop-blur sm:rounded-full">
+            <span className="inline-flex items-center gap-1.5 font-display font-black tracking-[0.12em] text-white">
+              <Icon name="maple" className="h-3.5 w-3.5 shrink-0 text-maple" />
+              {t("heroEyebrow")}
+            </span>
+            <span aria-hidden className="hidden h-3 w-px bg-white/25 sm:block" />
+            <span className="min-w-0 font-medium italic text-sky">{t("heroTagline")}</span>
           </p>
 
-          <h1 className="mt-6 font-display text-[2.4rem] font-black leading-[1.05] tracking-tight sm:text-5xl lg:text-6xl">
+          <h1 className="mt-5 font-display text-[2.15rem] font-black leading-[1.06] tracking-tight sm:text-5xl lg:text-[3.15rem] xl:text-[3.4rem]">
             {t("heroTitleA")}{" "}
             <span className="bg-gradient-to-r from-sky via-white to-silver bg-clip-text text-transparent">
               {t("heroTitleAccent")}
@@ -68,19 +68,16 @@ export function HomeHero() {
             {t("heroTitleB")}
           </h1>
 
-          <p className="mt-6 max-w-xl text-base leading-relaxed text-white/75 sm:text-lg">{t("heroSubtitle")}</p>
+          <p className="mt-4 max-w-xl text-base leading-relaxed text-white/75 sm:mt-5 sm:text-lg">{t("heroSubtitle")}</p>
 
-          <div className="mt-8 flex flex-col gap-3 sm:flex-row">
-            <ButtonLink href="/transfert" size="lg">
-              {t("heroCtaSend")}
-              <Icon name="arrowRight" className="h-4 w-4" />
-            </ButtonLink>
+          <div className="mt-6 flex flex-col gap-3 sm:flex-row sm:flex-wrap">
+            <AppDownloadButton size="lg" label={t("heroCtaSend")} />
             <ButtonLink href="#services" variant="outline-light" size="lg">
               {t("heroCtaServices")}
             </ButtonLink>
           </div>
 
-          <ul className="mt-8 flex flex-wrap gap-2.5">
+          <ul className="mt-6 hidden flex-wrap gap-2.5 sm:flex">
             {chips.map((c) => (
               <li
                 key={c.icon}
@@ -95,9 +92,62 @@ export function HomeHero() {
 
         <div className="animate-rise-2 relative mx-auto w-full max-w-md lg:max-w-none">
           <div aria-hidden className="absolute -inset-4 -z-10 rounded-[2rem] bg-sky/20 blur-2xl" />
-          <TransferCalculator />
+          <TransferCalculator id="simulateur" compact />
         </div>
       </Container>
     </section>
+  );
+}
+
+const SHORTCUTS: { n: 1 | 2 | 3 | 4 | 5; href: string; icon: IconName }[] = [
+  { n: 1, href: "#simulateur", icon: "chart" },
+  { n: 2, href: "/shipping/devis", icon: "box" },
+  { n: 3, href: "/finances/rendez-vous", icon: "clock" },
+  { n: 4, href: "/technologies/projet", icon: "code" },
+  { n: 5, href: "/shipping/suivi", icon: "pin" },
+];
+
+/** Bande de raccourcis vers les parcours principaux, juste sous le hero. */
+export function ShortcutsBand() {
+  const t = useT(homeMessages);
+  return (
+    <nav aria-label={t("shortcutsTitle")} className="border-b border-line bg-white">
+      <Container className="py-5 sm:py-6">
+        <ul className="grid grid-cols-2 gap-2.5 sm:grid-cols-3 sm:gap-3 lg:grid-cols-5">
+          {SHORTCUTS.map((s) => {
+            const cls =
+              "group flex h-full items-center gap-3 rounded-2xl border border-line bg-white p-3 transition hover:-translate-y-0.5 hover:border-brand/30 hover:shadow-card focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-brand/20 sm:p-3.5";
+            const inner = (
+              <>
+                <span className="grid h-10 w-10 shrink-0 place-items-center rounded-xl bg-brand-soft text-brand transition group-hover:bg-brand group-hover:text-white">
+                  <Icon name={s.icon} className="h-5 w-5" />
+                </span>
+                <span className="min-w-0 flex-1">
+                  <span className="block text-sm font-bold leading-snug text-ink">
+                    {t(`sc${s.n}Title` as HomeKey)}
+                  </span>
+                  <span className="mt-0.5 hidden text-xs text-muted min-[420px]:block">
+                    {t(`sc${s.n}Text` as HomeKey)}
+                  </span>
+                </span>
+              </>
+            );
+            return (
+              <li key={s.n} className={s.n === 1 ? "col-span-2 sm:col-span-1" : ""}>
+                {s.href.startsWith("#") ? (
+                  <a href={s.href} className={cls}>
+                    {inner}
+                  </a>
+                ) : (
+                  <Link href={s.href} className={cls}>
+                    {inner}
+                  </Link>
+                )}
+              </li>
+            );
+          })}
+        </ul>
+      </Container>
+    </nav>
   );
 }

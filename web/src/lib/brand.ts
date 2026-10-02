@@ -1,14 +1,21 @@
+import { company } from "@/lib/company";
+
 export const appName = process.env.NEXT_PUBLIC_APP_NAME ?? "PWFINTECH";
 export const appFullName =
   process.env.NEXT_PUBLIC_APP_FULL_NAME ?? "Paul World Finances and Technologies";
 
-/** Coordonnées affichées sur le site — à renseigner dans les variables d'environnement. */
+/**
+ * Coordonnées (compatibilité) — dérivées de la fiche entreprise `@/lib/company`.
+ * Préférez `company` + `display()` dans le nouveau code : ici les valeurs absentes
+ * deviennent des chaînes vides (sauf le courriel, qui garde son ancien repli pour
+ * ne pas casser les liens mailto: existants).
+ */
 export const contact = {
-  email: process.env.NEXT_PUBLIC_CONTACT_EMAIL ?? "contact@pwfintech.ca",
-  phone: process.env.NEXT_PUBLIC_CONTACT_PHONE ?? "",
-  whatsapp: process.env.NEXT_PUBLIC_CONTACT_WHATSAPP ?? "",
-  city: process.env.NEXT_PUBLIC_CONTACT_CITY ?? "Toronto, Ontario",
-  country: "Canada",
+  email: company.email ?? "contact@pwfintech.ca",
+  phone: company.phone ?? "",
+  whatsapp: company.whatsapp ?? "",
+  city: company.city ?? "",
+  country: company.country,
 };
 
 export const logo = {

@@ -4,7 +4,9 @@ import Link from "next/link";
 import type { ReactNode } from "react";
 import { Icon } from "@/components/ui/icon";
 import { Container, PageHero } from "@/components/ui/layout";
-import { appFullName, contact } from "@/lib/brand";
+import { CompanyValue } from "@/components/info/shared";
+import { appFullName } from "@/lib/brand";
+import { company } from "@/lib/company";
 import { type MessageBundle, useT } from "@/i18n/define";
 import { legalCommon, privacyDoc, termsDoc } from "@/i18n/legal";
 import { common } from "@/i18n/common";
@@ -64,7 +66,11 @@ function LegalDocument<K extends string>({
 }) {
   const t = useT(bundle);
   const l = useT(legalCommon);
-  const vars = { email: contact.email, company: appFullName, city: contact.city };
+  const vars = {
+    email: company.email ?? l("emailFallback"),
+    company: company.legalName ?? appFullName,
+    cityPart: company.city ? ` (${company.city})` : "",
+  };
   const k = (key: string) => t(key as K, vars);
   const items = range(sections).map((i) => ({ id: `section-${i}`, n: i, title: k(`s${i}t`), body: k(`s${i}b`) }));
 
@@ -135,9 +141,19 @@ function LegalDocument<K extends string>({
             <div className="mt-14 flex flex-col gap-4 rounded-3xl border border-line bg-surface-soft p-6 sm:flex-row sm:items-center sm:justify-between">
               <div>
                 <p className="font-display font-bold text-ink">{l("questions")}</p>
-                <a href={`mailto:${contact.email}`} className="mt-1 inline-block break-all text-sm font-semibold text-brand hover:text-brand-strong">
-                  {contact.email}
-                </a>
+                <CompanyValue
+                  value={company.email}
+                  href={company.email ? `mailto:${company.email}` : null}
+                  className="mt-1 inline-block break-all text-sm font-semibold text-brand hover:text-brand-strong"
+                />
+                {!company.email && (
+                  <Link href="/contact" className="mt-1 block text-sm font-semibold text-brand hover:text-brand-strong">
+                    {l("contactUs")}
+                  </Link>
+                )}
+                {company.registration && (
+                  <p className="mt-2 text-xs text-muted">{l("registration", { n: company.registration })}</p>
+                )}
               </div>
               <div className="flex flex-wrap gap-x-5 gap-y-2 text-sm font-semibold">
                 <Link href={other.href} className="inline-flex items-center gap-1.5 text-brand hover:text-brand-strong">
@@ -163,10 +179,10 @@ function LegalDocument<K extends string>({
 
 export function PrivacyContent() {
   const c = useT(common);
-  return <LegalDocument bundle={privacyDoc} sections={12} other={{ href: "/conditions", label: c("terms") }} />;
+  return <LegalDocument bundle={privacyDoc} sections={13} other={{ href: "/conditions", label: c("terms") }} />;
 }
 
 export function TermsContent() {
   const c = useT(common);
-  return <LegalDocument bundle={termsDoc} sections={11} other={{ href: "/confidentialite", label: c("privacy") }} />;
+  return <LegalDocument bundle={termsDoc} sections={13} other={{ href: "/confidentialite", label: c("privacy") }} />;
 }

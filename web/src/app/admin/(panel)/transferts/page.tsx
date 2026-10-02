@@ -8,8 +8,7 @@ import { AdminDashboard, type AdminTransferRow } from "./admin-dashboard";
 export const dynamic = "force-dynamic";
 
 export const metadata: Metadata = {
-  title: "Administration",
-  robots: { index: false, follow: false },
+  title: "Transferts",
 };
 
 async function loadTransfers(): Promise<AdminTransferRow[] | null> {
@@ -34,7 +33,7 @@ async function loadTransfers(): Promise<AdminTransferRow[] | null> {
         recipientNetwork: t.beneficiary.network,
         isBank: isBankNetwork(t.beneficiary.network, t.beneficiary.country),
         recipientBankName: t.beneficiary.bankName,
-        // Page sans authentification : numéro masqué, le complet passe par le jeton opérateur.
+        // Numéro masqué dans la liste ; le complet s'affiche à la demande (GET bank-payout, session admin).
         recipientAccountMasked: maskAccount(t.beneficiary.accountNumber),
         payoutProvider: t.payoutProvider,
         createdAt: t.createdAt.toISOString(),

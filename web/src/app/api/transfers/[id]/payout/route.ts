@@ -2,10 +2,17 @@ import { NextResponse } from "next/server";
 import { queueAndRunPayout } from "@/lib/transfer-service";
 import { prisma } from "@/lib/prisma";
 import { publicTransfer } from "@/lib/bank";
+import { requireAdmin } from "@/lib/admin-auth";
 
 type Params = { params: Promise<{ id: string }> };
 
-export async function POST(_request: Request, { params }: Params) {
+/**
+ * Déclenchement manuel du versement : réservé à l'administration (session admin ou ADMIN_API_TOKEN).
+ * Le parcours démo n'en dépend pas : simulate-pay enchaîne le versement tant que AUTO_PAYOUT ≠ "false".
+ */
+export async function POST(request: Request, { params }: Params) {
+  const denied = await requireAdmin(request);
+  if (denied) return denied;
   const { id } = await params;
   const transfer = await prisma.transfer.findUnique({ where: { id } });
   if (!transfer) {

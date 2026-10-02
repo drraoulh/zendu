@@ -1,6 +1,6 @@
 "use client";
 
-import { type FormEvent, useEffect, useState } from "react";
+import { useState } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { Badge } from "@/components/ui/layout";
@@ -11,8 +11,6 @@ import { adminMessages } from "@/i18n/admin";
 import { formatMoney } from "@/lib/money";
 import type { AdminTransferRow } from "./admin-dashboard";
 
-const TOKEN_KEY = "pw-admin-token";
-
 type BankDetails = {
   fullName: string;
   phone: string;
@@ -21,27 +19,10 @@ type BankDetails = {
   bankCode: string | null;
 };
 
-function readToken(): string {
-  try {
-    return sessionStorage.getItem(TOKEN_KEY) ?? "";
-  } catch {
-    return "";
-  }
-}
-
-function writeToken(value: string) {
-  try {
-    if (value) sessionStorage.setItem(TOKEN_KEY, value);
-    else sessionStorage.removeItem(TOKEN_KEY);
-  } catch {
-    /* stockage indisponible : le jeton reste en mémoire */
-  }
-}
-
 /**
  * File des virements bancaires à traiter manuellement (payoutProvider "manual_bank").
  * Les coordonnées complètes et les actions passent par POST/GET /api/transfers/[id]/bank-payout,
- * protégés par ADMIN_API_TOKEN.
+ * protégés par la session admin (cookie) ou ADMIN_API_TOKEN.
  */
 export function BankQueue({
   rows,
@@ -53,27 +34,6 @@ export function BankQueue({
   date: (iso: string) => string;
 }) {
   const t = useT(adminMessages);
-  const [token, setToken] = useState("");
-  const [tokenInput, setTokenInput] = useState("");
-
-  useEffect(() => {
-    setToken(readToken());
-  }, []);
-
-  function unlock(e: FormEvent) {
-    e.preventDefault();
-    const v = tokenInput.trim();
-    if (!v) return;
-    writeToken(v);
-    setToken(v);
-    setTokenInput("");
-  }
-
-  function lock() {
-    writeToken("");
-    setToken("");
-  }
-
   return (
     <section aria-labelledby="admin-bank-queue" className="rounded-3xl border border-warn/30 bg-white p-5 shadow-card sm:p-6">
       <div className="flex flex-wrap items-start justify-between gap-3">
@@ -87,42 +47,14 @@ export function BankQueue({
           </h2>
           <p className="mt-1 text-sm text-muted">{t("bankQueueHint")}</p>
         </div>
-        {token && (
-          <Button size="sm" variant="ghost" onClick={lock}>
-            <Icon name="lock" className="h-4 w-4" />
-            {t("tokenClear")}
-          </Button>
-        )}
       </div>
-
-      {!token && (
-        <form onSubmit={unlock} className="mt-4 rounded-2xl bg-surface-soft p-4">
-          <label htmlFor="admin-token" className="block text-sm font-medium text-ink">
-            {t("tokenLabel")}
-          </label>
-          <div className="mt-2 flex flex-col gap-2 sm:flex-row">
-            <input
-              id="admin-token"
-              type="password"
-              autoComplete="off"
-              value={tokenInput}
-              onChange={(e) => setTokenInput(e.target.value)}
-              className="w-full min-w-0 rounded-xl border border-line bg-white px-3 py-2.5 text-sm text-ink outline-none focus:border-brand focus:ring-2 focus:ring-brand/20"
-            />
-            <Button type="submit" size="sm">
-              {t("tokenSave")}
-            </Button>
-          </div>
-          <p className="mt-1.5 text-xs text-muted">{t("tokenMissing")} {t("tokenHint")}</p>
-        </form>
-      )}
 
       {rows.length === 0 ? (
         <p className="mt-4 text-sm text-muted">{t("bankQueueEmpty")}</p>
       ) : (
         <ul className="mt-4 space-y-3">
           {rows.map((r) => (
-            <BankQueueItem key={r.id} row={r} token={token} nl={nl} date={date} />
+            <BankQueueItem key={r.id} row={r} nl={nl} date={date} />
           ))}
         </ul>
       )}
@@ -132,12 +64,10 @@ export function BankQueue({
 
 function BankQueueItem({
   row,
-  token,
   nl,
   date,
 }: {
   row: AdminTransferRow;
-  token: string;
   nl: string;
   date: (iso: string) => string;
 }) {
@@ -149,12 +79,10 @@ function BankQueueItem({
   const [busy, setBusy] = useState(false);
   const [message, setMessage] = useState<{ ok: boolean; text: string } | null>(null);
 
-  const headers = { "Content-Type": "application/json", Authorization: `Bearer ${token}` };
-
   async function call(method: "GET" | "POST", body?: unknown) {
     const res = await fetch(`/api/transfers/${row.id}/bank-payout`, {
       method,
-      headers,
+      headers: body ? { "Content-Type": "application/json" } : undefined,
       body: body ? JSON.stringify(body) : undefined,
       cache: "no-store",
     });
@@ -211,13 +139,13 @@ function BankQueueItem({
         </p>
       </div>
 
-      {token && !details && (
+      {!details && (
         <Button size="sm" variant="secondary" className="mt-3" disabled={busy} onClick={() => void loadDetails()}>
           {t("showDetails")}
         </Button>
       )}
 
-      {token && details && (
+      {details && (
         <div className="mt-3 space-y-3">
           <dl className="grid gap-x-4 gap-y-1 rounded-xl bg-surface-soft p-3 text-sm sm:grid-cols-[auto_1fr]">
             <dt className="text-muted">{t("bankName")}</dt>

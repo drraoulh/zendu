@@ -2,11 +2,15 @@ import { NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { statusLabel } from "@/lib/transfer-machine";
 import { maskAccount } from "@/lib/bank";
+import { requireAdmin } from "@/lib/admin-auth";
 
 export const dynamic = "force-dynamic";
 
-/** Export activité CSV (style Remitly transfer history download). */
-export async function GET() {
+/** Export activité CSV (style Remitly transfer history download). Réservé à l'administration. */
+export async function GET(request: Request) {
+  const denied = await requireAdmin(request);
+  if (denied) return denied;
+
   const transfers = await prisma.transfer.findMany({
     include: { beneficiary: true },
     orderBy: { createdAt: "desc" },
@@ -48,7 +52,7 @@ export async function GET() {
       t.beneficiary.phone,
       t.beneficiary.network,
       csv(t.beneficiary.bankName ?? ""),
-      // Export accessible sans authentification : numéro de compte masqué.
+      // Numéro de compte masqué même pour l'admin (le complet passe par /api/transfers/[id]/bank-payout).
       maskAccount(t.beneficiary.accountNumber) ?? "",
       csv(t.beneficiary.bankCode ?? ""),
       t.payoutProvider,

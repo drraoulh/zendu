@@ -1,30 +1,74 @@
 "use client";
 
 import Link from "next/link";
+import type { ReactNode } from "react";
 import { LogoWordmark } from "@/components/brand/logo";
 import { LanguageSelect } from "@/components/layout/language-select";
 import { Container } from "@/components/ui/layout";
 import { Icon } from "@/components/ui/icon";
-import { NAV } from "@/components/layout/site-header";
 import { WstLogo } from "@/components/brand/wst-logo";
 import { StoreBadges } from "@/components/app/store-badges";
+import { CompanyValue } from "@/components/info/shared";
 import { appMessages } from "@/i18n/app";
-import { appFullName, appName, contact } from "@/lib/brand";
+import { appFullName, appName } from "@/lib/brand";
+import { company, companyLocality, socialLinks, telHref, whatsappHref } from "@/lib/company";
 import { common } from "@/i18n/common";
+import { footerMessages } from "@/i18n/info";
 import { useT } from "@/i18n/define";
+
+type FooterKey = keyof typeof footerMessages.fr;
+
+const COLUMNS: Array<{ title: FooterKey; links: Array<{ href: string; key: FooterKey }> }> = [
+  {
+    title: "services",
+    links: [
+      { href: "/transfert", key: "transfer" },
+      { href: "/application", key: "wst" },
+      { href: "/finances", key: "finances" },
+      { href: "/technologies", key: "tech" },
+      { href: "/shipping", key: "shipping" },
+    ],
+  },
+  {
+    title: "info",
+    links: [
+      { href: "/frais", key: "fees" },
+      { href: "/pays", key: "countries" },
+      { href: "/aide", key: "help" },
+      { href: "/shipping/suivi", key: "tracking" },
+    ],
+  },
+  {
+    title: "company",
+    links: [
+      { href: "/a-propos", key: "about" },
+      { href: "/contact", key: "contact" },
+      { href: "/application", key: "download" },
+    ],
+  },
+  {
+    title: "legal",
+    links: [
+      { href: "/confidentialite", key: "privacy" },
+      { href: "/conditions", key: "terms" },
+      { href: "/conditions#section-5", key: "feesTerms" },
+    ],
+  },
+];
 
 export function SiteFooter() {
   const t = useT(common);
+  const f = useT(footerMessages);
   const ta = useT(appMessages);
   const year = new Date().getFullYear();
-
-  const services = NAV.slice(0, 4);
-  const company = NAV.slice(4);
+  const locality = companyLocality();
+  const wa = whatsappHref(company.whatsapp);
+  const socials = socialLinks();
 
   return (
     <footer className="bg-navy-gradient text-white">
       <Container className="py-16">
-        <div className="grid gap-12 lg:grid-cols-[1.4fr_1fr_1fr_1.2fr]">
+        <div className="grid gap-12 lg:grid-cols-[1.35fr_2.65fr]">
           <div>
             <LogoWordmark light />
             <p className="mt-5 max-w-sm text-sm leading-relaxed text-white/70">{t("tagline")}</p>
@@ -32,45 +76,81 @@ export function SiteFooter() {
               <Icon name="maple" className="h-4 w-4 text-maple" />
               {t("basedIn")}
             </p>
-          </div>
 
-          <FooterColumn title={t("services")}>
-            {services.map((s) => (
-              <FooterLink key={s.href} href={s.href}>
-                {t(s.key)}
-              </FooterLink>
-            ))}
-            <FooterLink href="/transfert">WorldSoft Transfer</FooterLink>
-            <FooterLink href="/application">{ta("downloadApp")}</FooterLink>
-          </FooterColumn>
+            <p className="mt-8 font-display text-sm font-bold uppercase tracking-[0.14em] text-white">{f("contactTitle")}</p>
+            <ul className="mt-4 grid gap-3 text-sm text-white/70">
+              <li className="flex items-center gap-2.5">
+                <Icon name="mail" className="h-4 w-4 shrink-0 text-sky" />
+                <CompanyValue
+                  value={company.email}
+                  href={company.email ? `mailto:${company.email}` : null}
+                  light
+                  className="break-all hover:text-white"
+                />
+              </li>
+              <li className="flex items-center gap-2.5">
+                <Icon name="phone" className="h-4 w-4 shrink-0 text-sky" />
+                <CompanyValue value={company.phone} href={company.phone ? telHref(company.phone) : null} light className="hover:text-white" />
+              </li>
+              {wa && (
+                <li className="flex items-center gap-2.5">
+                  <Icon name="phone" className="h-4 w-4 shrink-0 text-sky" />
+                  <a href={wa} target="_blank" rel="noopener noreferrer" className="hover:text-white">
+                    WhatsApp
+                  </a>
+                </li>
+              )}
+              <li className="flex items-start gap-2.5">
+                <Icon name="pin" className="mt-0.5 h-4 w-4 shrink-0 text-sky" />
+                <span>
+                  {company.address && <span className="block">{company.address}</span>}
+                  <span className="block">{[locality, company.country].filter(Boolean).join(", ")}</span>
+                </span>
+              </li>
+              {company.hours && (
+                <li className="flex items-center gap-2.5">
+                  <Icon name="clock" className="h-4 w-4 shrink-0 text-sky" />
+                  {company.hours}
+                </li>
+              )}
+            </ul>
 
-          <FooterColumn title={t("company")}>
-            {company.map((s) => (
-              <FooterLink key={s.href} href={s.href}>
-                {t(s.key)}
-              </FooterLink>
-            ))}
-          </FooterColumn>
-
-          <FooterColumn title={t("contactUs")}>
-            <a href={`mailto:${contact.email}`} className="inline-flex items-center gap-2.5 text-sm text-white/70 hover:text-white">
-              <Icon name="mail" className="h-4 w-4 text-sky" />
-              {contact.email}
-            </a>
-            {contact.phone && (
-              <a href={`tel:${contact.phone.replace(/\s/g, "")}`} className="inline-flex items-center gap-2.5 text-sm text-white/70 hover:text-white">
-                <Icon name="phone" className="h-4 w-4 text-sky" />
-                {contact.phone}
-              </a>
+            {socials.length > 0 && (
+              <div className="mt-6">
+                <p className="text-xs font-semibold uppercase tracking-[0.14em] text-white/55">{f("follow")}</p>
+                <ul className="mt-3 flex flex-wrap gap-2">
+                  {socials.map((s) => (
+                    <li key={s.id}>
+                      <a
+                        href={s.href}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="inline-flex rounded-full border border-white/15 bg-white/5 px-3 py-1.5 text-xs font-semibold text-white/80 hover:bg-white/15 hover:text-white"
+                      >
+                        {s.label}
+                      </a>
+                    </li>
+                  ))}
+                </ul>
+              </div>
             )}
-            <span className="inline-flex items-center gap-2.5 text-sm text-white/70">
-              <Icon name="pin" className="h-4 w-4 text-sky" />
-              {contact.city}, {contact.country}
-            </span>
-            <div className="pt-2">
+
+            <div className="mt-6">
               <LanguageSelect dark />
             </div>
-          </FooterColumn>
+          </div>
+
+          <div className="grid grid-cols-2 gap-x-6 gap-y-10 sm:grid-cols-4">
+            {COLUMNS.map((col) => (
+              <FooterColumn key={col.title} title={f(col.title)}>
+                {col.links.map((l) => (
+                  <FooterLink key={`${l.href}-${l.key}`} href={l.href}>
+                    {f(l.key)}
+                  </FooterLink>
+                ))}
+              </FooterColumn>
+            ))}
+          </div>
         </div>
 
         <div className="mt-14 flex flex-col gap-6 rounded-3xl border border-white/10 bg-white/5 p-6 sm:p-8 md:flex-row md:items-center md:justify-between">
@@ -88,14 +168,15 @@ export function SiteFooter() {
       <div className="border-t border-white/10">
         <Container className="flex flex-col gap-3 py-6 text-xs text-white/55 sm:flex-row sm:items-center sm:justify-between">
           <p>
-            © {year} {appName} — {appFullName}. {t("rights")}
+            © {year} {appName} — {company.legalName ?? appFullName}. {t("rights")}
+            {company.registration && <span className="block sm:inline"> {f("registration", { n: company.registration })}</span>}
           </p>
           <div className="flex gap-5">
             <Link href="/confidentialite" className="hover:text-white">
-              {t("privacy")}
+              {f("privacy")}
             </Link>
             <Link href="/conditions" className="hover:text-white">
-              {t("terms")}
+              {f("terms")}
             </Link>
           </div>
         </Container>
@@ -104,16 +185,16 @@ export function SiteFooter() {
   );
 }
 
-function FooterColumn({ title, children }: { title: string; children: React.ReactNode }) {
+function FooterColumn({ title, children }: { title: string; children: ReactNode }) {
   return (
-    <div>
+    <div className="min-w-0">
       <p className="font-display text-sm font-bold uppercase tracking-[0.14em] text-white">{title}</p>
       <div className="mt-5 flex flex-col gap-3">{children}</div>
     </div>
   );
 }
 
-function FooterLink({ href, children }: { href: string; children: React.ReactNode }) {
+function FooterLink({ href, children }: { href: string; children: ReactNode }) {
   return (
     <Link href={href} className="text-sm text-white/70 transition hover:text-white">
       {children}

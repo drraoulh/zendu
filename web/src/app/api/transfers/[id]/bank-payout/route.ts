@@ -1,9 +1,9 @@
-import { timingSafeEqual } from "crypto";
 import { NextResponse } from "next/server";
 import { z } from "zod";
 import { publicTransfer } from "@/lib/bank";
 import { prisma } from "@/lib/prisma";
 import { completeManualBankPayout } from "@/lib/transfer-service";
+import { requireAdmin } from "@/lib/admin-auth";
 
 type Params = { params: Promise<{ id: string }> };
 
@@ -13,35 +13,17 @@ const bodySchema = z.object({
   reason: z.string().trim().max(300).optional(),
 });
 
-/** Le site n'a pas de rôle « admin » : cette action opérateur est protégée par ADMIN_API_TOKEN. */
-function authorized(request: Request): boolean {
-  const expected = process.env.ADMIN_API_TOKEN;
-  if (!expected) return false;
-  const header = request.headers.get("authorization") ?? "";
-  const given = header.startsWith("Bearer ")
-    ? header.slice(7)
-    : (request.headers.get("x-admin-token") ?? "");
-  const a = Buffer.from(given);
-  const b = Buffer.from(expected);
-  return a.length === b.length && timingSafeEqual(a, b);
-}
-
-function guard(request: Request): NextResponse | null {
-  if (!process.env.ADMIN_API_TOKEN) {
-    return NextResponse.json(
-      { error: "Action opérateur désactivée : définissez ADMIN_API_TOKEN" },
-      { status: 503 },
-    );
-  }
-  if (!authorized(request)) {
-    return NextResponse.json({ error: "Jeton opérateur invalide" }, { status: 401 });
-  }
-  return null;
+/**
+ * Action opérateur : session admin (/admin/login) ou jeton ADMIN_API_TOKEN en
+ * `Authorization: Bearer …` (compatibilité scripts). Voir src/lib/admin-auth.ts.
+ */
+async function guard(request: Request): Promise<NextResponse | null> {
+  return requireAdmin(request);
 }
 
 /** Opérateur : coordonnées bancaires complètes nécessaires pour émettre le virement. */
 export async function GET(request: Request, { params }: Params) {
-  const denied = guard(request);
+  const denied = await guard(request);
   if (denied) return denied;
   const { id } = await params;
   const transfer = await prisma.transfer.findUnique({
@@ -70,7 +52,7 @@ export async function GET(request: Request, { params }: Params) {
  * POST { outcome: "delivered" | "failed", bankReference?, reason? }
  */
 export async function POST(request: Request, { params }: Params) {
-  const denied = guard(request);
+  const denied = await guard(request);
   if (denied) return denied;
 
   const { id } = await params;

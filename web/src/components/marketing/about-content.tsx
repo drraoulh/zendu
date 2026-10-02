@@ -5,7 +5,9 @@ import { LogoFull } from "@/components/brand/logo";
 import { Icon, type IconName } from "@/components/ui/icon";
 import { Container, PageHero, Section, SectionHeading } from "@/components/ui/layout";
 import { ButtonLink } from "@/components/ui/button";
-import { contact } from "@/lib/brand";
+import { WstLogo } from "@/components/brand/wst-logo";
+import { CompanyValue } from "@/components/info/shared";
+import { company, companyLocality, telHref } from "@/lib/company";
 import { aboutPage } from "@/i18n/company";
 import { common } from "@/i18n/common";
 import { useT } from "@/i18n/define";
@@ -25,6 +27,17 @@ export function AboutContent() {
   const t = useT(aboutPage);
   const c = useT(common);
   const k = (key: string) => t(key as K);
+  const locality = companyLocality();
+  const facts: Array<{ label: string; value: string | null; href?: string | null }> = [
+    { label: t("factLegalName"), value: company.legalName },
+    { label: t("factBrand"), value: company.brandName },
+    { label: t("factAddress"), value: company.address },
+    { label: t("factLocality"), value: locality },
+    { label: t("factCountry"), value: company.country },
+    { label: t("factEmail"), value: company.email, href: company.email ? `mailto:${company.email}` : null },
+    { label: t("factPhone"), value: company.phone, href: company.phone ? telHref(company.phone) : null },
+    { label: t("factHours"), value: company.hours },
+  ];
 
   return (
     <>
@@ -51,7 +64,8 @@ export function AboutContent() {
               </div>
               <span className="absolute -bottom-4 left-1/2 inline-flex -translate-x-1/2 items-center gap-2 whitespace-nowrap rounded-full border border-line bg-white px-4 py-2 text-sm font-semibold text-ink shadow-card">
                 <Icon name="maple" className="h-4 w-4 text-maple" />
-                {t("basedIn")} · {contact.city}
+                {t("basedIn")}
+                {company.city ? ` · ${company.city}` : ""}
               </span>
               <figcaption className="mt-10 text-center text-xs leading-relaxed text-muted">{t("logoCaption")}</figcaption>
             </figure>
@@ -134,6 +148,98 @@ export function AboutContent() {
               );
             })}
           </ul>
+        </Container>
+      </Section>
+
+      {/* WorldSoft Transfer, une solution PWFINTECH */}
+      <Section>
+        <Container>
+          <div className="grid items-center gap-10 lg:grid-cols-[1.1fr_1fr] lg:gap-16">
+            <div>
+              <SectionHeading eyebrow={t("wstEyebrow")} title={t("wstTitle")} />
+              <div className="mt-6 grid gap-4 text-base leading-relaxed text-muted">
+                <p>{t("wstText1")}</p>
+                <p>{t("wstText2")}</p>
+              </div>
+              <div className="mt-8 flex flex-col gap-3 sm:flex-row sm:flex-wrap">
+                <ButtonLink href="/application" size="lg">
+                  {t("wstCtaApp")}
+                  <Icon name="arrowRight" className="h-4 w-4" />
+                </ButtonLink>
+                <ButtonLink href="/frais" variant="secondary" size="lg">
+                  {t("wstCtaFees")}
+                </ButtonLink>
+                <ButtonLink href="/pays" variant="ghost" size="lg">
+                  {t("wstCtaCountries")}
+                </ButtonLink>
+              </div>
+            </div>
+            <div className="rounded-[2rem] border border-line bg-white p-6 shadow-float sm:p-8">
+              <WstLogo variant="horizontal" className="h-9 w-auto" />
+              <ul className="mt-6 grid gap-3">
+                {(["wstPoint1", "wstPoint2", "wstPoint3"] as const).map((key) => (
+                  <li key={key} className="flex gap-3 text-sm leading-relaxed text-ink">
+                    <span className="mt-0.5 grid h-5 w-5 shrink-0 place-items-center rounded-full bg-brand-soft text-brand">
+                      <Icon name="check" className="h-3.5 w-3.5" strokeWidth={2.4} />
+                    </span>
+                    {t(key)}
+                  </li>
+                ))}
+              </ul>
+            </div>
+          </div>
+        </Container>
+      </Section>
+
+      {/* Conformité + fiche entreprise */}
+      <Section className="bg-surface-soft">
+        <Container>
+          <div className="grid gap-6 lg:grid-cols-2">
+            <article className="rounded-3xl border border-line bg-white p-6 shadow-card sm:p-8">
+              <span className="grid h-12 w-12 place-items-center rounded-2xl bg-brand-soft text-brand">
+                <Icon name="shield" className="h-6 w-6" />
+              </span>
+              <p className="mt-6 font-display text-xs font-bold uppercase tracking-[0.18em] text-brand">{t("complianceEyebrow")}</p>
+              <h2 className="mt-2 font-display text-2xl font-extrabold text-ink">{t("complianceTitle")}</h2>
+              <div className="mt-4 grid gap-3 text-sm leading-relaxed text-muted">
+                <p>{t("complianceText1")}</p>
+                <p>{t("complianceText2")}</p>
+              </div>
+              <dl className="mt-6 grid gap-3 rounded-2xl bg-surface-soft p-4 text-sm">
+                <div className="flex flex-col gap-0.5 sm:flex-row sm:justify-between sm:gap-4">
+                  <dt className="font-semibold text-ink">{t("complianceReg")}</dt>
+                  <dd className="sm:text-right">
+                    <CompanyValue value={company.registration} className="font-semibold text-ink" />
+                  </dd>
+                </div>
+                {!company.registration && (
+                  <div className="flex flex-col gap-0.5 sm:flex-row sm:justify-between sm:gap-4">
+                    <dt className="font-semibold text-ink">{t("complianceStatus")}</dt>
+                    <dd className="text-muted sm:text-right">{t("complianceStatusValue")}</dd>
+                  </div>
+                )}
+              </dl>
+              <p className="mt-3 text-xs text-muted">{t("complianceVerify")}</p>
+            </article>
+
+            <article className="rounded-3xl border border-line bg-white p-6 shadow-card sm:p-8">
+              <span className="grid h-12 w-12 place-items-center rounded-2xl bg-brand-soft text-brand">
+                <Icon name="info" className="h-6 w-6" />
+              </span>
+              <p className="mt-6 font-display text-xs font-bold uppercase tracking-[0.18em] text-brand">{t("factsEyebrow")}</p>
+              <h2 className="mt-2 font-display text-2xl font-extrabold text-ink">{t("factsTitle")}</h2>
+              <dl className="mt-5 divide-y divide-line text-sm">
+                {facts.map((f) => (
+                  <div key={f.label} className="flex flex-col gap-0.5 py-3 sm:flex-row sm:justify-between sm:gap-4">
+                    <dt className="text-muted">{f.label}</dt>
+                    <dd className="min-w-0 break-words sm:text-right">
+                      <CompanyValue value={f.value} href={f.href} className={f.href ? "font-semibold text-brand hover:text-brand-strong" : "font-semibold text-ink"} />
+                    </dd>
+                  </div>
+                ))}
+              </dl>
+            </article>
+          </div>
         </Container>
       </Section>
 
