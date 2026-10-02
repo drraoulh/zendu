@@ -28,7 +28,7 @@ const SHORTCUTS: Array<{ href: string; icon: IconName; key: K }> = [
   { href: "/technologies#faq", icon: "code", key: "shortcut3" },
   { href: "/shipping#faq", icon: "ship", key: "shortcut4" },
   { href: "/shipping#devis", icon: "box", key: "shortcut5" },
-  { href: "/history", icon: "receipt", key: "shortcut6" },
+  { href: "/application", icon: "receipt", key: "shortcut6" },
 ];
 
 type Values = { name: string; email: string; phone: string; subject: Subject; message: string };

@@ -1,9 +1,11 @@
 "use client";
 
 import { useCallback, useEffect, useMemo, useRef, useState, type ReactNode } from "react";
+import { AppDownloadButton } from "@/components/app/app-download-button";
+import { WstLogo } from "@/components/brand/wst-logo";
 import { CountryFlag } from "@/components/country-flag";
 import { useI18n } from "@/components/i18n-provider";
-import { Button, ButtonLink } from "@/components/ui/button";
+import { Button } from "@/components/ui/button";
 import { Icon } from "@/components/ui/icon";
 import { calculatorMessages } from "@/i18n/calculator";
 import { useT } from "@/i18n/define";
@@ -103,8 +105,46 @@ function formatRate(rate: number, tag: string): string {
 }
 
 /* ------------------------------------------------------------------ */
+/* Présélection d'un corridor (?corridor=CA-SN&amount=200 ou événement)  */
+/* ------------------------------------------------------------------ */
 
-export function TransferCalculator({ className = "" }: { className?: string }) {
+const SELECT_EVENT = "pw:calculator-corridor";
+
+type Preselect = { source?: string; dest?: string; amount?: number };
+
+function parseCorridorParam(corridor: string | null, amount: string | null): Preselect {
+  const out: Preselect = {};
+  const m = corridor?.toUpperCase().match(/^([A-Z]{2})-([A-Z]{2})$/);
+  if (m) {
+    out.source = m[1];
+    out.dest = m[2];
+  }
+  const n = amount ? Number(amount) : NaN;
+  if (Number.isFinite(n) && n > 0) out.amount = n;
+  return out;
+}
+
+/** Présélectionne un corridor dans les calculateurs déjà affichés sur la page. */
+export function selectCalculatorCorridor(corridorId: string, amount?: number) {
+  if (typeof window === "undefined") return;
+  window.dispatchEvent(new CustomEvent<Preselect>(SELECT_EVENT, { detail: parseCorridorParam(corridorId, amount ? String(amount) : null) }));
+}
+
+/** Lien vers le simulateur de /transfert avec un corridor présélectionné. */
+export function simulatorHref(corridorId: string): string {
+  return `/transfert?corridor=${encodeURIComponent(corridorId)}#simulateur`;
+}
+
+/* ------------------------------------------------------------------ */
+
+export function TransferCalculator({
+  className = "",
+  id,
+}: {
+  className?: string;
+  /** Ancre facultative (ex. « simulateur »). */
+  id?: string;
+}) {
   const t = useT(calculatorMessages);
   const { locale } = useI18n();
   const tag = localeTag(locale);
@@ -125,6 +165,29 @@ export function TransferCalculator({ className = "" }: { className?: string }) {
   const [refreshNonce, setRefreshNonce] = useState(0);
   const [now, setNow] = useState(() => Date.now());
   const lastKeyRef = useRef("");
+
+  /* Présélection via l'URL ou un événement de page ------------------- */
+  useEffect(() => {
+    const apply = (p: Preselect) => {
+      if (p.source) setSourceCode(p.source);
+      if (p.dest) setDestCode(p.dest);
+      if (p.source || p.dest || p.amount) {
+        setMode("send");
+        setQuote(null);
+        setReceiveText("");
+      }
+      if (p.amount) setSendText(String(p.amount));
+    };
+    try {
+      const params = new URLSearchParams(window.location.search);
+      apply(parseCorridorParam(params.get("corridor"), params.get("amount")));
+    } catch {
+      /* URL illisible : on garde les valeurs par défaut */
+    }
+    const onSelect = (e: Event) => apply((e as CustomEvent<Preselect>).detail ?? {});
+    window.addEventListener(SELECT_EVENT, onSelect);
+    return () => window.removeEventListener(SELECT_EVENT, onSelect);
+  }, []);
 
   /* Corridors ------------------------------------------------------- */
   useEffect(() => {
@@ -300,7 +363,8 @@ export function TransferCalculator({ className = "" }: { className?: string }) {
 
   return (
     <div
-      className={`w-full overflow-hidden rounded-3xl border border-white/60 bg-white text-ink shadow-float ${className}`}
+      id={id}
+      className={`w-full scroll-mt-24 overflow-hidden rounded-3xl border border-white/60 bg-white text-ink shadow-float ${className}`}
     >
       {/* En-tête */}
       <div className="flex flex-wrap items-center justify-between gap-2 border-b border-line px-5 py-4 sm:px-6">
@@ -465,21 +529,18 @@ export function TransferCalculator({ className = "" }: { className?: string }) {
             />
           </dl>
 
-          {showQuote ? (
-            <ButtonLink
-              href={`/send?corridor=${encodeURIComponent(corridorId)}&amount=${showQuote.sendAmount}`}
-              size="lg"
-              className="w-full"
-            >
-              {t("send")}
-              <Icon name="arrowRight" className="h-4 w-4" />
-            </ButtonLink>
-          ) : (
-            <Button size="lg" className="w-full" disabled>
-              {loading ? <Spinner light /> : null}
-              {t("send")}
-            </Button>
-          )}
+          <AppDownloadButton
+            corridor={corridorId}
+            amount={showQuote ? showQuote.sendAmount : undefined}
+            size="lg"
+            className="w-full"
+          />
+          <p className="flex items-center justify-center gap-2 text-center text-xs font-medium text-ink">
+            <span aria-hidden className="shrink-0">
+              <WstLogo variant="symbol" className="h-5 w-5" />
+            </span>
+            {t("finishInApp")}
+          </p>
 
           <p className="flex items-center justify-center gap-1.5 text-center text-xs text-muted">
             <Icon name="lock" className="h-3.5 w-3.5" />

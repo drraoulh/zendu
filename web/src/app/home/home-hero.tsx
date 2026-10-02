@@ -71,7 +71,7 @@ export function HomeHero() {
           <p className="mt-6 max-w-xl text-base leading-relaxed text-white/75 sm:text-lg">{t("heroSubtitle")}</p>
 
           <div className="mt-8 flex flex-col gap-3 sm:flex-row">
-            <ButtonLink href="/send" size="lg">
+            <ButtonLink href="/transfert" size="lg">
               {t("heroCtaSend")}
               <Icon name="arrowRight" className="h-4 w-4" />
             </ButtonLink>

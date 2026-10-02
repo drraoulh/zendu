@@ -76,3 +76,14 @@ CREATE INDEX IF NOT EXISTS "TransferEvent_transferId_idx" ON "TransferEvent"("tr
 ALTER TABLE "Beneficiary" ADD COLUMN IF NOT EXISTS "bankName" TEXT;
 ALTER TABLE "Beneficiary" ADD COLUMN IF NOT EXISTS "accountNumber" TEXT;
 ALTER TABLE "Beneficiary" ADD COLUMN IF NOT EXISTS "bankCode" TEXT;
+
+-- Liste d'attente de l'application WorldSoft Transfer (2026-10-02)
+CREATE TABLE IF NOT EXISTS "WaitlistSignup" (
+  "id" TEXT PRIMARY KEY,
+  "email" TEXT NOT NULL,
+  "country" TEXT,
+  "locale" TEXT,
+  "source" TEXT,
+  "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP
+);
+CREATE UNIQUE INDEX IF NOT EXISTS "WaitlistSignup_email_key" ON "WaitlistSignup"("email");

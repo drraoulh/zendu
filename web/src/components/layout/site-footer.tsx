@@ -6,12 +6,16 @@ import { LanguageSelect } from "@/components/layout/language-select";
 import { Container } from "@/components/ui/layout";
 import { Icon } from "@/components/ui/icon";
 import { NAV } from "@/components/layout/site-header";
+import { WstLogo } from "@/components/brand/wst-logo";
+import { StoreBadges } from "@/components/app/store-badges";
+import { appMessages } from "@/i18n/app";
 import { appFullName, appName, contact } from "@/lib/brand";
 import { common } from "@/i18n/common";
 import { useT } from "@/i18n/define";
 
 export function SiteFooter() {
   const t = useT(common);
+  const ta = useT(appMessages);
   const year = new Date().getFullYear();
 
   const services = NAV.slice(0, 4);
@@ -36,7 +40,8 @@ export function SiteFooter() {
                 {t(s.key)}
               </FooterLink>
             ))}
-            <FooterLink href="/send">{t("sendMoney")}</FooterLink>
+            <FooterLink href="/transfert">WorldSoft Transfer</FooterLink>
+            <FooterLink href="/application">{ta("downloadApp")}</FooterLink>
           </FooterColumn>
 
           <FooterColumn title={t("company")}>
@@ -45,8 +50,6 @@ export function SiteFooter() {
                 {t(s.key)}
               </FooterLink>
             ))}
-            <FooterLink href="/history">{t("navHistory")}</FooterLink>
-            <FooterLink href="/refer">{t("navRefer")}</FooterLink>
           </FooterColumn>
 
           <FooterColumn title={t("contactUs")}>
@@ -68,6 +71,17 @@ export function SiteFooter() {
               <LanguageSelect dark />
             </div>
           </FooterColumn>
+        </div>
+
+        <div className="mt-14 flex flex-col gap-6 rounded-3xl border border-white/10 bg-white/5 p-6 sm:p-8 md:flex-row md:items-center md:justify-between">
+          <div>
+            <p className="font-display text-xs font-bold uppercase tracking-[0.18em] text-sky">{ta("ourApp")}</p>
+            <Link href="/application" className="mt-3 inline-block" aria-label="WorldSoft Transfer">
+              <WstLogo variant="negative" className="h-7 w-auto" />
+            </Link>
+            <p className="mt-3 max-w-md text-sm text-white/70">{ta("ourAppText")}</p>
+          </div>
+          <StoreBadges dark />
         </div>
       </Container>
 

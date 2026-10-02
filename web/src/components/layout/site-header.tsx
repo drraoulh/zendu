@@ -1,5 +1,6 @@
 "use client";
 
+import Image from "next/image";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useEffect, useState } from "react";
@@ -8,6 +9,9 @@ import { LanguageSelect } from "@/components/layout/language-select";
 import { ButtonLink, buttonClass } from "@/components/ui/button";
 import { Icon, type IconName } from "@/components/ui/icon";
 import { displayName, useAuth } from "@/components/auth-provider";
+import { StoreBadges } from "@/components/app/store-badges";
+import { webTransfersEnabled } from "@/lib/app-links";
+import { appMessages } from "@/i18n/app";
 import { common } from "@/i18n/common";
 import { useT } from "@/i18n/define";
 
@@ -22,8 +26,14 @@ export const NAV: { href: string; key: NavKey; icon: IconName }[] = [
   { href: "/contact", key: "navContact", icon: "mail" },
 ];
 
+/** Petit symbole WST blanc pour le bouton « Télécharger l'app ». */
+function WstGlyph({ className = "h-4 w-4" }: { className?: string }) {
+  return <Image src="/brand/wst/symbol-mono-white.svg" width={20} height={20} alt="" className={className} unoptimized />;
+}
+
 export function SiteHeader() {
   const t = useT(common);
+  const ta = useT(appMessages);
   const pathname = usePathname();
   const { user, loading, signOut } = useAuth();
   const [open, setOpen] = useState(false);
@@ -76,7 +86,7 @@ export function SiteHeader() {
           <div className="hidden md:block">
             <LanguageSelect />
           </div>
-          {!loading && user ? (
+          {webTransfersEnabled && !loading && user ? (
             <div className="hidden items-center gap-1 lg:flex">
               <Link
                 href="/history"
@@ -95,18 +105,18 @@ export function SiteHeader() {
                 <Icon name="logout" className="h-4 w-4" />
               </button>
             </div>
-          ) : (
+          ) : webTransfersEnabled ? (
             <Link
               href="/login"
               className="hidden whitespace-nowrap rounded-full px-3 py-2 text-sm font-semibold text-ink hover:bg-surface-soft lg:inline-flex"
             >
               {t("logIn")}
             </Link>
-          )}
+          ) : null}
           <div className="hidden sm:block">
-            <ButtonLink href="/send" size="sm" className="whitespace-nowrap">
-              {t("sendMoney")}
-              <Icon name="arrowRight" className="h-4 w-4" />
+            <ButtonLink href="/application" size="sm" className="whitespace-nowrap">
+              <WstGlyph />
+              {ta("downloadApp")}
             </ButtonLink>
           </div>
           <button
@@ -141,7 +151,7 @@ export function SiteHeader() {
 
             <div className="my-3 border-t border-line" />
 
-            {!loading && user ? (
+            {!webTransfersEnabled ? null : !loading && user ? (
               <>
                 <Link href="/history" className="flex items-center gap-3 rounded-2xl px-4 py-3 font-semibold hover:bg-surface-soft">
                   <Icon name="receipt" /> {t("navHistory")}
@@ -168,9 +178,16 @@ export function SiteHeader() {
               </div>
             )}
 
-            <ButtonLink href="/send" size="lg" className="mt-3 w-full">
-              {t("sendMoney")}
+            <ButtonLink href="/application" size="lg" className={`w-full ${webTransfersEnabled ? "mt-3" : ""}`}>
+              <WstGlyph className="h-5 w-5" />
+              {ta("downloadApp")}
             </ButtonLink>
+
+            <div className="mt-5 rounded-2xl border border-line p-4">
+              <p className="text-sm font-semibold text-ink">{ta("ourApp")}</p>
+              <p className="mt-1 text-sm text-muted">{ta("ourAppText")}</p>
+              <StoreBadges className="mt-4" />
+            </div>
 
             <div className="mt-5 flex items-center justify-between rounded-2xl bg-surface-soft px-4 py-3">
               <span className="text-sm font-semibold text-muted">{t("language")}</span>

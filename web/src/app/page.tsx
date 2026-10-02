@@ -1,5 +1,5 @@
 import { HomeHero } from "@/app/home/home-hero";
-import { BrandSection, DestinationsSection, FaqSection, FinalCta } from "@/app/home/home-more";
+import { AppSection, BrandSection, DestinationsSection, FaqSection, FinalCta } from "@/app/home/home-more";
 import { ServicesSection, StepsSection, ValuesSection } from "@/app/home/home-sections";
 import { getDestinationCountries } from "@/lib/corridors";
 
@@ -14,6 +14,7 @@ export default function HomePage() {
     <>
       <HomeHero />
       <ServicesSection />
+      <AppSection />
       <StepsSection />
       <ValuesSection />
       <DestinationsSection destinations={destinations} />

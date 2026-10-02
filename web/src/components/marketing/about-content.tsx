@@ -142,7 +142,7 @@ export function AboutContent() {
           title={t("ctaTitle")}
           text={t("ctaText")}
           primary={{ href: "/contact", label: t("heroCta2") }}
-          secondary={{ href: "/send", label: c("sendMoney") }}
+          secondary={{ href: "/transfert", label: c("sendMoney") }}
         />
       </div>
     </>

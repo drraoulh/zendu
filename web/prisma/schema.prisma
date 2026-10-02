@@ -85,3 +85,13 @@ model TransferEvent {
 
   @@index([transferId])
 }
+
+/// Liste d'attente de l'application mobile WorldSoft Transfer (page /application).
+model WaitlistSignup {
+  id        String   @id @default(cuid())
+  email     String   @unique
+  country   String?
+  locale    String?
+  source    String?
+  createdAt DateTime @default(now())
+}

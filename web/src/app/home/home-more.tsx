@@ -1,10 +1,14 @@
 "use client";
 
 import Link from "next/link";
+import { AppDownloadButton } from "@/components/app/app-download-button";
+import { StoreBadges } from "@/components/app/store-badges";
 import { LogoFull } from "@/components/brand/logo";
+import { WstLogo } from "@/components/brand/wst-logo";
 import { CountryFlag } from "@/components/country-flag";
 import { useI18n } from "@/components/i18n-provider";
-import { countryName } from "@/components/transfer/transfer-calculator";
+import { HomeScreen, PhoneFrame } from "@/components/marketing/wst/phone-screens";
+import { countryName, simulatorHref } from "@/components/transfer/transfer-calculator";
 import { ButtonLink } from "@/components/ui/button";
 import { Icon } from "@/components/ui/icon";
 import { Container, Eyebrow, Section, SectionHeading } from "@/components/ui/layout";
@@ -34,7 +38,7 @@ export function DestinationsSection({ destinations }: { destinations: HomeDestin
           {items.map((d) => (
             <li key={d.code}>
               <Link
-                href={`/send?corridor=CA-${d.code}`}
+                href={simulatorHref(`CA-${d.code}`)}
                 aria-label={t("destSendTo", { country: d.label })}
                 className="group flex h-full items-center gap-3 rounded-2xl border border-line bg-white px-3.5 py-3 transition hover:-translate-y-0.5 hover:border-brand/30 hover:shadow-card"
               >
@@ -53,6 +57,51 @@ export function DestinationsSection({ destinations }: { destinations: HomeDestin
             </li>
           ))}
         </ul>
+      </Container>
+    </Section>
+  );
+}
+
+export function AppSection() {
+  const t = useT(homeMessages);
+  return (
+    <Section className="bg-bg">
+      <Container>
+        <div className="bg-navy-gradient relative grid items-center gap-12 overflow-hidden rounded-[2rem] px-6 pt-12 text-white shadow-float sm:px-10 lg:grid-cols-[1.1fr_0.9fr] lg:gap-10 lg:px-14 lg:pt-14">
+          <div aria-hidden className="bg-grid absolute inset-0 opacity-30 [mask-image:linear-gradient(to_right,black,transparent)]" />
+          <div aria-hidden className="absolute -right-20 top-10 h-80 w-80 rounded-full bg-brand/40 blur-3xl" />
+          <div className="relative pb-0 lg:pb-14">
+            <WstLogo variant="negative" className="h-8 w-auto sm:h-9" />
+            <h2 className="mt-6 font-display text-3xl font-extrabold tracking-tight sm:text-4xl">{t("appTitle")}</h2>
+            <p className="mt-4 max-w-xl text-base leading-relaxed text-white/75 sm:text-lg">{t("appText")}</p>
+            <ul className="mt-6 space-y-2.5">
+              {(["appPoint1", "appPoint2", "appPoint3"] as const).map((key) => (
+                <li key={key} className="flex gap-2.5 text-sm text-white/90 sm:text-base">
+                  <Icon name="check" className="mt-0.5 h-4 w-4 shrink-0 text-sky" strokeWidth={2.4} />
+                  {t(key)}
+                </li>
+              ))}
+            </ul>
+            <div className="mt-8">
+              <StoreBadges dark />
+            </div>
+            <div className="mt-6 flex flex-col gap-3 sm:flex-row sm:flex-wrap">
+              <ButtonLink href="/application" variant="white">
+                {t("appLink")}
+                <Icon name="arrowRight" className="h-4 w-4" />
+              </ButtonLink>
+              <ButtonLink href="/transfert" variant="outline-light">
+                {t("appProduct")}
+              </ButtonLink>
+            </div>
+          </div>
+          <div className="relative mx-auto -mb-28 w-full max-w-[300px] sm:-mb-24 lg:mb-[-7rem]">
+            <div aria-hidden className="absolute -inset-8 rounded-full bg-sky/25 blur-3xl" />
+            <PhoneFrame>
+              <HomeScreen />
+            </PhoneFrame>
+          </div>
+        </div>
       </Container>
     </Section>
   );
@@ -147,9 +196,9 @@ export function FinalCta() {
             <p className="mt-3 text-lg text-white/80">{t("ctaSubtitle")}</p>
           </div>
           <div className="flex shrink-0 flex-col gap-3 sm:flex-row">
-            <ButtonLink href="/send" variant="white" size="lg">
-              {t("ctaSend")}
-              <Icon name="arrowRight" className="h-4 w-4" />
+            <AppDownloadButton variant="white" size="lg" />
+            <ButtonLink href="/transfert#simulateur" variant="outline-light" size="lg">
+              {t("ctaSimulate")}
             </ButtonLink>
             <ButtonLink href="/contact" variant="outline-light" size="lg">
               {t("ctaContact")}

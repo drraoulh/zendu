@@ -209,7 +209,7 @@ export const contactPage = defineMessages({
     shortcut3: "Questions sur nos services technologiques",
     shortcut4: "Questions sur le shipping",
     shortcut5: "Demander un devis d'expédition",
-    shortcut6: "Suivre mes transferts",
+    shortcut6: "Suivre mes transferts dans l’app",
   },
   en: {
     heroEyebrow: "Contact",
@@ -261,7 +261,7 @@ export const contactPage = defineMessages({
     shortcut3: "Technology services questions",
     shortcut4: "Shipping questions",
     shortcut5: "Request a shipping quote",
-    shortcut6: "Track my transfers",
+    shortcut6: "Track transfers in the app",
   },
   es: {
     heroEyebrow: "Contacto",

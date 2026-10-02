@@ -1,6 +1,7 @@
 "use client";
 
 import Link from "next/link";
+import { WstLogo } from "@/components/brand/wst-logo";
 import { Icon, type IconName } from "@/components/ui/icon";
 import { Container, Section, SectionHeading } from "@/components/ui/layout";
 import { useT } from "@/i18n/define";
@@ -41,6 +42,14 @@ export function ServicesSection() {
                   <Icon name={s.icon} className="h-6 w-6" />
                 </span>
                 <h3 className="mt-5 font-display text-lg font-extrabold tracking-tight text-ink">{t(k("Title"))}</h3>
+                {s.n === 1 && (
+                  <p className="mt-1.5 inline-flex items-center gap-1.5 self-start rounded-full bg-brand-soft px-2.5 py-1 font-display text-xs font-extrabold text-navy">
+                    <span aria-hidden className="shrink-0">
+                      <WstLogo variant="symbol" className="h-4 w-4" />
+                    </span>
+                    {t("s1Brand")}
+                  </p>
+                )}
                 <p className="mt-2 text-sm leading-relaxed text-muted">{t(k("Pitch"))}</p>
                 <ul className="mt-5 space-y-2.5 text-sm text-ink">
                   {(["b1", "b2", "b3"] as const).map((b) => (

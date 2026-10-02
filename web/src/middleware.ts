@@ -1,7 +1,34 @@
-import { type NextRequest } from "next/server";
+import { NextResponse, type NextRequest } from "next/server";
 import { updateSession } from "@/lib/supabase/middleware";
 
+/**
+ * Écrans d'envoi web conservés dans le code (moteur de l'app WorldSoft Transfer) mais fermés au
+ * public : sans WEB_TRANSFERS_ENABLED=true, ils redirigent vers /application.
+ * /api/**, /admin et /auth/callback ne sont jamais concernés.
+ */
+const BLOCKED_EXACT = new Set(["/send", "/history", "/refer", "/login", "/signup"]);
+
+function isBlocked(pathname: string): boolean {
+  const path = pathname.length > 1 ? pathname.replace(/\/+$/, "") : pathname;
+  return BLOCKED_EXACT.has(path) || path === "/transfers" || path.startsWith("/transfers/");
+}
+
 export async function middleware(request: NextRequest) {
+  const { pathname, searchParams } = request.nextUrl;
+
+  if (process.env.WEB_TRANSFERS_ENABLED !== "true" && isBlocked(pathname)) {
+    const target = request.nextUrl.clone();
+    target.pathname = "/application";
+    target.search = "";
+    if (pathname.replace(/\/+$/, "") === "/send") {
+      const corridor = searchParams.get("corridor");
+      const amount = searchParams.get("amount");
+      if (corridor) target.searchParams.set("corridor", corridor);
+      if (amount) target.searchParams.set("amount", amount);
+    }
+    return NextResponse.redirect(target, 307);
+  }
+
   return updateSession(request);
 }
 

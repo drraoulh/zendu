@@ -9,7 +9,7 @@ export const homeMessages = defineMessages({
     heroTitleB: "depuis le Canada.",
     heroSubtitle:
       "Transfert d'argent, finances, technologies et shipping : PWFINTECH accompagne la diaspora et les entrepreneurs entre le Canada et le reste du monde, avec des frais clairs et un suivi à chaque étape.",
-    heroCtaSend: "Envoyer de l'argent",
+    heroCtaSend: "Découvrir WorldSoft Transfer",
     heroCtaServices: "Découvrir nos services",
     chipFees: "Frais transparents",
     chipTracking: "Suivi en temps réel",
@@ -21,7 +21,8 @@ export const homeMessages = defineMessages({
     servicesSubtitle:
       "Des services complémentaires pour soutenir vos proches, vos projets et votre entreprise, ici comme ailleurs.",
     s1Title: "Transfert d'argent",
-    s1Pitch: "Envoyez de l'argent vers l'Afrique, l'Asie et les Caraïbes, simplement et rapidement.",
+    s1Brand: "WorldSoft Transfer",
+    s1Pitch: "Notre application pour envoyer de l'argent vers l'Afrique, l'Asie et les Caraïbes, simplement et rapidement.",
     s1b1: "Taux et frais affichés avant paiement",
     s1b2: "Mobile money, compte bancaire ou retrait",
     s1b3: "Suivi de chaque étape du transfert",
@@ -44,13 +45,14 @@ export const homeMessages = defineMessages({
 
     stepsEyebrow: "Comment ça marche",
     stepsTitle: "Un transfert en quatre étapes",
-    stepsSubtitle: "Pas de surprise : vous voyez le montant reçu, les frais et le délai avant de payer.",
+    stepsSubtitle:
+      "Avec l'application WorldSoft Transfer, pas de surprise : vous voyez le montant reçu, les frais et le délai avant de payer.",
     step1Title: "Simulez",
     step1Text: "Choisissez le pays de destination et le montant : le taux, les frais et le montant reçu s'affichent instantanément.",
     step2Title: "Ajoutez le bénéficiaire",
     step2Text: "Indiquez son nom, son numéro et le mode de réception : mobile money, banque ou retrait.",
     step3Title: "Payez en sécurité",
-    step3Text: "Réglez votre transfert en ligne via une connexion chiffrée. Le montant total est confirmé avant validation.",
+    step3Text: "Réglez votre transfert dans l'application via une connexion chiffrée. Le montant total est confirmé avant validation.",
     step4Title: "Suivez en temps réel",
     step4Text: "Consultez le statut de votre transfert jusqu'à sa remise, et gardez votre reçu à portée de main.",
 
@@ -70,8 +72,8 @@ export const homeMessages = defineMessages({
 
     destEyebrow: "Destinations",
     destTitle: "Où souhaitez-vous envoyer ?",
-    destSubtitle: "Des corridors au départ du Canada vers {n} pays. Choisissez une destination pour commencer.",
-    destSendTo: "Envoyer vers {country}",
+    destSubtitle: "Des corridors au départ du Canada vers {n} pays. Choisissez une destination pour simuler votre envoi.",
+    destSendTo: "Simuler un envoi vers {country}",
 
     brandEyebrow: "Notre marque",
     brandTitle: "Paul World Finances and Technologies",
@@ -87,9 +89,9 @@ export const homeMessages = defineMessages({
     faqSubtitle: "Vous ne trouvez pas votre réponse ? Notre équipe est là pour vous aider.",
     faqContact: "Poser une question",
     q1: "Comment envoyer de l'argent avec PWFINTECH ?",
-    a1: "Simulez votre transfert avec le calculateur, créez votre compte, ajoutez votre bénéficiaire puis payez en ligne. Vous recevez un reçu et pouvez suivre le transfert à tout moment.",
+    a1: "Simulez votre transfert avec le calculateur, puis téléchargez l'application WorldSoft Transfer : créez votre compte, ajoutez votre bénéficiaire et payez dans l'application. Vous recevez un reçu et pouvez suivre le transfert à tout moment.",
     q2: "Quels sont les frais ?",
-    a2: "Les frais se composent d'une part fixe et d'une part variable selon le montant. Ils sont toujours affichés dans le calculateur, avec le total à payer, avant que vous ne validiez.",
+    a2: "Les frais se composent d'une part fixe et d'une part variable selon le montant. Ils sont toujours affichés dans le calculateur et dans l'application WorldSoft Transfer, avec le total à payer, avant que vous ne validiez.",
     q3: "Combien de temps prend un transfert ?",
     a3: "Pour la plupart des destinations, l'argent est disponible en quelques minutes une fois le paiement confirmé. Certains corridors peuvent prendre jusqu'à 24 h, et un virement sur compte bancaire prend généralement 1 à 2 jours ouvrables. Le délai estimé est indiqué avant l'envoi.",
     q4: "Mes données et mon argent sont-ils protégés ?",
@@ -100,8 +102,20 @@ export const homeMessages = defineMessages({
     a6: "Oui : PWFINTECH accompagne aussi les particuliers et entreprises en finances et en technologies (sites web, applications, outils numériques). Écrivez-nous pour discuter de votre projet.",
 
     ctaTitle: "Prêt à construire votre avenir avec nous ?",
-    ctaSubtitle: "Envoyez votre premier transfert en quelques minutes ou parlez-nous de votre projet.",
+    ctaSubtitle:
+      "Envoyez votre premier transfert avec l'application WorldSoft Transfer ou parlez-nous de votre projet.",
     ctaSend: "Envoyer de l'argent",
+    ctaSimulate: "Simuler un transfert",
+
+    appEyebrow: "Notre application",
+    appTitle: "Notre application WorldSoft Transfer",
+    appText:
+      "WorldSoft Transfer est l'application de transfert d'argent de PWFINTECH. Simulez, ajoutez vos destinataires, payez et suivez chaque envoi depuis votre téléphone.",
+    appPoint1: "Taux, frais et délai affichés avant de payer",
+    appPoint2: "Mobile money, virement bancaire ou retrait",
+    appPoint3: "Suivi de chaque étape, reçu détaillé",
+    appLink: "Télécharger l'application",
+    appProduct: "Découvrir WorldSoft Transfer",
     ctaContact: "Nous contacter",
   },
   en: {
@@ -111,7 +125,7 @@ export const homeMessages = defineMessages({
     heroTitleB: "from Canada.",
     heroSubtitle:
       "Money transfer, finances, technologies and shipping: PWFINTECH supports the diaspora and entrepreneurs between Canada and the rest of the world, with clear fees and tracking at every step.",
-    heroCtaSend: "Send money",
+    heroCtaSend: "Discover WorldSoft Transfer",
     heroCtaServices: "Explore our services",
     chipFees: "Transparent fees",
     chipTracking: "Real-time tracking",
@@ -123,7 +137,8 @@ export const homeMessages = defineMessages({
     servicesSubtitle:
       "Complementary services to support your loved ones, your projects and your business, here and abroad.",
     s1Title: "Money transfer",
-    s1Pitch: "Send money to Africa, Asia and the Caribbean, simply and quickly.",
+    s1Brand: "WorldSoft Transfer",
+    s1Pitch: "Our app to send money to Africa, Asia and the Caribbean, simply and quickly.",
     s1b1: "Rate and fees shown before you pay",
     s1b2: "Mobile money, bank account or cash pickup",
     s1b3: "Tracking at every step of the transfer",
@@ -146,13 +161,14 @@ export const homeMessages = defineMessages({
 
     stepsEyebrow: "How it works",
     stepsTitle: "A transfer in four steps",
-    stepsSubtitle: "No surprises: you see the amount received, the fees and the delivery time before you pay.",
+    stepsSubtitle:
+      "With the WorldSoft Transfer app, no surprises: you see the amount received, the fees and the delivery time before you pay.",
     step1Title: "Estimate",
     step1Text: "Pick the destination country and amount: the rate, fees and amount received appear instantly.",
     step2Title: "Add your recipient",
     step2Text: "Enter their name, phone number and how they receive: mobile money, bank or cash pickup.",
     step3Title: "Pay securely",
-    step3Text: "Pay for your transfer online over an encrypted connection. The total is confirmed before you validate.",
+    step3Text: "Pay for your transfer in the app over an encrypted connection. The total is confirmed before you validate.",
     step4Title: "Track in real time",
     step4Text: "Follow your transfer's status until it is delivered, and keep your receipt at hand.",
 
@@ -172,8 +188,8 @@ export const homeMessages = defineMessages({
 
     destEyebrow: "Destinations",
     destTitle: "Where would you like to send?",
-    destSubtitle: "Corridors from Canada to {n} countries. Pick a destination to get started.",
-    destSendTo: "Send to {country}",
+    destSubtitle: "Corridors from Canada to {n} countries. Pick a destination to simulate your transfer.",
+    destSendTo: "Simulate a transfer to {country}",
 
     brandEyebrow: "Our brand",
     brandTitle: "Paul World Finances and Technologies",
@@ -189,9 +205,9 @@ export const homeMessages = defineMessages({
     faqSubtitle: "Can't find your answer? Our team is here to help.",
     faqContact: "Ask a question",
     q1: "How do I send money with PWFINTECH?",
-    a1: "Estimate your transfer with the calculator, create your account, add your recipient and pay online. You get a receipt and can track the transfer at any time.",
+    a1: "Estimate your transfer with the calculator, then download the WorldSoft Transfer app: create your account, add your recipient and pay in the app. You get a receipt and can track the transfer at any time.",
     q2: "What are the fees?",
-    a2: "Fees are made of a flat part and a variable part based on the amount. They are always shown in the calculator, along with the total to pay, before you confirm.",
+    a2: "Fees are made of a flat part and a variable part based on the amount. They are always shown in the calculator and in the WorldSoft Transfer app, along with the total to pay, before you confirm.",
     q3: "How long does a transfer take?",
     a3: "For most destinations, the money is available within minutes once the payment is confirmed. Some corridors can take up to 24 hours, and a payout to a bank account usually takes 1–2 business days. The estimated time is shown before you send.",
     q4: "Are my data and money protected?",
@@ -202,8 +218,19 @@ export const homeMessages = defineMessages({
     a6: "Yes: PWFINTECH also supports individuals and businesses with finances and technologies (websites, apps, digital tools). Write to us to discuss your project.",
 
     ctaTitle: "Ready to build your future with us?",
-    ctaSubtitle: "Send your first transfer in minutes or tell us about your project.",
+    ctaSubtitle: "Send your first transfer with the WorldSoft Transfer app or tell us about your project.",
     ctaSend: "Send money",
+    ctaSimulate: "Simulate a transfer",
+
+    appEyebrow: "Our app",
+    appTitle: "Our WorldSoft Transfer app",
+    appText:
+      "WorldSoft Transfer is PWFINTECH's money transfer app. Simulate, add your recipients, pay and track every transfer from your phone.",
+    appPoint1: "Rate, fees and delivery time shown before you pay",
+    appPoint2: "Mobile money, bank transfer or cash pickup",
+    appPoint3: "Tracking at every step, detailed receipt",
+    appLink: "Download the app",
+    appProduct: "Discover WorldSoft Transfer",
     ctaContact: "Contact us",
   },
   es: {
@@ -212,7 +239,7 @@ export const homeMessages = defineMessages({
     heroTitleB: "desde Canadá.",
     heroSubtitle:
       "Envío de dinero, finanzas, tecnologías y shipping: PWFINTECH acompaña a la diáspora y a los emprendedores entre Canadá y el resto del mundo, con comisiones claras y seguimiento en cada etapa.",
-    heroCtaSend: "Enviar dinero",
+    heroCtaSend: "Descubrir WorldSoft Transfer",
     heroCtaServices: "Descubrir nuestros servicios",
     chipFees: "Comisiones transparentes",
     chipTracking: "Seguimiento en tiempo real",
@@ -229,7 +256,9 @@ export const homeMessages = defineMessages({
     whyEyebrow: "Por qué PWFINTECH",
     whyTitle: "Nuestros compromisos",
     destTitle: "¿A dónde desea enviar?",
-    destSendTo: "Enviar a {country}",
+    destSendTo: "Simular un envío a {country}",
+    appTitle: "Nuestra aplicación WorldSoft Transfer",
+    appLink: "Descargar la aplicación",
     brandTagline: "Más que un servicio, una solución para su futuro.",
     faqTitle: "Preguntas frecuentes",
     ctaTitle: "¿Listo para construir su futuro con nosotros?",
@@ -242,7 +271,7 @@ export const homeMessages = defineMessages({
     heroTitleB: "从加拿大出发。",
     heroSubtitle:
       "汇款、金融、科技与物流：PWFINTECH 为往返加拿大与世界各地的海外侨民和创业者提供服务，费用清晰，每一步都可追踪。",
-    heroCtaSend: "汇款",
+    heroCtaSend: "了解 WorldSoft Transfer",
     heroCtaServices: "了解我们的服务",
     chipFees: "费用透明",
     chipTracking: "实时追踪",
@@ -260,7 +289,9 @@ export const homeMessages = defineMessages({
     whyEyebrow: "为什么选择 PWFINTECH",
     whyTitle: "我们的承诺",
     destTitle: "您想汇款到哪里？",
-    destSendTo: "汇款至{country}",
+    destSendTo: "试算汇款至{country}",
+    appTitle: "我们的应用 WorldSoft Transfer",
+    appLink: "下载应用",
     brandTagline: "不只是服务，更是您未来的解决方案。",
     faqTitle: "常见问题",
     ctaTitle: "准备好与我们共建未来了吗？",
