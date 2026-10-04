@@ -14,10 +14,12 @@ import { colors, fonts, radius } from "@/lib/theme";
  * Démo : la capture est simulée. En production, brancher le SDK du prestataire KYC à cet endroit.
  */
 export default function Kyc() {
-  const { profile, update, updateSettings } = useSession();
+  const { profile, submitKyc, updateSettings } = useSession();
   const country = (profile?.country ?? "CA") as CountryCode;
   const docs = KYC_DOCUMENTS[country] ?? KYC_DOCUMENTS.CA;
-  const [step, setStep] = useState(profile?.kyc === "none" ? 6 : 9);
+  const [step, setStep] = useState(profile?.kyc === "none" || profile?.kyc === "rejected" ? 6 : 9);
+  const [error, setError] = useState<string | null>(null);
+  const [busy, setBusy] = useState(false);
   const [docId, setDocId] = useState(docs[0].id);
   const [front, setFront] = useState(false);
   const [back, setBack] = useState(false);
@@ -26,7 +28,11 @@ export default function Kyc() {
   const doc = docs.find((d) => d.id === docId) ?? docs[0];
 
   async function submit() {
-    await update({ kyc: "pending", kycDocument: doc.label });
+    setBusy(true);
+    setError(null);
+    const r = await submitKyc(doc.label);
+    setBusy(false);
+    if (!r.ok) return setError(r.error);
     setStep(9);
   }
 
@@ -55,6 +61,16 @@ export default function Kyc() {
         <Steps current={6} total={8} label="Pièce d'identité" />
         <H1>Vérifions votre identité</H1>
         <P style={{ marginTop: 6, marginBottom: 18 }}>Exigée par la réglementation sur les transferts d&apos;argent. Cela prend environ 2 minutes.</P>
+        {profile?.kyc === "rejected" ? (
+          <View style={{ marginBottom: 14 }}>
+            <Notice
+              tone="danger"
+              icon="alert"
+              title="Votre précédente vérification a été refusée"
+              text={profile.kycNote ? `Motif : ${profile.kycNote}. Recommencez avec un document valide.` : "Recommencez avec un document valide et lisible."}
+            />
+          </View>
+        ) : null}
         <Small style={{ fontFamily: fonts.semibold, color: colors.ink, marginBottom: 8 }}>Choisissez un document valide</Small>
         {docs.map((d) => (
           <Choice key={d.id} icon="id" label={d.label} description={d.description} selected={docId === d.id} onPress={() => setDocId(d.id)} />
@@ -91,7 +107,7 @@ export default function Kyc() {
 
   if (step === 8) {
     return (
-      <Screen footer={<Button title="Envoyer pour vérification" onPress={submit} disabled={!selfie} />}>
+      <Screen footer={<Button title="Envoyer pour vérification" onPress={submit} disabled={!selfie} loading={busy} />}>
         <Header title="Vérification du visage" onBack={() => setStep(7)} />
         <Steps current={8} total={8} label="Selfie" />
         <H1>Prenez un selfie</H1>
@@ -102,6 +118,11 @@ export default function Kyc() {
           </View>
         </View>
         <Button title={selfie ? "Reprendre le selfie" : "Prendre le selfie"} icon="camera" variant="secondary" onPress={() => setSelfie(true)} />
+        {error ? (
+          <View style={{ marginTop: 12 }}>
+            <Notice tone="danger" icon="alert" text={error} />
+          </View>
+        ) : null}
         <Card style={{ paddingVertical: 6, marginTop: 14 }}>
           <Tip icon="face" text="Centrez votre visage dans l'ovale" />
           <Tip icon="user" text="Retirez lunettes et chapeau, seul(e) dans le cadre" />

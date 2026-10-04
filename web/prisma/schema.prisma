@@ -9,33 +9,33 @@ datasource db {
 }
 
 model Beneficiary {
-  id        String     @id @default(cuid())
-  fullName  String
-  phone     String
-  network   String     @default("MTN")
-  country   String     @default("CM")
+  id            String     @id @default(cuid())
+  fullName      String
+  phone         String
+  network       String     @default("MTN")
+  country       String     @default("CM")
   /// Virement bancaire uniquement (réseau de type "bank") — null pour mobile money / retrait.
   bankName      String?
   /// IBAN / RIB / numéro de compte, sans espaces, en majuscules.
   accountNumber String?
   /// Code SWIFT/BIC ou code banque/agence (facultatif).
   bankCode      String?
-  createdAt DateTime   @default(now())
-  transfers Transfer[]
+  createdAt     DateTime   @default(now())
+  transfers     Transfer[]
 }
 
 model Quote {
-  id               String     @id @default(cuid())
-  corridorId       String     @default("CA-CM")
-  sendCurrency     String     @default("CAD")
-  receiveCurrency  String     @default("XAF")
+  id               String    @id @default(cuid())
+  corridorId       String    @default("CA-CM")
+  sendCurrency     String    @default("CAD")
+  receiveCurrency  String    @default("XAF")
   sendAmountCad    Float
   receiveAmountXaf Float
   rate             Float
   feeCad           Float
   totalCad         Float
   expiresAt        DateTime
-  createdAt        DateTime   @default(now())
+  createdAt        DateTime  @default(now())
   transfer         Transfer?
 }
 
@@ -60,6 +60,9 @@ model Transfer {
   payoutProvider   String          @default("mock_momo")
   payoutRef        String?
   failureReason    String?
+  /// Client WorldSoft Transfer connecté (null pour un envoi sans compte depuis le site).
+  customerId       String?
+  customer         Customer?       @relation(fields: [customerId], references: [id], onDelete: SetNull)
   quoteId          String?         @unique
   quote            Quote?          @relation(fields: [quoteId], references: [id])
   beneficiaryId    String
@@ -73,6 +76,7 @@ model Transfer {
   @@index([senderEmail])
   @@index([status])
   @@index([createdAt])
+  @@index([customerId])
 }
 
 model TransferEvent {
@@ -160,4 +164,60 @@ model ShipmentEvent {
   at         DateTime @default(now())
 
   @@index([shipmentId])
+}
+
+/// Compte client de l'application WorldSoft Transfer (POST /api/auth/*, /api/me/*), géré dans /admin/clients.
+/// kycStatus : none | pending | verified | rejected — status : active | suspended
+model Customer {
+  id                 String            @id @default(cuid())
+  email              String            @unique
+  phone              String
+  firstName          String
+  lastName           String
+  country            String
+  region             String?
+  birthDate          String?
+  occupation         String?
+  jobTitle           String?
+  /// { line1, line2?, city, region, postalCode? }
+  address            Json?
+  /// scrypt$N$sel$hash (jamais renvoyé par les API).
+  passwordHash       String
+  /// Vrai après un mot de passe temporaire donné par l'équipe : changement imposé à la connexion.
+  mustChangePassword Boolean           @default(false)
+  passwordChangedAt  DateTime?
+  kycStatus          String            @default("none")
+  kycDocument        String?
+  kycSubmittedAt     DateTime?
+  kycReviewedAt      DateTime?
+  /// Motif de refus ou note KYC visible par le client.
+  kycNote            String?
+  status             String            @default("active")
+  marketing          Boolean           @default(false)
+  /// Note interne de l'équipe (jamais exposée au client).
+  adminNote          String?
+  lastLoginAt        DateTime?
+  sessions           CustomerSession[]
+  transfers          Transfer[]
+  createdAt          DateTime          @default(now())
+  updatedAt          DateTime          @updatedAt
+
+  @@index([kycStatus])
+  @@index([status])
+  @@index([createdAt])
+}
+
+/// Session de l'application (jeton Bearer, seul son SHA-256 est stocké) = un « appareil connecté ».
+model CustomerSession {
+  id         String    @id @default(cuid())
+  tokenHash  String    @unique
+  customerId String
+  customer   Customer  @relation(fields: [customerId], references: [id], onDelete: Cascade)
+  device     String?
+  createdAt  DateTime  @default(now())
+  lastUsedAt DateTime  @default(now())
+  expiresAt  DateTime
+  revokedAt  DateTime?
+
+  @@index([customerId])
 }

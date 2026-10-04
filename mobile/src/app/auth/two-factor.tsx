@@ -8,7 +8,7 @@ import { useSession } from "@/lib/session";
 import { colors } from "@/lib/theme";
 
 export default function TwoFactor() {
-  const { signIn, accountContact: contact } = useSession();
+  const { completeSignIn, pending: contact } = useSession();
   const [code, setCode] = useState("");
   const [countdown, setCountdown] = useState(45);
   const [channel, setChannel] = useState<"sms" | "email">("sms");
@@ -22,9 +22,9 @@ export default function TwoFactor() {
 
   async function verify() {
     if (code.length !== 6) return setError("Saisissez les 6 chiffres.");
-    await signIn();
+    const r = await completeSignIn();
     router.dismissAll();
-    router.replace("/");
+    router.replace(r.mustChangePassword ? "/auth/reset" : "/");
   }
 
   const phoneTail = contact?.phone.replace(/\D/g, "").slice(-2) ?? "••";

@@ -11,6 +11,7 @@ import { getCorridor, getCountry } from "@/lib/corridors";
 import { isBankNetwork, MANUAL_BANK_PROVIDER, MOCK_BANK_PROVIDER, publicTransfer } from "@/lib/bank";
 import { beneficiaryInputSchema, normalizeBeneficiary } from "@/lib/beneficiary-input";
 import { requireAdmin } from "@/lib/admin-auth";
+import { getCustomer } from "@/lib/customer-auth";
 
 const createSchema = z.object({
   corridorId: z.string().default("CA-CM"),
@@ -41,6 +42,17 @@ export async function POST(request: Request) {
     if (sendAmount == null) {
       return NextResponse.json({ error: "Montant requis" }, { status: 400 });
     }
+
+    // Client de l'appli connecté : identité vérifiée obligatoire, l'expéditeur est le titulaire du compte.
+    const authed = await getCustomer(request);
+    if (authed && authed.customer.kycStatus !== "verified") {
+      return NextResponse.json(
+        { error: "Votre identité doit être vérifiée avant d'envoyer de l'argent.", code: "kyc_required" },
+        { status: 403 },
+      );
+    }
+    const senderName = authed ? `${authed.customer.firstName} ${authed.customer.lastName}` : data.senderName;
+    const senderEmail = authed ? authed.customer.email : data.senderEmail;
 
     const corridor = getCorridor(data.corridorId);
     if (!corridor?.active) {
@@ -90,8 +102,9 @@ export async function POST(request: Request) {
         destCountry: quoteData.destCountry,
         sendCurrency: quoteData.sendCurrency,
         receiveCurrency: quoteData.receiveCurrency,
-        senderName: data.senderName,
-        senderEmail: data.senderEmail,
+        senderName,
+        senderEmail,
+        customerId: authed?.customer.id ?? null,
         sendAmountCad: quoteData.sendAmount,
         receiveAmountXaf: quoteData.receiveAmount,
         rate: quoteData.rate,

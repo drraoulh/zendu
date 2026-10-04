@@ -5,10 +5,13 @@ import { usePathname } from "next/navigation";
 import type { ReactNode } from "react";
 import { Container, Eyebrow } from "@/components/ui/layout";
 import { Icon, type IconName } from "@/components/ui/icon";
+import { useT } from "@/i18n/define";
+import { customersMessages } from "@/i18n/admin-customers";
 import { useAdminT } from "./kit";
 
-const NAV: { href: string; key: "navOverview" | "navRequests" | "navShipments" | "navTransfers"; icon: IconName }[] = [
+const NAV: { href: string; key: "navOverview" | "navRequests" | "navShipments" | "navTransfers" | "navCustomers"; icon: IconName }[] = [
   { href: "/admin", key: "navOverview", icon: "chart" },
+  { href: "/admin/clients", key: "navCustomers", icon: "users" },
   { href: "/admin/demandes", key: "navRequests", icon: "mail" },
   { href: "/admin/colis", key: "navShipments", icon: "box" },
   { href: "/admin/transferts", key: "navTransfers", icon: "transfer" },
@@ -16,7 +19,10 @@ const NAV: { href: string; key: "navOverview" | "navRequests" | "navShipments" |
 
 /** Cadre de l'espace équipe : bandeau, navigation latérale (onglets sur mobile), déconnexion. */
 export function AdminShell({ devOpen, children }: { devOpen: boolean; children: ReactNode }) {
-  const { t } = useAdminT();
+  const { t: tAdmin } = useAdminT();
+  const tc = useT(customersMessages);
+  const t = (key: (typeof NAV)[number]["key"] | Parameters<typeof tAdmin>[0]) =>
+    key === "navCustomers" ? tc("navCustomers") : tAdmin(key as Parameters<typeof tAdmin>[0]);
   const pathname = usePathname() ?? "/admin";
   const isActive = (href: string) => (href === "/admin" ? pathname === "/admin" : pathname.startsWith(href));
 

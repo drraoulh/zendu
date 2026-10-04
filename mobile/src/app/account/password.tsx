@@ -17,8 +17,8 @@ export default function ChangePassword() {
     if (passwordScore(next) < 4) return setError("Le nouveau mot de passe ne respecte pas toutes les règles.");
     if (next !== confirm) return setError("La confirmation ne correspond pas.");
     if (next === current) return setError("Choisissez un mot de passe différent de l'actuel.");
-    const ok = await changePassword(current, next);
-    if (!ok) return setError("Mot de passe actuel incorrect.");
+    const r = await changePassword(current, next);
+    if (!r.ok) return setError(r.error);
     setDone(true);
     setTimeout(() => router.back(), 1200);
   }

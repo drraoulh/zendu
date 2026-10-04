@@ -35,11 +35,16 @@ sont envoyées à l'API du site (`/api/requests`) et apparaissent dans l'admin.
 
 ## État actuel (à brancher avant la production)
 
-- **Comptes** : stockés sur l'appareil (mot de passe et PIN hachés). À relier à Supabase Auth.
-- **Codes SMS / courriel** (inscription, 2 étapes, mot de passe oublié) : simulés, aucun message envoyé.
+- **Comptes** : sur le serveur (`/api/auth`, `/api/me`), gérés dans le backoffice `/admin/clients`.
+  Compte de démo : `demo@pwfintech.test` / `Demo2026!` (voir `web/README.md`). L'appareil ne garde que
+  le jeton de session (Keychain / Keystore), les réglages et le code PIN haché.
+- **Codes SMS** (inscription, vérification en deux étapes) : simulés, aucun SMS envoyé.
+- **Mot de passe oublié** : la demande arrive dans `/admin/demandes` ; l'équipe génère un mot de passe
+  temporaire dans la fiche client, que le client remplace à sa connexion.
+- **KYC** : la capture photo est simulée ; l'identité est validée par l'équipe (ou automatiquement avec
+  `KYC_AUTO_APPROVE=true` côté serveur).
 - **Cartes** : seuls marque, 4 derniers chiffres et expiration sont gardés ; aucun débit en démo.
 - **Langues** : français ; anglais, espagnol et chinois à venir.
-- **KYC** : capture simulée. À remplacer par le SDK d'un prestataire KYC.
 - **Paiement** : mode démo (bouton « Simuler le paiement ») ; si `STRIPE_SECRET_KEY` est défini
   côté serveur, l'app ouvre la page de paiement Stripe.
 - **Versements** Interac, Alipay et WeChat Pay : non intégrés (MTN/Orange via MoMo côté serveur).

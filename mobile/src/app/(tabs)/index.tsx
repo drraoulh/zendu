@@ -1,10 +1,12 @@
 import { router, type Href } from "expo-router";
+import { useEffect, useRef } from "react";
 import { Pressable, StyleSheet, Text, View } from "react-native";
 import { WstSymbol } from "@/components/brand";
 import { Icon, type IconName } from "@/components/icons";
 import { Simulator } from "@/components/simulator";
 import { TransferRow } from "@/components/transfer-row";
 import { Button, Card, Empty, H2, Screen, Small } from "@/components/ui";
+import { defaultCorridorFor, SAMPLE_AMOUNT } from "@/lib/corridors";
 import { useSession } from "@/lib/session";
 import { useStore } from "@/lib/store";
 import { colors, fonts, radius } from "@/lib/theme";
@@ -24,8 +26,21 @@ export default function Home() {
   const { unread } = useNotifications();
   const kyc = profile?.kyc ?? "none";
 
+  // Premier affichage pour ce compte : trajet au départ de son pays de résidence.
+  const seeded = useRef<string | null>(null);
+  useEffect(() => {
+    if (!profile || seeded.current === profile.id) return;
+    seeded.current = profile.id;
+    const corridorId = defaultCorridorFor(profile.country);
+    if (!draft.corridorId.startsWith(`${profile.country}-`)) {
+      const currency = { CA: "CAD", CM: "XAF", CN: "CNY" }[profile.country] ?? "CAD";
+      setDraft({ corridorId, sendAmount: SAMPLE_AMOUNT[currency] ?? 200, quote: null });
+    }
+  }, [profile, draft.corridorId, setDraft]);
+  const todo = kyc === "none" || kyc === "rejected";
+
   function startSend() {
-    if (kyc === "none") return router.push("/kyc");
+    if (todo) return router.push("/kyc");
     if (kyc === "pending") return router.push("/(tabs)/send");
     router.push("/send/recipient");
   }
@@ -48,21 +63,25 @@ export default function Home() {
 
       {kyc !== "verified" ? (
         <Card
-          onPress={kyc === "none" ? () => router.push("/kyc") : undefined}
-          style={{ marginBottom: 16, backgroundColor: colors.warnSoft, borderColor: colors.warnSoft }}
+          onPress={todo ? () => router.push("/kyc") : undefined}
+          style={{ marginBottom: 16, backgroundColor: kyc === "rejected" ? colors.dangerSoft : colors.warnSoft, borderColor: kyc === "rejected" ? colors.dangerSoft : colors.warnSoft }}
         >
           <View style={{ flexDirection: "row", gap: 12, alignItems: "center" }}>
-            <Icon name={kyc === "none" ? "shield" : "clock"} color={colors.warn} />
+            <Icon name={kyc === "pending" ? "clock" : kyc === "rejected" ? "alert" : "shield"} color={kyc === "rejected" ? colors.danger : colors.warn} />
             <View style={{ flex: 1 }}>
-              <Text style={{ fontFamily: fonts.heading, color: colors.ink }}>{kyc === "none" ? "Vérifiez votre identité" : "Vérification en cours"}</Text>
-              <Small>{kyc === "none" ? "Obligatoire avant votre premier transfert · 2 min" : "Généralement quelques minutes. Vous serez averti."}</Small>
+              <Text style={{ fontFamily: fonts.heading, color: colors.ink }}>{kyc === "none" ? "Vérifiez votre identité" : kyc === "rejected" ? "Vérification refusée" : "Vérification en cours"}</Text>
+              <Small>{kyc === "none"
+                  ? "Obligatoire avant votre premier transfert · 2 min"
+                  : kyc === "rejected"
+                    ? profile?.kycNote ?? "Recommencez avec un document valide."
+                    : "Généralement quelques minutes. Vous serez averti."}</Small>
             </View>
-            {kyc === "none" ? <Icon name="chev" color={colors.warn} size={18} /> : null}
+            {todo ? <Icon name="chev" color={kyc === "rejected" ? colors.danger : colors.warn} size={18} /> : null}
           </View>
         </Card>
       ) : null}
 
-      <Simulator corridorId={draft.corridorId} amount={draft.sendAmount} onChange={(n) => setDraft(n)} onContinue={startSend} ctaLabel="Envoyer" />
+      <Simulator key={draft.corridorId.split("-")[0]} corridorId={draft.corridorId} amount={draft.sendAmount} onChange={(n) => setDraft(n)} onContinue={startSend} ctaLabel="Envoyer" />
 
       <View style={st.sectionHead}>
         <H2 style={{ fontSize: 18 }}>Découvrir PWFINTECH</H2>

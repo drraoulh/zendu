@@ -1,11 +1,12 @@
 import { router } from "expo-router";
 import { useEffect, useState } from "react";
-import { Platform } from "react-native";
-import { ConfirmDialog, SectionTitle, ToggleRow } from "@/components/form";
-import { Button, Card, Header, ListItem, Notice, Screen, Small } from "@/components/ui";
+import { Platform, View } from "react-native";
+import { SectionTitle, ToggleRow } from "@/components/form";
+import { Button, Card, Field, Header, ListItem, Notice, Screen, Small } from "@/components/ui";
 import { authenticate, biometricKind, biometricLabel, type BiometricKind } from "@/lib/biometrics";
 import { useSession } from "@/lib/session";
 import { useStore } from "@/lib/store";
+import { colors } from "@/lib/theme";
 
 function since(iso?: string) {
   if (!iso) return "Jamais modifié";
@@ -21,6 +22,19 @@ export default function Security() {
   const [bio, setBio] = useState<BiometricKind>("none");
   const [message, setMessage] = useState<string | null>(null);
   const [confirmDelete, setConfirmDelete] = useState(false);
+  const [password, setPassword] = useState("");
+  const [deleteError, setDeleteError] = useState<string | null>(null);
+  const [deleting, setDeleting] = useState(false);
+
+  async function remove() {
+    setDeleteError(null);
+    setDeleting(true);
+    const r = await deleteAccount(password);
+    setDeleting(false);
+    if (!r.ok) return setDeleteError(r.error);
+    clearAll();
+    router.replace("/welcome");
+  }
 
   useEffect(() => {
     void biometricKind().then(setBio);
@@ -57,7 +71,7 @@ export default function Security() {
 
       <SectionTitle>Appareils et appli</SectionTitle>
       <Card style={{ paddingVertical: 4 }}>
-        <ListItem icon="phone" tone="neutral" title="Appareils connectés" subtitle="Cet appareil" onPress={() => router.push("/account/devices")} />
+        <ListItem icon="phone" tone="neutral" title="Appareils connectés" subtitle="Gérer les sessions" onPress={() => router.push("/account/devices")} />
         <ToggleRow
           icon="lock"
           label="Code PIN de l'appli"
@@ -68,23 +82,23 @@ export default function Security() {
       </Card>
 
       <SectionTitle>Zone sensible</SectionTitle>
-      <Button title="Supprimer mon compte" variant="danger" onPress={() => setConfirmDelete(true)} />
+      {confirmDelete ? (
+        <Card>
+          <Small style={{ marginBottom: 12, color: colors.ink }}>
+            Vos informations, cartes et destinataires seront effacés. Cette action est définitive. Confirmez avec votre mot de passe.
+          </Small>
+          <Field label="Mot de passe" value={password} onChangeText={setPassword} secureTextEntry autoComplete="current-password" error={deleteError} />
+          <View style={{ gap: 8 }}>
+            <Button title="Supprimer définitivement" variant="danger" onPress={remove} loading={deleting} disabled={!password} />
+            <Button title="Annuler" variant="secondary" onPress={() => setConfirmDelete(false)} />
+          </View>
+        </Card>
+      ) : (
+        <Button title="Supprimer mon compte" variant="danger" onPress={() => setConfirmDelete(true)} />
+      )}
       <Small style={{ marginTop: 8 }}>La suppression est définitive. Vos reçus restent disponibles par courriel.</Small>
 
-      <ConfirmDialog
-        visible={confirmDelete}
-        title="Supprimer votre compte ?"
-        message="Vos informations, cartes et destinataires enregistrés sur cet appareil seront effacés. Cette action est définitive."
-        confirmLabel="Supprimer définitivement"
-        destructive
-        onCancel={() => setConfirmDelete(false)}
-        onConfirm={async () => {
-          setConfirmDelete(false);
-          clearAll();
-          await deleteAccount();
-          router.replace("/welcome");
-        }}
-      />
+
     </Screen>
   );
 }

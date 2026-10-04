@@ -78,3 +78,10 @@ export function findCorridor(list: CorridorMeta[], id: string) {
 
 /** Montant d'exemple par devise d'envoi. */
 export const SAMPLE_AMOUNT: Record<string, number> = { CAD: 200, XAF: 100_000, CNY: 1_000 };
+
+/** Trajet proposé par défaut selon le pays de résidence du client. */
+export function defaultCorridorFor(country: string | undefined) {
+  if (country === "CM") return "CM-CA";
+  if (country === "CN") return "CN-CM";
+  return "CA-CM";
+}

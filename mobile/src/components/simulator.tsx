@@ -88,14 +88,16 @@ export function Simulator({
       if (source === code) source = corridor.destination;
     }
     const next = findCorridor(corridors, `${source}-${destination}`);
-    if (next.sendCurrency !== corridor.sendCurrency) setText(String(SAMPLE_AMOUNT[next.sendCurrency] ?? 100));
-    onChange({ corridorId: next.id, sendAmount: value, quote: null });
+    const amount = next.sendCurrency !== corridor.sendCurrency ? (SAMPLE_AMOUNT[next.sendCurrency] ?? 100) : value;
+    setText(String(amount));
+    onChange({ corridorId: next.id, sendAmount: amount, quote: null });
   }
 
   function swap() {
     const next = findCorridor(corridors, `${corridor.destination}-${corridor.source}`);
-    setText(String(SAMPLE_AMOUNT[next.sendCurrency] ?? 100));
-    onChange({ corridorId: next.id, sendAmount: value, quote: null });
+    const amount = SAMPLE_AMOUNT[next.sendCurrency] ?? 100;
+    setText(String(amount));
+    onChange({ corridorId: next.id, sendAmount: amount, quote: null });
   }
 
   return (

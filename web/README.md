@@ -39,6 +39,35 @@ Copie `.env.example` vers `.env` (déjà présent).
 
 Sans clés Stripe/MoMo, tout tourne en **mock** (idéal pour développer).
 
+## Comptes clients et backoffice
+
+L'application mobile WorldSoft Transfer utilise de vrais comptes stockés dans la base (tables `Customer`
+et `CustomerSession`). À faire une fois dans Supabase › SQL Editor :
+
+```
+prisma/migrations-manual/2026-10-04-customers.sql
+```
+
+Le script crée les tables et un **compte de démonstration** (identité déjà vérifiée) :
+
+| Courriel | Mot de passe |
+| --- | --- |
+| `demo@pwfintech.test` | `Demo2026!` |
+
+À supprimer avant l'ouverture au public : `DELETE FROM "Customer" WHERE "email" = 'demo@pwfintech.test';`
+
+API de l'appli : `POST /api/auth/signup|login|logout|password-reset`, `GET|PATCH|DELETE /api/me`,
+`POST /api/me/password`, `POST /api/me/kyc`, `GET /api/me/transfers`, `GET|DELETE /api/me/sessions`.
+Jeton en `Authorization: Bearer …` (seule son empreinte SHA-256 est stockée), mot de passe haché avec scrypt.
+Un client connecté ne peut envoyer qu'une fois son identité vérifiée.
+
+Backoffice `/admin/clients` (même mot de passe que l'admin) :
+- créer un compte client (mot de passe choisi ou temporaire) ;
+- valider / refuser une identité (motif visible par le client), redemander les documents ;
+- suspendre / réactiver un compte (déconnexion immédiate de tous ses appareils) ;
+- générer un mot de passe temporaire (demandes « mot de passe oublié » reçues dans `/admin/demandes`) ;
+- voir et déconnecter les appareils, consulter les transferts du client, note interne, suppression.
+
 ## Architecture
 
 ```

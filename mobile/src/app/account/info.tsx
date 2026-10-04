@@ -15,7 +15,7 @@ export default function Info() {
       <Notice
         tone={verified ? "success" : "warn"}
         icon="shield"
-        title={verified ? "Identité vérifiée" : profile.kyc === "pending" ? "Vérification en cours" : "Identité à vérifier"}
+        title={verified ? "Identité vérifiée" : profile.kyc === "pending" ? "Vérification en cours" : profile.kyc === "rejected" ? "Vérification refusée" : "Identité à vérifier"}
         text={verified ? `Vérification KYC complétée${profile.kycDocument ? ` · ${profile.kycDocument.toLowerCase()}` : ""}` : "Nécessaire avant votre premier transfert."}
       />
       <Card style={{ marginTop: 14, marginBottom: 14 }}>

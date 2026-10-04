@@ -4,6 +4,7 @@ import Link from "next/link";
 import { Icon, type IconName } from "@/components/ui/icon";
 import { REQUEST_KINDS, REQUEST_STATUSES, SHIPMENT_STATUSES } from "@/lib/requests";
 import type { AdminRequest } from "../_server/data";
+import { useCustomersT } from "./customers-kit";
 import { DbError, KIND_ICON, PageTitle, Panel, RequestStatusBadge, useAdminT } from "./kit";
 
 type Data = {
@@ -11,6 +12,7 @@ type Data = {
   shipments: { status: string; count: number }[];
   transfers: { status: string; count: number }[] | null;
   recentRequests: AdminRequest[];
+  customers: { total: number; active30: number; byKyc: Record<string, number> } | null;
 };
 
 function Bars({ rows, total }: { rows: { label: string; count: number; href?: string }[]; total: number }) {
@@ -42,6 +44,7 @@ function Bars({ rows, total }: { rows: { label: string; count: number; href?: st
 
 export function AdminOverview({ data }: { data: Data | null }) {
   const { t, label, dateTime } = useAdminT();
+  const { t: tc } = useCustomersT();
 
   if (!data) {
     return (
@@ -105,6 +108,33 @@ export function AdminOverview({ data }: { data: Data | null }) {
           </li>
         ))}
       </ul>
+
+      {data.customers && (
+        <Panel
+          id="ov-customers"
+          title={tc("ovCustomers")}
+          actions={
+            <Link href="/admin/clients" className="text-sm font-semibold text-brand hover:underline">
+              {t("seeAll")}
+            </Link>
+          }
+        >
+          <ul className="grid gap-3 sm:grid-cols-3">
+            {[
+              { label: tc("ovTotal"), value: data.customers.total, href: "/admin/clients" },
+              { label: tc("ovActive"), value: data.customers.active30, href: "/admin/clients?status=active" },
+              { label: tc("ovPending"), value: data.customers.byKyc.pending ?? 0, href: "/admin/clients?kyc=pending" },
+            ].map((k) => (
+              <li key={k.label}>
+                <Link href={k.href} className="block rounded-2xl bg-surface-soft p-4 transition hover:bg-brand-soft">
+                  <p className="text-xs font-medium text-muted">{k.label}</p>
+                  <p className="mt-1 font-display text-2xl font-extrabold text-ink">{k.value}</p>
+                </Link>
+              </li>
+            ))}
+          </ul>
+        </Panel>
+      )}
 
       <div className="grid gap-6 lg:grid-cols-2">
         <Panel

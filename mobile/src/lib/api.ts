@@ -92,6 +92,38 @@ export type Shipment = {
   events: { status: string; label: string; location: string | null; at: string }[];
 };
 
+export type Address = { line1: string; line2?: string; city: string; region: string; postalCode?: string };
+
+/** Compte client tel que renvoyé par /api/me. */
+export type Customer = {
+  id: string;
+  email: string;
+  phone: string;
+  firstName: string;
+  lastName: string;
+  country: string;
+  region?: string | null;
+  birthDate?: string | null;
+  occupation?: string | null;
+  jobTitle?: string | null;
+  address?: Address | null;
+  marketing?: boolean;
+  kyc: "none" | "pending" | "verified" | "rejected";
+  kycDocument?: string | null;
+  kycNote?: string | null;
+  kycVerifiedAt?: string | null;
+  mustChangePassword: boolean;
+  passwordChangedAt?: string | null;
+  createdAt: string;
+};
+
+export type SignupInput = Omit<Customer, "id" | "kyc" | "kycDocument" | "kycNote" | "kycVerifiedAt" | "mustChangePassword" | "passwordChangedAt" | "createdAt"> & {
+  password: string;
+  device?: string;
+};
+
+export type DeviceSession = { id: string; device: string | null; createdAt: string; lastUsedAt: string; current: boolean };
+
 export class ApiError extends Error {
   status: number;
   constructor(message: string, status: number) {
@@ -112,22 +144,56 @@ function errorMessage(data: unknown): string | null {
   return null;
 }
 
-async function request<T>(path: string, init?: RequestInit): Promise<T> {
+/** Jeton de session du client connecté (ajouté en Authorization: Bearer). */
+let authToken: string | null = null;
+let onUnauthorized: (() => void) | null = null;
+
+export function setAuthToken(token: string | null) {
+  authToken = token;
+}
+
+export function setUnauthorizedHandler(fn: (() => void) | null) {
+  onUnauthorized = fn;
+}
+
+async function request<T>(path: string, init?: RequestInit & { token?: string | null }): Promise<T> {
   let res: Response;
+  const token = init?.token !== undefined ? init.token : authToken;
   try {
     res = await fetch(`${API_URL}${path}`, {
       ...init,
-      headers: { Accept: "application/json", ...(init?.body ? { "Content-Type": "application/json" } : {}), ...init?.headers },
+      headers: {
+        Accept: "application/json",
+        ...(init?.body ? { "Content-Type": "application/json" } : {}),
+        ...(token ? { Authorization: `Bearer ${token}` } : {}),
+        ...init?.headers,
+      },
     });
   } catch {
     throw new ApiError("Connexion impossible. Vérifiez votre réseau.", 0);
   }
   const data = await res.json().catch(() => null);
+  if (res.status === 401 && token && path.startsWith("/api/me")) onUnauthorized?.();
   if (!res.ok) throw new ApiError(errorMessage(data) ?? "Une erreur est survenue.", res.status);
   return data as T;
 }
 
 export const api = {
+  signup: (input: SignupInput) => request<{ token: string; customer: Customer }>("/api/auth/signup", { method: "POST", body: JSON.stringify(input) }),
+  login: (email: string, password: string, device?: string) =>
+    request<{ token: string; customer: Customer }>("/api/auth/login", { method: "POST", body: JSON.stringify({ email, password, device }) }),
+  logout: (token: string) => request<{ ok: true }>("/api/auth/logout", { method: "POST", token }),
+  passwordReset: (email: string) => request<{ ok: true }>("/api/auth/password-reset", { method: "POST", body: JSON.stringify({ email }) }),
+  me: (token?: string) => request<{ customer: Customer }>("/api/me", token ? { token } : undefined),
+  updateMe: (patch: Partial<Customer>) => request<{ customer: Customer }>("/api/me", { method: "PATCH", body: JSON.stringify(patch) }),
+  deleteMe: (password: string) => request<{ ok: true }>("/api/me", { method: "DELETE", body: JSON.stringify({ password }) }),
+  changePassword: (current: string, next: string, token?: string) =>
+    request<{ customer: Customer }>("/api/me/password", { method: "POST", body: JSON.stringify({ current, next }), ...(token ? { token } : {}) }),
+  submitKyc: (document: string) => request<{ customer: Customer }>("/api/me/kyc", { method: "POST", body: JSON.stringify({ document }) }),
+  myTransfers: () => request<Transfer[]>("/api/me/transfers"),
+  sessions: () => request<DeviceSession[]>("/api/me/sessions"),
+  revokeSession: (id: string) => request<{ ok: true }>(`/api/me/sessions/${encodeURIComponent(id)}`, { method: "DELETE" }),
+  revokeOtherSessions: () => request<{ ok: true; revoked: number }>("/api/me/sessions", { method: "DELETE" }),
   corridors: () => request<CorridorMeta[]>("/api/quotes?meta=corridors"),
   quote: (corridorId: string, amount: number, mode: "send" | "receive" = "send") =>
     request<Quote>("/api/quotes", {

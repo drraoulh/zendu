@@ -1,37 +1,28 @@
 import { Link, router } from "expo-router";
-import { useEffect, useState } from "react";
-import { Platform, Text, View } from "react-native";
+import { useState } from "react";
+import { Text, View } from "react-native";
 import { WstWordmark } from "@/components/brand";
 import { Button, Field, H1, Notice, P, Screen } from "@/components/ui";
-import { biometricKind, type BiometricKind } from "@/lib/biometrics";
 import { useSession } from "@/lib/session";
 import { colors, fonts } from "@/lib/theme";
 
 export default function Login() {
-  const { checkPassword, signIn, settings, hasAccount } = useSession();
+  const { startSignIn } = useSession();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState<string | null>(null);
   const [busy, setBusy] = useState(false);
-  const [bio, setBio] = useState<BiometricKind>("none");
-
-  useEffect(() => {
-    void biometricKind().then(setBio);
-  }, []);
 
   async function submit() {
     setError(null);
     if (!email.trim() || !password) return setError("Saisissez votre courriel et votre mot de passe.");
     setBusy(true);
-    const ok = await checkPassword(email, password);
+    const r = await startSignIn(email, password);
     setBusy(false);
-    if (!ok) return setError("Courriel ou mot de passe incorrect.");
-    if (settings.twoFactor) return router.push("/auth/two-factor");
-    await signIn();
-    router.replace("/");
+    if (!r.ok) return setError(r.error);
+    if (r.needsCode) return router.push("/auth/two-factor");
+    router.replace(r.mustChangePassword ? "/auth/reset" : "/");
   }
-
-  const canBio = Platform.OS !== "web" && hasAccount && settings.biometric && bio !== "none";
 
   return (
     <Screen
@@ -68,9 +59,6 @@ export default function Login() {
         </View>
       ) : null}
       <Button title="Se connecter" onPress={submit} loading={busy} />
-      {canBio ? (
-        <Button title="Utiliser Face ID / empreinte" icon="face" variant="secondary" onPress={() => router.push("/auth/biometric")} style={{ marginTop: 10 }} />
-      ) : null}
     </Screen>
   );
 }

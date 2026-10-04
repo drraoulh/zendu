@@ -18,6 +18,7 @@ export default function Send() {
       <Steps current={1} total={3} label="Montant" />
       <P style={{ marginTop: 6, marginBottom: 18 }}>Choisissez le trajet et le montant. Le taux et les frais sont affichés avant tout paiement.</P>
       <Simulator
+        key={draft.corridorId.split("-")[0]}
         corridorId={draft.corridorId}
         amount={draft.sendAmount}
         onChange={(n) => setDraft(n)}
@@ -26,7 +27,7 @@ export default function Send() {
       />
       <View style={{ marginTop: 16, gap: 10 }}>
         {pending ? <Notice tone="warn" icon="clock" text="Votre identité est en cours de vérification. Vous pourrez envoyer dès qu'elle sera confirmée." /> : null}
-        {kyc === "none" ? <Notice tone="warn" icon="shield" text="Votre identité doit être vérifiée avant votre premier envoi." /> : null}
+        {kyc === "none" || kyc === "rejected" ? <Notice tone="warn" icon="shield" text="Votre identité doit être vérifiée avant votre premier envoi." /> : null}
         <Notice tone="neutral" icon="clock" text="Le devis est garanti 15 minutes. Passé ce délai, il est recalculé au taux du moment." />
       </View>
     </Screen>

@@ -32,8 +32,8 @@ export default function Profile() {
           </Text>
           <Small numberOfLines={1}>{profile.email}</Small>
           <Badge
-            label={kyc === "verified" ? "Identité vérifiée" : kyc === "pending" ? "Vérification en cours" : "Identité à vérifier"}
-            tone={kyc === "verified" ? "success" : "warn"}
+            label={kyc === "verified" ? "Identité vérifiée" : kyc === "pending" ? "Vérification en cours" : kyc === "rejected" ? "Vérification refusée" : "Identité à vérifier"}
+            tone={kyc === "verified" ? "success" : kyc === "rejected" ? "danger" : "warn"}
           />
         </View>
         <Icon name="chev" color={colors.muted} size={18} />
@@ -60,7 +60,7 @@ export default function Profile() {
         <ListItem icon="id" tone="neutral" title="Informations personnelles" onPress={go("/account/info")} />
         <ListItem icon="wallet" tone="neutral" title="Moyens de paiement" subtitle={card ? `•••• ${card.last4}` : "Aucune carte"} onPress={go("/account/payment-methods")} />
         <ListItem icon="user" tone="neutral" title="Mes destinataires" subtitle={`${recipients.length} enregistré${recipients.length > 1 ? "s" : ""}`} onPress={go("/recipients")} />
-        {kyc === "none" ? <ListItem icon="shield" tone="warn" title="Vérifier mon identité" onPress={go("/kyc")} /> : null}
+        {kyc === "none" || kyc === "rejected" ? <ListItem icon="shield" tone="warn" title="Vérifier mon identité" onPress={go("/kyc")} /> : null}
       </Card>
 
       <SectionTitle>Paramètres</SectionTitle>

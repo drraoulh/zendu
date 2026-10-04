@@ -27,7 +27,7 @@ function isProtectedAdminPath(pathname: string): boolean {
  * et pour les origines listées dans MOBILE_CORS_ORIGINS (séparées par des virgules).
  * Les apps iOS/Android natives n'envoient pas d'en-tête Origin et n'en ont pas besoin.
  */
-const PUBLIC_API = /^\/api\/(quotes|transfers|requests|shipments|appointments|waitlist)(\/|$)/;
+const PUBLIC_API = /^\/api\/(quotes|transfers|requests|shipments|appointments|waitlist|auth|me)(\/|$)/;
 
 function corsOrigin(request: NextRequest): string | null {
   const origin = request.headers.get("origin");
@@ -43,8 +43,8 @@ function corsOrigin(request: NextRequest): string | null {
 function withCors(response: NextResponse, origin: string): NextResponse {
   response.headers.set("Access-Control-Allow-Origin", origin);
   response.headers.set("Vary", "Origin");
-  response.headers.set("Access-Control-Allow-Methods", "GET,POST,OPTIONS");
-  response.headers.set("Access-Control-Allow-Headers", "Content-Type");
+  response.headers.set("Access-Control-Allow-Methods", "GET,POST,PATCH,DELETE,OPTIONS");
+  response.headers.set("Access-Control-Allow-Headers", "Content-Type, Authorization");
   response.headers.set("Access-Control-Max-Age", "600");
   return response;
 }

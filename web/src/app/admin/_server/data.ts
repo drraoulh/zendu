@@ -1,5 +1,6 @@
 import { z } from "zod";
 import type { Prisma } from "@prisma/client";
+import { customerCounts } from "./customers";
 import { prisma } from "@/lib/prisma";
 import {
   appointmentSlotKey,
@@ -396,16 +397,19 @@ export async function deleteShipmentEvent(number: string, eventId: string) {
 /* ------------------------------------------------------------------ Vue d'ensemble */
 
 export async function overviewCounts() {
-  const [byKindStatus, shipmentsByStatus, transfersByStatus, recentRequests] = await Promise.all([
+  const [byKindStatus, shipmentsByStatus, transfersByStatus, recentRequests, customers] = await Promise.all([
     prisma.serviceRequest.groupBy({ by: ["kind", "status"], _count: { _all: true } }),
     prisma.shipment.groupBy({ by: ["status"], _count: { _all: true } }),
     prisma.transfer.groupBy({ by: ["status"], _count: { _all: true } }).catch(() => null),
     prisma.serviceRequest.findMany({ include: requestInclude, orderBy: { createdAt: "desc" }, take: 6 }),
+    // Table Customer absente (migration non exécutée) : la vue d'ensemble reste disponible.
+    customerCounts().catch(() => null),
   ]);
   return {
     requests: byKindStatus.map((r) => ({ kind: r.kind, status: r.status, count: r._count._all })),
     shipments: shipmentsByStatus.map((r) => ({ status: r.status, count: r._count._all })),
     transfers: transfersByStatus?.map((r) => ({ status: r.status, count: r._count._all })) ?? null,
     recentRequests: recentRequests.map(serializeRequest),
+    customers,
   };
 }

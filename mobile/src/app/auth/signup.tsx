@@ -86,7 +86,7 @@ export default function SignUp() {
       return setStep(step + 1);
     }
     setBusy(true);
-    await signUp(
+    const r = await signUp(
       {
         firstName: firstName.trim(),
         lastName: lastName.trim(),
@@ -103,6 +103,7 @@ export default function SignUp() {
       password,
     );
     setBusy(false);
+    if (!r.ok) return setErrors({ submit: r.error });
     router.replace("/kyc");
   }
 
@@ -290,6 +291,7 @@ export default function SignUp() {
           <Checkbox checked={marketing} onChange={setMarketing}>
             <Small style={{ color: colors.ink }}>Recevoir les offres et nouveautés par courriel (facultatif)</Small>
           </Checkbox>
+          {errors.submit ? <Notice tone="danger" icon="alert" text={errors.submit} /> : null}
         </>
       ) : null}
     </Screen>

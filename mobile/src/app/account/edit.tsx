@@ -1,7 +1,7 @@
 import { router } from "expo-router";
 import { useState } from "react";
 import { SelectField } from "@/components/form";
-import { Button, Field, Header, Screen } from "@/components/ui";
+import { Button, Field, Header, Notice, Screen } from "@/components/ui";
 import type { CountryCode } from "@/lib/corridors";
 import { OCCUPATIONS, POSTAL_LABEL, REGION_LABEL, REGIONS } from "@/lib/geo";
 import { useSession } from "@/lib/session";
@@ -21,6 +21,7 @@ export default function EditInfo() {
   const [occupation, setOccupation] = useState(profile?.occupation ?? "");
   const [jobTitle, setJobTitle] = useState(profile?.jobTitle ?? "");
   const [errors, setErrors] = useState<Record<string, string>>({});
+  const [busy, setBusy] = useState(false);
 
   async function save() {
     const e: Record<string, string> = {};
@@ -30,7 +31,8 @@ export default function EditInfo() {
     if (city.trim().length < 2) e.city = "Ville requise";
     setErrors(e);
     if (Object.keys(e).length) return;
-    await update({
+    setBusy(true);
+    const r = await update({
       email: email.trim().toLowerCase(),
       phone: phone.trim(),
       region,
@@ -38,11 +40,13 @@ export default function EditInfo() {
       jobTitle: jobTitle.trim() || undefined,
       address: { line1: line1.trim(), line2: line2.trim() || undefined, city: city.trim(), region, postalCode: postal.trim().toUpperCase() || undefined },
     });
+    setBusy(false);
+    if (!r.ok) return setErrors({ submit: r.error });
     router.back();
   }
 
   return (
-    <Screen footer={<Button title="Enregistrer" onPress={save} />}>
+    <Screen footer={<Button title="Enregistrer" onPress={save} loading={busy} />}>
       <Header title="Modifier mes informations" />
       <Field label="Courriel" value={email} onChangeText={setEmail} keyboardType="email-address" autoCapitalize="none" error={errors.email} />
       <Field label="Téléphone" value={phone} onChangeText={setPhone} keyboardType="phone-pad" error={errors.phone} />
@@ -53,6 +57,7 @@ export default function EditInfo() {
       {POSTAL_LABEL[country] ? <Field label="Code postal" value={postal} onChangeText={setPostal} autoCapitalize="characters" /> : null}
       <SelectField label="Profession ou occupation" value={occupation} options={OCCUPATIONS.map((o) => ({ value: o, label: o }))} onChange={setOccupation} />
       <Field label="Poste ou domaine (facultatif)" value={jobTitle} onChangeText={setJobTitle} />
+      {errors.submit ? <Notice tone="danger" icon="alert" text={errors.submit} /> : null}
     </Screen>
   );
 }
