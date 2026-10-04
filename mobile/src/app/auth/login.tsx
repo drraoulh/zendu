@@ -2,7 +2,8 @@ import { Link, router } from "expo-router";
 import { useState } from "react";
 import { Text, View } from "react-native";
 import { WstWordmark } from "@/components/brand";
-import { Button, Field, H1, Notice, P, Screen } from "@/components/ui";
+import { Button, Field, H1, Notice, P, Screen, Small } from "@/components/ui";
+import { API_URL } from "@/lib/api";
 import { useSession } from "@/lib/session";
 import { colors, fonts } from "@/lib/theme";
 
@@ -59,6 +60,7 @@ export default function Login() {
         </View>
       ) : null}
       <Button title="Se connecter" onPress={submit} loading={busy} />
+      {__DEV__ ? <Small style={{ textAlign: "center", marginTop: 12 }}>Serveur : {API_URL}</Small> : null}
     </Screen>
   );
 }

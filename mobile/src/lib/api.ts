@@ -2,7 +2,15 @@
  * Client de l'API PWFINTECH (Next.js, dossier web/).
  * L'URL se règle avec EXPO_PUBLIC_API_URL (ex. https://pwfintech.vercel.app).
  */
-export const API_URL = (process.env.EXPO_PUBLIC_API_URL ?? "http://localhost:3000").replace(/\/$/, "");
+/** Adresse normalisée : guillemets et espaces retirés, https:// ajouté si absent, sans « / » ni « /api » final. */
+export function normalizeApiUrl(raw: string | undefined) {
+  let url = (raw ?? "").trim().replace(/^["']|["']$/g, "").trim();
+  if (!url) return "http://localhost:3000";
+  if (!/^https?:\/\//i.test(url)) url = `https://${url}`;
+  return url.replace(/\/+$/, "").replace(/\/api$/i, "");
+}
+
+export const API_URL = normalizeApiUrl(process.env.EXPO_PUBLIC_API_URL);
 
 export type Network = { id: string; label: string; type: "mobile_money" | "bank" | "cash" };
 
@@ -170,7 +178,10 @@ async function request<T>(path: string, init?: RequestInit & { token?: string | 
       },
     });
   } catch {
-    throw new ApiError("Connexion impossible. Vérifiez votre réseau.", 0);
+    throw new ApiError(
+      __DEV__ ? `Serveur injoignable (${API_URL}). Vérifiez EXPO_PUBLIC_API_URL et votre réseau.` : "Connexion impossible. Vérifiez votre réseau.",
+      0,
+    );
   }
   const data = await res.json().catch(() => null);
   if (res.status === 401 && token && path.startsWith("/api/me")) onUnauthorized?.();
