@@ -4,7 +4,8 @@
  */
 function link(value: string | undefined): string | null {
   const v = value?.trim();
-  return v ? v : null;
+  // Les anciens liens d'exemple (apps.apple.com/app/zendu…) ne pointent vers aucune app réelle.
+  return v && !/zendu/i.test(v) ? v : null;
 }
 
 export const appLinks: { ios: string | null; android: string | null } = {

@@ -1,8 +1,8 @@
 import { company } from "@/lib/company";
 
-export const appName = process.env.NEXT_PUBLIC_APP_NAME ?? "PWFINTECH";
-export const appFullName =
-  process.env.NEXT_PUBLIC_APP_FULL_NAME ?? "Paul World Finances and Technologies";
+/** Noms de marque fixes : ils ne dépendent plus des variables d'environnement (anciennes valeurs « Zendu »). */
+export const appName = "PWFINTECH";
+export const appFullName = "Paul World Finances and Technologies";
 
 /**
  * Coordonnées (compatibilité) — dérivées de la fiche entreprise `@/lib/company`.

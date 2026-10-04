@@ -8,10 +8,15 @@
  * Les anciennes variables `NEXT_PUBLIC_CONTACT_*` restent acceptées en repli.
  */
 
+/** Anciennes valeurs de l'époque « Zendu » restées dans les variables d'environnement : ignorées. */
+export function isLegacyValue(s: string): boolean {
+  return /zendu/i.test(s);
+}
+
 function v(...values: Array<string | undefined>): string | null {
   for (const value of values) {
     const s = value?.trim();
-    if (s) return s;
+    if (s && !isLegacyValue(s)) return s;
   }
   return null;
 }
@@ -44,7 +49,7 @@ export type Company = {
 // Accès explicites (process.env.X) : nécessaires pour l'injection NEXT_PUBLIC_* côté client.
 export const company: Company = {
   legalName: v(process.env.NEXT_PUBLIC_COMPANY_LEGAL_NAME),
-  brandName: v(process.env.NEXT_PUBLIC_COMPANY_BRAND_NAME, process.env.NEXT_PUBLIC_APP_NAME) ?? "PWFINTECH",
+  brandName: "PWFINTECH",
   tagline:
     v(process.env.NEXT_PUBLIC_COMPANY_TAGLINE) ?? "Plus qu'un service, une solution pour votre avenir.",
   email: v(process.env.NEXT_PUBLIC_COMPANY_EMAIL, process.env.NEXT_PUBLIC_CONTACT_EMAIL),
