@@ -64,7 +64,7 @@ export function HomeHero() {
             {t("heroTitleA")}{" "}
             <span className="bg-gradient-to-r from-sky via-white to-silver bg-clip-text text-transparent">
               {t("heroTitleAccent")}
-            </span>{" "}
+            </span>
             {t("heroTitleB")}
           </h1>
 

@@ -113,6 +113,9 @@ const SELECT_EVENT = "pw:calculator-corridor";
 
 type Preselect = { source?: string; dest?: string; amount?: number };
 
+/** Montant proposé par défaut selon la devise d'envoi (au-dessus des minimums). */
+const DEFAULT_AMOUNT: Record<string, number> = { CAD: 100, XAF: 100000, CNY: 1000 };
+
 function parseCorridorParam(corridor: string | null, amount: string | null): Preselect {
   const out: Preselect = {};
   const m = corridor?.toUpperCase().match(/^([A-Z]{2})-([A-Z]{2})$/);
@@ -181,6 +184,10 @@ export function TransferCalculator({
         setReceiveText("");
       }
       if (p.amount) setSendText(String(p.amount));
+      else if (p.source) {
+        const cur = p.source === "CM" ? "XAF" : p.source === "CN" ? "CNY" : "CAD";
+        setSendText(String(DEFAULT_AMOUNT[cur]));
+      }
     };
     try {
       const params = new URLSearchParams(window.location.search);
@@ -341,6 +348,8 @@ export function TransferCalculator({
   /* Handlers --------------------------------------------------------- */
   const onSourceChange = (code: string) => {
     setSourceCode(code);
+    const currency = corridors.find((c) => c.sourceCode === code)?.sendCurrency;
+    if (currency && DEFAULT_AMOUNT[currency]) setSendText(String(DEFAULT_AMOUNT[currency]));
     setMode("send");
     setQuote(null);
     setReceiveText("");

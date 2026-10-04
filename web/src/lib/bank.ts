@@ -82,6 +82,8 @@ export function publicTransfer<T extends { beneficiary: { accountNumber?: string
  * le champ reste libre.
  */
 export const BANK_SUGGESTIONS: Record<string, string[]> = {
+  CA: ["RBC Banque Royale", "TD Canada Trust", "Banque Scotia", "BMO Banque de Montréal", "CIBC", "Banque Nationale", "Desjardins"],
+  CN: ["Bank of China", "ICBC", "China Construction Bank", "Agricultural Bank of China", "Bank of Communications", "China Merchants Bank"],
   CM: [
     "Afriland First Bank",
     "BICEC",

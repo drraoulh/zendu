@@ -18,13 +18,12 @@ import { Icon, type IconName } from "@/components/ui/icon";
 import { Container, Eyebrow, Section, SectionHeading } from "@/components/ui/layout";
 import { useT } from "@/i18n/define";
 import { marketing, transferPage } from "@/i18n/services";
-import { getDestinationCountries, type PayoutNetwork } from "@/lib/corridors";
+import { CORRIDORS, getCountry, getDestinationCountries, type PayoutNetwork } from "@/lib/corridors";
 import { Faq, FeatureGrid, Steps, range } from "./sections";
 import { HomeScreen, PayoutScreen, PhoneShot, TrackingScreen } from "./wst/phone-screens";
 
 type K = keyof typeof transferPage.fr;
 
-const SOURCE = "CA";
 const SEC_ICONS: IconName[] = ["user", "lock", "receipt", "users"];
 
 export function TransferContent() {
@@ -36,14 +35,18 @@ export function TransferContent() {
   /* Destinations et réseaux de réception, depuis src/lib/corridors.ts */
   const { destinations, byType } = useMemo(() => {
     const countries = getDestinationCountries();
-    const list = countries
-      .map((c) => ({
-        code: c.code,
-        name: countryName(c.code, locale, c.name),
-        currency: c.currency,
-        modes: c.networks.length,
-      }))
-      .sort((a, b) => a.name.localeCompare(b.name, locale));
+    const list = CORRIDORS.filter((c) => c.active).map((c) => {
+      const from = getCountry(c.source);
+      const to = getCountry(c.destination);
+      return {
+        corridorId: c.id,
+        source: from.code,
+        code: to.code,
+        name: `${countryName(from.code, locale, from.name)} → ${countryName(to.code, locale, to.name)}`,
+        currency: `${from.currency} → ${to.currency}`,
+        modes: to.networks.length,
+      };
+    });
 
     const types: Record<PayoutNetwork["type"], { labels: string[]; countries: number }> = {
       mobile_money: { labels: [], countries: 0 },
@@ -195,11 +198,11 @@ export function TransferContent() {
               title={t("destTitle")}
               subtitle={t("destSubtitle", { n: destinations.length })}
             />
-            <ul className="mt-8 grid grid-cols-1 gap-3 min-[420px]:grid-cols-2 lg:grid-cols-4">
+            <ul className="mt-8 grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-3">
               {destinations.map((d) => {
-                const corridorId = `${SOURCE}-${d.code}`;
+                const corridorId = d.corridorId;
                 return (
-                  <li key={d.code}>
+                  <li key={corridorId}>
                     <Link
                       href={simulatorHref(corridorId)}
                       scroll={false}
@@ -210,7 +213,10 @@ export function TransferContent() {
                       aria-label={t("destAria", { country: d.name })}
                       className="group flex h-full items-center gap-3 rounded-2xl border border-line bg-white p-3.5 transition hover:-translate-y-0.5 hover:border-brand/40 hover:shadow-card"
                     >
-                      <CountryFlag code={d.code} size={36} title={d.name} className="shrink-0 rounded-md" />
+                      <span className="flex shrink-0 items-center gap-1">
+                        <CountryFlag code={d.source} size={28} title="" className="rounded-md" />
+                        <CountryFlag code={d.code} size={28} title="" className="rounded-md" />
+                      </span>
                       <span className="min-w-0 flex-1">
                         <span className="block font-display text-sm font-bold leading-snug text-ink [overflow-wrap:anywhere]">
                           {d.name}

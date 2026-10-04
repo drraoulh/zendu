@@ -1,5 +1,3 @@
-import { roundMoney } from "./money";
-
 export type FxSnapshot = {
   pair: string;
   from: string;
@@ -24,6 +22,10 @@ const CACHE_TTL_MS = 60_000;
 
 const FALLBACKS: Record<string, number> = {
   "CAD-XAF": 410,
+  "CAD-CNY": 5.2,
+  "XAF-CAD": 0.00243,
+  "XAF-CNY": 0.0127,
+  "CNY-CAD": 0.19,
   "USD-XAF": 560,
   "EUR-XAF": 650,
   "GBP-XAF": 750,
@@ -71,9 +73,10 @@ function getMarginPercent(): number {
   return Number.isFinite(raw) ? raw : 1.5;
 }
 
-function applyMargin(midRate: number, toCurrency: string): number {
+/** Taux client = taux moyen moins la marge, gardé sur 6 chiffres significatifs (XAF→CAD ≈ 0,0024). */
+function applyMargin(midRate: number): number {
   const margin = getMarginPercent();
-  return roundMoney(midRate * (1 - margin / 100), toCurrency === "XAF" || toCurrency === "XOF" ? "CAD" : toCurrency);
+  return Number((midRate * (1 - margin / 100)).toPrecision(6));
 }
 
 function cacheKey(from: string, to: string) {
@@ -130,7 +133,7 @@ function snapshot(
     from,
     to,
     midRate,
-    customerRate: applyMargin(midRate, to),
+    customerRate: applyMargin(midRate),
     marginPercent: getMarginPercent(),
     source,
     fetchedAt: new Date(fetchedAt).toISOString(),

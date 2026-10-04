@@ -4,7 +4,7 @@ import { SendFlow } from "./send-flow";
 
 export const metadata: Metadata = {
   title: "Envoyer de l'argent",
-  description: "Envoyez de l'argent depuis le Canada : devis en direct, frais affichés avant de payer et suivi jusqu'à la livraison.",
+  description: "Envoyez de l'argent entre le Canada, le Cameroun et la Chine : devis en direct, frais affichés avant de payer et suivi jusqu'à la livraison.",
 };
 
 export default function SendPage() {

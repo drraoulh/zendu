@@ -1,14 +1,24 @@
 import { HomeHero, ShortcutsBand } from "@/app/home/home-hero";
 import { AppSection, DestinationsSection, FaqSection, FinalCta } from "@/app/home/home-more";
 import { FeesSection, ServicesSection, StepsSection, ValuesSection } from "@/app/home/home-sections";
-import { getDestinationCountries } from "@/lib/corridors";
+import { CORRIDORS, getCountry } from "@/lib/corridors";
 
 export default function HomePage() {
-  const destinations = getDestinationCountries().map((c) => ({
-    code: c.code,
-    name: c.name,
-    currency: c.currency,
-  }));
+  const routes = CORRIDORS.filter((c) => c.active).map((c) => {
+    const from = getCountry(c.source);
+    const to = getCountry(c.destination);
+    return {
+      id: c.id,
+      source: from.code,
+      sourceName: from.name,
+      dest: to.code,
+      destName: to.name,
+      sendCurrency: from.currency,
+      receiveCurrency: to.currency,
+      networks: to.networks.map((n) => ({ label: n.label, type: n.type })),
+      fast: c.deliveryEstimate === "A few minutes",
+    };
+  });
 
   return (
     <>
@@ -18,7 +28,7 @@ export default function HomePage() {
       <AppSection />
       <StepsSection />
       <FeesSection />
-      <DestinationsSection destinations={destinations} />
+      <DestinationsSection routes={routes} />
       <ValuesSection />
       <FaqSection />
       <FinalCta />

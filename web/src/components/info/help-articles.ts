@@ -79,11 +79,11 @@ export const HELP_ARTICLES: HelpArticle[] = [
     links: ["linkApp", "linkFees"],
     fr: {
       q: "Qu'est-ce que WorldSoft Transfer ?",
-      a: "WorldSoft Transfer est l'application mobile de transfert d'argent de PWFINTECH (« une solution PWFINTECH »). Elle permet d'envoyer de l'argent depuis le Canada vers {countries} pays, sur un portefeuille mobile money, un compte bancaire ou en retrait d'espèces selon la destination.\n\nDans l'application, vous enregistrez vos destinataires, voyez les frais et le taux avant de payer, puis suivez chaque transfert jusqu'à sa livraison.",
+      a: "WorldSoft Transfer est l'application mobile de transfert d'argent de PWFINTECH (« une solution PWFINTECH »). Elle permet d'envoyer de l'argent entre {countries} pays — le Canada, le Cameroun et la Chine — sur un portefeuille mobile money (MTN, Orange), Interac, Alipay, WeChat Pay ou un compte bancaire selon le pays du destinataire.\n\nDans l'application, vous enregistrez vos destinataires, voyez les frais et le taux avant de payer, puis suivez chaque transfert jusqu'à sa livraison.",
     },
     en: {
       q: "What is WorldSoft Transfer?",
-      a: "WorldSoft Transfer is PWFINTECH's money transfer mobile app (“a PWFINTECH solution”). It lets you send money from Canada to {countries} countries, to a mobile money wallet, a bank account or for cash pickup depending on the destination.\n\nIn the app, you save your recipients, see the fees and rate before paying, then track each transfer until it's delivered.",
+      a: "WorldSoft Transfer is PWFINTECH's money transfer mobile app (“a PWFINTECH solution”). It lets you send money between {countries} countries — Canada, Cameroon and China — to a mobile money wallet (MTN, Orange), Interac, Alipay, WeChat Pay or a bank account depending on the recipient's country.\n\nIn the app, you save your recipients, see the fees and rate before paying, then track each transfer until it's delivered.",
     },
     es: { q: "¿Qué es WorldSoft Transfer?" },
     zh: { q: "什么是 WorldSoft Transfer？" },
@@ -120,11 +120,11 @@ export const HELP_ARTICLES: HelpArticle[] = [
     links: ["linkCountries", "linkFees"],
     fr: {
       q: "Vers quels pays puis-je envoyer de l'argent ?",
-      a: "Depuis le Canada, WorldSoft Transfer dessert actuellement {countries} pays en Afrique centrale, de l'Ouest, de l'Est, australe et du Nord, ainsi qu'en Asie et dans les Caraïbes.\n\nLa page « Pays desservis » présente chaque destination : devise, réseaux mobile money, virement bancaire, retrait, délais et frais. Votre pays n'y figure pas ? Écrivez-nous : vos demandes nous aident à choisir les prochaines destinations.",
+      a: "WorldSoft Transfer relie actuellement {countries} pays : le Canada, le Cameroun et la Chine. Chacun peut envoyer vers les deux autres et en recevoir.\n\nLa page « Nos pays » présente chaque pays : devise, modes de réception (mobile money, Interac, Alipay, WeChat Pay, compte bancaire), délais et frais. Un autre pays vous intéresse ? Écrivez-nous : vos demandes nous aident à choisir les prochains pays.",
     },
     en: {
       q: "Which countries can I send money to?",
-      a: "From Canada, WorldSoft Transfer currently serves {countries} countries in Central, West, East, Southern and North Africa, as well as Asia and the Caribbean.\n\nThe “Destinations” page details each one: currency, mobile money networks, bank transfer, cash pickup, delivery times and fees. Your country isn't listed? Write to us: your requests help us choose the next destinations.",
+      a: "WorldSoft Transfer currently connects {countries} countries: Canada, Cameroon and China. Each one can send to and receive from the other two.\n\nThe “Our countries” page details each one: currency, payout methods (mobile money, Interac, Alipay, WeChat Pay, bank account), delivery times and fees. Interested in another country? Write to us: your requests help us choose the next countries.",
     },
   },
   {

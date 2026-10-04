@@ -22,7 +22,7 @@ const inter = Inter({
 
 const appUrl = process.env.NEXT_PUBLIC_APP_URL ?? "http://localhost:3000";
 const description =
-  "Transfert d'argent, finances, technologies et shipping depuis le Canada. Plus qu'un service, une solution pour votre avenir.";
+  "Transfert d'argent entre le Canada, le Cameroun et la Chine, finances, technologies et shipping. Plus qu'un service, une solution pour votre avenir.";
 
 export const metadata: Metadata = {
   metadataBase: new URL(appUrl),

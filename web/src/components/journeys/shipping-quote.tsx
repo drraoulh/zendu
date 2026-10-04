@@ -4,7 +4,7 @@ import { useMemo } from "react";
 import { useI18n } from "@/components/i18n-provider";
 import { localCountryName } from "@/components/app/country-name";
 import { Icon } from "@/components/ui/icon";
-import { getDestinationCountries } from "@/lib/corridors";
+import { ACTIVE_COUNTRY_CODES, getCountry } from "@/lib/corridors";
 import { useT } from "@/i18n/define";
 import { shippingJourney, wizardMessages } from "@/i18n/journeys";
 import { RadioCards, SelectInput, TextArea, TextInput } from "./fields";
@@ -16,6 +16,7 @@ export const PROVINCES = ["AB", "BC", "MB", "NB", "NL", "NS", "NT", "NU", "ON", 
 type Province = (typeof PROVINCES)[number];
 
 type Values = {
+  originCountry: string;
   originProvince: string;
   originCity: string;
   destCountry: string;
@@ -35,6 +36,7 @@ type Values = {
 };
 
 const INITIAL: Values = {
+  originCountry: "CA",
   originProvince: "",
   originCity: "",
   destCountry: "",
@@ -64,11 +66,9 @@ export function ShippingQuoteJourney() {
   const w = useT(wizardMessages);
   const { locale } = useI18n();
 
-  const countries = useMemo(
-    () =>
-      getDestinationCountries()
-        .map((c) => localCountryName(c.code, locale, c.name))
-        .sort((a, b) => a.localeCompare(b, locale)),
+  const countryLabel = (code: string) => localCountryName(code, locale, getCountry(code).name);
+  const countryOptions = useMemo(
+    () => ACTIVE_COUNTRY_CODES.map((code) => ({ value: code, label: localCountryName(code, locale, getCountry(code).name) })),
     [locale],
   );
 
@@ -86,11 +86,12 @@ export function ShippingQuoteJourney() {
       label: t("stepRoute"),
       title: t("routeTitle"),
       description: t("routeText"),
-      fields: ["originProvince", "originCity", "destCountry", "destCity", "deliveryAddress", "origin", "destination"],
+      fields: ["originCountry", "originProvince", "originCity", "destCountry", "destCity", "deliveryAddress", "origin", "destination"],
       validate: (v) => ({
-        originProvince: v.originProvince ? undefined : t("errProvince"),
+        originCountry: v.originCountry ? undefined : w("errRequired"),
+        originProvince: v.originCountry !== "CA" || v.originProvince ? undefined : t("errProvince"),
         originCity: v.originCity.trim() ? undefined : w("errRequired"),
-        destCountry: v.destCountry.trim() ? undefined : w("errRequired"),
+        destCountry: v.destCountry && v.destCountry !== v.originCountry ? undefined : w("errRequired"),
         destCity: v.destCity.trim() ? undefined : w("errRequired"),
       }),
       render: ({ values, set, errors, fieldId }) => (
@@ -102,22 +103,36 @@ export function ShippingQuoteJourney() {
             </p>
             <div className="grid gap-5 sm:grid-cols-2">
               <SelectInput
-                id={fieldId("originProvince")}
-                label={t("provinceLabel")}
+                id={fieldId("originCountry")}
+                label={t("originCountryLabel")}
                 required
-                placeholder={t("provincePlaceholder")}
-                error={errors.originProvince}
-                value={values.originProvince}
-                onChange={(v) => set("originProvince", v)}
-                options={PROVINCES.map((p) => ({ value: p, label: t(`prov_${p}`) }))}
+                error={errors.originCountry}
+                value={values.originCountry}
+                onChange={(v) => {
+                  set("originCountry", v);
+                  if (v === values.destCountry) set("destCountry", "");
+                }}
+                options={countryOptions}
               />
+              {values.originCountry === "CA" && (
+                <SelectInput
+                  id={fieldId("originProvince")}
+                  label={t("provinceLabel")}
+                  required
+                  placeholder={t("provincePlaceholder")}
+                  error={errors.originProvince}
+                  value={values.originProvince}
+                  onChange={(v) => set("originProvince", v)}
+                  options={PROVINCES.map((p) => ({ value: p, label: t(`prov_${p}`) }))}
+                />
+              )}
               <TextInput
                 id={fieldId("originCity")}
                 label={t("cityLabel")}
                 required
                 autoComplete="address-level2"
                 maxLength={120}
-                placeholder={t("originCityPh")}
+                placeholder={values.originCountry === "CN" ? t("originCityPhCN") : values.originCountry === "CM" ? t("originCityPhCM") : t("originCityPh")}
                 error={errors.originCity}
                 value={values.originCity}
                 onChange={(v) => set("originCity", v)}
@@ -130,22 +145,16 @@ export function ShippingQuoteJourney() {
               {t("destHeading")}
             </p>
             <div className="grid gap-5 sm:grid-cols-2">
-              <TextInput
+              <SelectInput
                 id={fieldId("destCountry")}
                 label={t("countryLabel")}
                 required
-                list={`${fieldId("destCountry")}-list`}
-                hint={t("countryHint")}
-                maxLength={80}
+                placeholder={t("provincePlaceholder")}
                 error={errors.destCountry}
                 value={values.destCountry}
                 onChange={(v) => set("destCountry", v)}
+                options={countryOptions.filter((o) => o.value !== values.originCountry)}
               />
-              <datalist id={`${fieldId("destCountry")}-list`}>
-                {countries.map((c) => (
-                  <option key={c} value={c} />
-                ))}
-              </datalist>
               <TextInput
                 id={fieldId("destCity")}
                 label={t("cityLabel")}
@@ -394,8 +403,8 @@ export function ShippingQuoteJourney() {
             title: t("stepRoute"),
             step: 0,
             rows: [
-              { label: t("sumFrom"), value: [v.originCity.trim(), provinceName(v.originProvince), "Canada"].filter(Boolean).join(", ") },
-              { label: t("sumTo"), value: [v.destCity.trim(), v.destCountry.trim()].filter(Boolean).join(", ") },
+              { label: t("sumFrom"), value: [v.originCity.trim(), v.originCountry === "CA" ? provinceName(v.originProvince) : "", countryLabel(v.originCountry)].filter(Boolean).join(", ") },
+              { label: t("sumTo"), value: [v.destCity.trim(), v.destCountry ? countryLabel(v.destCountry) : ""].filter(Boolean).join(", ") },
               { label: t("deliveryAddressLabel"), value: v.deliveryAddress },
             ],
           },
@@ -429,8 +438,8 @@ export function ShippingQuoteJourney() {
             email: v.email,
             phone: v.phone,
             payload: {
-              origin: [v.originCity.trim(), v.originProvince, "Canada"].filter(Boolean).join(", "),
-              destination: [v.destCity.trim(), v.destCountry.trim()].filter(Boolean).join(", "),
+              origin: [v.originCity.trim(), v.originCountry === "CA" ? v.originProvince : "", getCountry(v.originCountry).name].filter(Boolean).join(", "),
+              destination: [v.destCity.trim(), v.destCountry ? getCountry(v.destCountry).name : ""].filter(Boolean).join(", "),
               mode: v.mode,
               weightKg: num(v.weight),
               dimensionsCm: hasDims

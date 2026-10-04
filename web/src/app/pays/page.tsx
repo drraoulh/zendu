@@ -1,17 +1,19 @@
 import type { Metadata } from "next";
 import { CountriesContent } from "@/components/info/countries-content";
-import { getAllDestinations } from "@/components/info/destinations";
+import { countryCodes, getCountryInfo, type CountryInfo } from "@/components/info/destinations";
 
 export const revalidate = 3600;
 
 export const metadata: Metadata = {
-  title: "Pays desservis",
+  title: "Nos pays : Canada, Cameroun, Chine",
   description:
-    "Toutes les destinations de WorldSoft Transfer depuis le Canada : Afrique, Asie et Caraïbes. Modes de réception (mobile money, banque, retrait), devises et délais.",
+    "WorldSoft Transfer relie le Canada, le Cameroun et la Chine dans les deux sens : mobile money, Interac, Alipay, WeChat Pay ou compte bancaire. Devises, délais et frais.",
   alternates: { canonical: "/pays" },
 };
 
 export default async function Page() {
-  const destinations = await getAllDestinations();
-  return <CountriesContent destinations={destinations} />;
+  const countries = (await Promise.all(countryCodes().map((c) => getCountryInfo(c)))).filter(
+    (c): c is CountryInfo => c !== null,
+  );
+  return <CountriesContent countries={countries} />;
 }

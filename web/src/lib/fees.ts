@@ -9,6 +9,7 @@ export function computeTransferFee(sendAmount: number, currency: string) {
     EUR: Number(process.env.FEE_FLAT_EUR ?? "1.99"),
     GBP: Number(process.env.FEE_FLAT_GBP ?? "1.49"),
     CNY: Number(process.env.FEE_FLAT_CNY ?? "9.9"),
+    XAF: Number(process.env.FEE_FLAT_XAF ?? "1000"),
     AED: Number(process.env.FEE_FLAT_AED ?? "7.0"),
   };
 

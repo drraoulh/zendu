@@ -16,29 +16,33 @@ import { homeMessages } from "@/i18n/home";
 
 type HomeKey = keyof typeof homeMessages.fr;
 
-export type HomeDestination = { code: string; name: string; currency: string };
+export type HomeRoute = {
+  id: string;
+  source: string;
+  sourceName: string;
+  dest: string;
+  destName: string;
+  sendCurrency: string;
+  receiveCurrency: string;
+  networks: Array<{ label: string; type: string }>;
+  fast: boolean;
+};
 
-const PREVIEW_COUNT = 10;
-
-function corridorHref(code: string) {
-  return `/?corridor=${encodeURIComponent(`CA-${code}`)}#simulateur`;
+function corridorHref(id: string) {
+  return `/?corridor=${encodeURIComponent(id)}#simulateur`;
 }
 
-/** Aperçu des destinations : un clic présélectionne le simulateur de l'accueil. */
-export function DestinationsSection({ destinations }: { destinations: HomeDestination[] }) {
+/** Les trajets ouverts : un clic présélectionne le simulateur de l'accueil. */
+export function DestinationsSection({ routes }: { routes: HomeRoute[] }) {
   const t = useT(homeMessages);
   const { locale } = useI18n();
-  const items = destinations
-    .map((d) => ({ ...d, label: countryName(d.code, locale, d.name) }))
-    .sort((a, b) => a.label.localeCompare(b.label, locale))
-    .slice(0, PREVIEW_COUNT);
 
-  const onPick = (e: MouseEvent<HTMLAnchorElement>, code: string) => {
+  const onPick = (e: MouseEvent<HTMLAnchorElement>, id: string) => {
     if (e.metaKey || e.ctrlKey || e.shiftKey || e.altKey || e.button !== 0) return;
     const target = document.getElementById("simulateur");
     if (!target) return;
     e.preventDefault();
-    selectCalculatorCorridor(`CA-${code}`);
+    selectCalculatorCorridor(id);
     target.scrollIntoView({ behavior: "smooth", block: "start" });
   };
 
@@ -46,39 +50,49 @@ export function DestinationsSection({ destinations }: { destinations: HomeDestin
     <Section className="bg-bg">
       <Container>
         <div className="flex flex-col gap-6 lg:flex-row lg:items-end lg:justify-between">
-          <SectionHeading
-            eyebrow={t("destEyebrow")}
-            title={t("destTitle")}
-            subtitle={t("destSubtitle", { n: destinations.length })}
-          />
+          <SectionHeading eyebrow={t("destEyebrow")} title={t("destTitle")} subtitle={t("destSubtitle", { n: routes.length })} />
           <ButtonLink href="/pays" variant="secondary" className="self-start lg:self-auto">
             <Icon name="globe" className="h-4 w-4" />
-            {t("destAll", { n: destinations.length })}
+            {t("destAll")}
           </ButtonLink>
         </div>
-        <ul className="mt-10 grid grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-5">
-          {items.map((d) => (
-            <li key={d.code}>
-              <a
-                href={corridorHref(d.code)}
-                onClick={(e) => onPick(e, d.code)}
-                aria-label={t("destSendTo", { country: d.label })}
-                className="group flex h-full items-center gap-3 rounded-2xl border border-line bg-white px-3.5 py-3 transition hover:-translate-y-0.5 hover:border-brand/30 hover:shadow-card focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-brand/20"
-              >
-                <CountryFlag code={d.code} size={32} title={d.label} className="shrink-0 rounded" />
-                <span className="min-w-0 flex-1">
-                  <span className="block text-sm font-semibold leading-snug text-ink [overflow-wrap:anywhere]">
-                    {d.label}
+        <ul className="mt-10 grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
+          {routes.map((r) => {
+            const from = countryName(r.source, locale, r.sourceName);
+            const to = countryName(r.dest, locale, r.destName);
+            return (
+              <li key={r.id}>
+                <a
+                  href={corridorHref(r.id)}
+                  onClick={(e) => onPick(e, r.id)}
+                  aria-label={t("destSendTo", { country: `${from} → ${to}` })}
+                  className="group flex h-full flex-col gap-3 rounded-2xl border border-line bg-white p-4 transition hover:-translate-y-0.5 hover:border-brand/30 hover:shadow-card focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-brand/20"
+                >
+                  <span className="flex items-center gap-2">
+                    <CountryFlag code={r.source} size={28} title="" className="shrink-0 rounded" />
+                    <Icon name="arrowRight" className="h-4 w-4 text-brand" />
+                    <CountryFlag code={r.dest} size={28} title="" className="shrink-0 rounded" />
+                    <span className="ml-1 min-w-0 flex-1 text-sm font-bold leading-snug text-ink">
+                      {from} → {to}
+                    </span>
                   </span>
-                  <span className="block text-xs text-muted">{d.currency}</span>
-                </span>
-                <Icon
-                  name="arrowRight"
-                  className="hidden h-4 w-4 shrink-0 text-brand opacity-0 transition group-hover:opacity-100 sm:block"
-                />
-              </a>
-            </li>
-          ))}
+                  <span className="flex flex-wrap gap-1.5">
+                    {r.networks.map((n) => (
+                      <span key={n.label} className="rounded-full bg-brand-soft px-2 py-0.5 text-[11px] font-semibold text-brand-strong">
+                        {n.type === "bank" ? t("netBank") : n.type === "cash" ? t("netCash") : n.label}
+                      </span>
+                    ))}
+                  </span>
+                  <span className="mt-auto flex items-center justify-between text-xs text-muted">
+                    <span>
+                      {r.sendCurrency} → {r.receiveCurrency} · {r.fast ? t("routeFast") : t("routeDay")}
+                    </span>
+                    <span className="font-semibold text-brand opacity-0 transition group-hover:opacity-100">{t("routeSimulate")}</span>
+                  </span>
+                </a>
+              </li>
+            );
+          })}
         </ul>
       </Container>
     </Section>

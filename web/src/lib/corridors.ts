@@ -36,9 +36,13 @@ const MM = {
   cash: { id: "CASH", label: "Cash pickup", type: "cash" as const },
   vodafone: { id: "VODAFONE", label: "Vodafone Cash", type: "mobile_money" as const },
   airtel: { id: "AIRTEL", label: "Airtel Money", type: "mobile_money" as const },
+  interac: { id: "INTERAC", label: "Interac e-Transfer", type: "mobile_money" as const },
+  alipay: { id: "ALIPAY", label: "Alipay", type: "mobile_money" as const },
+  wechat: { id: "WECHAT", label: "WeChat Pay", type: "mobile_money" as const },
 };
 
-export const COUNTRIES: Record<string, Country> = {
+/** Catalogue complet ; seuls les pays de ACTIVE_COUNTRY_CODES sont ouverts. */
+const ALL_COUNTRIES: Record<string, Country> = {
   CA: {
     code: "CA",
     name: "Canada",
@@ -48,7 +52,7 @@ export const COUNTRIES: Record<string, Country> = {
     phoneRegex: /^\d{10,11}$/,
     phoneHint: "Canadian number",
     role: "source",
-    networks: [],
+    networks: [MM.interac, MM.bank],
   },
   US: {
     code: "US",
@@ -92,7 +96,7 @@ export const COUNTRIES: Record<string, Country> = {
     phoneRegex: /^\d{11,13}$/,
     phoneHint: "China number",
     role: "source",
-    networks: [],
+    networks: [MM.alipay, MM.wechat, MM.bank],
   },
   DE: {
     code: "DE",
@@ -382,28 +386,63 @@ export const COUNTRIES: Record<string, Country> = {
   },
 };
 
-const SOURCE_CODES = Object.values(COUNTRIES)
-  .filter((c) => c.role === "source")
-  .map((c) => c.code);
+/**
+ * Pays ouverts pour le moment : Canada, Cameroun, Chine (modifiable par
+ * NEXT_PUBLIC_ACTIVE_COUNTRIES, ex. "CA,CM,CN"). Chaque pays ouvert peut envoyer
+ * vers les autres et en recevoir.
+ */
+export const ACTIVE_COUNTRY_CODES: string[] = (process.env.NEXT_PUBLIC_ACTIVE_COUNTRIES ?? "CA,CM,CN")
+  .split(",")
+  .map((c) => c.trim().toUpperCase())
+  .filter((c) => c in ALL_COUNTRIES);
 
-const DEST_CODES = Object.values(COUNTRIES)
-  .filter((c) => c.role === "destination")
-  .map((c) => c.code);
-
-/** Tous les corridors source → destination ouverts (démo). */
-export const CORRIDORS: Corridor[] = SOURCE_CODES.flatMap((source) =>
-  DEST_CODES.map((destination) => ({
-    id: `${source}-${destination}`,
-    source,
-    destination,
-    active: true,
-    feeSend: 0,
-    minSend: source === "CN" ? 50 : 10,
-    maxSend: source === "CN" ? 20000 : 5000,
-    deliveryEstimate:
-      destination === "CN" || source === "CN" ? "Under 24h" : "A few minutes",
-  })),
+export const COUNTRIES: Record<string, Country> = Object.fromEntries(
+  ACTIVE_COUNTRY_CODES.map((code) => [code, { ...ALL_COUNTRIES[code], role: "both" as const }]),
 );
+
+/** Montants min/max par devise d'envoi. */
+const LIMITS: Record<string, { min: number; max: number }> = {
+  CAD: { min: 10, max: 5000 },
+  XAF: { min: 5000, max: 3_000_000 },
+  CNY: { min: 50, max: 30_000 },
+};
+
+/** Délai indicatif selon le pays de réception (traduit côté UI). */
+function estimateFor(destination: string): string {
+  if (destination === "CM") return "A few minutes";
+  return "Under 24h";
+}
+
+export const CORRIDORS: Corridor[] = ACTIVE_COUNTRY_CODES.flatMap((source) =>
+  ACTIVE_COUNTRY_CODES.filter((destination) => destination !== source).map((destination) => {
+    const limits = LIMITS[ALL_COUNTRIES[source].currency] ?? { min: 10, max: 5000 };
+    return {
+      id: `${source}-${destination}`,
+      source,
+      destination,
+      active: true,
+      feeSend: 0,
+      minSend: limits.min,
+      maxSend: limits.max,
+      deliveryEstimate: estimateFor(destination),
+    };
+  }),
+);
+
+/** Corridor par défaut (et premier corridor proposé depuis un pays). */
+export const DEFAULT_CORRIDOR_ID = "CA-CM";
+
+export function corridorsFrom(source: string): Corridor[] {
+  return CORRIDORS.filter((c) => c.source === source && c.active);
+}
+
+export function corridorsTo(destination: string): Corridor[] {
+  return CORRIDORS.filter((c) => c.destination === destination && c.active);
+}
+
+export function isActiveCountry(code: string): boolean {
+  return ACTIVE_COUNTRY_CODES.includes(code.toUpperCase());
+}
 
 export function getCorridor(id: string): Corridor | undefined {
   return CORRIDORS.find((c) => c.id === id);
@@ -414,17 +453,17 @@ export function getActiveCorridors(): Corridor[] {
 }
 
 export function getCountry(code: string): Country {
-  const c = COUNTRIES[code];
+  const c = COUNTRIES[code] ?? ALL_COUNTRIES[code];
   if (!c) throw new Error(`Unknown country: ${code}`);
   return c;
 }
 
 export function getSourceCountries(): Country[] {
-  return Object.values(COUNTRIES).filter((c) => c.role === "source");
+  return Object.values(COUNTRIES).filter((c) => c.role === "source" || c.role === "both");
 }
 
 export function getDestinationCountries(): Country[] {
-  return Object.values(COUNTRIES).filter((c) => c.role === "destination");
+  return Object.values(COUNTRIES).filter((c) => c.role === "destination" || c.role === "both");
 }
 
 export function normalizePhone(phone: string, countryCode: string): string {

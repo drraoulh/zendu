@@ -9,7 +9,7 @@ export const aboutPage = defineMessages({
     heroEyebrow: "À propos",
     heroTitle: "Paul World Finances and Technologies",
     heroSubtitle:
-      "Une entreprise basée au Canada qui réunit transfert d'argent, accompagnement financier, technologies et shipping pour simplifier la vie des familles et des entrepreneurs, entre le Canada, l'Afrique et le monde.",
+      "Une entreprise basée au Canada qui réunit transfert d'argent, accompagnement financier, technologies et shipping pour simplifier la vie des familles et des entrepreneurs, entre le Canada, le Cameroun et la Chine.",
     heroCta: "Découvrir nos services",
     heroCta2: "Nous contacter",
 
@@ -22,14 +22,14 @@ export const aboutPage = defineMessages({
     story3:
       "Basée au Canada, notre équipe connaît les réalités de part et d'autre de l'Atlantique. Notre devise résume notre ambition : plus qu'un service, une solution pour votre avenir.",
     basedIn: "Basée au Canada",
-    logoCaption: "Notre logo officiel : le globe, la skyline et le monogramme PW symbolisent un service ancré au Canada et ouvert sur le monde.",
+    logoCaption: "Notre logo officiel : le globe, la skyline et le monogramme PW symbolisent un service ancré au Canada et tourné vers le Cameroun et la Chine.",
 
     missionTitle: "Notre mission",
     missionText:
       "Offrir des services financiers, technologiques et logistiques accessibles, transparents et sûrs, qui aident chacun à soutenir ses proches et à faire avancer ses projets.",
     visionTitle: "Notre vision",
     visionText:
-      "Devenir un partenaire de confiance pour la diaspora et les entrepreneurs, en rapprochant le Canada, l'Afrique et le reste du monde grâce à des solutions simples et modernes.",
+      "Devenir un partenaire de confiance pour la diaspora et les entrepreneurs, en rapprochant le Canada, le Cameroun et la Chine grâce à des solutions simples et modernes.",
 
     valuesEyebrow: "Nos valeurs",
     valuesTitle: "Ce qui guide chacune de nos décisions",
@@ -51,7 +51,7 @@ export const aboutPage = defineMessages({
     polesTitle: "Quatre expertises, une même exigence",
     polesSubtitle: "Des services complémentaires pour répondre à vos besoins ici et là-bas.",
     pole1Title: "Transfert d'argent",
-    pole1Text: "Avec l'application WorldSoft Transfer, envoyez de l'argent du Canada vers l'Afrique et le monde, par mobile money ou virement bancaire.",
+    pole1Text: "Avec l'application WorldSoft Transfer, envoyez de l'argent entre le Canada, le Cameroun et la Chine, par mobile money, Interac, Alipay, WeChat Pay ou virement bancaire.",
     pole2Title: "Finances",
     pole2Text: "Budget, épargne, accompagnement des entrepreneurs et éducation financière.",
     pole3Title: "Technologies",
@@ -66,7 +66,7 @@ export const aboutPage = defineMessages({
     wstEyebrow: "Une solution PWFINTECH",
     wstTitle: "WorldSoft Transfer, notre application de transfert d'argent",
     wstText1:
-      "Le pôle Transfert d'argent de PWFINTECH prend la forme d'une application mobile : WorldSoft Transfer. On y simule, on y envoie et on y suit ses transferts depuis le Canada vers l'Afrique, l'Asie et les Caraïbes.",
+      "Le pôle Transfert d'argent de PWFINTECH prend la forme d'une application mobile : WorldSoft Transfer. On y simule, on y envoie et on y suit ses transferts entre le Canada, le Cameroun et la Chine, dans les deux sens.",
     wstText2:
       "Le site web reste votre point de départ : il présente les frais, les pays desservis et le simulateur, qui utilise le même calcul que l'application.",
     wstPoint1: "Frais et taux affichés avant chaque paiement",
@@ -102,7 +102,7 @@ export const aboutPage = defineMessages({
     heroEyebrow: "About us",
     heroTitle: "Paul World Finances and Technologies",
     heroSubtitle:
-      "A Canada-based company bringing together money transfer, financial guidance, technology and shipping to make life easier for families and entrepreneurs between Canada, Africa and the world.",
+      "A Canada-based company bringing together money transfer, financial guidance, technology and shipping to make life easier for families and entrepreneurs between Canada, Cameroon and China.",
     heroCta: "Explore our services",
     heroCta2: "Contact us",
 
@@ -116,14 +116,14 @@ export const aboutPage = defineMessages({
       "Based in Canada, our team understands the realities on both sides of the Atlantic. Our motto sums up our ambition: more than a service, a solution for your future.",
     basedIn: "Based in Canada",
     logoCaption:
-      "Our official logo: the globe, the skyline and the PW monogram stand for a service rooted in Canada and open to the world.",
+      "Our official logo: the globe, the skyline and the PW monogram stand for a service rooted in Canada and connected to Cameroon and China.",
 
     missionTitle: "Our mission",
     missionText:
       "To offer accessible, transparent and secure financial, technology and logistics services that help everyone support their loved ones and move their projects forward.",
     visionTitle: "Our vision",
     visionText:
-      "To become a trusted partner for the diaspora and entrepreneurs, bringing Canada, Africa and the rest of the world closer through simple, modern solutions.",
+      "To become a trusted partner for the diaspora and entrepreneurs, bringing Canada, Cameroon and China closer through simple, modern solutions.",
 
     valuesEyebrow: "Our values",
     valuesTitle: "What guides every decision we make",
@@ -145,7 +145,7 @@ export const aboutPage = defineMessages({
     polesTitle: "Four areas of expertise, one standard",
     polesSubtitle: "Complementary services to meet your needs here and abroad.",
     pole1Title: "Money transfer",
-    pole1Text: "With the WorldSoft Transfer app, send money from Canada to Africa and the world, via mobile money or bank transfer.",
+    pole1Text: "With the WorldSoft Transfer app, send money between Canada, Cameroon and China, via mobile money, Interac, Alipay, WeChat Pay or bank transfer.",
     pole2Title: "Finances",
     pole2Text: "Budgeting, savings, support for entrepreneurs and financial education.",
     pole3Title: "Technologies",
@@ -160,7 +160,7 @@ export const aboutPage = defineMessages({
     wstEyebrow: "A PWFINTECH solution",
     wstTitle: "WorldSoft Transfer, our money transfer app",
     wstText1:
-      "PWFINTECH's Money transfer line takes the form of a mobile app: WorldSoft Transfer. You simulate, send and track your transfers from Canada to Africa, Asia and the Caribbean.",
+      "PWFINTECH's Money transfer line takes the form of a mobile app: WorldSoft Transfer. You simulate, send and track your transfers between Canada, Cameroon and China, both ways.",
     wstText2:
       "The website remains your starting point: it presents fees, destinations and the simulator, which uses the same calculation as the app.",
     wstPoint1: "Fees and rate shown before every payment",

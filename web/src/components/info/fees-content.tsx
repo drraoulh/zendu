@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { useMemo, useState } from "react";
+import { useMemo } from "react";
 import { CountryFlag } from "@/components/country-flag";
 import { ButtonLink } from "@/components/ui/button";
 import { Icon, type IconName } from "@/components/ui/icon";
@@ -9,21 +9,16 @@ import { Container, PageHero, Section, SectionHeading } from "@/components/ui/la
 import { CtaBand, Faq, Notice } from "@/components/marketing/sections";
 import { useT } from "@/i18n/define";
 import { feesPage } from "@/i18n/info";
+import { capitalize, countryPhrase, groupByDelivery } from "@/i18n/countries";
 import type { DestinationInfo } from "./destinations";
-import { REGION_ORDER } from "./regions";
-import { SearchField, deliveryRank, normalize, useInfoLabels } from "./shared";
-
-type SortKey = "name" | "region" | "currency" | "delivery";
-const AMOUNTS = [100, 500, 1000];
+import { useInfoLabels } from "./shared";
 
 export function FeesContent({ destinations }: { destinations: DestinationInfo[] }) {
   const t = useT(feesPage);
   const L = useInfoLabels();
-  const [q, setQ] = useState("");
-  const [sort, setSort] = useState<SortKey>("name");
 
-  const sample = destinations.find((d) => d.code === "CM") ?? destinations[0];
-  const q100 = sample?.quotes.find((x) => x.sendAmount === 100) ?? sample?.quotes[0];
+  const sample = destinations.find((d) => d.corridorId === "CA-CM") ?? destinations[0];
+  const q100 = sample?.quotes[0];
   const sendCurrency = sample?.sendCurrency ?? "CAD";
   const flat = q100 ? L.money(q100.feeFlat, sendCurrency) : "—";
   const percent = q100 ? L.number(q100.feePercent) : "—";
@@ -33,48 +28,25 @@ export function FeesContent({ destinations }: { destinations: DestinationInfo[] 
   const allStale = destinations.every((d) => d.fxStale);
   const updated = allStale || !fetchedAt ? t("staleRates") : t("updatedAt", { date: L.date(fetchedAt) });
 
-  const rows = useMemo(() => {
-    const needle = normalize(q);
-    const filtered = destinations.filter((d) => {
-      if (!needle) return true;
-      const hay = normalize(
-        [
-          L.country(d.code, d.name),
-          d.name,
-          d.code,
-          d.currency,
-          L.region(d.region),
-          ...d.networks.map((n) => `${n.label} ${L.network(n)} ${L.networkType(n.type)}`),
-        ].join(" "),
-      );
-      return hay.includes(needle);
-    });
-    const byName = (a: DestinationInfo, b: DestinationInfo) =>
-      L.country(a.code, a.name).localeCompare(L.country(b.code, b.name), L.locale);
-    return [...filtered].sort((a, b) => {
-      if (sort === "region") return REGION_ORDER.indexOf(a.region) - REGION_ORDER.indexOf(b.region) || byName(a, b);
-      if (sort === "currency") return a.currency.localeCompare(b.currency) || byName(a, b);
-      if (sort === "delivery") return deliveryRank(a.deliveryEstimate) - deliveryRank(b.deliveryEstimate) || byName(a, b);
-      return byName(a, b);
-    });
-  }, [destinations, q, sort, L]);
+  /* Un groupe par pays d'envoi, dans l'ordre des pays ouverts. */
+  const groups = useMemo(() => {
+    const order: string[] = [];
+    const bySource = new Map<string, DestinationInfo[]>();
+    for (const d of destinations) {
+      if (!bySource.has(d.sourceCode)) {
+        bySource.set(d.sourceCode, []);
+        order.push(d.sourceCode);
+      }
+      bySource.get(d.sourceCode)!.push(d);
+    }
+    return order.map((code) => ({ code, items: bySource.get(code)! }));
+  }, [destinations]);
 
   const howItems: Array<{ icon: IconName; title: string; text: string }> = [
     { icon: "receipt", title: t("how1Title"), text: t("how1Text", { flat, percent }) },
     { icon: "chart", title: t("how2Title"), text: t("how2Text", { margin }) },
     { icon: "check", title: t("how3Title"), text: t("how3Text") },
   ];
-
-  const feeCell = (d: DestinationInfo, amount: number) => {
-    const quote = d.quotes.find((x) => x.sendAmount === amount);
-    if (!quote) return <span className="text-muted">—</span>;
-    return (
-      <>
-        <span className="block font-semibold text-ink">{L.money(quote.fee, d.sendCurrency)}</span>
-        <span className="block text-xs text-muted">{t("receiveApprox", { amount: L.money(quote.receiveAmount, d.currency) })}</span>
-      </>
-    );
-  };
 
   const simulateHref = (d: DestinationInfo) => `/transfert?corridor=${encodeURIComponent(d.corridorId)}#simulateur`;
 
@@ -117,7 +89,7 @@ export function FeesContent({ destinations }: { destinations: DestinationInfo[] 
                 <div aria-hidden className="bg-grid absolute inset-0 opacity-30" />
                 <div className="relative">
                   <p className="inline-flex items-center gap-2 font-display text-xs font-bold uppercase tracking-[0.16em] text-sky">
-                    <CountryFlag code="CA" size={20} title="Canada" />→
+                    <CountryFlag code={sample.sourceCode} size={20} title={L.country(sample.sourceCode, sample.sourceName)} />→
                     <CountryFlag code={sample.code} size={20} title={L.country(sample.code, sample.name)} />
                   </p>
                   <h3 className="mt-3 font-display text-xl font-extrabold">
@@ -143,7 +115,7 @@ export function FeesContent({ destinations }: { destinations: DestinationInfo[] 
         </Container>
       </Section>
 
-      {/* Tableau par destination */}
+      {/* Tableaux par pays d'envoi */}
       <Section id="destinations" className="scroll-mt-20 bg-surface-soft">
         <Container>
           <SectionHeading
@@ -152,145 +124,121 @@ export function FeesContent({ destinations }: { destinations: DestinationInfo[] 
             subtitle={t("tableSubtitle")}
           />
 
-          <div className="mt-8 flex flex-col gap-3 sm:flex-row sm:items-center">
-            <SearchField
-              id="fees-search"
-              label={t("searchLabel")}
-              placeholder={t("searchPh")}
-              value={q}
-              onChange={setQ}
-              className="flex-1"
-            />
-            <div className="flex items-center gap-2">
-              <label htmlFor="fees-sort" className="shrink-0 text-sm font-semibold text-ink">
-                {t("sortLabel")}
-              </label>
-              <div className="relative flex-1 sm:flex-none">
-                <select
-                  id="fees-sort"
-                  value={sort}
-                  onChange={(e) => setSort(e.target.value as SortKey)}
-                  className="block w-full appearance-none rounded-full border border-line bg-white py-2.5 pl-4 pr-10 text-base text-ink shadow-sm focus:border-brand focus:outline-none focus:ring-4 focus:ring-brand/15 sm:text-sm"
-                >
-                  <option value="name">{t("sortName")}</option>
-                  <option value="region">{t("sortRegion")}</option>
-                  <option value="currency">{t("sortCurrency")}</option>
-                  <option value="delivery">{t("sortDelivery")}</option>
-                </select>
-                <Icon name="chevronDown" className="pointer-events-none absolute right-4 top-1/2 h-4 w-4 -translate-y-1/2 text-muted" />
-              </div>
-            </div>
-          </div>
-          <p className="mt-3 text-xs text-muted" aria-live="polite">
-            {t("resultsCount", { n: rows.length })}
-          </p>
+          <div className="mt-10 grid gap-10">
+            {groups.map((g) => {
+              const first = g.items[0];
+              const amounts = first.quotes.map((q) => q.sendAmount);
+              const sourceName = capitalize(countryPhrase(L.locale, g.code, L.country(g.code, first.sourceName)).from);
+              return (
+                <section key={g.code} aria-labelledby={`from-${g.code}`}>
+                  <div className="flex items-center gap-3">
+                    <CountryFlag code={g.code} size={36} title="" className="rounded-md" />
+                    <div>
+                      <h3 id={`from-${g.code}`} className="font-display text-xl font-extrabold text-ink sm:text-2xl">
+                        {sourceName}
+                      </h3>
+                      <p className="text-sm text-muted">{t("fromSubtitle", { currency: first.sendCurrency })}</p>
+                    </div>
+                  </div>
 
-          {rows.length === 0 ? (
-            <p className="mt-6 rounded-3xl border border-line bg-white p-8 text-center text-sm text-muted">
-              {L.t("noResults", { q })}
-            </p>
-          ) : (
-            <>
-              {/* Grand écran : tableau */}
-              <div className="mt-6 hidden overflow-hidden rounded-3xl border border-line bg-white shadow-card lg:block">
-                <table className="w-full text-left text-sm">
-                  <caption className="sr-only">{t("tableTitle", { count: destinations.length })}</caption>
-                  <thead className="bg-surface-soft text-xs font-bold uppercase tracking-wider text-muted">
-                    <tr>
-                      <th scope="col" className="px-5 py-4">{t("colCountry")}</th>
-                      <th scope="col" className="px-3 py-4">{t("colModes")}</th>
-                      <th scope="col" className="px-3 py-4">{t("colDelivery")}</th>
-                      {AMOUNTS.map((a) => (
-                        <th key={a} scope="col" className="px-3 py-4">
-                          {t("colFee", { amount: L.money(a, sendCurrency) })}
-                        </th>
-                      ))}
-                      <th scope="col" className="px-3 py-4">{t("colLimits")}</th>
-                      <th scope="col" className="px-5 py-4"><span className="sr-only">{t("colAction")}</span></th>
-                    </tr>
-                  </thead>
-                  <tbody className="divide-y divide-line">
-                    {rows.map((d) => (
-                      <tr key={d.code} className="align-top transition hover:bg-brand-soft/30">
-                        <th scope="row" className="px-5 py-4 font-normal">
-                          <Link href={`/pays/${d.code.toLowerCase()}`} className="group flex items-center gap-3">
-                            <CountryFlag code={d.code} size={28} title={L.country(d.code, d.name)} />
-                            <span>
-                              <span className="block font-semibold text-ink group-hover:text-brand-strong">{L.country(d.code, d.name)}</span>
-                              <span className="block text-xs text-muted">{d.currency} · {L.region(d.region)}</span>
-                            </span>
-                          </Link>
-                        </th>
-                        <td className="px-3 py-4">
-                          <NetworkChips d={d} />
-                        </td>
-                        <td className="px-3 py-4 text-xs text-muted">
-                          <DeliveryLines d={d} />
-                        </td>
-                        {AMOUNTS.map((a) => (
-                          <td key={a} className="px-3 py-4">{feeCell(d, a)}</td>
+                  {/* Grand écran : tableau */}
+                  <div className="mt-5 hidden overflow-hidden rounded-3xl border border-line bg-white shadow-card lg:block">
+                    <table className="w-full text-left text-sm">
+                      <caption className="sr-only">{sourceName}</caption>
+                      <thead className="bg-surface-soft text-xs font-bold uppercase tracking-wider text-muted">
+                        <tr>
+                          <th scope="col" className="px-5 py-4">{t("colRoute")}</th>
+                          <th scope="col" className="px-3 py-4">{t("colModes")}</th>
+                          <th scope="col" className="px-3 py-4">{t("colDelivery")}</th>
+                          {amounts.map((a) => (
+                            <th key={a} scope="col" className="px-3 py-4">
+                              {t("colFee", { amount: L.money(a, first.sendCurrency) })}
+                            </th>
+                          ))}
+                          <th scope="col" className="px-3 py-4">{t("colLimits")}</th>
+                          <th scope="col" className="px-5 py-4"><span className="sr-only">{t("colAction")}</span></th>
+                        </tr>
+                      </thead>
+                      <tbody className="divide-y divide-line">
+                        {g.items.map((d) => (
+                          <tr key={d.corridorId} className="align-top transition hover:bg-brand-soft/30">
+                            <th scope="row" className="px-5 py-4 font-normal">
+                              <Link href={`/pays/${d.code.toLowerCase()}`} className="group flex items-center gap-3">
+                                <CountryFlag code={d.code} size={28} title={L.country(d.code, d.name)} />
+                                <span>
+                                  <span className="block font-semibold text-ink group-hover:text-brand-strong">{L.country(d.code, d.name)}</span>
+                                  <span className="block text-xs text-muted">{t("rateLine", { from: d.sendCurrency, rate: d.rate != null ? L.number(d.rate, 4) : "—", to: d.currency })}</span>
+                                </span>
+                              </Link>
+                            </th>
+                            <td className="px-3 py-4"><NetworkChips d={d} /></td>
+                            <td className="px-3 py-4 text-xs text-muted"><DeliveryLines d={d} /></td>
+                            {d.quotes.map((quote) => (
+                              <td key={quote.sendAmount} className="px-3 py-4">
+                                <span className="block font-semibold text-ink">{L.money(quote.fee, d.sendCurrency)}</span>
+                                <span className="block text-xs text-muted">{t("receiveApprox", { amount: L.money(quote.receiveAmount, d.currency) })}</span>
+                              </td>
+                            ))}
+                            <td className="whitespace-nowrap px-3 py-4 text-xs text-muted">
+                              {L.money(d.minSend, d.sendCurrency)} – {L.money(d.maxSend, d.sendCurrency)}
+                            </td>
+                            <td className="px-5 py-4 text-right">
+                              <Link
+                                href={simulateHref(d)}
+                                className="inline-flex items-center gap-1 whitespace-nowrap rounded-full bg-brand-soft px-3 py-1.5 text-xs font-semibold text-brand-strong hover:bg-brand hover:text-white"
+                              >
+                                {L.t("simulate")}
+                                <Icon name="arrowRight" className="h-3.5 w-3.5" />
+                              </Link>
+                            </td>
+                          </tr>
                         ))}
-                        <td className="whitespace-nowrap px-3 py-4 text-xs text-muted">
-                          {L.money(d.minSend, d.sendCurrency)} – {L.money(d.maxSend, d.sendCurrency)}
-                        </td>
-                        <td className="px-5 py-4 text-right">
+                      </tbody>
+                    </table>
+                  </div>
+
+                  {/* Mobile / tablette : cartes */}
+                  <ul className="mt-5 grid gap-4 sm:grid-cols-2 lg:hidden">
+                    {g.items.map((d) => (
+                      <li key={d.corridorId} className="rounded-3xl border border-line bg-white p-5 shadow-card">
+                        <Link href={`/pays/${d.code.toLowerCase()}`} className="flex items-center gap-3">
+                          <CountryFlag code={d.code} size={32} title={L.country(d.code, d.name)} />
+                          <span className="min-w-0">
+                            <span className="block font-display font-bold text-ink">{L.country(d.code, d.name)}</span>
+                            <span className="block text-xs text-muted">{t("rateLine", { from: d.sendCurrency, rate: d.rate != null ? L.number(d.rate, 4) : "—", to: d.currency })}</span>
+                          </span>
+                        </Link>
+                        <div className="mt-4"><NetworkChips d={d} /></div>
+                        <div className="mt-3 text-xs text-muted"><DeliveryLines d={d} /></div>
+                        <dl className="mt-4 grid grid-cols-3 gap-2 rounded-2xl bg-surface-soft p-3 text-center">
+                          {d.quotes.map((quote) => (
+                            <div key={quote.sendAmount} className="min-w-0">
+                              <dt className="text-[11px] text-muted">{L.money(quote.sendAmount, d.sendCurrency)}</dt>
+                              <dd className="mt-0.5 text-sm font-semibold text-ink">{L.money(quote.fee, d.sendCurrency)}</dd>
+                            </div>
+                          ))}
+                        </dl>
+                        <div className="mt-4 flex items-center justify-between gap-3">
+                          <span className="text-xs text-muted">
+                            {t("colLimits")} : {L.money(d.minSend, d.sendCurrency)} – {L.money(d.maxSend, d.sendCurrency)}
+                          </span>
                           <Link
                             href={simulateHref(d)}
-                            className="inline-flex items-center gap-1 whitespace-nowrap rounded-full bg-brand-soft px-3 py-1.5 text-xs font-semibold text-brand-strong hover:bg-brand hover:text-white"
+                            className="inline-flex shrink-0 items-center gap-1 rounded-full bg-brand px-3.5 py-2 text-xs font-semibold text-white hover:bg-brand-strong"
                           >
                             {L.t("simulate")}
                             <Icon name="arrowRight" className="h-3.5 w-3.5" />
                           </Link>
-                        </td>
-                      </tr>
+                        </div>
+                      </li>
                     ))}
-                  </tbody>
-                </table>
-              </div>
+                  </ul>
+                </section>
+              );
+            })}
+          </div>
 
-              {/* Mobile / tablette : cartes */}
-              <ul className="mt-6 grid gap-4 sm:grid-cols-2 lg:hidden">
-                {rows.map((d) => (
-                  <li key={d.code} className="rounded-3xl border border-line bg-white p-5 shadow-card">
-                    <Link href={`/pays/${d.code.toLowerCase()}`} className="flex items-center gap-3">
-                      <CountryFlag code={d.code} size={32} title={L.country(d.code, d.name)} />
-                      <span className="min-w-0">
-                        <span className="block font-display font-bold text-ink">{L.country(d.code, d.name)}</span>
-                        <span className="block text-xs text-muted">{d.currency} · {L.region(d.region)}</span>
-                      </span>
-                    </Link>
-                    <div className="mt-4"><NetworkChips d={d} /></div>
-                    <div className="mt-3 text-xs text-muted"><DeliveryLines d={d} /></div>
-                    <dl className="mt-4 grid grid-cols-3 gap-2 rounded-2xl bg-surface-soft p-3 text-center">
-                      {AMOUNTS.map((a) => {
-                        const quote = d.quotes.find((x) => x.sendAmount === a);
-                        return (
-                          <div key={a} className="min-w-0">
-                            <dt className="text-[11px] text-muted">{L.money(a, d.sendCurrency)}</dt>
-                            <dd className="mt-0.5 text-sm font-semibold text-ink">{quote ? L.money(quote.fee, d.sendCurrency) : "—"}</dd>
-                          </div>
-                        );
-                      })}
-                    </dl>
-                    <div className="mt-4 flex items-center justify-between gap-3">
-                      <span className="text-xs text-muted">
-                        {t("colLimits")} : {L.money(d.minSend, d.sendCurrency)} – {L.money(d.maxSend, d.sendCurrency)}
-                      </span>
-                      <Link
-                        href={simulateHref(d)}
-                        className="inline-flex shrink-0 items-center gap-1 rounded-full bg-brand px-3.5 py-2 text-xs font-semibold text-white hover:bg-brand-strong"
-                      >
-                        {L.t("simulate")}
-                        <Icon name="arrowRight" className="h-3.5 w-3.5" />
-                      </Link>
-                    </div>
-                  </li>
-                ))}
-              </ul>
-            </>
-          )}
-
-          <div className="mt-8">
+          <div className="mt-10">
             <Notice title={t("noticeTitle")} icon="info">
               {t("noticeText", { updated })}
             </Notice>
@@ -344,15 +292,6 @@ function NetworkChips({ d }: { d: DestinationInfo }) {
 }
 
 function DeliveryLines({ d }: { d: DestinationInfo }) {
-  const t = useT(feesPage);
   const L = useInfoLabels();
-  const hasMobile = d.networks.some((n) => n.type === "mobile_money");
-  const hasBank = d.networks.some((n) => n.type === "bank");
-  return (
-    <span className="grid gap-0.5">
-      {hasMobile && <span>{t("deliveryMobile", { d: L.delivery(d.deliveryEstimate) })}</span>}
-      {!hasMobile && <span>{L.delivery(d.deliveryEstimate)}</span>}
-      {hasBank && <span>{t("deliveryBank", { d: L.delivery(d.bankEstimate) })}</span>}
-    </span>
-  );
+  return <span>{groupByDelivery(d.networks, (n) => L.network(n), L.delivery)}</span>;
 }

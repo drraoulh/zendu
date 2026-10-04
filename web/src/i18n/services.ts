@@ -48,12 +48,12 @@ export const marketing = defineMessages({
 
 export const transferPage = defineMessages({
   fr: {
-    heroBadge: "Une solution PWFINTECH · depuis le Canada",
+    heroBadge: "Une solution PWFINTECH · Canada · Cameroun · Chine",
     heroTitleA: "L'argent arrive en quelques minutes.",
     heroTitleB: "Les frais, vous les voyez avant.",
     heroSubtitle: "WorldSoft Transfer, l'application de transfert d'argent de PWFINTECH.",
     heroLead:
-      "Envoyez depuis le Canada vers le mobile money, un compte bancaire ou un point de retrait de vos proches, avec le taux, les frais et le délai affichés avant de payer.",
+      "Envoyez entre le Canada, le Cameroun et la Chine vers le mobile money, Interac, Alipay, WeChat Pay ou le compte bancaire de vos proches, avec le taux, les frais et le délai affichés avant de payer.",
     heroCta2: "Simuler un transfert",
     hl1: "Frais et taux affichés à l'avance",
     hl2: "Mobile money et banque",
@@ -143,8 +143,8 @@ export const transferPage = defineMessages({
     payEyebrow: "Modes de réception",
     payTitle: "Vos proches reçoivent comme ils préfèrent",
     paySubtitle: "Les options proposées dépendent du pays de destination ; l'application n'affiche que celles qui sont disponibles.",
-    payMobileTitle: "Mobile money",
-    payMobileText: "Directement sur le portefeuille du destinataire.",
+    payMobileTitle: "Mobile money et portefeuilles",
+    payMobileText: "Directement sur le portefeuille du destinataire : MTN MoMo, Orange Money, Interac, Alipay ou WeChat Pay.",
     payBankTitle: "Virement bancaire",
     payBankText: "Sur le compte bancaire du destinataire (numéro de compte, IBAN ou RIB selon le pays).",
     payCashTitle: "Retrait en espèces",
@@ -153,11 +153,11 @@ export const transferPage = defineMessages({
 
     destEyebrow: "Destinations",
     destTitle: "Où pouvez-vous envoyer ?",
-    destSubtitle: "Des envois au départ du Canada vers {n} pays. Choisissez un pays pour le simuler.",
+    destSubtitle: "{n} trajets ouverts entre le Canada, le Cameroun et la Chine. Choisissez-en un pour le simuler.",
     destModes: "{n} modes de réception",
     destMode: "1 mode de réception",
     destSimulate: "Simuler",
-    destAll: "Voir tous les pays desservis",
+    destAll: "Voir nos pays",
     destAria: "Simuler un envoi vers {country}",
 
     secEyebrow: "Sécurité",
@@ -175,7 +175,7 @@ export const transferPage = defineMessages({
     faqTitle: "Questions sur WorldSoft Transfer",
     faq1Q: "Qu'est-ce que WorldSoft Transfer ?",
     faq1A:
-      "WorldSoft Transfer est l'application mobile de transfert d'argent de PWFINTECH. Elle permet d'envoyer de l'argent depuis le Canada vers le mobile money, un compte bancaire ou un point de retrait, et de suivre chaque envoi.",
+      "WorldSoft Transfer est l'application mobile de transfert d'argent de PWFINTECH. Elle permet d'envoyer de l'argent entre le Canada, le Cameroun et la Chine (mobile money, Interac, Alipay, WeChat Pay ou compte bancaire), et de suivre chaque envoi.",
     faq2Q: "Puis-je envoyer de l'argent depuis le site web ?",
     faq2A:
       "Le site vous permet de simuler un envoi et de connaître les frais. L'envoi lui-même se fait dans l'application WorldSoft Transfer, où se trouvent aussi vos destinataires et le suivi.",
@@ -197,12 +197,12 @@ export const transferPage = defineMessages({
     ctaApp: "Page de l'application",
   },
   en: {
-    heroBadge: "A PWFINTECH solution · from Canada",
+    heroBadge: "A PWFINTECH solution · Canada · Cameroon · China",
     heroTitleA: "Money arrives in minutes.",
     heroTitleB: "You see the fees up front.",
     heroSubtitle: "WorldSoft Transfer, the money transfer app by PWFINTECH.",
     heroLead:
-      "Send from Canada to your loved ones' mobile money, bank account or cash pickup point, with the rate, fees and delivery time shown before you pay.",
+      "Send between Canada, Cameroon and China to your loved ones' mobile money, Interac, Alipay, WeChat Pay or bank account, with the rate, fees and delivery time shown before you pay.",
     heroCta2: "Simulate a transfer",
     hl1: "Fees and rate shown up front",
     hl2: "Mobile money and bank",
@@ -292,8 +292,8 @@ export const transferPage = defineMessages({
     payEyebrow: "Delivery methods",
     payTitle: "Your loved ones receive the way they prefer",
     paySubtitle: "Options depend on the destination country; the app only shows the ones that are available.",
-    payMobileTitle: "Mobile money",
-    payMobileText: "Straight to the recipient's wallet.",
+    payMobileTitle: "Mobile money and wallets",
+    payMobileText: "Straight to the recipient's wallet: MTN MoMo, Orange Money, Interac, Alipay or WeChat Pay.",
     payBankTitle: "Bank transfer",
     payBankText: "To the recipient's bank account (account number, IBAN or RIB depending on the country).",
     payCashTitle: "Cash pickup",
@@ -302,7 +302,7 @@ export const transferPage = defineMessages({
 
     destEyebrow: "Destinations",
     destTitle: "Where can you send?",
-    destSubtitle: "Transfers from Canada to {n} countries. Pick a country to simulate it.",
+    destSubtitle: "{n} open routes between Canada, Cameroon and China. Pick one to simulate it.",
     destModes: "{n} delivery methods",
     destMode: "1 delivery method",
     destSimulate: "Simulate",
@@ -324,7 +324,7 @@ export const transferPage = defineMessages({
     faqTitle: "Questions about WorldSoft Transfer",
     faq1Q: "What is WorldSoft Transfer?",
     faq1A:
-      "WorldSoft Transfer is PWFINTECH's money transfer mobile app. It lets you send money from Canada to mobile money, a bank account or a cash pickup point, and track every transfer.",
+      "WorldSoft Transfer is PWFINTECH's money transfer mobile app. It lets you send money between Canada, Cameroon and China (mobile money, Interac, Alipay, WeChat Pay or bank account), and track every transfer.",
     faq2Q: "Can I send money from the website?",
     faq2A:
       "The website lets you simulate a transfer and see the fees. The transfer itself is made in the WorldSoft Transfer app, which also holds your recipients and tracking.",
@@ -416,7 +416,7 @@ export const financesPage = defineMessages({
       "Organisation financière, suivi de trésorerie, tableaux de bord et préparation de vos rencontres avec les banques.",
     offer4Title: "Entrepreneurs de la diaspora",
     offer4Text:
-      "Structurer un projet entre le Canada et l'Afrique : budget prévisionnel, étapes clés et points de vigilance.",
+      "Structurer un projet entre le Canada, le Cameroun et la Chine : budget prévisionnel, étapes clés et points de vigilance.",
     offer5Title: "Éducation financière",
     offer5Text:
       "Ateliers et séances individuelles pour comprendre le crédit, l'épargne, les frais bancaires et le système financier canadien.",
@@ -486,7 +486,7 @@ export const financesPage = defineMessages({
     d3a: "Organisation de la comptabilité de gestion",
     d3b: "Suivi de trésorerie et tableaux de bord simples",
     d3c: "Préparation des rencontres avec votre banque",
-    d4a: "Budget prévisionnel d'un projet Canada–Afrique",
+    d4a: "Budget prévisionnel d'un projet Canada–Cameroun–Chine",
     d4b: "Étapes clés et points de vigilance",
     d4c: "Organisation des flux entre les deux pays",
     d5a: "Comprendre le crédit et le dossier de crédit",
@@ -541,7 +541,7 @@ export const financesPage = defineMessages({
     offer3Text: "Financial organization, cash-flow tracking, dashboards and preparing your meetings with banks.",
     offer4Title: "Diaspora entrepreneurs",
     offer4Text:
-      "Structure a project between Canada and Africa: forecast budget, key milestones and points of attention.",
+      "Structure a project between Canada, Cameroon and China: forecast budget, key milestones and points of attention.",
     offer5Title: "Financial education",
     offer5Text:
       "Workshops and one-on-one sessions to understand credit, savings, bank fees and the Canadian financial system.",
@@ -611,7 +611,7 @@ export const financesPage = defineMessages({
     d3a: "Organizing management accounting",
     d3b: "Cash-flow tracking and simple dashboards",
     d3c: "Preparing meetings with your bank",
-    d4a: "Forecast budget for a Canada–Africa project",
+    d4a: "Forecast budget for a Canada–Cameroon–China project",
     d4b: "Key milestones and points of attention",
     d4c: "Organizing flows between both countries",
     d5a: "Understanding credit and your credit report",
@@ -671,7 +671,7 @@ export const techPage = defineMessages({
     heroEyebrow: "Technologies",
     heroTitle: "Des solutions numériques qui font grandir votre activité",
     heroSubtitle:
-      "Sites web, applications mobiles, solutions de paiement et conseil IT : nous concevons des outils fiables, pensés pour vos clients au Canada, en Afrique et ailleurs.",
+      "Sites web, applications mobiles, solutions de paiement et conseil IT : nous concevons des outils fiables, pensés pour vos clients au Canada, au Cameroun et en Chine.",
     heroCta: "Parler de votre projet",
     heroCta2: "Notre méthode",
     hl1: "Web et mobile",
@@ -711,7 +711,7 @@ export const techPage = defineMessages({
     who1: "Les startups qui veulent lancer un produit solide",
     who2: "Les PME qui souhaitent moderniser leurs outils et leurs ventes",
     who3: "Les associations et organisations qui ont besoin d'une présence en ligne fiable",
-    who4: "Les entrepreneurs de la diaspora qui développent une activité entre le Canada et l'Afrique",
+    who4: "Les entrepreneurs de la diaspora qui développent une activité entre le Canada, le Cameroun et la Chine",
 
     comTitle: "Nos engagements techniques",
     comSubtitle: "Construire des outils durables, c'est une question de méthode.",
@@ -798,7 +798,7 @@ export const techPage = defineMessages({
     heroEyebrow: "Technologies",
     heroTitle: "Digital solutions that help your business grow",
     heroSubtitle:
-      "Websites, mobile apps, payment solutions and IT consulting: we build reliable tools designed for your customers in Canada, Africa and beyond.",
+      "Websites, mobile apps, payment solutions and IT consulting: we build reliable tools designed for your customers in Canada, Cameroon and China.",
     heroCta: "Discuss your project",
     heroCta2: "Our method",
     hl1: "Web and mobile",
@@ -835,7 +835,7 @@ export const techPage = defineMessages({
     who1: "Startups that want to launch a solid product",
     who2: "SMEs looking to modernize their tools and sales",
     who3: "Non-profits and organizations that need a reliable online presence",
-    who4: "Diaspora entrepreneurs growing a business between Canada and Africa",
+    who4: "Diaspora entrepreneurs growing a business between Canada, Cameroon and China",
 
     comTitle: "Our technical commitments",
     comSubtitle: "Building lasting tools is a matter of method.",
@@ -942,7 +942,7 @@ export const techPage = defineMessages({
 export const shippingPage = defineMessages({
   fr: {
     heroEyebrow: "Shipping",
-    heroTitle: "Vos colis et marchandises du Canada vers l'Afrique et le monde",
+    heroTitle: "Vos colis et marchandises entre le Canada, la Chine et le Cameroun",
     heroSubtitle:
       "Fret aérien ou maritime, achat pour votre compte, accompagnement au dédouanement et suivi : nous vous aidons à expédier en toute sérénité.",
     heroCta: "Demander un devis",
@@ -1122,7 +1122,7 @@ export const shippingPage = defineMessages({
   },
   en: {
     heroEyebrow: "Shipping",
-    heroTitle: "Your parcels and goods from Canada to Africa and the world",
+    heroTitle: "Your parcels and goods between Canada, China and Cameroon",
     heroSubtitle:
       "Air or sea freight, shopping on your behalf, customs support and tracking: we help you ship with peace of mind.",
     heroCta: "Get a quote",

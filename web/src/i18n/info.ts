@@ -115,7 +115,7 @@ export const feesPage = defineMessages({
     heroEyebrow: "Tarifs WorldSoft Transfer",
     heroTitle: "Frais, taux et délais",
     heroSubtitle:
-      "Ce que coûte un transfert, comment le taux de change est fixé et combien de temps il faut, pour chaque destination. Les montants ci-dessous sont calculés par le même moteur que notre simulateur.",
+      "Ce que coûte un transfert entre le Canada, le Cameroun et la Chine, comment le taux de change est fixé et combien de temps il faut. Les montants ci-dessous sont calculés par le même moteur que notre simulateur.",
     ctaSimulate: "Ouvrir le simulateur",
     ctaApp: "Télécharger l'app",
 
@@ -138,10 +138,13 @@ export const feesPage = defineMessages({
     exampleReceive: "Montant reçu au {country}",
     exampleRate: "Taux appliqué",
 
-    tableEyebrow: "Par destination",
-    tableTitle: "Frais et délais vers {count} pays",
+    tableEyebrow: "Par trajet",
+    fromTitle: "Depuis {country}",
+    fromSubtitle: "Envois payés en {currency}",
+    colRoute: "Vers",
+    tableTitle: "Frais et délais sur {count} trajets",
     tableSubtitle:
-      "Frais calculés pour des envois depuis le Canada en CAD. Le montant reçu est estimé avec le taux indicatif du moment.",
+      "Frais calculés dans la devise du pays d'envoi. Le montant reçu est estimé avec le taux indicatif du moment.",
     searchLabel: "Rechercher un pays ou une devise",
     searchPh: "Ex. : Cameroun, XOF, Wave…",
     sortLabel: "Trier par",
@@ -160,7 +163,7 @@ export const feesPage = defineMessages({
     perTransfer: "par transfert",
     deliveryMobile: "Mobile money : {d}",
     deliveryBank: "Banque : {d}",
-    resultsCount: "{n} destination(s)",
+    resultsCount: "{n} trajet(s)",
     rateLine: "1 {from} ≈ {rate} {to}",
 
     noticeTitle: "Taux indicatifs, confirmés avant paiement",
@@ -191,7 +194,7 @@ export const feesPage = defineMessages({
     heroEyebrow: "WorldSoft Transfer pricing",
     heroTitle: "Fees, rates and delivery times",
     heroSubtitle:
-      "What a transfer costs, how the exchange rate is set and how long it takes, for every destination. The amounts below are calculated by the same engine as our simulator.",
+      "What a transfer between Canada, Cameroon and China costs, how the exchange rate is set and how long it takes. The amounts below are calculated by the same engine as our simulator.",
     ctaSimulate: "Open the simulator",
     ctaApp: "Get the app",
 
@@ -214,10 +217,13 @@ export const feesPage = defineMessages({
     exampleReceive: "Amount received in {country}",
     exampleRate: "Rate applied",
 
-    tableEyebrow: "By destination",
-    tableTitle: "Fees and delivery times to {count} countries",
+    tableEyebrow: "By route",
+    fromTitle: "From {country}",
+    fromSubtitle: "Transfers paid in {currency}",
+    colRoute: "To",
+    tableTitle: "Fees and delivery times on {count} routes",
     tableSubtitle:
-      "Fees calculated for transfers from Canada in CAD. The amount received is estimated with the current indicative rate.",
+      "Fees are calculated in the sending country's currency. The amount received is estimated with the current indicative rate.",
     searchLabel: "Search a country or currency",
     searchPh: "e.g. Cameroon, XOF, Wave…",
     sortLabel: "Sort by",
@@ -236,7 +242,7 @@ export const feesPage = defineMessages({
     perTransfer: "per transfer",
     deliveryMobile: "Mobile money: {d}",
     deliveryBank: "Bank: {d}",
-    resultsCount: "{n} destination(s)",
+    resultsCount: "{n} route(s)",
     rateLine: "1 {from} ≈ {rate} {to}",
 
     noticeTitle: "Indicative rates, confirmed before payment",
@@ -296,7 +302,7 @@ export const feesPage = defineMessages({
 export const countriesPage = defineMessages({
   fr: {
     heroEyebrow: "Pays desservis",
-    heroTitle: "Envoyez de l'argent vers {count} pays",
+    heroTitle: "Envoyez de l'argent dans nos {count} pays",
     heroSubtitle:
       "Depuis le Canada, avec WorldSoft Transfer : mobile money, compte bancaire ou retrait en espèces selon le pays. Choisissez une destination pour voir ses modes de réception, ses délais et ses frais.",
     searchLabel: "Rechercher une destination",
@@ -311,7 +317,7 @@ export const countriesPage = defineMessages({
   },
   en: {
     heroEyebrow: "Destinations",
-    heroTitle: "Send money to {count} countries",
+    heroTitle: "Send money across our {count} countries",
     heroSubtitle:
       "From Canada, with WorldSoft Transfer: mobile money, bank account or cash pickup depending on the country. Pick a destination to see its payout methods, delivery times and fees.",
     searchLabel: "Search a destination",
@@ -664,7 +670,7 @@ export const footerMessages = defineMessages({
     tech: "Technologies",
     shipping: "Shipping",
     fees: "Frais et délais",
-    countries: "Pays desservis",
+    countries: "Nos pays",
     help: "Centre d'aide",
     tracking: "Suivi de colis",
     about: "À propos",
@@ -688,7 +694,7 @@ export const footerMessages = defineMessages({
     tech: "Technologies",
     shipping: "Shipping",
     fees: "Fees and delivery",
-    countries: "Destinations",
+    countries: "Our countries",
     help: "Help center",
     tracking: "Parcel tracking",
     about: "About",
