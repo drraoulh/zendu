@@ -40,7 +40,7 @@ export function ServiceHero({
   highlights?: string[];
 }) {
   return (
-    <div className="relative">
+    <div className="relative overflow-hidden">
       <PageHero eyebrow={eyebrow} title={title} subtitle={subtitle}>
         <div className="flex flex-col gap-6">
           {(primary || secondary) && (
@@ -73,7 +73,7 @@ export function ServiceHero({
       {icon && (
         <div
           aria-hidden
-          className="pointer-events-none absolute right-6 top-1/2 hidden -translate-y-1/2 lg:block xl:right-[max(1.5rem,calc((100vw-72rem)/2))]"
+          className="pointer-events-none absolute top-1/2 hidden -translate-y-1/2 xl:right-[max(1.5rem,calc((100vw-72rem)/2))] xl:block"
         >
           <div className="relative grid h-56 w-56 place-items-center">
             <div className="animate-orbit absolute inset-0 rounded-full border border-dashed border-white/20" />

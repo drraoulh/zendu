@@ -72,6 +72,11 @@ function bearer(request: Request): string | null {
   return m ? m[1].trim() : null;
 }
 
+/** La requête porte-t-elle un jeton client (valide ou non) ? */
+export function hasBearer(request: Request): boolean {
+  return bearer(request) !== null;
+}
+
 export type AuthedCustomer = { customer: Customer; session: CustomerSession };
 
 /** Client connecté (jeton valide, non expiré, non révoqué, compte actif) ou null. */

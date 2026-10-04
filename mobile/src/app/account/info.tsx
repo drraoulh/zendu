@@ -1,6 +1,6 @@
 import { router } from "expo-router";
 import { Button, Card, Header, Notice, Screen, SummaryRow } from "@/components/ui";
-import { countryName } from "@/lib/format";
+import { countryName, phone } from "@/lib/format";
 import { useSession } from "@/lib/session";
 
 export default function Info() {
@@ -16,13 +16,19 @@ export default function Info() {
         tone={verified ? "success" : "warn"}
         icon="shield"
         title={verified ? "Identité vérifiée" : profile.kyc === "pending" ? "Vérification en cours" : profile.kyc === "rejected" ? "Vérification refusée" : "Identité à vérifier"}
-        text={verified ? `Vérification KYC complétée${profile.kycDocument ? ` · ${profile.kycDocument.toLowerCase()}` : ""}` : "Nécessaire avant votre premier transfert."}
+        text={
+          verified
+            ? `Vérification KYC complétée${profile.kycDocument ? ` · ${profile.kycDocument.toLowerCase()}` : ""}`
+            : profile.kyc === "pending"
+              ? "Nous vérifions vos documents, généralement en quelques minutes."
+              : "Nécessaire avant votre premier transfert."
+        }
       />
       <Card style={{ marginTop: 14, marginBottom: 14 }}>
         <SummaryRow label="Nom légal" value={`${profile.firstName} ${profile.lastName}`} />
         <SummaryRow label="Date de naissance" value={profile.birthDate ?? "—"} />
         <SummaryRow label="Courriel" value={profile.email} />
-        <SummaryRow label="Téléphone" value={profile.phone} />
+        <SummaryRow label="Téléphone" value={phone(profile.phone) || profile.phone} />
         <SummaryRow
           label="Adresse"
           value={a ? [a.line1, a.line2, `${a.city} (${a.region})`, a.postalCode, countryName(profile.country)].filter(Boolean).join(", ") : countryName(profile.country)}

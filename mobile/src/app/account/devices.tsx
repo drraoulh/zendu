@@ -52,8 +52,14 @@ export default function Devices() {
               key={s.id}
               icon={/navigateur|windows|mac/i.test(s.device ?? "") ? "tech" : "phone"}
               title={s.device ?? "Appareil inconnu"}
-              subtitle={s.current ? "Cet appareil · actif maintenant" : `Actif le ${dateTime(s.lastUsedAt)}`}
-              right={s.current ? <Badge label="Cet appareil" tone="success" /> : <Button title="Déconnecter" size="sm" variant="secondary" onPress={() => revoke(s.id)} />}
+              subtitle={s.current ? "Actif maintenant" : `Actif le ${dateTime(s.lastUsedAt)}`}
+              // Badge / bouton sous le texte : à droite, ils écrasaient le nom de l'appareil sur petit écran.
+              extra={
+                <View style={{ marginTop: 6, alignItems: "flex-start" }}>
+                  {s.current ? <Badge label="Cet appareil" tone="success" /> : <Button title="Déconnecter" size="sm" variant="secondary" onPress={() => revoke(s.id)} />}
+                </View>
+              }
+              right={<View />}
             />
           ))}
         </Card>

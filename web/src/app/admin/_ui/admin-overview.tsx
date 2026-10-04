@@ -4,6 +4,7 @@ import Link from "next/link";
 import { Icon, type IconName } from "@/components/ui/icon";
 import { REQUEST_KINDS, REQUEST_STATUSES, SHIPMENT_STATUSES } from "@/lib/requests";
 import type { AdminRequest } from "../_server/data";
+import { useTransferLabels } from "@/components/transfer-app/use-transfer-labels";
 import { useCustomersT } from "./customers-kit";
 import { DbError, KIND_ICON, PageTitle, Panel, RequestStatusBadge, useAdminT } from "./kit";
 
@@ -45,6 +46,7 @@ function Bars({ rows, total }: { rows: { label: string; count: number; href?: st
 export function AdminOverview({ data }: { data: Data | null }) {
   const { t, label, dateTime } = useAdminT();
   const { t: tc } = useCustomersT();
+  const { status: transferStatus } = useTransferLabels();
 
   if (!data) {
     return (
@@ -217,7 +219,7 @@ export function AdminOverview({ data }: { data: Data | null }) {
           ) : (
             <Bars
               total={transferTotal ?? 0}
-              rows={[...data.transfers].sort((a, b) => b.count - a.count).map((s) => ({ label: s.status, count: s.count }))}
+              rows={[...data.transfers].sort((a, b) => b.count - a.count).map((s) => ({ label: transferStatus(s.status), count: s.count }))}
             />
           )}
         </Panel>

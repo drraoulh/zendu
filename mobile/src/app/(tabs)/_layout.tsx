@@ -1,6 +1,6 @@
 import { Redirect, router } from "expo-router";
 import { useEffect } from "react";
-import { Platform } from "react-native";
+import { Platform, useWindowDimensions } from "react-native";
 import { Tabs } from "expo-router/js-tabs";
 import { Icon, type IconName } from "@/components/icons";
 import { useSession } from "@/lib/session";
@@ -16,6 +16,8 @@ const TABS: { name: string; title: string; icon: IconName }[] = [
 
 export default function TabsLayout() {
   const { profile, locked } = useSession();
+  // 5 onglets sur 320 px : « Historique » et « Découvrir » étaient tronqués en 11 px.
+  const narrow = useWindowDimensions().width < 360;
 
   // Sans session (lien direct, rechargement) : retour à l'accueil. Différé pour laisser l'écran
   // qui déconnecte naviguer lui-même — une <Redirect> immédiate ici bouclerait avec la sienne.
@@ -34,7 +36,8 @@ export default function TabsLayout() {
         headerShown: false,
         tabBarActiveTintColor: colors.brand,
         tabBarInactiveTintColor: colors.muted,
-        tabBarLabelStyle: { fontFamily: fonts.semibold, fontSize: 11, lineHeight: 15 },
+        tabBarLabelStyle: { fontFamily: fonts.semibold, fontSize: narrow ? 10 : 11, lineHeight: 15 },
+        tabBarItemStyle: narrow ? { paddingHorizontal: 0 } : undefined,
         tabBarStyle: { borderTopColor: colors.line, backgroundColor: colors.white, ...(Platform.OS === "web" ? { height: 62, paddingBottom: 6 } : null) },
         sceneStyle: { backgroundColor: colors.bg },
       }}

@@ -103,11 +103,12 @@ export function ShippingContent() {
         <Container>
           <h3 className="font-display text-xl font-extrabold text-ink sm:text-2xl">{t("cmpTitle")}</h3>
           <div className="mt-6 overflow-hidden rounded-3xl border border-line bg-white shadow-card">
-            <table className="w-full table-fixed text-left text-sm">
+            {/* Mobile : critère en pleine largeur au-dessus des deux colonnes ; tableau classique dès sm. */}
+            <table className="block w-full text-left text-sm sm:table sm:table-fixed">
               <caption className="sr-only">{t("cmpTitle")}</caption>
-              <thead className="bg-surface-soft text-xs uppercase tracking-wide text-muted">
-                <tr>
-                  <th scope="col" className="w-[28%] px-3 py-3 font-semibold sm:px-5">{t("cmpCriteria")}</th>
+              <thead className="block bg-surface-soft text-xs uppercase tracking-wide text-muted sm:table-header-group">
+                <tr className="grid grid-cols-2 sm:table-row">
+                  <th scope="col" className="hidden w-[28%] px-3 py-3 font-semibold sm:table-cell sm:px-5">{t("cmpCriteria")}</th>
                   <th scope="col" className="px-3 py-3 font-semibold sm:px-5">
                     <span className="inline-flex items-center gap-1.5 text-ink"><Icon name="plane" className="h-4 w-4 text-brand" />{t("fAir")}</span>
                   </th>
@@ -116,17 +117,17 @@ export function ShippingContent() {
                   </th>
                 </tr>
               </thead>
-              <tbody className="divide-y divide-line">
+              <tbody className="block divide-y divide-line sm:table-row-group">
                 {(["Speed", "Cost", "Best", "Price"] as const).map((row) => (
-                  <tr key={row}>
-                    <th scope="row" className="px-3 py-3 align-top font-semibold text-ink sm:px-5">{k(`cmp${row}`)}</th>
+                  <tr key={row} className="grid grid-cols-2 sm:table-row">
+                    <th scope="row" className="col-span-2 px-3 pb-0 pt-3 align-top font-semibold text-ink sm:px-5 sm:pb-3">{k(`cmp${row}`)}</th>
                     <td className="break-words px-3 py-3 align-top text-muted sm:px-5">{k(`cmp${row}Air`)}</td>
                     <td className="break-words px-3 py-3 align-top text-muted sm:px-5">{k(`cmp${row}Sea`)}</td>
                   </tr>
                 ))}
-                <tr>
-                  <th scope="row" className="px-3 py-3 align-top font-semibold text-ink sm:px-5">{t("cmpDelay")}</th>
-                  <td colSpan={2} className="px-3 py-3 align-top text-muted sm:px-5">{t("cmpDelayBoth")}</td>
+                <tr className="grid grid-cols-2 sm:table-row">
+                  <th scope="row" className="col-span-2 px-3 pb-0 pt-3 align-top font-semibold text-ink sm:px-5 sm:pb-3">{t("cmpDelay")}</th>
+                  <td colSpan={2} className="col-span-2 px-3 py-3 align-top text-muted sm:px-5">{t("cmpDelayBoth")}</td>
                 </tr>
               </tbody>
             </table>
@@ -221,13 +222,13 @@ export function ShippingContent() {
 
       <Section>
         <Container>
-          <div className="grid gap-8 rounded-3xl border border-line bg-white p-6 shadow-card sm:p-10 lg:grid-cols-[1.2fr_1fr] lg:items-center">
-            <div className="flex items-start gap-4">
+          <div className="grid gap-8 rounded-3xl border border-line bg-white p-5 shadow-card sm:p-10 lg:grid-cols-[1.2fr_1fr] lg:items-center">
+            <div className="flex flex-col items-start gap-4 sm:flex-row">
               <span className="grid h-12 w-12 shrink-0 place-items-center rounded-2xl bg-brand-soft text-brand">
                 <Icon name="shield" className="h-6 w-6" />
               </span>
-              <div>
-                <h2 className="font-display text-2xl font-extrabold text-ink sm:text-3xl">{t("customsTitle")}</h2>
+              <div className="min-w-0">
+                <h2 className="break-words font-display text-2xl font-extrabold text-ink sm:text-3xl">{t("customsTitle")}</h2>
                 <p className="mt-3 text-sm leading-relaxed text-muted sm:text-base">{t("customsText")}</p>
               </div>
             </div>

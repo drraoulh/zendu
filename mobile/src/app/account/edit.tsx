@@ -1,4 +1,5 @@
 import { router } from "expo-router";
+import { View } from "react-native";
 import { useState } from "react";
 import { SelectField } from "@/components/form";
 import { Button, Field, Header, Notice, Screen } from "@/components/ui";
@@ -29,6 +30,8 @@ export default function EditInfo() {
     if (phone.replace(/\D/g, "").length < 8) e.phone = "Numéro invalide";
     if (line1.trim().length < 4) e.line1 = "Adresse requise";
     if (city.trim().length < 2) e.city = "Ville requise";
+    if (country === "CA" && !/^[A-Za-z]\d[A-Za-z]\s?\d[A-Za-z]\d$/.test(postal.trim())) e.postal = "Code postal invalide (A1A 1A1)";
+    if (country === "CN" && postal.trim() && !/^\d{6}$/.test(postal.trim())) e.postal = "Code postal à 6 chiffres";
     setErrors(e);
     if (Object.keys(e).length) return;
     setBusy(true);
@@ -46,7 +49,15 @@ export default function EditInfo() {
   }
 
   return (
-    <Screen footer={<Button title="Enregistrer" onPress={save} loading={busy} />}>
+    <Screen
+      footer={
+        <View style={{ gap: 10 }}>
+          {/* Dans le pied de page : visible même quand le formulaire est défilé. */}
+          {errors.submit ? <Notice tone="danger" icon="alert" text={errors.submit} /> : Object.keys(errors).length ? <Notice tone="danger" icon="alert" text="Corrigez les champs signalés en rouge." /> : null}
+          <Button title="Enregistrer" onPress={save} loading={busy} />
+        </View>
+      }
+    >
       <Header title="Modifier mes informations" />
       <Field label="Courriel" value={email} onChangeText={setEmail} keyboardType="email-address" autoCapitalize="none" error={errors.email} />
       <Field label="Téléphone" value={phone} onChangeText={setPhone} keyboardType="phone-pad" error={errors.phone} />
@@ -54,10 +65,18 @@ export default function EditInfo() {
       <Field label="Appartement, bureau (facultatif)" value={line2} onChangeText={setLine2} />
       <Field label="Ville" value={city} onChangeText={setCity} error={errors.city} />
       <SelectField label={REGION_LABEL[country]} value={region} options={REGIONS[country].map((r) => ({ value: r, label: r }))} onChange={setRegion} />
-      {POSTAL_LABEL[country] ? <Field label="Code postal" value={postal} onChangeText={setPostal} autoCapitalize="characters" /> : null}
+      {POSTAL_LABEL[country] ? (
+        <Field
+          label={country === "CN" ? "Code postal (facultatif)" : "Code postal"}
+          value={postal}
+          onChangeText={setPostal}
+          placeholder={country === "CA" ? "A1A 1A1" : "100000"}
+          autoCapitalize="characters"
+          error={errors.postal}
+        />
+      ) : null}
       <SelectField label="Profession ou occupation" value={occupation} options={OCCUPATIONS.map((o) => ({ value: o, label: o }))} onChange={setOccupation} />
       <Field label="Poste ou domaine (facultatif)" value={jobTitle} onChangeText={setJobTitle} />
-      {errors.submit ? <Notice tone="danger" icon="alert" text={errors.submit} /> : null}
     </Screen>
   );
 }

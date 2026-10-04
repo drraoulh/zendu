@@ -460,7 +460,7 @@ export function Wizard<V extends object>({
               : null;
 
   return (
-    <div className="rounded-3xl border border-line bg-white p-5 shadow-card sm:p-8">
+    <div className="rounded-3xl border border-line bg-white p-4 shadow-card min-[360px]:p-5 sm:p-8">
       <Stepper labels={labels} current={step} maxReached={maxStep} onSelect={goTo} />
 
       <p className="sr-only" aria-live="polite" aria-atomic="true">

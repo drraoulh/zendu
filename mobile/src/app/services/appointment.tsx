@@ -154,9 +154,10 @@ export default function Appointment() {
 }
 
 const s = StyleSheet.create({
-  day: { width: 58, paddingVertical: 10, borderRadius: radius.md, borderWidth: 1, borderColor: colors.line, backgroundColor: colors.white, alignItems: "center" },
+  // 5 jours par ligne quelle que soit la largeur (58 px fixes débordaient sur 320 px).
+  day: { flexGrow: 1, flexBasis: "17%", maxWidth: 72, paddingVertical: 10, borderRadius: radius.md, borderWidth: 1, borderColor: colors.line, backgroundColor: colors.white, alignItems: "center" },
   dayName: { fontSize: 12, color: colors.muted },
   dayNum: { fontFamily: fonts.heading, fontSize: 18, color: colors.ink },
-  slot: { paddingHorizontal: 14, paddingVertical: 10, borderRadius: radius.sm, borderWidth: 1, borderColor: colors.line, backgroundColor: colors.white },
+  slot: { minHeight: 44, justifyContent: "center", paddingHorizontal: 14, paddingVertical: 10, borderRadius: radius.sm, borderWidth: 1, borderColor: colors.line, backgroundColor: colors.white },
   slotText: { fontFamily: fonts.semibold, color: colors.ink },
 });

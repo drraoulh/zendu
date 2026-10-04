@@ -1,8 +1,14 @@
 import { NextResponse } from "next/server";
 import { getPayoutMode } from "@/lib/providers/payout";
 import { momoGetBalance } from "@/lib/providers/momo";
+import { requireAdmin } from "@/lib/admin-auth";
 
-export async function GET() {
+export const dynamic = "force-dynamic";
+
+/** Solde du compte de décaissement MoMo : donnée d'exploitation, réservée à l'administration. */
+export async function GET(request: Request) {
+  const denied = await requireAdmin(request);
+  if (denied) return denied;
   if (getPayoutMode() !== "momo") {
     return NextResponse.json({
       mode: "mock_momo",

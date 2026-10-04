@@ -3,12 +3,12 @@ import { useEffect, useState } from "react";
 import { Text, View } from "react-native";
 import { Button, Card, Choice, Divider, H1, Header, Notice, Screen, Small, Steps, SummaryRow } from "@/components/ui";
 import { api, type Quote } from "@/lib/api";
-import { countryName, etaLabel, money, networkLabel, phone, rate } from "@/lib/format";
+import { countryName, deliveryEstimate, etaLabel, money, networkLabel, phone, rate } from "@/lib/format";
 import { useStore } from "@/lib/store";
 import { colors, fonts } from "@/lib/theme";
 
 export default function Review() {
-  const { draft } = useStore();
+  const { draft, setDraft } = useStore();
   const [quote, setQuote] = useState<Quote | null>(draft.quote);
   const [error, setError] = useState<string | null>(null);
   const recipient = draft.recipient;
@@ -18,9 +18,13 @@ export default function Review() {
     if (!draft.sendAmount) return;
     api
       .quote(draft.corridorId, draft.sendAmount)
-      .then(setQuote)
+      .then((q) => {
+        setQuote(q);
+        // Le paiement et le reçu reprennent ce devis à jour.
+        setDraft({ quote: q });
+      })
       .catch((e: Error) => setError(e.message));
-  }, [draft.corridorId, draft.sendAmount]);
+  }, [draft.corridorId, draft.sendAmount, setDraft]);
 
   if (!recipient) return <Redirect href="/(tabs)/send" />;
 
@@ -55,7 +59,7 @@ export default function Review() {
             <SummaryRow label="Frais" value={money(quote.fee, quote.sendCurrency)} />
             <Divider />
             <SummaryRow label="Total à payer" value={money(quote.total, quote.sendCurrency)} strong />
-            <SummaryRow label="Délai estimé" value={etaLabel(quote.deliveryEstimate)} />
+            <SummaryRow label="Délai estimé" value={etaLabel(deliveryEstimate(quote.deliveryEstimate, recipient.network))} />
           </>
         ) : (
           <Small>Calcul du devis…</Small>

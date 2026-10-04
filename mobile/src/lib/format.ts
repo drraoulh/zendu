@@ -57,6 +57,11 @@ export function etaLabel(estimate: string) {
   return map[estimate] ?? estimate;
 }
 
+/** Délai annoncé pour un trajet ; un virement bancaire prend toujours 1 à 2 jours ouvrables. */
+export function deliveryEstimate(corridorEstimate: string, network?: string | null) {
+  return network === "BANK" ? "1-2 business days" : corridorEstimate;
+}
+
 export type StatusInfo = { label: string; tone: "brand" | "success" | "warn" | "danger" | "neutral"; step: number };
 
 export function statusInfo(status: string): StatusInfo {
@@ -101,11 +106,17 @@ export function eventTitle(type: string) {
   return EVENT_TITLES[type] ?? "Mise à jour";
 }
 
-/** « 237670000000 » → « +237 670 000 000 » (indicatifs des pays ouverts). */
+/**
+ * « 237670000000 » → « +237 670 000 000 », « +1 4165550142 » → « +1 416 555 0142 »,
+ * « 8613812345678 » → « +86 138 1234 5678 » (indicatifs des pays ouverts).
+ */
 export function phone(digits: string) {
   const d = digits.replace(/\D/g, "");
   if (!d) return "";
   const dial = ["237", "86", "1"].find((c) => d.startsWith(c)) ?? "";
-  const rest = d.slice(dial.length).replace(/(\d{3})(?=\d)/g, "$1 ");
+  const n = d.slice(dial.length);
+  let rest = n.replace(/(\d{3})(?=\d)/g, "$1 ");
+  if (dial === "1" && n.length === 10) rest = `${n.slice(0, 3)} ${n.slice(3, 6)} ${n.slice(6)}`;
+  if (dial === "86" && n.length === 11) rest = `${n.slice(0, 3)} ${n.slice(3, 7)} ${n.slice(7)}`;
   return dial ? `+${dial} ${rest}` : `+${rest}`;
 }

@@ -1,7 +1,7 @@
 import { NextResponse } from "next/server";
 import { z } from "zod";
 import { publicCustomer, requireCustomer, verifyPassword } from "@/lib/customer-auth";
-import { profilePatchSchema } from "@/lib/customer-input";
+import { profileErrorMessage, profilePatchSchema } from "@/lib/customer-input";
 import { prisma } from "@/lib/prisma";
 import { isUniqueViolation, zodIssues } from "@/lib/requests";
 
@@ -19,7 +19,9 @@ export async function PATCH(request: Request) {
   const authed = await requireCustomer(request);
   if (authed instanceof NextResponse) return authed;
   try {
-    const patch = profilePatchSchema.parse(await request.json());
+    const body = await request.json().catch(() => null);
+    if (!body || typeof body !== "object") return NextResponse.json({ ok: false, error: "Données invalides" }, { status: 400 });
+    const patch = profilePatchSchema.parse(body);
     if (authed.customer.kycStatus === "verified" || authed.customer.kycStatus === "pending") {
       delete patch.firstName;
       delete patch.lastName;
@@ -28,7 +30,7 @@ export async function PATCH(request: Request) {
     const customer = await prisma.customer.update({ where: { id: authed.customer.id }, data: patch });
     return NextResponse.json({ customer: publicCustomer(customer) });
   } catch (error) {
-    if (error instanceof z.ZodError) return NextResponse.json({ ok: false, error: "Données invalides", issues: zodIssues(error) }, { status: 400 });
+    if (error instanceof z.ZodError) return NextResponse.json({ ok: false, error: profileErrorMessage(error), issues: zodIssues(error) }, { status: 400 });
     if (isUniqueViolation(error, "email")) return NextResponse.json({ ok: false, error: "Ce courriel est déjà utilisé par un autre compte." }, { status: 409 });
     console.error("[me:patch]", error);
     return NextResponse.json({ ok: false, error: "Mise à jour impossible." }, { status: 500 });

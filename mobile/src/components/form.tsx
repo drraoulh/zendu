@@ -1,5 +1,5 @@
 import { useRef, useState, type ReactNode } from "react";
-import { Modal, Pressable, ScrollView, StyleSheet, Switch, Text, TextInput, View } from "react-native";
+import { Modal, Platform, Pressable, ScrollView, StyleSheet, Switch, Text, TextInput, View, useWindowDimensions } from "react-native";
 import { PASSWORD_RULES } from "@/lib/session";
 import { colors, fonts, radius } from "@/lib/theme";
 import { Icon, type IconName } from "./icons";
@@ -161,15 +161,18 @@ export function ToggleRow({
 }) {
   return (
     <View style={f.toggle}>
-      {icon ? (
-        <View style={f.toggleIcon}>
-          <Icon name={icon} color={colors.brand} size={20} />
+      {/* Toute la ligne bascule l'interrupteur (zone tactile plus grande que le seul Switch). */}
+      <Pressable onPress={disabled ? undefined : () => onChange(!value)} accessible={false} style={f.toggleText}>
+        {icon ? (
+          <View style={f.toggleIcon}>
+            <Icon name={icon} color={colors.brand} size={20} />
+          </View>
+        ) : null}
+        <View style={{ flex: 1 }}>
+          <Text style={f.toggleLabel}>{label}</Text>
+          {sub ? <Small>{sub}</Small> : null}
         </View>
-      ) : null}
-      <View style={{ flex: 1 }}>
-        <Text style={f.toggleLabel}>{label}</Text>
-        {sub ? <Small>{sub}</Small> : null}
-      </View>
+      </Pressable>
       <Switch
         accessibilityLabel={label}
         value={value}
@@ -177,6 +180,7 @@ export function ToggleRow({
         disabled={disabled}
         trackColor={{ true: colors.brand, false: colors.line }}
         thumbColor={colors.white}
+        {...(Platform.OS === "web" ? ({ activeThumbColor: colors.white } as object) : null)}
       />
     </View>
   );
@@ -186,6 +190,9 @@ export function ToggleRow({
 
 export function OtpInput({ length = 6, value, onChange, label = "Code de vérification" }: { length?: number; value: string; onChange: (v: string) => void; label?: string }) {
   const ref = useRef<TextInput>(null);
+  const { width } = useWindowDimensions();
+  // 6 cases de 46 px ne tiennent pas sur un écran de 320 px : on réduit la case si besoin.
+  const box = Math.min(46, Math.floor((Math.min(width, 480) - 40 - 8 * (length - 1)) / length));
   return (
     <Pressable onPress={() => ref.current?.focus()} accessibilityLabel={label} style={{ marginVertical: 12 }}>
       <View style={{ flexDirection: "row", gap: 8, justifyContent: "center" }}>
@@ -193,7 +200,7 @@ export function OtpInput({ length = 6, value, onChange, label = "Code de vérifi
           const ch = value[i] ?? "";
           const active = i === Math.min(value.length, length - 1);
           return (
-            <View key={i} style={[f.otpBox, active && { borderColor: colors.brand }, ch ? { backgroundColor: colors.brandSoft, borderColor: colors.brandSoft } : null]}>
+            <View key={i} style={[f.otpBox, { width: box }, active && { borderColor: colors.brand }, ch ? { backgroundColor: colors.brandSoft, borderColor: colors.brandSoft } : null]}>
               <Text style={f.otpText}>{ch}</Text>
             </View>
           );
@@ -282,7 +289,7 @@ export function Checkbox({ checked, onChange, children }: { checked: boolean; on
       accessibilityRole="checkbox"
       accessibilityState={{ checked }}
       onPress={() => onChange(!checked)}
-      style={{ flexDirection: "row", gap: 10, alignItems: "flex-start", marginBottom: 12 }}
+      style={{ flexDirection: "row", gap: 10, alignItems: "flex-start", marginBottom: 8, minHeight: 44, paddingTop: 2 }}
     >
       <View
         style={{
@@ -329,12 +336,13 @@ const f = StyleSheet.create({
   sheet: { backgroundColor: colors.white, borderTopLeftRadius: 28, borderTopRightRadius: 28, padding: 20, paddingBottom: 34 },
   grabber: { alignSelf: "center", width: 40, height: 4, borderRadius: 2, backgroundColor: colors.line, marginBottom: 12 },
   sheetTitle: { fontFamily: fonts.heading, fontSize: 18, color: colors.ink, marginBottom: 10 },
-  option: { flexDirection: "row", alignItems: "center", justifyContent: "space-between", padding: 14, borderRadius: radius.sm },
+  option: { flexDirection: "row", alignItems: "center", justifyContent: "space-between", padding: 14, minHeight: 48, borderRadius: radius.sm },
   optionText: { fontSize: 16, color: colors.ink },
   dialog: { backgroundColor: colors.white, borderRadius: radius.xl, padding: 22 },
-  chip: { flexDirection: "row", alignItems: "center", gap: 6, paddingHorizontal: 14, paddingVertical: 9, borderRadius: radius.pill, borderWidth: 1, borderColor: colors.line, backgroundColor: colors.white },
+  chip: { flexDirection: "row", alignItems: "center", gap: 6, paddingHorizontal: 14, paddingVertical: 9, minHeight: 44, borderRadius: radius.pill, borderWidth: 1, borderColor: colors.line, backgroundColor: colors.white },
   chipText: { fontFamily: fonts.semibold, fontSize: 14, color: colors.ink },
-  toggle: { flexDirection: "row", alignItems: "center", gap: 12, paddingVertical: 12 },
+  toggle: { flexDirection: "row", alignItems: "center", gap: 12 },
+  toggleText: { flex: 1, flexDirection: "row", alignItems: "center", gap: 12, paddingVertical: 12, minHeight: 56 },
   toggleIcon: { width: 40, height: 40, borderRadius: 14, backgroundColor: colors.brandSoft, alignItems: "center", justifyContent: "center" },
   toggleLabel: { fontFamily: fonts.semibold, fontSize: 15, color: colors.ink },
   otpBox: { width: 46, height: 56, borderRadius: radius.sm, borderWidth: 1.5, borderColor: colors.line, backgroundColor: colors.white, alignItems: "center", justifyContent: "center" },

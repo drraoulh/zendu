@@ -29,7 +29,8 @@ export const profileFields = {
 
 export const signupSchema = z.object({
   email: emailSchema,
-  password: z.string().min(8).max(200),
+  // Longueur et complexité vérifiées par passwordProblem() (message lisible).
+  password: z.string().max(200),
   device: optional(120),
   ...profileFields,
 });
@@ -49,3 +50,30 @@ export const profilePatchSchema = z
     birthDate: profileFields.birthDate,
   })
   .strict();
+
+const FIELD_LABELS: Record<string, string> = {
+  email: "courriel",
+  password: "mot de passe",
+  firstName: "prénom",
+  lastName: "nom",
+  phone: "téléphone",
+  country: "pays",
+  region: "province / région",
+  birthDate: "date de naissance (JJ/MM/AAAA)",
+  occupation: "occupation",
+  jobTitle: "poste",
+  address: "adresse",
+  marketing: "préférence de communication",
+  device: "appareil",
+};
+
+/** Message lisible pour une erreur de validation du profil : « Champs invalides ou manquants : prénom, pays. » */
+export function profileErrorMessage(error: z.ZodError): string {
+  const unknown = error.issues.flatMap((i) => (i.code === "unrecognized_keys" ? i.keys : []));
+  if (unknown.length) return `Champ non modifiable : ${unknown.join(", ")}.`;
+  const labels = [...new Set(error.issues.map((i) => FIELD_LABELS[String(i.path[0] ?? "")] ?? String(i.path[0] ?? "")).filter(Boolean))];
+  if (!labels.length) return "Données invalides";
+  const country = error.issues.find((i) => i.path[0] === "country" && i.code === "custom");
+  if (country && labels.length === 1) return `${country.message}.`;
+  return `Champs invalides ou manquants : ${labels.join(", ")}.`;
+}

@@ -182,7 +182,8 @@ export const customerCreateSchema = z.object({
   email: emailSchema,
   ...profileFields,
   /** Vide → mot de passe temporaire généré, à changer à la première connexion. */
-  password: z.preprocess((v) => (v === "" ? undefined : v), z.string().min(8).max(200).optional()),
+  // Longueur et complexité vérifiées par passwordProblem() dans createCustomer (message lisible).
+  password: z.preprocess((v) => (v === "" ? undefined : v), z.string().max(200).optional()),
   kycStatus: z.enum(KYC_STATUSES).default("none"),
   adminNote: z.preprocess((v) => (v === "" ? undefined : v), z.string().trim().max(2000).optional()),
 });

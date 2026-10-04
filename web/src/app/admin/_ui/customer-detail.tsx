@@ -7,7 +7,8 @@ import { Button } from "@/components/ui/button";
 import { Icon } from "@/components/ui/icon";
 import { formatMoney } from "@/lib/money";
 import type { AdminCustomer, AdminCustomerSession, AdminCustomerTransfer } from "../_server/customers";
-import { AccountBadge, COUNTRY_LABEL, KycBadge, TRANSFER_STATUS_LABEL, useCustomersT } from "./customers-kit";
+import { useTransferLabels } from "@/components/transfer-app/use-transfer-labels";
+import { AccountBadge, COUNTRY_LABEL, KycBadge, useCustomersT } from "./customers-kit";
 import { adminFetch, Field, inputClass, Message, PageTitle, Panel, useAdminT } from "./kit";
 
 type Detail = { customer: AdminCustomer; transfers: AdminCustomerTransfer[]; sessions: AdminCustomerSession[]; totals: Record<string, number> };
@@ -25,6 +26,7 @@ export function CustomerDetail({ initial }: { initial: Detail }) {
   const router = useRouter();
   const { t } = useCustomersT();
   const { dateTime, label, nl } = useAdminT();
+  const { status: transferStatus } = useTransferLabels();
   const [c, setC] = useState(initial.customer);
   const [sessions, setSessions] = useState(initial.sessions);
   const [kycNote, setKycNote] = useState(c.kycNote ?? "");
@@ -247,7 +249,7 @@ export function CustomerDetail({ initial }: { initial: Detail }) {
                 <p className="text-sm text-ink">{formatMoney(tr.totalCad, tr.sendCurrency, nl)}</p>
                 <p className="text-sm text-ink">{formatMoney(tr.receiveAmountXaf, tr.receiveCurrency, nl)}</p>
                 <p className="text-xs text-muted sm:text-right">
-                  {TRANSFER_STATUS_LABEL[tr.status] ?? tr.status}
+                  {transferStatus(tr.status)}
                   <span className="block">{dateTime(tr.createdAt)}</span>
                 </p>
               </li>

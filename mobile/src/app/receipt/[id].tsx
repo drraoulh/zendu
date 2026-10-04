@@ -1,17 +1,19 @@
 import { useLocalSearchParams } from "expo-router";
 import { useEffect, useState } from "react";
-import { ActivityIndicator, Share, StyleSheet, Text, View } from "react-native";
+import { ActivityIndicator, StyleSheet, Text, View } from "react-native";
 import { PoweredBy, WstWordmark } from "@/components/brand";
 import { Badge, Button, Card, Divider, Header, Screen, Small, SummaryRow } from "@/components/ui";
 import { api, type Transfer } from "@/lib/api";
 import { countryName, dateTime, money, networkLabel, phone, rate, statusInfo } from "@/lib/format";
 import { openSite } from "@/lib/links";
+import { useShare } from "@/lib/share";
 import { colors, fonts } from "@/lib/theme";
 
 export default function Receipt() {
   const { id, card } = useLocalSearchParams<{ id: string; card?: string }>();
   const [t, setT] = useState<Transfer | null>(null);
   const [error, setError] = useState<string | null>(null);
+  const sharer = useShare();
 
   useEffect(() => {
     api.transfer(id).then(setT).catch((e: Error) => setError(e.message));
@@ -52,7 +54,7 @@ export default function Receipt() {
       footer={
         <View style={{ flexDirection: "row", gap: 8 }}>
           <Button title="Version PDF" variant="secondary" style={{ flex: 1 }} onPress={() => openSite(`/transfers/${t.id}/receipt`)} />
-          <Button title="Partager" icon="send" style={{ flex: 1 }} onPress={() => Share.share({ message: text() })} />
+          <Button title={sharer.label} icon={sharer.copied ? "check" : "send"} style={{ flex: 1 }} onPress={() => sharer.share(text())} />
         </View>
       }
     >

@@ -33,15 +33,3 @@ export function AccountBadge({ status }: { status: string }) {
 }
 
 export const COUNTRY_LABEL: Record<string, string> = { CA: "Canada", CM: "Cameroun", CN: "Chine" };
-
-export const TRANSFER_STATUS_LABEL: Record<string, string> = {
-  awaiting_payment: "En attente de paiement",
-  payment_detected: "Paiement reçu",
-  payout_queued: "Versement en file",
-  payout_sent: "Versement envoyé",
-  delivered: "Livré",
-  payment_mismatch: "Montant à vérifier",
-  payout_failed: "Échec du versement",
-  expired: "Expiré",
-  cancelled: "Annulé",
-};

@@ -1,5 +1,6 @@
 import { SectionTitle, ToggleRow } from "@/components/form";
 import { Card, Header, Screen } from "@/components/ui";
+import { phone } from "@/lib/format";
 import { useSession, type NotificationPrefs } from "@/lib/session";
 
 export default function NotificationSettings() {
@@ -22,7 +23,7 @@ export default function NotificationSettings() {
       <Card style={{ paddingVertical: 4 }}>
         <ToggleRow icon="phone" label="Notifications push" sub="Sur cet appareil" value={n.push} onChange={set("push")} />
         <ToggleRow icon="mail" label="Courriel" sub={profile?.email} value={n.email} onChange={set("email")} />
-        <ToggleRow icon="phone" label="SMS" sub={profile?.phone} value={n.sms} onChange={set("sms")} />
+        <ToggleRow icon="phone" label="SMS" sub={profile ? phone(profile.phone) || profile.phone : undefined} value={n.sms} onChange={set("sms")} />
       </Card>
     </Screen>
   );

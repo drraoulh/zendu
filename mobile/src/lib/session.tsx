@@ -66,7 +66,9 @@ type SessionValue = {
   updateSettings: (patch: Partial<Settings>) => Promise<void>;
   changePassword: (current: string, next: string) => Promise<Result>;
   /** Mot de passe temporaire donné par l'équipe : à remplacer juste après la connexion. */
-  replaceTemporaryPassword: (next: string) => Promise<Result>;
+  replaceTemporaryPassword: (next: string, current?: string) => Promise<Result>;
+  /** Vrai si l'appli connaît encore le mot de passe temporaire saisi (perdu après un redémarrage). */
+  knowsTemporaryPassword: () => boolean;
   setPin: (pin: string | null) => Promise<void>;
   checkPin: (pin: string) => Promise<boolean>;
   unlock: () => void;
@@ -265,10 +267,11 @@ export function SessionProvider({ children }: { children: ReactNode }) {
           return { ok: false, error: message(e) };
         }
       },
-      replaceTemporaryPassword: async (next) => {
-        if (!tempPassword.current) return { ok: false, error: "Reconnectez-vous avec le mot de passe temporaire." };
+      replaceTemporaryPassword: async (next, current) => {
+        const temp = current ?? tempPassword.current;
+        if (!temp) return { ok: false, error: "Saisissez le mot de passe temporaire reçu par courriel." };
         try {
-          const r = await api.changePassword(tempPassword.current, next);
+          const r = await api.changePassword(temp, next);
           tempPassword.current = null;
           await saveProfile(r.customer);
           return { ok: true };
@@ -276,6 +279,7 @@ export function SessionProvider({ children }: { children: ReactNode }) {
           return { ok: false, error: message(e) };
         }
       },
+      knowsTemporaryPassword: () => Boolean(tempPassword.current),
       setPin: async (pin) => {
         const h = pin ? await hash(`pin:${pin}`) : null;
         setPinHash(h);

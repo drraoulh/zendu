@@ -1,5 +1,5 @@
 import { router } from "expo-router";
-import type { ReactNode } from "react";
+import { useState, type ReactNode } from "react";
 import {
   ActivityIndicator,
   KeyboardAvoidingView,
@@ -93,13 +93,13 @@ export function Header({
           <Icon name="back" color={colors.ink} />
         </Pressable>
       ) : (
-        <View style={{ width: 40 }} />
+        <View style={styles.headerSide} />
       )}
-      <View style={{ flex: 1, alignItems: "center" }}>
-        {title ? <Text style={styles.headerTitle} numberOfLines={1}>{title}</Text> : null}
-        {subtitle ? <Text style={styles.small}>{subtitle}</Text> : null}
+      <View style={{ flex: 1, alignItems: "center", paddingHorizontal: 8 }}>
+        {title ? <Text style={styles.headerTitle} numberOfLines={2}>{title}</Text> : null}
+        {subtitle ? <Text style={styles.small} numberOfLines={1}>{subtitle}</Text> : null}
       </View>
-      <View style={{ width: 40, alignItems: "flex-end" }}>{right}</View>
+      <View style={[styles.headerSide, { alignItems: "flex-end" }]}>{right}</View>
     </View>
   );
 }
@@ -185,7 +185,7 @@ export function Button({
       ) : (
         <>
           {icon ? <Icon name={icon} color={v.fg} size={size === "sm" ? 18 : 20} /> : null}
-          <Text style={[styles.btnText, size === "sm" && { fontSize: 14 }, { color: v.fg }]}>{title}</Text>
+          <Text style={[styles.btnText, size === "sm" && { fontSize: 14 }, { color: v.fg }]} numberOfLines={2}>{title}</Text>
         </>
       )}
     </Pressable>
@@ -255,6 +255,8 @@ export function ListItem({
   right,
   tone = "brand",
   leading,
+  extra,
+  subtitleLines = 2,
 }: {
   icon?: IconName;
   title: string;
@@ -263,14 +265,12 @@ export function ListItem({
   right?: ReactNode;
   tone?: Tone;
   leading?: ReactNode;
+  /** Contenu affiché sous le sous-titre (badge, etc.). */
+  extra?: ReactNode;
+  subtitleLines?: number;
 }) {
-  return (
-    <Pressable
-      accessibilityRole={onPress ? "button" : undefined}
-      onPress={onPress}
-      disabled={!onPress}
-      style={({ pressed }) => [styles.listItem, pressed && { backgroundColor: colors.bg }]}
-    >
+  const content = (
+    <>
       {leading ??
         (icon ? (
           <View style={[styles.listIcon, { backgroundColor: TONE_COLORS[tone].bg }]}>
@@ -278,10 +278,18 @@ export function ListItem({
           </View>
         ) : null)}
       <View style={{ flex: 1 }}>
-        <Text style={styles.listTitle} numberOfLines={1}>{title}</Text>
-        {subtitle ? <Text style={styles.small} numberOfLines={2}>{subtitle}</Text> : null}
+        <Text style={styles.listTitle} numberOfLines={2}>{title}</Text>
+        {subtitle ? <Text style={styles.small} numberOfLines={subtitleLines}>{subtitle}</Text> : null}
+        {extra}
       </View>
       {right ?? (onPress ? <Icon name="chev" color={colors.muted} size={18} /> : null)}
+    </>
+  );
+  // Sans action : simple ligne (un Pressable désactivé bloquerait aussi les boutons placés à droite).
+  if (!onPress) return <View style={styles.listItem}>{content}</View>;
+  return (
+    <Pressable accessibilityRole="button" onPress={onPress} style={({ pressed }) => [styles.listItem, pressed && { backgroundColor: colors.bg }]}>
+      {content}
     </Pressable>
   );
 }
@@ -294,17 +302,28 @@ export function Field({
   hint,
   left,
   style,
+  onFocus,
+  onBlur,
   ...props
 }: TextInputProps & { label: string; error?: string | null; hint?: string; left?: ReactNode }) {
+  const [focused, setFocused] = useState(false);
   return (
     <View style={{ marginBottom: 14 }}>
       <Label>{label}</Label>
-      <View style={[styles.input, error ? { borderColor: colors.danger } : null]}>
+      <View style={[styles.input, focused && { borderColor: colors.brand }, error ? { borderColor: colors.danger } : null]}>
         {left}
         <TextInput
           placeholderTextColor="#8a94ad"
           accessibilityLabel={label}
           style={[styles.inputText, style]}
+          onFocus={(e) => {
+            setFocused(true);
+            onFocus?.(e);
+          }}
+          onBlur={(e) => {
+            setFocused(false);
+            onBlur?.(e);
+          }}
           {...props}
         />
       </View>
@@ -362,16 +381,17 @@ export const styles = StyleSheet.create({
   content: { paddingHorizontal: 20, paddingBottom: 32, paddingTop: 8 },
   footer: { paddingHorizontal: 20, paddingTop: 10, paddingBottom: 12, backgroundColor: "transparent" },
   header: { flexDirection: "row", alignItems: "center", paddingVertical: 8, marginBottom: 8 },
-  headerTitle: { fontFamily: fonts.heading, fontSize: 17, color: colors.ink },
-  iconBtn: { width: 40, height: 40, borderRadius: 14, alignItems: "center", justifyContent: "center", backgroundColor: colors.white, borderWidth: 1, borderColor: colors.line },
+  headerSide: { minWidth: 44, flexShrink: 0 },
+  headerTitle: { fontFamily: fonts.heading, fontSize: 17, lineHeight: 21, color: colors.ink, textAlign: "center" },
+  iconBtn: { width: 44, height: 44, borderRadius: 14, alignItems: "center", justifyContent: "center", backgroundColor: colors.white, borderWidth: 1, borderColor: colors.line },
   h1: { fontFamily: fonts.display, fontSize: 28, lineHeight: 34, color: colors.navy, letterSpacing: -0.5 },
   h2: { fontFamily: fonts.heading, fontSize: 20, lineHeight: 26, color: colors.ink },
   p: { fontSize: 15, lineHeight: 22, color: colors.muted },
   small: { fontSize: 13, lineHeight: 18, color: colors.muted },
   label: { fontFamily: fonts.semibold, fontSize: 13, color: colors.ink, marginBottom: 6 },
   btn: { minHeight: 54, borderRadius: radius.md, borderWidth: 1, flexDirection: "row", alignItems: "center", justifyContent: "center", gap: 8, paddingHorizontal: 18 },
-  btnSm: { minHeight: 42, borderRadius: radius.sm, paddingHorizontal: 14 },
-  btnText: { fontFamily: fonts.heading, fontSize: 16 },
+  btnSm: { minHeight: 44, borderRadius: radius.sm, paddingHorizontal: 14 },
+  btnText: { fontFamily: fonts.heading, fontSize: 16, textAlign: "center", flexShrink: 1 },
   card: { backgroundColor: colors.white, borderRadius: radius.lg, padding: 18, borderWidth: 1, borderColor: colors.line, shadowColor: colors.navy, shadowOpacity: 0.06, shadowRadius: 16, shadowOffset: { width: 0, height: 6 }, elevation: 2 },
   badge: { flexDirection: "row", alignItems: "center", gap: 6, paddingHorizontal: 10, paddingVertical: 5, borderRadius: radius.pill, alignSelf: "flex-start" },
   dot: { width: 6, height: 6, borderRadius: 3 },
@@ -385,7 +405,8 @@ export const styles = StyleSheet.create({
   listIcon: { width: 42, height: 42, borderRadius: 14, alignItems: "center", justifyContent: "center" },
   listTitle: { fontFamily: fonts.semibold, fontSize: 15, color: colors.ink },
   input: { flexDirection: "row", alignItems: "center", gap: 8, minHeight: 52, borderRadius: radius.sm, borderWidth: 1, borderColor: colors.line, backgroundColor: colors.white, paddingHorizontal: 14 },
-  inputText: { flex: 1, fontSize: 16, color: colors.ink, paddingVertical: 12 },
+  // minWidth 0 : sinon, sur le web, la largeur par défaut d'un <input> déborde de la ligne.
+  inputText: { flex: 1, minWidth: 0, fontSize: 16, color: colors.ink, paddingVertical: 12, ...(Platform.OS === "web" ? { outlineStyle: "none" as never } : null) },
   error: { color: colors.danger, fontSize: 13, marginTop: 4 },
   choice: { flexDirection: "row", alignItems: "center", gap: 12, padding: 14, borderRadius: radius.md, borderWidth: 1.5, borderColor: colors.line, backgroundColor: colors.white, marginBottom: 10 },
   radio: { width: 22, height: 22, borderRadius: 11, borderWidth: 2, borderColor: colors.line, alignItems: "center", justifyContent: "center" },

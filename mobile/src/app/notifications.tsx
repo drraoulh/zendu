@@ -37,6 +37,7 @@ export default function Notifications() {
                   tone={n.tone}
                   title={n.title}
                   subtitle={`${n.text}\n${dateTime(n.at)}`}
+                  subtitleLines={4}
                   onPress={() => {
                     markRead([n.id]);
                     if (n.href) router.push(n.href as Href);

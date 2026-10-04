@@ -1,6 +1,6 @@
 import { router, type Href } from "expo-router";
 import { useEffect, useRef } from "react";
-import { Pressable, StyleSheet, Text, View } from "react-native";
+import { Pressable, StyleSheet, Text, View, useWindowDimensions } from "react-native";
 import { WstSymbol } from "@/components/brand";
 import { Icon, type IconName } from "@/components/icons";
 import { Simulator } from "@/components/simulator";
@@ -25,6 +25,8 @@ export default function Home() {
   const { items, loading } = useMyTransfers(3);
   const { unread } = useNotifications();
   const kyc = profile?.kyc ?? "none";
+  // Écrans étroits (iPhone SE 1re gén.) : « Technologies » ne tient pas sur un tiers de largeur.
+  const narrow = useWindowDimensions().width < 360;
 
   // Premier affichage pour ce compte : trajet au départ de son pays de résidence.
   const seeded = useRef<string | null>(null);
@@ -89,13 +91,19 @@ export default function Home() {
           <Text style={st.link}>En savoir plus</Text>
         </Pressable>
       </View>
-      <View style={{ flexDirection: "row", gap: 10 }}>
+      <View style={{ flexDirection: narrow ? "column" : "row", gap: narrow ? 8 : 10 }}>
         {POLES.map((p) => (
-          <Pressable key={p.label} accessibilityRole="button" onPress={() => router.push(p.href)} style={({ pressed }) => [st.pole, pressed && { opacity: 0.85 }]}>
+          <Pressable
+            key={p.label}
+            accessibilityRole="button"
+            onPress={() => router.push(p.href)}
+            style={({ pressed }) => [st.pole, narrow && st.poleRow, pressed && { opacity: 0.85 }]}
+          >
             <View style={st.poleIcon}>
               <Icon name={p.icon} color={colors.brand} />
             </View>
-            <Text style={st.poleLabel} numberOfLines={1}>{p.label}</Text>
+            <Text style={[st.poleLabel, narrow && { flex: 1, fontSize: 14 }]} numberOfLines={1}>{p.label}</Text>
+            {narrow ? <Icon name="chev" color={colors.muted} size={18} /> : null}
           </Pressable>
         ))}
       </View>
@@ -128,13 +136,14 @@ export default function Home() {
 
 const st = StyleSheet.create({
   top: { flexDirection: "row", alignItems: "center", justifyContent: "space-between", marginTop: 4, marginBottom: 14 },
-  bell: { width: 42, height: 42, borderRadius: 14, backgroundColor: colors.white, borderWidth: 1, borderColor: colors.line, alignItems: "center", justifyContent: "center" },
+  bell: { width: 44, height: 44, borderRadius: 14, backgroundColor: colors.white, borderWidth: 1, borderColor: colors.line, alignItems: "center", justifyContent: "center" },
   badge: { position: "absolute", top: -4, right: -4, minWidth: 18, height: 18, borderRadius: 9, backgroundColor: colors.maple, alignItems: "center", justifyContent: "center", paddingHorizontal: 4 },
   badgeText: { color: colors.white, fontSize: 10, fontFamily: fonts.heading },
   hello: { fontFamily: fonts.display, fontSize: 26, color: colors.navy },
   sectionHead: { flexDirection: "row", justifyContent: "space-between", alignItems: "center", marginTop: 24, marginBottom: 10 },
   link: { color: colors.brand, fontFamily: fonts.semibold, fontSize: 14 },
-  pole: { flex: 1, backgroundColor: colors.white, borderRadius: radius.md, borderWidth: 1, borderColor: colors.line, padding: 12, gap: 8, alignItems: "flex-start" },
+  pole: { flex: 1, backgroundColor: colors.white, borderRadius: radius.md, borderWidth: 1, borderColor: colors.line, padding: 10, gap: 8, alignItems: "flex-start" },
+  poleRow: { flexDirection: "row", alignItems: "center", gap: 12 },
   poleIcon: { width: 38, height: 38, borderRadius: 12, backgroundColor: colors.brandSoft, alignItems: "center", justifyContent: "center" },
-  poleLabel: { fontFamily: fonts.semibold, fontSize: 13, color: colors.ink },
+  poleLabel: { fontFamily: fonts.semibold, fontSize: 12, color: colors.ink },
 });

@@ -18,12 +18,14 @@ export function TransferRow({ transfer }: { transfer: Transfer }) {
       }
       title={transfer.beneficiary.fullName}
       subtitle={`${countryName(transfer.destCountry)} · ${dateTime(transfer.createdAt)}`}
-      right={
-        <View style={{ alignItems: "flex-end", gap: 4 }}>
-          <Text style={{ fontFamily: fonts.heading, color: colors.ink, fontSize: 14 }}>{money(transfer.receiveAmountXaf, transfer.receiveCurrency)}</Text>
+      subtitleLines={3}
+      // Statut sous le nom : à droite, un long statut (« En attente de paiement ») écrasait le nom.
+      extra={
+        <View style={{ marginTop: 4 }}>
           <Badge label={info.label} tone={info.tone} />
         </View>
       }
+      right={<Text style={{ fontFamily: fonts.heading, color: colors.ink, fontSize: 14, textAlign: "right" }}>{money(transfer.receiveAmountXaf, transfer.receiveCurrency)}</Text>}
     />
   );
 }

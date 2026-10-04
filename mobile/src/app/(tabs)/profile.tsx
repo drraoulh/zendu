@@ -1,6 +1,6 @@
 import { router, type Href } from "expo-router";
 import { useState } from "react";
-import { Pressable, Text, View } from "react-native";
+import { Pressable, Text, View, useWindowDimensions } from "react-native";
 import { PoweredBy } from "@/components/brand";
 import { Avatar, ConfirmDialog, SectionTitle } from "@/components/form";
 import { Icon, type IconName } from "@/components/icons";
@@ -15,6 +15,7 @@ export default function Profile() {
   const { profile, settings, signOut } = useSession();
   const { cards, recipients } = useStore();
   const [confirm, setConfirm] = useState(false);
+  const narrow = useWindowDimensions().width < 360;
   if (!profile) return null;
   const kyc = profile.kyc;
   const card = cards.find((c) => c.isDefault) ?? cards[0];
@@ -49,11 +50,20 @@ export default function Profile() {
       </Card>
 
       <SectionTitle>Découvrir PWFINTECH</SectionTitle>
-      <View style={{ flexDirection: "row", gap: 10 }}>
-        <Tile icon="finance" label="Finances" onPress={go("/services/finances")} />
-        <Tile icon="tech" label="Technologies" onPress={go("/services/technologies")} />
-        <Tile icon="ship" label="Shipping" onPress={go("/services/shipping")} />
-      </View>
+      {narrow ? (
+        // Sur 320 px, « Technologies » ne tient pas dans une tuile d'un tiers de largeur.
+        <Card style={{ paddingVertical: 4 }}>
+          <ListItem icon="finance" title="Finances" onPress={go("/services/finances")} />
+          <ListItem icon="tech" title="Technologies" onPress={go("/services/technologies")} />
+          <ListItem icon="ship" title="Shipping" onPress={go("/services/shipping")} />
+        </Card>
+      ) : (
+        <View style={{ flexDirection: "row", gap: 10 }}>
+          <Tile icon="finance" label="Finances" onPress={go("/services/finances")} />
+          <Tile icon="tech" label="Technologies" onPress={go("/services/technologies")} />
+          <Tile icon="ship" label="Shipping" onPress={go("/services/shipping")} />
+        </View>
+      )}
 
       <SectionTitle>Compte</SectionTitle>
       <Card style={{ paddingVertical: 4 }}>
@@ -89,7 +99,7 @@ export default function Profile() {
       <ConfirmDialog
         visible={confirm}
         title="Se déconnecter ?"
-        message="Vous devrez saisir votre mot de passe ou utiliser Face ID pour vous reconnecter."
+        message="Vous devrez saisir votre courriel et votre mot de passe pour vous reconnecter sur cet appareil."
         confirmLabel="Se déconnecter"
         destructive
         onCancel={() => setConfirm(false)}

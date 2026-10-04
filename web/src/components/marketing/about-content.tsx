@@ -57,16 +57,21 @@ export function AboutContent() {
       <Section>
         <Container>
           <div className="grid items-center gap-12 lg:grid-cols-[1fr_1.1fr] lg:gap-16">
-            <figure className="relative mx-auto w-full max-w-md">
-              <div aria-hidden className="bg-brand-gradient absolute -inset-3 rotate-2 rounded-[2.25rem] opacity-15 blur-sm" />
-              <div className="relative overflow-hidden rounded-[2rem] border border-line bg-white p-4 shadow-float sm:p-6">
-                <LogoFull className="h-auto w-full rounded-2xl" priority />
+            <figure className="mx-auto w-full max-w-md">
+              {/* Badge ancré sur l'image (et non sur la légende, qu'il recouvrait). */}
+              <div className="relative">
+                <div aria-hidden className="bg-brand-gradient absolute -inset-3 rotate-2 rounded-[2.25rem] opacity-15 blur-sm" />
+                <div className="relative overflow-hidden rounded-[2rem] border border-line bg-white p-4 shadow-float sm:p-6">
+                  <LogoFull className="h-auto w-full rounded-2xl" priority />
+                </div>
+                <span className="absolute -bottom-4 left-1/2 inline-flex max-w-[calc(100%-1rem)] -translate-x-1/2 items-center gap-2 whitespace-nowrap rounded-full border border-line bg-white px-4 py-2 text-sm font-semibold text-ink shadow-card">
+                  <Icon name="maple" className="h-4 w-4 shrink-0 text-maple" />
+                  <span className="truncate">
+                    {t("basedIn")}
+                    {company.city ? ` · ${company.city}` : ""}
+                  </span>
+                </span>
               </div>
-              <span className="absolute -bottom-4 left-1/2 inline-flex -translate-x-1/2 items-center gap-2 whitespace-nowrap rounded-full border border-line bg-white px-4 py-2 text-sm font-semibold text-ink shadow-card">
-                <Icon name="maple" className="h-4 w-4 text-maple" />
-                {t("basedIn")}
-                {company.city ? ` · ${company.city}` : ""}
-              </span>
               <figcaption className="mt-10 text-center text-xs leading-relaxed text-muted">{t("logoCaption")}</figcaption>
             </figure>
 

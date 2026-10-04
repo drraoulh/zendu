@@ -1,12 +1,13 @@
 import { router } from "expo-router";
 import { useState } from "react";
-import { RefreshControl, ScrollView, Share, View } from "react-native";
+import { RefreshControl, ScrollView, View } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { Chips } from "@/components/form";
 import { TransferRow } from "@/components/transfer-row";
 import { Button, Card, Empty, Field, H1, Notice, Small } from "@/components/ui";
 import type { Transfer } from "@/lib/api";
 import { countryName, dateTime, money, networkLabel, statusInfo } from "@/lib/format";
+import { useShare } from "@/lib/share";
 import { colors } from "@/lib/theme";
 import { useMyTransfers } from "@/lib/use-transfers";
 
@@ -48,6 +49,7 @@ export default function History() {
   const { items, loading, failed, reload, count } = useMyTransfers();
   const [q, setQ] = useState("");
   const [filter, setFilter] = useState<Filter>("all");
+  const exporter = useShare("Exporter");
   const query = q.trim().toLowerCase();
   const list = items.filter(
     (t) => (filter === "all" || group(t) === filter) && (!query || t.beneficiary.fullName.toLowerCase().includes(query) || t.reference.toLowerCase().includes(query)),
@@ -62,7 +64,7 @@ export default function History() {
       >
         <View style={{ flexDirection: "row", justifyContent: "space-between", alignItems: "center", marginBottom: 14 }}>
           <H1>Mes transferts</H1>
-          {items.length ? <Button title="Exporter" size="sm" variant="secondary" onPress={() => Share.share({ message: csv(list), title: "Historique WorldSoft Transfer" })} /> : null}
+          {items.length ? <Button title={exporter.label} size="sm" variant="secondary" onPress={() => exporter.share(csv(list), "Historique WorldSoft Transfer")} /> : null}
         </View>
         {items.length ? (
           <>
@@ -78,7 +80,7 @@ export default function History() {
         <Card style={{ paddingVertical: 6 }}>
           {list.length ? (
             list.map((t) => <TransferRow key={t.id} transfer={t} />)
-          ) : loading && count > 0 ? (
+          ) : loading && !items.length ? (
             <Small style={{ padding: 12 }}>Chargement…</Small>
           ) : items.length ? (
             <Empty icon="history" title="Aucun résultat" text="Essayez un autre nom, une autre référence ou un autre filtre." />
@@ -86,7 +88,7 @@ export default function History() {
             <Empty
               icon="history"
               title="Aucun transfert"
-              text="Les transferts effectués depuis cet appareil apparaîtront ici."
+              text="Vos transferts apparaîtront ici, avec leur suivi en temps réel."
               action={<Button title="Envoyer de l'argent" size="sm" onPress={() => router.push("/(tabs)/send")} />}
             />
           )}

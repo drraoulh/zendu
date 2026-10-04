@@ -52,7 +52,7 @@ export function SectionHeading({
     <div className={center ? "mx-auto max-w-2xl text-center" : "max-w-2xl"}>
       {eyebrow && <Eyebrow light={light}>{eyebrow}</Eyebrow>}
       <h2
-        className={`mt-3 font-display text-3xl font-extrabold tracking-tight sm:text-4xl ${
+        className={`mt-3 break-words font-display text-[1.75rem] font-extrabold leading-tight tracking-tight min-[375px]:text-3xl sm:text-4xl ${
           light ? "text-white" : "text-ink"
         }`}
       >
@@ -105,7 +105,7 @@ export function PageHero({
       <div className="bg-grid absolute inset-0 opacity-40 [mask-image:linear-gradient(to_bottom,black,transparent)]" />
       <Container className="relative py-16 sm:py-20">
         {eyebrow && <Eyebrow light>{eyebrow}</Eyebrow>}
-        <h1 className="mt-4 max-w-3xl font-display text-4xl font-extrabold leading-[1.08] tracking-tight sm:text-5xl">
+        <h1 className="mt-4 max-w-3xl break-words font-display text-[2rem] font-extrabold leading-[1.08] tracking-tight min-[375px]:text-4xl sm:text-5xl">
           {title}
         </h1>
         {subtitle && <p className="mt-5 max-w-2xl text-lg leading-relaxed text-white/75">{subtitle}</p>}

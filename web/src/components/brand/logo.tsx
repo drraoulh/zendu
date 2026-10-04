@@ -23,7 +23,7 @@ export function LogoWordmark({
 }: {
   light?: boolean;
   priority?: boolean;
-  /** Masque le nom complet sur les écrans xl où la navigation prend la place. */
+  /** Masque le nom complet sur les écrans lg–xl où la navigation prend la place. */
   compact?: boolean;
 }) {
   return (
@@ -40,7 +40,7 @@ export function LogoWordmark({
           {appName}
         </span>
         <span
-          className={`mt-1 hidden max-w-[15rem] text-[0.6rem] font-semibold uppercase leading-snug tracking-[0.14em] sm:block ${compact ? "xl:hidden 2xl:block" : ""} ${
+          className={`mt-1 hidden max-w-[15rem] text-[0.6rem] font-semibold uppercase leading-snug tracking-[0.14em] sm:block ${compact ? "lg:hidden 2xl:block" : ""} ${
             light ? "text-white/60" : "text-muted"
           }`}
         >

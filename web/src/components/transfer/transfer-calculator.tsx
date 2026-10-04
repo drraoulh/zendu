@@ -289,6 +289,11 @@ export function TransferCalculator({
   useEffect(() => {
     if (!canQuote) {
       setLoading(false);
+      // Montant invalide : on vide le montant calculé pour ne pas afficher un résultat périmé.
+      if (metaState === "ready") {
+        if (mode === "send") setReceiveText("");
+        else setSendText("");
+      }
       return;
     }
     const key = `${corridorId}|${mode}|${activeValue}`;
@@ -310,6 +315,8 @@ export function TransferCalculator({
           if (!res.ok || typeof data?.rate !== "number") {
             setQuote(null);
             setQuoteError(mapServerError(data?.error));
+            if (mode === "send") setReceiveText("");
+            else setSendText("");
           } else {
             const q = data as Quote;
             lastKeyRef.current = key;
@@ -333,7 +340,7 @@ export function TransferCalculator({
       controller.abort();
       clearTimeout(timer);
     };
-  }, [canQuote, corridorId, mode, activeValue, refreshNonce, mapServerError, t]);
+  }, [canQuote, metaState, corridorId, mode, activeValue, refreshNonce, mapServerError, t]);
 
   // Rafraîchissement automatique du taux + horloge « il y a X s ».
   useEffect(() => {
@@ -503,7 +510,8 @@ export function TransferCalculator({
             >
               <Icon name="info" className="mt-0.5 h-4 w-4 shrink-0" />
               <span className="flex-1">{message}</span>
-              {quoteError && !validationError && (
+              {/* « Réessayer » seulement pour une erreur technique, pas pour un montant hors limites. */}
+              {quoteError && !validationError && quoteError === t("errorQuote") && (
                 <button
                   type="button"
                   className="font-semibold underline underline-offset-2"
@@ -524,7 +532,9 @@ export function TransferCalculator({
           >
             <Row label={t("flatFee")} value={showQuote ? formatMoney(showQuote.feeFlat, showQuote.sendCurrency, tag) : null} />
             <Row
-              label={t("percentFee", { p: showQuote?.feePercent ?? "–" })}
+              label={t("percentFee", {
+                p: showQuote ? new Intl.NumberFormat(tag, { maximumFractionDigits: 2 }).format(showQuote.feePercent) : "–",
+              })}
               value={showQuote ? formatMoney(showQuote.feeVariable, showQuote.sendCurrency, tag) : null}
             />
             <Row label={t("totalFees")} value={showQuote ? formatMoney(showQuote.fee, showQuote.sendCurrency, tag) : null} />
@@ -637,12 +647,12 @@ function AmountField({
         highlight ? "border-brand/15 bg-brand-soft/60" : "border-line bg-white"
       }`}
     >
-      <div className="flex items-center justify-between gap-3">
+      <div className="flex flex-wrap items-center justify-between gap-x-3 gap-y-1.5">
         <label htmlFor={id} className="text-xs font-semibold uppercase tracking-wider text-muted">
           {label}
         </label>
         {/* Sélecteur de pays : select natif transparent par-dessus un rendu avec drapeau */}
-        <div className="relative inline-flex max-w-[62%] min-w-0 items-center gap-2 rounded-full border border-line bg-white py-1.5 pl-2 pr-7 text-sm font-semibold shadow-sm focus-within:ring-2 focus-within:ring-brand/40">
+        <div className="relative inline-flex min-w-0 max-w-full items-center gap-2 rounded-full border border-line bg-white py-2 pl-2 pr-7 text-sm font-semibold shadow-sm focus-within:ring-2 focus-within:ring-brand/40">
           <CountryFlag code={selectValue} size={20} title={selectName} className="shrink-0" />
           <span className="truncate">{selectName}</span>
           <Icon name="chevronDown" className="pointer-events-none absolute right-2 h-4 w-4 text-muted" />

@@ -210,11 +210,11 @@ export function FeesContent({ destinations }: { destinations: DestinationInfo[] 
                         </Link>
                         <div className="mt-4"><NetworkChips d={d} /></div>
                         <div className="mt-3 text-xs text-muted"><DeliveryLines d={d} /></div>
-                        <dl className="mt-4 grid grid-cols-3 gap-2 rounded-2xl bg-surface-soft p-3 text-center">
+                        <dl className="mt-4 grid gap-1.5 rounded-2xl bg-surface-soft p-3 sm:grid-cols-3 sm:gap-2 sm:text-center">
                           {d.quotes.map((quote) => (
-                            <div key={quote.sendAmount} className="min-w-0">
-                              <dt className="text-[11px] text-muted">{L.money(quote.sendAmount, d.sendCurrency)}</dt>
-                              <dd className="mt-0.5 text-sm font-semibold text-ink">{L.money(quote.fee, d.sendCurrency)}</dd>
+                            <div key={quote.sendAmount} className="flex min-w-0 items-baseline justify-between gap-3 sm:block">
+                              <dt className="text-xs text-muted sm:text-[11px]">{L.money(quote.sendAmount, d.sendCurrency)}</dt>
+                              <dd className="break-words text-sm font-semibold text-ink sm:mt-0.5">{L.money(quote.fee, d.sendCurrency)}</dd>
                             </div>
                           ))}
                         </dl>

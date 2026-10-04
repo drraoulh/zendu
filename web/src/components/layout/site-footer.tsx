@@ -188,15 +188,15 @@ export function SiteFooter() {
 function FooterColumn({ title, children }: { title: string; children: ReactNode }) {
   return (
     <div className="min-w-0">
-      <p className="font-display text-sm font-bold uppercase tracking-[0.14em] text-white">{title}</p>
-      <div className="mt-5 flex flex-col gap-3">{children}</div>
+      <p className="break-words font-display text-xs font-bold uppercase tracking-[0.12em] text-white sm:text-sm sm:tracking-[0.14em]">{title}</p>
+      <div className="mt-4 flex flex-col items-start gap-1 sm:mt-5">{children}</div>
     </div>
   );
 }
 
 function FooterLink({ href, children }: { href: string; children: ReactNode }) {
   return (
-    <Link href={href} className="text-sm text-white/70 transition hover:text-white">
+    <Link href={href} className="py-1 text-sm text-white/70 transition hover:text-white">
       {children}
     </Link>
   );

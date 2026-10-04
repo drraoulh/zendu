@@ -8,8 +8,8 @@ export function LanguageSelect({ dark = false }: { dark?: boolean }) {
   const { locale, setLocale } = useI18n();
   return (
     <label
-      className={`relative inline-flex items-center gap-1.5 rounded-full border px-3 py-1.5 text-sm font-semibold ${
-        dark ? "border-white/20 bg-white/10 text-white" : "border-line bg-white text-ink"
+      className={`relative inline-flex items-center gap-1.5 rounded-full border px-3 py-1.5 text-sm font-semibold has-[:focus-visible]:ring-2 ${
+        dark ? "border-white/20 bg-white/10 text-white has-[:focus-visible]:ring-white/60" : "border-line bg-white text-ink has-[:focus-visible]:ring-brand/50"
       }`}
     >
       <Icon name="globe" className="h-4 w-4 opacity-70" />

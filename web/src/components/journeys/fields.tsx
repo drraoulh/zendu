@@ -273,7 +273,7 @@ function ChoiceCards({
           return (
             <label
               key={o.value}
-              className={`group relative flex cursor-pointer items-start gap-3 rounded-2xl border p-4 transition has-[:focus-visible]:ring-4 has-[:focus-visible]:ring-brand/20 ${
+              className={`group relative flex cursor-pointer items-start gap-2.5 rounded-2xl border p-3.5 transition sm:gap-3 sm:p-4 has-[:focus-visible]:ring-4 has-[:focus-visible]:ring-brand/20 ${
                 checked
                   ? "border-brand bg-brand-soft/70 shadow-[0_0_0_1px_var(--color-brand)]"
                   : error

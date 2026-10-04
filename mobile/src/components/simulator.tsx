@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState } from "react";
-import { ActivityIndicator, Modal, Pressable, StyleSheet, Text, TextInput, View } from "react-native";
+import { ActivityIndicator, Modal, Platform, Pressable, StyleSheet, Text, TextInput, View, useWindowDimensions } from "react-native";
 import { api, type CorridorMeta, type Quote } from "@/lib/api";
 import { COUNTRIES, SAMPLE_AMOUNT, findCorridor, useCorridors, type CountryCode } from "@/lib/corridors";
 import { countryName, etaLabel, money, parseAmount, rate } from "@/lib/format";
@@ -166,14 +166,19 @@ export function Simulator({
 }
 
 function CountryButton({ label, code, onPress }: { label: string; code: string; onPress: () => void }) {
+  // Écran étroit (320 px) : le drapeau monte à côté de « De / Vers » pour laisser toute la largeur au nom du pays.
+  const narrow = useWindowDimensions().width < 360;
   return (
-    <Pressable accessibilityRole="button" accessibilityLabel={`${label} ${countryName(code)}, modifier`} onPress={onPress} style={s.country}>
+    <Pressable accessibilityRole="button" accessibilityLabel={`${label} ${countryName(code)}, modifier`} onPress={onPress} style={[s.country, narrow && { paddingHorizontal: 8 }]}>
       <View style={{ flexDirection: "row", alignItems: "center", justifyContent: "space-between" }}>
-        <Text style={s.countryLabel}>{label}</Text>
+        <View style={{ flexDirection: "row", alignItems: "center", gap: 6 }}>
+          {narrow ? <Flag code={code} size={16} /> : null}
+          <Text style={s.countryLabel}>{label}</Text>
+        </View>
         <Icon name="chevDown" size={14} color={colors.muted} />
       </View>
       <View style={{ flexDirection: "row", alignItems: "center", gap: 8 }}>
-        <Flag code={code} size={20} />
+        {narrow ? null : <Flag code={code} size={20} />}
         <Text style={s.countryName} numberOfLines={1}>{countryName(code)}</Text>
       </View>
     </Pressable>
@@ -228,11 +233,12 @@ const s = StyleSheet.create({
   country: { flex: 1, backgroundColor: colors.bg, borderRadius: radius.md, paddingVertical: 10, paddingHorizontal: 9, gap: 4 },
   countryLabel: { fontSize: 11, color: colors.muted, textTransform: "uppercase", letterSpacing: 0.6 },
   countryName: { fontFamily: fonts.semibold, fontSize: 14, color: colors.ink, flexShrink: 1 },
-  swap: { width: 36, height: 36, borderRadius: 18, backgroundColor: colors.brandSoft, alignItems: "center", justifyContent: "center" },
+  swap: { width: 44, height: 44, borderRadius: 22, backgroundColor: colors.brandSoft, alignItems: "center", justifyContent: "center" },
   fieldLabel: { fontFamily: fonts.semibold, fontSize: 13, color: colors.muted, marginBottom: 6 },
   amountBox: { flexDirection: "row", alignItems: "center", borderWidth: 1.5, borderColor: colors.line, borderRadius: radius.md, paddingHorizontal: 14, minHeight: 60 },
-  amountInput: { flex: 1, fontFamily: fonts.display, fontSize: 26, color: colors.navy, paddingVertical: 10 },
-  currency: { fontFamily: fonts.heading, fontSize: 16, color: colors.navy },
+  // minWidth 0 : sans lui, sur le web, le champ garde la largeur par défaut d'un <input> et pousse la devise hors du cadre.
+  amountInput: { flex: 1, minWidth: 0, fontFamily: fonts.display, fontSize: 26, color: colors.navy, paddingVertical: 10, ...(Platform.OS === "web" ? { outlineStyle: "none" as never } : null) },
+  currency: { fontFamily: fonts.heading, fontSize: 16, color: colors.navy, marginLeft: 8 },
   error: { color: colors.danger, fontSize: 14 },
   hint: { color: colors.muted, fontSize: 13 },
   backdrop: { flex: 1, backgroundColor: "rgba(4,15,51,0.45)", justifyContent: "flex-end" },
