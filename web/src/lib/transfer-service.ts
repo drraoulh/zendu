@@ -186,7 +186,7 @@ export async function completeManualBankPayout(
     throw new Error("Ce virement n'est pas en traitement manuel");
   }
   if (transfer.status !== "payout_queued" && transfer.status !== "payout_sent") {
-    throw new Error(`Statut actuel: ${transfer.status}`);
+    throw new Error("Ce virement a déjà été traité ou n'est pas encore payé.");
   }
 
   const ref = input.bankReference?.trim() || null;

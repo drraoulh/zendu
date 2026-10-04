@@ -142,6 +142,11 @@ export class ApiError extends Error {
 
 function errorMessage(data: unknown): string | null {
   if (!data || typeof data !== "object") return null;
+  const { code, limit, currency } = data as { code?: unknown; limit?: unknown; currency?: unknown };
+  if ((code === "amount_too_low" || code === "amount_too_high") && typeof limit === "number" && typeof currency === "string") {
+    const unit = currency === "XAF" ? "FCFA" : currency;
+    return `Montant ${code === "amount_too_low" ? "minimum" : "maximum"} : ${limit.toLocaleString("fr-FR")} ${unit}.`;
+  }
   const err = (data as { error?: unknown }).error;
   if (typeof err === "string") return err;
   if (err && typeof err === "object") {

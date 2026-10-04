@@ -191,7 +191,8 @@ export async function adminFetch<T>(url: string, method: string, body?: unknown)
   });
   const data = (await res.json().catch(() => ({}))) as { error?: unknown; issues?: { path: string; message: string }[] };
   if (!res.ok) {
-    const detail = data.issues?.length ? ` (${data.issues.map((i) => i.path || i.message).join(", ")})` : "";
+    // Le message serveur nomme déjà les champs ; le détail brut ne sert qu'en repli.
+    const detail = data.issues?.length && (typeof data.error !== "string" || data.error === "Données invalides") ? ` (${data.issues.map((i) => i.path || i.message).join(", ")})` : "";
     throw new Error(`${typeof data.error === "string" ? data.error : res.status}${detail}`);
   }
   return data as T;

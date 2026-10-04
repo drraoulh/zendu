@@ -167,6 +167,49 @@ export function zodIssues(error: z.ZodError): Issue[] {
   return error.issues.map((i) => ({ path: i.path.map(String).join("."), message: i.message }));
 }
 
+const REQUEST_FIELD_LABELS: Record<string, string> = {
+  kind: "type de demande",
+  name: "nom",
+  email: "courriel",
+  phone: "téléphone",
+  subject: "objet",
+  message: "message (5 caractères minimum)",
+  origin: "origine",
+  destination: "destination",
+  mode: "mode",
+  weightKg: "poids",
+  dimensionsCm: "dimensions",
+  content: "contenu",
+  declaredValue: "valeur déclarée",
+  pickup: "ramassage",
+  deliveryAddress: "adresse de livraison",
+  topic: "sujet",
+  date: "date",
+  time: "heure",
+  timezone: "fuseau horaire",
+  note: "note",
+  projectTypes: "type de projet",
+  description: "description (10 caractères minimum)",
+  budget: "budget",
+  timeline: "échéance",
+  company: "entreprise",
+  website: "site web",
+};
+
+/** Message lisible d'une demande refusée : « Champs invalides ou manquants : nom, courriel. » */
+export function requestErrorMessage(error: z.ZodError): string {
+  const labels = [
+    ...new Set(
+      error.issues.map((i) => {
+        const key = String(i.path[0] === "payload" ? (i.path[1] ?? "") : (i.path[0] ?? ""));
+        return REQUEST_FIELD_LABELS[key] ?? key;
+      }),
+    ),
+  ].filter(Boolean);
+  if (labels.includes(REQUEST_FIELD_LABELS.kind)) return "Type de demande inconnu.";
+  return labels.length ? `Champs invalides ou manquants : ${labels.join(", ")}.` : "Données invalides";
+}
+
 /** Créneau unique d'un rendez-vous : "YYYY-MM-DDTHH:mm" (heure de l'Est). */
 export function appointmentSlotKey(date: string, time: string): string {
   return `${date}T${time}`;

@@ -21,7 +21,7 @@ export async function POST(_request: Request, { params }: Params) {
 
   if (transfer.status !== "awaiting_payment") {
     return NextResponse.json(
-      { error: `Statut actuel: ${transfer.status}` },
+      { error: "Ce transfert n'est plus en attente de paiement.", code: "not_awaiting_payment", status: transfer.status },
       { status: 400 },
     );
   }

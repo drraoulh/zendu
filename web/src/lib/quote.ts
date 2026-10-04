@@ -30,6 +30,22 @@ export type QuoteResult = {
   fx: FxSnapshot;
 };
 
+/** Montant hors limites du corridor (message anglais conservé : le simulateur web le reconnaît). */
+export class QuoteLimitError extends Error {
+  constructor(
+    readonly code: "amount_too_low" | "amount_too_high",
+    readonly limit: number,
+    readonly currency: string,
+  ) {
+    super(`${code === "amount_too_low" ? "Minimum" : "Maximum"} amount is ${limit} ${currency}.`);
+  }
+
+  /** Message français pour les réponses affichées telles quelles (création de transfert). */
+  get messageFr(): string {
+    return `Montant ${this.code === "amount_too_low" ? "minimum" : "maximum"} : ${this.limit} ${this.currency}.`;
+  }
+}
+
 export async function buildQuote(input: QuoteInput): Promise<QuoteResult> {
   const corridorId = input.corridorId ?? "CA-CM";
   const corridor = getCorridor(corridorId);
@@ -59,14 +75,10 @@ export async function buildQuote(input: QuoteInput): Promise<QuoteResult> {
   }
 
   if (!Number.isFinite(send) || send < corridor.minSend) {
-    throw new Error(
-      `Minimum amount is ${corridor.minSend} ${source.currency}.`,
-    );
+    throw new QuoteLimitError("amount_too_low", corridor.minSend, source.currency);
   }
   if (send > corridor.maxSend) {
-    throw new Error(
-      `Maximum amount is ${corridor.maxSend} ${source.currency}.`,
-    );
+    throw new QuoteLimitError("amount_too_high", corridor.maxSend, source.currency);
   }
 
   const feeParts = computeTransferFee(send, source.currency);

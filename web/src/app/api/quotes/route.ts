@@ -1,16 +1,30 @@
 import { NextResponse } from "next/server";
-import { buildQuote } from "@/lib/quote";
+import { buildQuote, QuoteLimitError } from "@/lib/quote";
 import { CORRIDORS, getCountry } from "@/lib/corridors";
+
+function quoteError(error: unknown) {
+  if (error instanceof QuoteLimitError) {
+    return NextResponse.json(
+      { error: error.message, code: error.code, limit: error.limit, currency: error.currency },
+      { status: 400 },
+    );
+  }
+  const message = error instanceof Error ? error.message : "Erreur devis";
+  return NextResponse.json({ error: message }, { status: 400 });
+}
 
 export async function POST(request: Request) {
   try {
-    const body = (await request.json()) as {
+    const body = (await request.json().catch(() => null)) as {
       corridorId?: string;
       sendAmount?: number;
       receiveAmount?: number;
       sendAmountCad?: number;
       receiveAmountXaf?: number;
     };
+    if (!body || typeof body !== "object") {
+      return NextResponse.json({ error: "Requête invalide" }, { status: 400 });
+    }
     const quote = await buildQuote({
       corridorId: body.corridorId,
       sendAmount:
@@ -24,8 +38,7 @@ export async function POST(request: Request) {
     });
     return NextResponse.json(serialize(quote));
   } catch (error) {
-    const message = error instanceof Error ? error.message : "Erreur devis";
-    return NextResponse.json({ error: message }, { status: 400 });
+    return quoteError(error);
   }
 }
 
@@ -67,8 +80,7 @@ export async function GET(request: Request) {
     });
     return NextResponse.json(serialize(quote));
   } catch (error) {
-    const message = error instanceof Error ? error.message : "Erreur devis";
-    return NextResponse.json({ error: message }, { status: 400 });
+    return quoteError(error);
   }
 }
 

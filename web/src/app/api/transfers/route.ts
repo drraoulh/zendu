@@ -1,7 +1,7 @@
 import { NextResponse } from "next/server";
 import { z } from "zod";
 import { prisma } from "@/lib/prisma";
-import { buildQuote } from "@/lib/quote";
+import { buildQuote, QuoteLimitError } from "@/lib/quote";
 import { createReference } from "@/lib/money";
 import { getPayInMode } from "@/lib/providers/payin";
 import { mockPayIn } from "@/lib/providers/mock-payin";
@@ -61,7 +61,10 @@ export async function GET(request: Request) {
 
 export async function POST(request: Request) {
   try {
-    const json = await request.json();
+    const json = await request.json().catch(() => null);
+    if (!json || typeof json !== "object") {
+      return NextResponse.json({ error: "Requête invalide" }, { status: 400 });
+    }
     const data = createSchema.parse(json);
     const sendAmount = data.sendAmount ?? data.sendAmountCad;
     if (sendAmount == null) {
@@ -194,6 +197,12 @@ export async function POST(request: Request) {
   } catch (error) {
     if (error instanceof z.ZodError) {
       return validationError(error);
+    }
+    if (error instanceof QuoteLimitError) {
+      return NextResponse.json(
+        { error: error.messageFr, code: error.code, limit: error.limit, currency: error.currency },
+        { status: 400 },
+      );
     }
     const message = error instanceof Error ? error.message : "Erreur création";
     return NextResponse.json({ error: message }, { status: 400 });

@@ -9,6 +9,7 @@ import {
   isUniqueViolation,
   rateLimit,
   requestBodySchema,
+  requestErrorMessage,
   zodIssues,
 } from "@/lib/requests";
 
@@ -66,7 +67,7 @@ export async function POST(request: Request) {
   const parsed = requestBodySchema.safeParse(json);
   if (!parsed.success) {
     return NextResponse.json(
-      { ok: false, error: "Données invalides", issues: zodIssues(parsed.error) },
+      { ok: false, error: requestErrorMessage(parsed.error), issues: zodIssues(parsed.error) },
       { status: 400 },
     );
   }
