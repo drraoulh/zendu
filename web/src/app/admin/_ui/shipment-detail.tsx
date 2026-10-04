@@ -115,7 +115,7 @@ export function ShipmentDetail({ shipment }: { shipment: AdminShipment }) {
               href={`/shipping/suivi?numero=${encodeURIComponent(shipment.number)}`}
               target="_blank"
               rel="noopener noreferrer"
-              className="inline-flex items-center gap-1.5 rounded-full border border-line bg-white px-3 py-1 text-xs font-semibold text-brand transition hover:border-brand/40"
+              className="inline-flex min-h-10 items-center gap-1.5 rounded-full border border-line bg-white px-3.5 py-1.5 text-xs font-semibold text-brand transition hover:border-brand/40 sm:min-h-0"
             >
               <Icon name="globe" className="h-3.5 w-3.5" />
               {t("publicTracking")}
@@ -151,7 +151,7 @@ export function ShipmentDetail({ shipment }: { shipment: AdminShipment }) {
                           type="button"
                           onClick={() => void removeEvent(ev.id)}
                           disabled={busy}
-                          className="rounded-full px-2 py-1 text-xs font-semibold text-danger transition hover:bg-danger/10 disabled:opacity-50"
+                          className="min-h-10 rounded-full px-3 py-1 text-xs font-semibold text-danger transition hover:bg-danger/10 disabled:opacity-50 sm:min-h-0"
                         >
                           {t("deleteEvent")}
                         </button>

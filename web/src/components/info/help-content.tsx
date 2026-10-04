@@ -126,7 +126,7 @@ export function HelpCenter({ numbers }: { numbers: HelpNumbers }) {
         type="button"
         aria-pressed={active}
         onClick={() => setCat(value)}
-        className={`inline-flex items-center gap-2 rounded-full border px-3.5 py-2 text-sm font-semibold transition focus:outline-none focus-visible:ring-4 focus-visible:ring-brand/20 ${
+        className={`inline-flex min-h-10 items-center gap-2 rounded-full border px-3.5 py-2 text-sm font-semibold transition focus:outline-none focus-visible:ring-4 focus-visible:ring-brand/20 ${
           active ? "border-brand bg-brand text-white" : "border-line bg-white text-ink hover:border-brand/40"
         }`}
       >
@@ -263,7 +263,7 @@ function Feedback({ slug }: { slug: string }) {
               type="button"
               aria-pressed={vote === v}
               onClick={() => answer(v)}
-              className={`rounded-full border px-5 py-2 text-sm font-semibold transition focus:outline-none focus-visible:ring-4 focus-visible:ring-brand/20 ${
+              className={`min-h-10 rounded-full border px-5 py-2 text-sm font-semibold transition focus:outline-none focus-visible:ring-4 focus-visible:ring-brand/20 ${
                 vote === v ? "border-brand bg-brand text-white" : "border-line bg-white text-ink hover:border-brand/40"
               }`}
             >

@@ -303,7 +303,9 @@ export function SiteHeader() {
       {open && (
         <div
           id="mobile-menu"
-          className="fixed inset-x-0 bottom-0 top-[4.5rem] overflow-y-auto overscroll-contain border-t border-line bg-white lg:hidden"
+          // L'en-tête a un backdrop-filter : il devient le bloc conteneur des éléments « fixed ».
+          // Le panneau est donc positionné sous l'en-tête et dimensionné sur la hauteur de l'écran.
+          className="absolute inset-x-0 top-full h-[calc(100dvh-4.5rem)] overflow-y-auto overscroll-contain border-t border-line bg-white lg:hidden"
         >
           <nav
             aria-label={t("mainNav")}
@@ -338,7 +340,7 @@ export function SiteHeader() {
                           <li key={a.href}>
                             <Link
                               href={a.href}
-                              className="inline-flex items-center gap-1 rounded-full border border-brand/20 bg-white px-3 py-1.5 text-xs font-semibold text-brand-strong hover:bg-brand-soft"
+                              className="inline-flex min-h-10 items-center gap-1 rounded-full border border-brand/20 bg-white px-3.5 py-2 text-xs font-semibold text-brand-strong hover:bg-brand-soft"
                             >
                               {t(a.key)}
                               <Icon name="arrowRight" className="h-3.5 w-3.5" />

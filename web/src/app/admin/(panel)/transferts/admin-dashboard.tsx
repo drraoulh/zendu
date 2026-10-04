@@ -97,10 +97,8 @@ export function AdminDashboard({
     acc[r.sendCurrency] = (acc[r.sendCurrency] ?? 0) + r.totalCad;
     return acc;
   }, {});
-  const volume =
-    Object.entries(volumeByCurrency)
-      .map(([cur, n]) => formatMoney(n, cur, nl))
-      .join(" · ") || formatMoney(0, "CAD", nl);
+  const volumeParts = Object.entries(volumeByCurrency).map(([cur, n]) => formatMoney(n, cur, nl));
+  const volume = volumeParts.length ? volumeParts : [formatMoney(0, "CAD", nl)];
 
   const kpis: { label: Key; value: string; icon: IconName; tone: string }[] = [
     { label: "kpiTotal", value: String(rows.length), icon: "receipt", tone: "bg-brand-soft text-brand" },
@@ -171,8 +169,14 @@ export function AdminDashboard({
               ))}
               <li className="bg-brand-gradient col-span-2 rounded-3xl p-4 text-white shadow-card sm:p-5 xl:col-span-5 sm:flex sm:items-center sm:justify-between">
                 <p className="text-xs font-semibold uppercase tracking-[0.14em] text-white/70">{t("kpiVolume")}</p>
-                <p className="mt-1 break-words font-display text-2xl font-extrabold tracking-tight sm:mt-0">
-                  {volume}
+                {/* Un montant par devise, jamais coupé au milieu ; les devises passent à la ligne sur mobile. */}
+                <p className="mt-1 flex flex-wrap gap-x-3 gap-y-0.5 font-display text-xl font-extrabold tracking-tight min-[375px]:text-2xl sm:mt-0 sm:justify-end">
+                  {volume.map((v, i) => (
+                    <span key={i} className="whitespace-nowrap">
+                      {i > 0 && <span aria-hidden className="mr-3 text-white/50">·</span>}
+                      {v}
+                    </span>
+                  ))}
                 </p>
               </li>
             </ul>

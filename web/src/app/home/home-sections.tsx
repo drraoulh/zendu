@@ -212,7 +212,7 @@ export function FeesSection() {
         </div>
         <ol className="grid gap-4 sm:grid-cols-3 lg:grid-cols-1">
           {FEES.map((f) => (
-            <li key={f.n} className="flex gap-4 rounded-3xl border border-line bg-white p-5 shadow-card">
+            <li key={f.n} className="flex gap-4 rounded-3xl border border-line bg-white p-5 shadow-card sm:flex-col sm:gap-3 lg:flex-row lg:gap-4">
               <span className="grid h-11 w-11 shrink-0 place-items-center rounded-2xl bg-brand-soft text-brand">
                 <Icon name={f.icon} className="h-5 w-5" />
               </span>

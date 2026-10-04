@@ -188,7 +188,7 @@ export function SiteFooter() {
 function FooterColumn({ title, children }: { title: string; children: ReactNode }) {
   return (
     <div className="min-w-0">
-      <p className="break-words font-display text-xs font-bold uppercase tracking-[0.12em] text-white sm:text-sm sm:tracking-[0.14em]">{title}</p>
+      <p className="break-words font-display text-xs font-bold uppercase tracking-[0.12em] text-white sm:text-sm sm:tracking-[0.14em] lg:text-xs lg:tracking-[0.12em] xl:text-sm xl:tracking-[0.14em]">{title}</p>
       <div className="mt-4 flex flex-col items-start gap-1 sm:mt-5">{children}</div>
     </div>
   );

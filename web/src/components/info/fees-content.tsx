@@ -224,7 +224,7 @@ export function FeesContent({ destinations }: { destinations: DestinationInfo[] 
                           </span>
                           <Link
                             href={simulateHref(d)}
-                            className="inline-flex shrink-0 items-center gap-1 rounded-full bg-brand px-3.5 py-2 text-xs font-semibold text-white hover:bg-brand-strong"
+                            className="inline-flex min-h-10 shrink-0 items-center gap-1 rounded-full bg-brand px-4 py-2 text-xs font-semibold text-white hover:bg-brand-strong"
                           >
                             {L.t("simulate")}
                             <Icon name="arrowRight" className="h-3.5 w-3.5" />

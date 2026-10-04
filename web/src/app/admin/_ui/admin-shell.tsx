@@ -47,7 +47,7 @@ export function AdminShell({ devOpen, children }: { devOpen: boolean; children: 
           <div className="flex flex-wrap items-center gap-2">
             <Link
               href="/"
-              className="inline-flex items-center gap-2 rounded-full border border-white/25 bg-white/5 px-4 py-2 text-sm font-semibold text-white transition hover:bg-white/15"
+              className="inline-flex min-h-10 items-center gap-2 rounded-full border border-white/25 bg-white/5 px-4 py-2 text-sm font-semibold text-white transition hover:bg-white/15"
             >
               <Icon name="globe" className="h-4 w-4" />
               {t("viewSite")}
@@ -56,7 +56,7 @@ export function AdminShell({ devOpen, children }: { devOpen: boolean; children: 
               <form action="/admin/logout" method="post">
                 <button
                   type="submit"
-                  className="inline-flex items-center gap-2 rounded-full bg-white px-4 py-2 text-sm font-semibold text-navy transition hover:bg-brand-soft"
+                  className="inline-flex min-h-10 items-center gap-2 rounded-full bg-white px-4 py-2 text-sm font-semibold text-navy transition hover:bg-brand-soft"
                 >
                   <Icon name="logout" className="h-4 w-4" />
                   {t("logout")}
