@@ -7,9 +7,10 @@ import { getPayInMode } from "@/lib/providers/payin";
 import { mockPayIn } from "@/lib/providers/mock-payin";
 import { createStripePayIn } from "@/lib/providers/stripe";
 import { getPayoutMode } from "@/lib/providers/payout";
-import { getCorridor } from "@/lib/corridors";
+import { getCorridor, getCountry } from "@/lib/corridors";
 import { isBankNetwork, MANUAL_BANK_PROVIDER, MOCK_BANK_PROVIDER, publicTransfer } from "@/lib/bank";
 import { beneficiaryInputSchema, normalizeBeneficiary } from "@/lib/beneficiary-input";
+import { requireAdmin } from "@/lib/admin-auth";
 
 const createSchema = z.object({
   corridorId: z.string().default("CA-CM"),
@@ -20,7 +21,10 @@ const createSchema = z.object({
   beneficiary: beneficiaryInputSchema,
 });
 
-export async function GET() {
+/** Liste complète : réservée à l'admin (contient les données de tous les clients). */
+export async function GET(request: Request) {
+  const denied = await requireAdmin(request);
+  if (denied) return denied;
   const transfers = await prisma.transfer.findMany({
     include: { beneficiary: true },
     orderBy: { createdAt: "desc" },
@@ -119,6 +123,8 @@ export async function POST(request: Request) {
       transferId: transfer.id,
       reference: transfer.reference,
       amountCad: transfer.totalCad,
+      currency: transfer.sendCurrency,
+      routeLabel: `${getCountry(transfer.sourceCountry).name} → ${getCountry(transfer.destCountry).name}`,
       customerEmail: transfer.senderEmail,
       successUrl: `${appUrl}/transfers/${transfer.id}?paid=1`,
       cancelUrl: `${appUrl}/transfers/${transfer.id}?cancelled=1`,

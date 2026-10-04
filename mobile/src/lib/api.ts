@@ -1,0 +1,133 @@
+/**
+ * Client de l'API PWFINTECH (Next.js, dossier web/).
+ * L'URL se règle avec EXPO_PUBLIC_API_URL (ex. https://pwfintech.vercel.app).
+ */
+export const API_URL = (process.env.EXPO_PUBLIC_API_URL ?? "http://localhost:3000").replace(/\/$/, "");
+
+export type Network = { id: string; label: string; type: "mobile_money" | "bank" | "cash" };
+
+export type CorridorMeta = {
+  id: string;
+  source: string;
+  destination: string;
+  active: boolean;
+  minSend: number;
+  maxSend: number;
+  deliveryEstimate: string;
+  sourceName: string;
+  destName: string;
+  sendCurrency: string;
+  receiveCurrency: string;
+  networks: Network[];
+};
+
+export type Quote = {
+  corridorId: string;
+  sourceCountry: string;
+  destCountry: string;
+  sendCurrency: string;
+  receiveCurrency: string;
+  sendAmount: number;
+  receiveAmount: number;
+  rate: number;
+  fee: number;
+  total: number;
+  deliveryEstimate: string;
+  expiresAt: string;
+};
+
+export type TransferEvent = { id: string; type: string; message: string; createdAt: string };
+
+export type Transfer = {
+  id: string;
+  reference: string;
+  status: string;
+  corridorId: string;
+  sourceCountry: string;
+  destCountry: string;
+  sendCurrency: string;
+  receiveCurrency: string;
+  senderName: string;
+  senderEmail: string;
+  sendAmountCad: number;
+  receiveAmountXaf: number;
+  rate: number;
+  feeCad: number;
+  totalCad: number;
+  payInProvider: string;
+  createdAt: string;
+  beneficiary: {
+    fullName: string;
+    phone: string;
+    network: string;
+    country: string;
+    bankName?: string | null;
+    accountMasked?: string | null;
+    bankCode?: string | null;
+  };
+  events?: TransferEvent[];
+};
+
+export type PayInSession = { provider: "stripe" | "mock"; checkoutUrl?: string; sessionId: string };
+
+export type BeneficiaryInput = {
+  fullName: string;
+  phone?: string;
+  network: string;
+  bankName?: string;
+  accountNumber?: string;
+  bankCode?: string;
+};
+
+export class ApiError extends Error {
+  status: number;
+  constructor(message: string, status: number) {
+    super(message);
+    this.status = status;
+  }
+}
+
+function errorMessage(data: unknown): string | null {
+  if (!data || typeof data !== "object") return null;
+  const err = (data as { error?: unknown }).error;
+  if (typeof err === "string") return err;
+  if (err && typeof err === "object") {
+    const flat = err as { formErrors?: string[]; fieldErrors?: Record<string, string[] | undefined> };
+    const first = flat.formErrors?.[0] ?? Object.values(flat.fieldErrors ?? {}).flat()[0];
+    if (first) return first;
+  }
+  return null;
+}
+
+async function request<T>(path: string, init?: RequestInit): Promise<T> {
+  let res: Response;
+  try {
+    res = await fetch(`${API_URL}${path}`, {
+      ...init,
+      headers: { Accept: "application/json", ...(init?.body ? { "Content-Type": "application/json" } : {}), ...init?.headers },
+    });
+  } catch {
+    throw new ApiError("Connexion impossible. Vérifiez votre réseau.", 0);
+  }
+  const data = await res.json().catch(() => null);
+  if (!res.ok) throw new ApiError(errorMessage(data) ?? "Une erreur est survenue.", res.status);
+  return data as T;
+}
+
+export const api = {
+  corridors: () => request<CorridorMeta[]>("/api/quotes?meta=corridors"),
+  quote: (corridorId: string, amount: number, mode: "send" | "receive" = "send") =>
+    request<Quote>("/api/quotes", {
+      method: "POST",
+      body: JSON.stringify(mode === "send" ? { corridorId, sendAmount: amount } : { corridorId, receiveAmount: amount }),
+    }),
+  createTransfer: (input: {
+    corridorId: string;
+    sendAmount: number;
+    senderName: string;
+    senderEmail: string;
+    beneficiary: BeneficiaryInput;
+  }) => request<{ transfer: Transfer; payIn: PayInSession }>("/api/transfers", { method: "POST", body: JSON.stringify(input) }),
+  transfer: (id: string) => request<Transfer>(`/api/transfers/${encodeURIComponent(id)}`),
+  simulatePay: (id: string) => request<Transfer>(`/api/transfers/${encodeURIComponent(id)}/simulate-pay`, { method: "POST" }),
+};

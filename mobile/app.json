@@ -1,0 +1,59 @@
+{
+  "expo": {
+    "name": "WorldSoft Transfer",
+    "slug": "worldsoft-transfer",
+    "version": "1.0.0",
+    "orientation": "portrait",
+    "icon": "./assets/brand/app-icon-1024.png",
+    "scheme": "worldsofttransfer",
+    "userInterfaceStyle": "light",
+    "backgroundColor": "#f5f8ff",
+    "ios": {
+      "bundleIdentifier": "com.pwfintech.worldsoft",
+      "supportsTablet": false,
+      "infoPlist": {
+        "ITSAppUsesNonExemptEncryption": false
+      }
+    },
+    "android": {
+      "package": "com.pwfintech.worldsoft",
+      "adaptiveIcon": {
+        "backgroundColor": "#0b4dff",
+        "foregroundImage": "./assets/brand/android-adaptive-foreground-432.png",
+        "backgroundImage": "./assets/brand/android-adaptive-background-432.png"
+      },
+      "predictiveBackGestureEnabled": false
+    },
+    "web": {
+      "output": "single",
+      "favicon": "./assets/brand/favicon-48.png"
+    },
+    "plugins": [
+      "expo-router",
+      "expo-secure-store",
+      "expo-web-browser",
+      [
+        "expo-font",
+        {
+          "fonts": [
+            "./assets/fonts/Montserrat-600.ttf",
+            "./assets/fonts/Montserrat-800.ttf",
+            "./assets/fonts/Montserrat-900.ttf"
+          ]
+        }
+      ],
+      [
+        "expo-splash-screen",
+        {
+          "backgroundColor": "#ffffff",
+          "image": "./assets/brand/splash-symbol.png",
+          "imageWidth": 120
+        }
+      ]
+    ],
+    "experiments": {
+      "typedRoutes": true,
+      "reactCompiler": true
+    }
+  }
+}

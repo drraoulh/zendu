@@ -14,6 +14,11 @@ export async function POST(_request: Request, { params }: Params) {
     return NextResponse.json({ error: "Introuvable" }, { status: 404 });
   }
 
+  // Réservé au mode démo : un vrai paiement (Stripe) n'est confirmé que par son webhook.
+  if (transfer.payInProvider !== "mock") {
+    return NextResponse.json({ error: "Simulation indisponible" }, { status: 403 });
+  }
+
   if (transfer.status !== "awaiting_payment") {
     return NextResponse.json(
       { error: `Statut actuel: ${transfer.status}` },

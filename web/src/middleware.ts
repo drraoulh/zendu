@@ -22,8 +22,44 @@ function isProtectedAdminPath(pathname: string): boolean {
   return path !== "/admin/login" && path !== "/admin/logout";
 }
 
+/**
+ * CORS pour l'app WorldSoft Transfer en version web (Expo web) : uniquement sur les API publiques
+ * et pour les origines listées dans MOBILE_CORS_ORIGINS (séparées par des virgules).
+ * Les apps iOS/Android natives n'envoient pas d'en-tête Origin et n'en ont pas besoin.
+ */
+const PUBLIC_API = /^\/api\/(quotes|transfers|requests|shipments|appointments|waitlist)(\/|$)/;
+
+function corsOrigin(request: NextRequest): string | null {
+  const origin = request.headers.get("origin");
+  if (!origin) return null;
+  const allowed = (process.env.MOBILE_CORS_ORIGINS ?? "")
+    .split(",")
+    .map((o) => o.trim())
+    .filter(Boolean);
+  if (process.env.NODE_ENV !== "production") allowed.push("http://localhost:8081", "http://localhost:8082");
+  return allowed.includes(origin) ? origin : null;
+}
+
+function withCors(response: NextResponse, origin: string): NextResponse {
+  response.headers.set("Access-Control-Allow-Origin", origin);
+  response.headers.set("Vary", "Origin");
+  response.headers.set("Access-Control-Allow-Methods", "GET,POST,OPTIONS");
+  response.headers.set("Access-Control-Allow-Headers", "Content-Type");
+  response.headers.set("Access-Control-Max-Age", "600");
+  return response;
+}
+
 export async function middleware(request: NextRequest) {
   const { pathname, searchParams } = request.nextUrl;
+
+  if (PUBLIC_API.test(pathname)) {
+    const origin = corsOrigin(request);
+    if (request.method === "OPTIONS") {
+      return origin ? withCors(new NextResponse(null, { status: 204 }), origin) : new NextResponse(null, { status: 204 });
+    }
+    const response = await updateSession(request);
+    return origin ? withCors(response, origin) : response;
+  }
 
   const hasAdminSession = async () => {
     const mode = adminMode();

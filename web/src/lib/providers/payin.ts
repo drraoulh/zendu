@@ -10,7 +10,12 @@ export type PayInProvider = {
   createSession: (input: {
     transferId: string;
     reference: string;
+    /** Montant total à payer, dans la devise d'envoi (`currency`). */
     amountCad: number;
+    /** Devise d'envoi (CAD, XAF, CNY…). Défaut : CAD. */
+    currency?: string;
+    /** Libellé du trajet, ex. « Canada → Cameroun ». */
+    routeLabel?: string;
     customerEmail: string;
     successUrl: string;
     cancelUrl: string;

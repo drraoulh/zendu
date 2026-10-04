@@ -4,8 +4,12 @@ import { prisma } from "@/lib/prisma";
 import { publicBeneficiary } from "@/lib/bank";
 import { COUNTRIES } from "@/lib/corridors";
 import { beneficiaryInputSchema, normalizeBeneficiary } from "@/lib/beneficiary-input";
+import { requireAdmin } from "@/lib/admin-auth";
 
-export async function GET() {
+/** Liste de tous les bénéficiaires : réservée à l'admin. */
+export async function GET(request: Request) {
+  const denied = await requireAdmin(request);
+  if (denied) return denied;
   const beneficiaries = await prisma.beneficiary.findMany({
     orderBy: { createdAt: "desc" },
     take: 20,
@@ -32,7 +36,7 @@ export async function POST(request: Request) {
   try {
     const input = createSchema.parse(await request.json());
     const country = COUNTRIES[input.country];
-    if (!country || country.role === "source") {
+    if (!country) {
       return NextResponse.json({ error: "Pays de réception invalide" }, { status: 400 });
     }
     const result = await normalizeBeneficiary(input, input.country);

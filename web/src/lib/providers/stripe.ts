@@ -15,6 +15,8 @@ export function createStripePayIn(): PayInProvider {
       transferId,
       reference,
       amountCad,
+      currency = "CAD",
+      routeLabel,
       customerEmail,
       successUrl,
       cancelUrl,
@@ -28,11 +30,12 @@ export function createStripePayIn(): PayInProvider {
           {
             quantity: 1,
             price_data: {
-              currency: "cad",
-              unit_amount: Math.round(amountCad * 100),
+              currency: currency.toLowerCase(),
+              // XAF/XOF sont des devises sans décimales pour Stripe.
+              unit_amount: ZERO_DECIMAL.has(currency.toUpperCase()) ? Math.round(amountCad) : Math.round(amountCad * 100),
               product_data: {
                 name: `Transfert PWFINTECH ${reference}`,
-                description: "Envoi d'argent Canada → Cameroun",
+                description: `Envoi d'argent ${routeLabel ?? ""}`.trim(),
               },
             },
           },
@@ -52,3 +55,5 @@ export function createStripePayIn(): PayInProvider {
     },
   };
 }
+
+const ZERO_DECIMAL = new Set(["XAF", "XOF", "JPY", "KRW"]);
