@@ -53,7 +53,7 @@ export default function Receipt() {
     <Screen
       footer={
         <View style={{ flexDirection: "row", gap: 8 }}>
-          <Button title="Version PDF" variant="secondary" style={{ flex: 1 }} onPress={() => openSite(`/transfers/${t.id}/receipt`)} />
+          <Button title="Reçu PDF" variant="secondary" style={{ flex: 1 }} onPress={() => openSite(`/transfers/${t.id}/receipt`)} />
           <Button title={sharer.label} icon={sharer.copied ? "check" : "send"} style={{ flex: 1 }} onPress={() => sharer.share(text())} />
         </View>
       }

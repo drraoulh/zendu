@@ -19,8 +19,9 @@ export default function Notifications() {
   return (
     <Screen>
       <Header title="Notifications" right={<Button title="Réglages" variant="ghost" size="sm" onPress={() => router.push("/account/notifications")} />} />
-      <View style={{ flexDirection: "row", justifyContent: "space-between", alignItems: "center", marginBottom: 4 }}>
-        <Text style={{ fontFamily: fonts.heading, color: colors.ink }}>
+      <View style={{ flexDirection: "row", justifyContent: "space-between", alignItems: "center", gap: 8, marginBottom: 4 }}>
+        {/* flexShrink 0 : à 320 px, « 5 non lues » passait sur deux lignes à côté du bouton. */}
+        <Text style={{ fontFamily: fonts.heading, color: colors.ink, flexShrink: 0 }}>
           {unread.length} non lue{unread.length > 1 ? "s" : ""}
         </Text>
         {unread.length ? <Button title="Tout marquer comme lu" variant="ghost" size="sm" onPress={markAllRead} /> : null}

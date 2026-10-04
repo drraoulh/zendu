@@ -89,7 +89,7 @@ export default function Appointment() {
 
   return (
     <Screen footer={<Button title="Confirmer le rendez-vous" onPress={confirm} disabled={!time} loading={busy} />}>
-      <Header title="Prendre rendez-vous" />
+      <Header title={"Prendre rendez\u2011vous"} />
       <Label>Sujet</Label>
       <Chips options={TOPICS.map((t) => ({ value: t, label: t }))} value={topic} onChange={setTopic} />
       <Label>Mode</Label>

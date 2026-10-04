@@ -1,6 +1,6 @@
 import { router, useLocalSearchParams } from "expo-router";
 import { useEffect, useState } from "react";
-import { ActivityIndicator, Text, View } from "react-native";
+import { ActivityIndicator, Text, View, useWindowDimensions } from "react-native";
 import { Icon } from "@/components/icons";
 import { Button, Card, H1, P, Screen, Small, SummaryRow } from "@/components/ui";
 import { api, type Transfer } from "@/lib/api";
@@ -17,6 +17,9 @@ export default function Success() {
   const [failed, setFailed] = useState(false);
   const sharer = useShare();
   const corridors = useCorridors();
+  // Écran court (568 px) : trois rangées de boutons masquaient la moitié du récapitulatif ;
+  // « Retour à l'accueil » passe alors sous le contenu.
+  const short = useWindowDimensions().height < 640;
 
   useEffect(() => {
     resetDraft();
@@ -70,7 +73,7 @@ export default function Success() {
             <Button title="Voir le reçu" variant="secondary" size="sm" style={{ flex: 1 }} onPress={() => router.push({ pathname: "/receipt/[id]", params: { id: t.id, card: card ?? "" } })} />
             <Button title={sharer.label} icon={sharer.copied ? "check" : "send"} variant="secondary" size="sm" style={{ flex: 1 }} onPress={share} />
           </View>
-          <Button title="Retour à l'accueil" variant="ghost" onPress={() => router.replace("/(tabs)")} />
+          {short ? null : <Button title="Retour à l'accueil" variant="ghost" onPress={() => router.replace("/(tabs)")} />}
         </View>
       }
     >
@@ -90,6 +93,7 @@ export default function Success() {
         {card ? <SummaryRow label="Payé avec" value={card} /> : null}
       </Card>
       <Small style={{ textAlign: "center", marginTop: 12 }}>Un reçu a été envoyé à {t.senderEmail}.</Small>
+      {short ? <Button title="Retour à l'accueil" variant="ghost" style={{ marginTop: 8 }} onPress={() => router.replace("/(tabs)")} /> : null}
     </Screen>
   );
 }

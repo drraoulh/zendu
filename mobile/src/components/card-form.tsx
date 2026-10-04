@@ -18,6 +18,12 @@ export function CardForm({ defaultHolder, submitLabel, onSubmit }: { defaultHold
   const [isDefault, setIsDefault] = useState(true);
   const [errors, setErrors] = useState<Record<string, string>>({});
   const brand = cardBrand(number);
+  // Une erreur disparaît dès que l'on corrige le champ : sinon « Numéro de carte invalide » restait affiché
+  // sous un numéro valide jusqu'au prochain envoi.
+  const edit = (key: string, set: (v: string) => void) => (v: string) => {
+    set(v);
+    if (errors[key]) setErrors(({ [key]: _, ...rest }) => rest);
+  };
 
   function submit() {
     const e: Record<string, string> = {};
@@ -44,7 +50,7 @@ export function CardForm({ defaultHolder, submitLabel, onSubmit }: { defaultHold
       <Field
         label="Numéro de carte"
         value={number}
-        onChangeText={(v) => setNumber(formatCardNumber(v))}
+        onChangeText={edit("number", (v) => setNumber(formatCardNumber(v)))}
         placeholder="1234 5678 9012 3456"
         keyboardType="number-pad"
         autoComplete="cc-number"
@@ -53,13 +59,13 @@ export function CardForm({ defaultHolder, submitLabel, onSubmit }: { defaultHold
       />
       <View style={{ flexDirection: "row", gap: 12 }}>
         <View style={{ flex: 1 }}>
-          <Field label="Expiration" value={exp} onChangeText={(v) => setExp(formatExpiry(v))} placeholder="MM/AA" keyboardType="number-pad" autoComplete="cc-exp" error={errors.exp} />
+          <Field label="Expiration" value={exp} onChangeText={edit("exp", (v) => setExp(formatExpiry(v)))} placeholder="MM/AA" keyboardType="number-pad" autoComplete="cc-exp" error={errors.exp} />
         </View>
         <View style={{ flex: 1 }}>
-          <Field label="CVC" value={cvc} onChangeText={(v) => setCvc(v.replace(/\D/g, "").slice(0, 4))} placeholder="3 chiffres" keyboardType="number-pad" secureTextEntry autoComplete="cc-csc" error={errors.cvc} />
+          <Field label="CVC" value={cvc} onChangeText={edit("cvc", (v) => setCvc(v.replace(/\D/g, "").slice(0, 4)))} placeholder="3 chiffres" keyboardType="number-pad" secureTextEntry autoComplete="cc-csc" error={errors.cvc} />
         </View>
       </View>
-      <Field label="Nom sur la carte" value={holder} onChangeText={setHolder} autoComplete="cc-name" error={errors.holder} />
+      <Field label="Nom sur la carte" value={holder} onChangeText={edit("holder", setHolder)} autoComplete="cc-name" error={errors.holder} />
       <Checkbox checked={isDefault} onChange={setIsDefault}>
         <Small style={{ color: colors.ink }}>Définir comme moyen de paiement par défaut</Small>
       </Checkbox>

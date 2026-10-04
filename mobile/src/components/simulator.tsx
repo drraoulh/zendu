@@ -41,7 +41,7 @@ export function Simulator({
     !Number.isFinite(value) || value <= 0
       ? "Saisissez un montant."
       : value < corridor.minSend || value > corridor.maxSend
-        ? `Entre ${money(corridor.minSend, corridor.sendCurrency)} et ${money(corridor.maxSend, corridor.sendCurrency)}.`
+        ? `Le montant doit être compris entre ${money(corridor.minSend, corridor.sendCurrency)} et ${money(corridor.maxSend, corridor.sendCurrency)}.`
         : null;
   // Le devis affiché doit correspondre exactement au trajet et au montant saisis.
   const current = !localError && quoted?.key === key ? quoted.quote : null;
@@ -100,9 +100,12 @@ export function Simulator({
     onChange({ corridorId: next.id, sendAmount: amount, quote: null });
   }
 
+  // Jusqu'à ~400 px : écart réduit pour que « Cameroun » tienne en entier à côté du bouton d'inversion.
+  const narrow = useWindowDimensions().width < 400;
+
   return (
     <View style={s.card}>
-      <View style={s.route}>
+      <View style={[s.route, narrow && { gap: 4 }]}>
         <CountryButton label="De" code={corridor.source} onPress={() => setPicker("source")} />
         <Pressable accessibilityRole="button" accessibilityLabel="Inverser le trajet" onPress={swap} style={s.swap} hitSlop={6}>
           <Icon name="swap" color={colors.brand} size={18} />
@@ -166,10 +169,12 @@ export function Simulator({
 }
 
 function CountryButton({ label, code, onPress }: { label: string; code: string; onPress: () => void }) {
-  // Écran étroit (320 px) : le drapeau monte à côté de « De / Vers » pour laisser toute la largeur au nom du pays.
-  const narrow = useWindowDimensions().width < 360;
+  // Écran étroit (< 400 px, ex. 375 px) : le drapeau monte à côté de « De / Vers » pour laisser toute la
+  // largeur au nom du pays ; sous 360 px, la police du nom réduit d'un point.
+  const width = useWindowDimensions().width;
+  const narrow = width < 400;
   return (
-    <Pressable accessibilityRole="button" accessibilityLabel={`${label} ${countryName(code)}, modifier`} onPress={onPress} style={[s.country, narrow && { paddingHorizontal: 8 }]}>
+    <Pressable accessibilityRole="button" accessibilityLabel={`${label} ${countryName(code)}, modifier`} onPress={onPress} style={[s.country, narrow && { paddingHorizontal: 6 }]}>
       <View style={{ flexDirection: "row", alignItems: "center", justifyContent: "space-between" }}>
         <View style={{ flexDirection: "row", alignItems: "center", gap: 6 }}>
           {narrow ? <Flag code={code} size={16} /> : null}
@@ -179,7 +184,7 @@ function CountryButton({ label, code, onPress }: { label: string; code: string; 
       </View>
       <View style={{ flexDirection: "row", alignItems: "center", gap: 8 }}>
         {narrow ? null : <Flag code={code} size={20} />}
-        <Text style={s.countryName} numberOfLines={1}>{countryName(code)}</Text>
+        <Text style={[s.countryName, width < 360 && { fontSize: 13 }]} numberOfLines={1}>{countryName(code)}</Text>
       </View>
     </Pressable>
   );

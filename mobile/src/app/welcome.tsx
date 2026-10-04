@@ -33,6 +33,11 @@ export default function Welcome() {
   const { height } = useWindowDimensions();
   const slide = SLIDES[index];
   const last = index === SLIDES.length - 1;
+  // Écran court (320×568) : le grand logo repoussait le bouton « Suivant » hors de l'écran.
+  // On ne garde alors que les drapeaux, sans pastille d'icône, avec un titre plus petit.
+  const compact = height < 640;
+  // Écran moyen (375×667) : logo réduit et pas de pastille d'icône, pour que la mention PWFINTECH reste visible.
+  const short = height < 760;
 
   function go(path: "/auth/signup" | "/auth/login") {
     void finishOnboarding();
@@ -50,10 +55,12 @@ export default function Welcome() {
         ) : null}
       </View>
 
-      <View style={[st.hero, { minHeight: Math.min(320, height * 0.36) }]}>
-        <View style={st.halo}>
-          <WstSymbol size={110} negative />
-        </View>
+      <View style={[st.hero, compact ? { minHeight: 0, paddingVertical: 12 } : short ? { minHeight: 0, gap: 14 } : { minHeight: Math.min(320, height * 0.36) }]}>
+        {compact ? null : (
+          <View style={[st.halo, short && { width: 120, height: 120, borderRadius: 60 }]}>
+            <WstSymbol size={short ? 72 : 110} negative />
+          </View>
+        )}
         <View style={st.flags}>
           {["CA", "CM", "CN"].map((c) => (
             <View key={c} style={st.flagPill}>
@@ -64,13 +71,15 @@ export default function Welcome() {
       </View>
 
       <View style={st.sheet}>
-        <View style={st.iconWrap}>
-          <Icon name={slide.icon} color={colors.brand} size={24} />
-        </View>
-        <Text style={st.title} accessibilityRole="header">{slide.title}</Text>
+        {short ? null : (
+          <View style={st.iconWrap}>
+            <Icon name={slide.icon} color={colors.brand} size={24} />
+          </View>
+        )}
+        <Text style={[st.title, compact && { fontSize: 21, lineHeight: 26 }]} accessibilityRole="header">{slide.title}</Text>
         <Text style={st.text}>{slide.text}</Text>
 
-        <View style={st.dots} accessibilityLabel={`Écran ${index + 1} sur ${SLIDES.length}`}>
+        <View style={[st.dots, compact && { marginVertical: 14 }]} accessibilityLabel={`Écran ${index + 1} sur ${SLIDES.length}`}>
           {SLIDES.map((_, i) => (
             <View key={i} style={[st.dot, i === index && st.dotOn]} />
           ))}
@@ -84,7 +93,7 @@ export default function Welcome() {
         ) : (
           <Button title="Suivant" onPress={() => setIndex(index + 1)} />
         )}
-        <View style={{ alignItems: "center", marginTop: 16 }}>
+        <View style={{ alignItems: "center", marginTop: compact ? 10 : 16 }}>
           <PoweredBy />
         </View>
       </View>

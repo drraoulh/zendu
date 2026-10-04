@@ -68,7 +68,7 @@ export default function History() {
         </View>
         {items.length ? (
           <>
-            <Field label="Rechercher" placeholder="Rechercher un nom ou une référence" value={q} onChangeText={setQ} autoCapitalize="none" />
+            <Field label="Rechercher" placeholder="Nom ou référence" value={q} onChangeText={setQ} autoCapitalize="none" />
             <Chips options={FILTERS} value={filter} onChange={setFilter} />
           </>
         ) : null}

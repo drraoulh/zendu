@@ -378,8 +378,9 @@ export function Empty({ icon, title, text, action }: { icon: IconName; title: st
 }
 
 export const styles = StyleSheet.create({
-  content: { paddingHorizontal: 20, paddingBottom: 32, paddingTop: 8 },
-  footer: { paddingHorizontal: 20, paddingTop: 10, paddingBottom: 12, backgroundColor: "transparent" },
+  // Tablette (768 px) : colonne centrée de 640 px au lieu de champs et boutons étirés sur toute la largeur.
+  content: { paddingHorizontal: 20, paddingBottom: 32, paddingTop: 8, width: "100%", maxWidth: 640, alignSelf: "center" },
+  footer: { paddingHorizontal: 20, paddingTop: 10, paddingBottom: 12, backgroundColor: "transparent", width: "100%", maxWidth: 640, alignSelf: "center" },
   header: { flexDirection: "row", alignItems: "center", paddingVertical: 8, marginBottom: 8 },
   headerSide: { minWidth: 44, flexShrink: 0 },
   headerTitle: { fontFamily: fonts.heading, fontSize: 17, lineHeight: 21, color: colors.ink, textAlign: "center" },
@@ -399,7 +400,8 @@ export const styles = StyleSheet.create({
   notice: { flexDirection: "row", gap: 10, padding: 14, borderRadius: radius.md, alignItems: "flex-start" },
   noticeTitle: { fontFamily: fonts.heading, fontSize: 14, marginBottom: 2 },
   row: { flexDirection: "row", justifyContent: "space-between", alignItems: "center", paddingVertical: 7, gap: 12 },
-  rowLabel: { fontSize: 14, color: colors.muted, flexShrink: 1 },
+  // Libellé court (« Délai estimé ») sur une ligne : c'est la valeur qui passe à la ligne si besoin (320 px).
+  rowLabel: { fontSize: 14, color: colors.muted, flexShrink: 0, maxWidth: "50%" },
   rowValue: { fontFamily: fonts.semibold, fontSize: 14, color: colors.ink, textAlign: "right", flexShrink: 1 },
   listItem: { flexDirection: "row", alignItems: "center", gap: 12, paddingVertical: 12, paddingHorizontal: 4, borderRadius: radius.sm },
   listIcon: { width: 42, height: 42, borderRadius: 14, alignItems: "center", justifyContent: "center" },
