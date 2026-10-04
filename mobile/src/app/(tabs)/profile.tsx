@@ -1,76 +1,120 @@
-import { router } from "expo-router";
-import { Alert, Platform, Text, View } from "react-native";
-import { Flag } from "@/components/flag";
-import { Badge, Card, H1, ListItem, Screen, Small } from "@/components/ui";
-import { countryName } from "@/lib/format";
-import { openSite } from "@/lib/links";
-import { useSession } from "@/lib/session";
+import { router, type Href } from "expo-router";
+import { useState } from "react";
+import { Pressable, Text, View } from "react-native";
+import { PoweredBy } from "@/components/brand";
+import { Avatar, ConfirmDialog, SectionTitle } from "@/components/form";
+import { Icon, type IconName } from "@/components/icons";
+import { Badge, Card, ListItem, Screen, Small } from "@/components/ui";
+import { referralCode, useSession } from "@/lib/session";
 import { useStore } from "@/lib/store";
-import { colors, fonts } from "@/lib/theme";
+import { colors, fonts, radius } from "@/lib/theme";
+
+const LANG: Record<string, string> = { fr: "Français", en: "English", es: "Español", zh: "中文" };
 
 export default function Profile() {
-  const { profile, signOut } = useSession();
-  const { recipients } = useStore();
+  const { profile, settings, signOut } = useSession();
+  const { cards, recipients } = useStore();
+  const [confirm, setConfirm] = useState(false);
   if (!profile) return null;
-  const kyc = profile.kyc === "verified";
-  const initials = `${profile.firstName[0] ?? ""}${profile.lastName[0] ?? ""}`.toUpperCase();
-
-  function confirmLogout() {
-    const run = async () => {
-      await signOut();
-      router.replace("/welcome");
-    };
-    if (Platform.OS === "web") return void run();
-    Alert.alert("Se déconnecter ?", "Vous devrez vous reconnecter pour envoyer de l'argent.", [
-      { text: "Annuler", style: "cancel" },
-      { text: "Se déconnecter", style: "destructive", onPress: () => void run() },
-    ]);
-  }
+  const kyc = profile.kyc;
+  const card = cards.find((c) => c.isDefault) ?? cards[0];
+  const go = (href: Href) => () => router.push(href);
 
   return (
     <Screen edges={["top"]}>
-      <H1 style={{ marginTop: 8, marginBottom: 16 }}>Profil</H1>
+      <Text style={{ fontFamily: fonts.display, fontSize: 28, color: colors.navy, marginTop: 8, marginBottom: 16 }}>Profil</Text>
 
-      <Card style={{ flexDirection: "row", alignItems: "center", gap: 14, marginBottom: 16 }}>
-        <View style={{ width: 56, height: 56, borderRadius: 20, backgroundColor: colors.brand, alignItems: "center", justifyContent: "center" }}>
-          <Text style={{ color: colors.white, fontFamily: fonts.display, fontSize: 20 }}>{initials}</Text>
-        </View>
+      <Card onPress={go("/account/info")} style={{ flexDirection: "row", alignItems: "center", gap: 14, marginBottom: 12 }}>
+        <Avatar name={`${profile.firstName} ${profile.lastName}`} size={58} />
         <View style={{ flex: 1, gap: 4 }}>
           <Text style={{ fontFamily: fonts.heading, fontSize: 17, color: colors.ink }} numberOfLines={1}>
             {profile.firstName} {profile.lastName}
           </Text>
           <Small numberOfLines={1}>{profile.email}</Small>
-          <Badge label={kyc ? "Identité vérifiée" : "Identité à vérifier"} tone={kyc ? "success" : "warn"} />
+          <Badge
+            label={kyc === "verified" ? "Identité vérifiée" : kyc === "pending" ? "Vérification en cours" : "Identité à vérifier"}
+            tone={kyc === "verified" ? "success" : "warn"}
+          />
         </View>
+        <Icon name="chev" color={colors.muted} size={18} />
       </Card>
 
-      <Card style={{ paddingVertical: 6, marginBottom: 16 }}>
-        <ListItem icon="phone" tone="neutral" title="Téléphone" subtitle={profile.phone} />
-        <ListItem
-          tone="neutral"
-          title="Pays de résidence"
-          subtitle={countryName(profile.country)}
-          leading={
-            <View style={{ width: 42, height: 42, borderRadius: 14, backgroundColor: colors.bg, alignItems: "center", justifyContent: "center" }}>
-              <Flag code={profile.country} size={24} />
-            </View>
-          }
-        />
-        <ListItem icon="shield" tone={kyc ? "success" : "warn"} title="Vérification d'identité" subtitle={kyc ? "Validée" : "À compléter"} onPress={kyc ? undefined : () => router.push("/kyc")} />
-        <ListItem icon="user" tone="neutral" title="Mes bénéficiaires" subtitle={`${recipients.length} enregistré${recipients.length > 1 ? "s" : ""}`} onPress={() => router.push("/recipients")} />
+      <Card onPress={go("/account/referral")} style={{ flexDirection: "row", alignItems: "center", gap: 12, backgroundColor: colors.brandSoft, borderColor: colors.brandSoft }}>
+        <Icon name="user" color={colors.brand} />
+        <View style={{ flex: 1 }}>
+          <Text style={{ fontFamily: fonts.heading, color: colors.ink }}>Parrainez vos proches</Text>
+          <Small>Code {referralCode(profile)}</Small>
+        </View>
+        <Icon name="chev" color={colors.brand} size={18} />
       </Card>
 
-      <Card style={{ paddingVertical: 6, marginBottom: 16 }}>
-        <ListItem icon="help" tone="neutral" title="Aide et contact" onPress={() => openSite("/aide")} />
-        <ListItem icon="info" tone="neutral" title="Conditions d'utilisation" onPress={() => openSite("/conditions")} />
-        <ListItem icon="lock" tone="neutral" title="Confidentialité" onPress={() => openSite("/confidentialite")} />
+      <SectionTitle>Découvrir PWFINTECH</SectionTitle>
+      <View style={{ flexDirection: "row", gap: 10 }}>
+        <Tile icon="finance" label="Finances" onPress={go("/services/finances")} />
+        <Tile icon="tech" label="Technologies" onPress={go("/services/technologies")} />
+        <Tile icon="ship" label="Shipping" onPress={go("/services/shipping")} />
+      </View>
+
+      <SectionTitle>Compte</SectionTitle>
+      <Card style={{ paddingVertical: 4 }}>
+        <ListItem icon="id" tone="neutral" title="Informations personnelles" onPress={go("/account/info")} />
+        <ListItem icon="wallet" tone="neutral" title="Moyens de paiement" subtitle={card ? `•••• ${card.last4}` : "Aucune carte"} onPress={go("/account/payment-methods")} />
+        <ListItem icon="user" tone="neutral" title="Mes destinataires" subtitle={`${recipients.length} enregistré${recipients.length > 1 ? "s" : ""}`} onPress={go("/recipients")} />
+        {kyc === "none" ? <ListItem icon="shield" tone="warn" title="Vérifier mon identité" onPress={go("/kyc")} /> : null}
       </Card>
 
-      <Card style={{ paddingVertical: 6 }}>
-        <ListItem icon="logout" tone="danger" title="Se déconnecter" onPress={confirmLogout} right={<View />} />
+      <SectionTitle>Paramètres</SectionTitle>
+      <Card style={{ paddingVertical: 4 }}>
+        <ListItem icon="lock" tone="neutral" title="Sécurité" onPress={go("/account/security")} />
+        <ListItem icon="globe" tone="neutral" title="Langue" subtitle={LANG[settings.language]} onPress={go("/account/language")} />
+        <ListItem icon="bell" tone="neutral" title="Notifications" onPress={go("/account/notifications")} />
       </Card>
 
-      <Small style={{ textAlign: "center", marginTop: 18 }}>WorldSoft Transfer · version 1.0.0</Small>
+      <SectionTitle>Assistance</SectionTitle>
+      <Card style={{ paddingVertical: 4 }}>
+        <ListItem icon="help" tone="neutral" title="Aide" onPress={go("/help")} />
+        <ListItem icon="mail" tone="neutral" title="Nous contacter" onPress={go("/help/contact")} />
+        <ListItem icon="info" tone="neutral" title="Documents légaux" onPress={go("/legal")} />
+      </Card>
+
+      <View style={{ alignItems: "center", marginTop: 20, gap: 4 }}>
+        <Small>WorldSoft Transfer 1.0.0</Small>
+        <PoweredBy />
+      </View>
+
+      <Card style={{ paddingVertical: 4, marginTop: 16 }}>
+        <ListItem icon="logout" tone="danger" title="Se déconnecter" onPress={() => setConfirm(true)} right={<View />} />
+      </Card>
+
+      <ConfirmDialog
+        visible={confirm}
+        title="Se déconnecter ?"
+        message="Vous devrez saisir votre mot de passe ou utiliser Face ID pour vous reconnecter."
+        confirmLabel="Se déconnecter"
+        destructive
+        onCancel={() => setConfirm(false)}
+        onConfirm={async () => {
+          setConfirm(false);
+          await signOut();
+          router.replace("/auth/login");
+        }}
+      />
     </Screen>
+  );
+}
+
+function Tile({ icon, label, onPress }: { icon: IconName; label: string; onPress: () => void }) {
+  return (
+    <Pressable
+      accessibilityRole="button"
+      onPress={onPress}
+      style={({ pressed }) => [
+        { flex: 1, backgroundColor: colors.white, borderRadius: radius.md, borderWidth: 1, borderColor: colors.line, padding: 12, alignItems: "center", gap: 6 },
+        pressed && { opacity: 0.85 },
+      ]}
+    >
+      <Icon name={icon} color={colors.brand} />
+      <Text style={{ fontFamily: fonts.semibold, fontSize: 12, color: colors.ink }} numberOfLines={1}>{label}</Text>
+    </Pressable>
   );
 }

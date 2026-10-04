@@ -33,6 +33,12 @@
       "expo-secure-store",
       "expo-web-browser",
       [
+        "expo-local-authentication",
+        {
+          "faceIDPermission": "WorldSoft Transfer utilise Face ID pour vous connecter et valider vos envois."
+        }
+      ],
+      [
         "expo-font",
         {
           "fonts": [

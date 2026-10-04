@@ -1,4 +1,5 @@
-import { Redirect } from "expo-router";
+import { Redirect, router } from "expo-router";
+import { useEffect } from "react";
 import { Platform } from "react-native";
 import { Tabs } from "expo-router/js-tabs";
 import { Icon, type IconName } from "@/components/icons";
@@ -9,13 +10,23 @@ const TABS: { name: string; title: string; icon: IconName }[] = [
   { name: "index", title: "Accueil", icon: "home" },
   { name: "send", title: "Envoyer", icon: "send" },
   { name: "history", title: "Historique", icon: "history" },
-  { name: "discover", title: "Services", icon: "grid" },
+  { name: "discover", title: "Découvrir", icon: "grid" },
   { name: "profile", title: "Profil", icon: "user" },
 ];
 
 export default function TabsLayout() {
-  const { profile } = useSession();
-  if (!profile) return <Redirect href="/welcome" />;
+  const { profile, locked } = useSession();
+
+  // Sans session (lien direct, rechargement) : retour à l'accueil. Différé pour laisser l'écran
+  // qui déconnecte naviguer lui-même — une <Redirect> immédiate ici bouclerait avec la sienne.
+  useEffect(() => {
+    if (profile) return;
+    const t = setTimeout(() => router.replace("/"), 150);
+    return () => clearTimeout(t);
+  }, [profile]);
+
+  if (!profile) return null;
+  if (locked) return <Redirect href="/lock" />;
 
   return (
     <Tabs

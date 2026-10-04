@@ -1,69 +1,88 @@
-import { router } from "expo-router";
+import { router, type Href } from "expo-router";
 import { Pressable, StyleSheet, Text, View } from "react-native";
 import { WstSymbol } from "@/components/brand";
 import { Icon, type IconName } from "@/components/icons";
 import { Simulator } from "@/components/simulator";
 import { TransferRow } from "@/components/transfer-row";
-import { Button, Card, Empty, H2, IconButton, Notice, Screen, Small } from "@/components/ui";
+import { Button, Card, Empty, H2, Screen, Small } from "@/components/ui";
 import { useSession } from "@/lib/session";
 import { useStore } from "@/lib/store";
 import { colors, fonts, radius } from "@/lib/theme";
+import { useNotifications } from "@/lib/use-notifications";
 import { useMyTransfers } from "@/lib/use-transfers";
+
+const POLES: { icon: IconName; label: string; href: Href }[] = [
+  { icon: "finance", label: "Finances", href: "/services/finances" },
+  { icon: "tech", label: "Technologies", href: "/services/technologies" },
+  { icon: "ship", label: "Shipping", href: "/services/shipping" },
+];
 
 export default function Home() {
   const { profile } = useSession();
   const { draft, setDraft } = useStore();
   const { items, loading } = useMyTransfers(3);
-  const kycDone = profile?.kyc === "verified";
+  const { unread } = useNotifications();
+  const kyc = profile?.kyc ?? "none";
 
   function startSend() {
-    if (!kycDone) return router.push("/kyc");
+    if (kyc === "none") return router.push("/kyc");
+    if (kyc === "pending") return router.push("/(tabs)/send");
     router.push("/send/recipient");
   }
 
   return (
     <Screen edges={["top"]}>
       <View style={st.top}>
-        <View style={{ flexDirection: "row", alignItems: "center", gap: 10, flex: 1 }}>
-          <WstSymbol size={36} />
-          <View style={{ flex: 1 }}>
-            <Small>Bonjour</Small>
-            <Text style={st.hello} numberOfLines={1}>{profile?.firstName ?? ""}</Text>
-          </View>
-        </View>
-        <IconButton name="bell" label="Notifications" onPress={() => router.push("/(tabs)/history")} />
-      </View>
-
-      {!kycDone ? (
-        <Card onPress={() => router.push("/kyc")} style={{ marginBottom: 16, backgroundColor: colors.warnSoft, borderColor: colors.warnSoft }}>
-          <View style={{ flexDirection: "row", gap: 12, alignItems: "center" }}>
-            <Icon name="shield" color={colors.warn} />
-            <View style={{ flex: 1 }}>
-              <Text style={{ fontFamily: fonts.heading, color: colors.ink }}>Vérifiez votre identité</Text>
-              <Small>Obligatoire avant votre premier transfert · 3 min</Small>
+        <WstSymbol size={34} />
+        <Pressable accessibilityRole="button" accessibilityLabel={`Notifications, ${unread.length} non lues`} onPress={() => router.push("/notifications")} style={st.bell}>
+          <Icon name="bell" color={colors.ink} size={20} />
+          {unread.length ? (
+            <View style={st.badge}>
+              <Text style={st.badgeText}>{unread.length > 9 ? "9+" : unread.length}</Text>
             </View>
-            <Icon name="chev" color={colors.warn} size={18} />
+          ) : null}
+        </Pressable>
+      </View>
+      <Text style={st.hello}>Bonjour {profile?.firstName}</Text>
+      <Small style={{ marginBottom: 16 }}>À qui envoyez-vous aujourd&apos;hui ?</Small>
+
+      {kyc !== "verified" ? (
+        <Card
+          onPress={kyc === "none" ? () => router.push("/kyc") : undefined}
+          style={{ marginBottom: 16, backgroundColor: colors.warnSoft, borderColor: colors.warnSoft }}
+        >
+          <View style={{ flexDirection: "row", gap: 12, alignItems: "center" }}>
+            <Icon name={kyc === "none" ? "shield" : "clock"} color={colors.warn} />
+            <View style={{ flex: 1 }}>
+              <Text style={{ fontFamily: fonts.heading, color: colors.ink }}>{kyc === "none" ? "Vérifiez votre identité" : "Vérification en cours"}</Text>
+              <Small>{kyc === "none" ? "Obligatoire avant votre premier transfert · 2 min" : "Généralement quelques minutes. Vous serez averti."}</Small>
+            </View>
+            {kyc === "none" ? <Icon name="chev" color={colors.warn} size={18} /> : null}
           </View>
         </Card>
       ) : null}
 
-      <Simulator
-        corridorId={draft.corridorId}
-        amount={draft.sendAmount}
-        onChange={(n) => setDraft(n)}
-        onContinue={startSend}
-        ctaLabel="Envoyer maintenant"
-      />
+      <Simulator corridorId={draft.corridorId} amount={draft.sendAmount} onChange={(n) => setDraft(n)} onContinue={startSend} ctaLabel="Envoyer" />
 
-      <View style={st.actions}>
-        <Action icon="send" label="Envoyer" onPress={startSend} />
-        <Action icon="history" label="Suivi" onPress={() => router.push("/(tabs)/history")} />
-        <Action icon="user" label="Bénéficiaires" onPress={() => router.push("/recipients")} />
-        <Action icon="grid" label="Services" onPress={() => router.push("/(tabs)/discover")} />
+      <View style={st.sectionHead}>
+        <H2 style={{ fontSize: 18 }}>Découvrir PWFINTECH</H2>
+        <Pressable onPress={() => router.push("/(tabs)/discover")} hitSlop={8}>
+          <Text style={st.link}>En savoir plus</Text>
+        </Pressable>
+      </View>
+      <View style={{ flexDirection: "row", gap: 10 }}>
+        {POLES.map((p) => (
+          <Pressable key={p.label} accessibilityRole="button" onPress={() => router.push(p.href)} style={({ pressed }) => [st.pole, pressed && { opacity: 0.85 }]}>
+            <View style={st.poleIcon}>
+              <Icon name={p.icon} color={colors.brand} />
+            </View>
+            <Text style={st.poleLabel} numberOfLines={1}>{p.label}</Text>
+          </Pressable>
+        ))}
       </View>
 
       <View style={st.sectionHead}>
-        <H2 style={{ fontSize: 18 }}>Derniers transferts</H2>
+        <H2 style={{ fontSize: 18 }}>Transferts récents</H2>
         {items.length ? (
           <Pressable onPress={() => router.push("/(tabs)/history")} hitSlop={8}>
             <Text style={st.link}>Tout voir</Text>
@@ -84,32 +103,19 @@ export default function Home() {
           />
         )}
       </Card>
-
-      <View style={{ marginTop: 16 }}>
-        <Notice tone="brand" icon="lock" text="Vos paiements sont chiffrés et vos transferts suivis à chaque étape." />
-      </View>
     </Screen>
   );
 }
 
-function Action({ icon, label, onPress }: { icon: IconName; label: string; onPress: () => void }) {
-  return (
-    <Pressable accessibilityRole="button" onPress={onPress} style={({ pressed }) => [st.action, pressed && { opacity: 0.8 }]}>
-      <View style={st.actionIcon}>
-        <Icon name={icon} color={colors.brand} />
-      </View>
-      <Text style={st.actionLabel} numberOfLines={1}>{label}</Text>
-    </Pressable>
-  );
-}
-
 const st = StyleSheet.create({
-  top: { flexDirection: "row", alignItems: "center", justifyContent: "space-between", marginBottom: 18, marginTop: 4 },
-  hello: { fontFamily: fonts.display, fontSize: 22, color: colors.navy },
-  actions: { flexDirection: "row", justifyContent: "space-between", marginTop: 18, gap: 8 },
-  action: { flex: 1, alignItems: "center", gap: 6 },
-  actionIcon: { width: 54, height: 54, borderRadius: radius.md, backgroundColor: colors.white, borderWidth: 1, borderColor: colors.line, alignItems: "center", justifyContent: "center" },
-  actionLabel: { fontFamily: fonts.semibold, fontSize: 12, color: colors.ink },
+  top: { flexDirection: "row", alignItems: "center", justifyContent: "space-between", marginTop: 4, marginBottom: 14 },
+  bell: { width: 42, height: 42, borderRadius: 14, backgroundColor: colors.white, borderWidth: 1, borderColor: colors.line, alignItems: "center", justifyContent: "center" },
+  badge: { position: "absolute", top: -4, right: -4, minWidth: 18, height: 18, borderRadius: 9, backgroundColor: colors.maple, alignItems: "center", justifyContent: "center", paddingHorizontal: 4 },
+  badgeText: { color: colors.white, fontSize: 10, fontFamily: fonts.heading },
+  hello: { fontFamily: fonts.display, fontSize: 26, color: colors.navy },
   sectionHead: { flexDirection: "row", justifyContent: "space-between", alignItems: "center", marginTop: 24, marginBottom: 10 },
   link: { color: colors.brand, fontFamily: fonts.semibold, fontSize: 14 },
+  pole: { flex: 1, backgroundColor: colors.white, borderRadius: radius.md, borderWidth: 1, borderColor: colors.line, padding: 12, gap: 8, alignItems: "flex-start" },
+  poleIcon: { width: 38, height: 38, borderRadius: 12, backgroundColor: colors.brandSoft, alignItems: "center", justifyContent: "center" },
+  poleLabel: { fontFamily: fonts.semibold, fontSize: 13, color: colors.ink },
 });

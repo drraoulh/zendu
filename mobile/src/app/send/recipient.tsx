@@ -5,7 +5,7 @@ import { Flag } from "@/components/flag";
 import { RecipientForm } from "@/components/recipient-form";
 import { Button, Card, H1, H2, Header, ListItem, P, Screen, Steps } from "@/components/ui";
 import { findCorridor, useCorridors, type CountryCode } from "@/lib/corridors";
-import { countryName, networkLabel } from "@/lib/format";
+import { countryName, networkLabel, phone } from "@/lib/format";
 import { useStore, type Recipient } from "@/lib/store";
 import { colors } from "@/lib/theme";
 
@@ -24,7 +24,7 @@ export default function ChooseRecipient() {
   return (
     <Screen>
       <Header title="Bénéficiaire" subtitle={`Vers ${countryName(country)}`} />
-      <Steps current={2} total={3} />
+      <Steps current={2} total={3} label="Destinataire" />
       <H1>À qui envoyez-vous ?</H1>
       <P style={{ marginTop: 6, marginBottom: 18 }}>Le nom doit correspondre à celui du compte ou de la pièce d&apos;identité du bénéficiaire.</P>
 
@@ -35,7 +35,7 @@ export default function ChooseRecipient() {
               <ListItem
                 key={r.id}
                 title={r.fullName}
-                subtitle={`${networkLabel(r.network)} · ${r.network === "BANK" ? r.bankName ?? "" : `+${r.phone}`}`}
+                subtitle={`${networkLabel(r.network)} · ${r.network === "BANK" ? r.bankName ?? "" : phone(r.phone ?? "")}`}
                 onPress={() => choose(r)}
                 leading={
                   <View style={{ width: 42, height: 42, borderRadius: 14, backgroundColor: colors.bg, alignItems: "center", justifyContent: "center" }}>

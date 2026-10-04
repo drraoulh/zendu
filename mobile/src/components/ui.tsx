@@ -67,7 +67,19 @@ export function Screen({
   );
 }
 
-export function Header({ title, subtitle, back = true, right }: { title?: string; subtitle?: string; back?: boolean; right?: ReactNode }) {
+export function Header({
+  title,
+  subtitle,
+  back = true,
+  right,
+  onBack,
+}: {
+  title?: string;
+  subtitle?: string;
+  back?: boolean;
+  right?: ReactNode;
+  onBack?: () => void;
+}) {
   return (
     <View style={styles.header}>
       {back ? (
@@ -75,7 +87,7 @@ export function Header({ title, subtitle, back = true, right }: { title?: string
           accessibilityRole="button"
           accessibilityLabel="Retour"
           hitSlop={10}
-          onPress={() => (router.canGoBack() ? router.back() : router.replace("/"))}
+          onPress={onBack ?? (() => (router.canGoBack() ? router.back() : router.replace("/")))}
           style={styles.iconBtn}
         >
           <Icon name="back" color={colors.ink} />
@@ -92,12 +104,19 @@ export function Header({ title, subtitle, back = true, right }: { title?: string
   );
 }
 
-export function Steps({ current, total }: { current: number; total: number }) {
+export function Steps({ current, total, label }: { current: number; total: number; label?: string }) {
   return (
-    <View style={{ flexDirection: "row", gap: 6, marginBottom: 18 }} accessibilityLabel={`Étape ${current} sur ${total}`}>
-      {Array.from({ length: total }, (_, i) => (
-        <View key={i} style={{ flex: 1, height: 4, borderRadius: 2, backgroundColor: i < current ? colors.brand : colors.line }} />
-      ))}
+    <View style={{ marginBottom: 18 }} accessibilityLabel={`Étape ${current} sur ${total}${label ? ` : ${label}` : ""}`}>
+      <View style={{ flexDirection: "row", gap: 6 }}>
+        {Array.from({ length: total }, (_, i) => (
+          <View key={i} style={{ flex: 1, height: 4, borderRadius: 2, backgroundColor: i < current ? colors.brand : colors.line }} />
+        ))}
+      </View>
+      {label ? (
+        <Text style={[styles.small, { marginTop: 8, fontFamily: fonts.semibold, color: colors.brand }]}>
+          Étape {current} sur {total} · {label}
+        </Text>
+      ) : null}
     </View>
   );
 }

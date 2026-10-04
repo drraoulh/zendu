@@ -12,18 +12,18 @@ import { colors, fonts } from "@/lib/theme";
 const SLIDES: { icon: IconName; title: string; text: string }[] = [
   {
     icon: "send",
-    title: "Envoyez entre le Canada, le Cameroun et la Chine",
-    text: "Six trajets ouverts, dans les deux sens. Mobile Money, virement bancaire, Interac, Alipay ou WeChat Pay.",
+    title: "Envoyez de l'argent entre le Canada, le Cameroun et la Chine",
+    text: "Six trajets ouverts, dans les deux sens : Mobile Money (MTN, Orange), virement bancaire, Interac, Alipay ou WeChat Pay.",
   },
   {
     icon: "eye",
-    title: "Le taux et les frais, avant de payer",
-    text: "Le simulateur affiche le montant exact reçu par votre proche. Aucun frais caché.",
+    title: "Des frais clairs, un suivi en temps réel",
+    text: "Vous voyez le taux, les frais et le total avant de payer, puis chaque étape jusqu'à la livraison.",
   },
   {
-    icon: "shield",
-    title: "Un compte vérifié, des transferts suivis",
-    text: "Identité vérifiée une fois, puis chaque transfert suivi étape par étape jusqu'à la livraison.",
+    icon: "grid",
+    title: "Découvrez aussi l'univers PWFINTECH",
+    text: "WorldSoft Transfer est une solution PWFINTECH. Depuis l'appli, découvrez aussi ses pôles Finances, Technologies et Shipping.",
   },
 ];
 

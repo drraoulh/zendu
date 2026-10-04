@@ -79,6 +79,19 @@ export type BeneficiaryInput = {
   bankCode?: string;
 };
 
+export type ServiceKind = "contact" | "shipping_quote" | "finance_appointment" | "tech_project";
+
+export type Shipment = {
+  number: string;
+  origin: string;
+  destination: string;
+  mode: "air" | "sea";
+  status: string;
+  weightKg: number | null;
+  estimatedDelivery: string | null;
+  events: { status: string; label: string; location: string | null; at: string }[];
+};
+
 export class ApiError extends Error {
   status: number;
   constructor(message: string, status: number) {
@@ -129,5 +142,9 @@ export const api = {
     beneficiary: BeneficiaryInput;
   }) => request<{ transfer: Transfer; payIn: PayInSession }>("/api/transfers", { method: "POST", body: JSON.stringify(input) }),
   transfer: (id: string) => request<Transfer>(`/api/transfers/${encodeURIComponent(id)}`),
+  submitRequest: (input: { kind: ServiceKind; name: string; email: string; phone?: string; payload: Record<string, unknown> }) =>
+    request<{ ok: true; reference: string }>("/api/requests", { method: "POST", body: JSON.stringify({ ...input, locale: "fr" }) }),
+  slots: (date: string) => request<{ date: string; slots: string[]; timezone: string }>(`/api/appointments/slots?date=${date}`),
+  trackShipment: (number: string) => request<{ shipment: Shipment }>(`/api/shipments/track?number=${encodeURIComponent(number)}`),
   simulatePay: (id: string) => request<Transfer>(`/api/transfers/${encodeURIComponent(id)}/simulate-pay`, { method: "POST" }),
 };

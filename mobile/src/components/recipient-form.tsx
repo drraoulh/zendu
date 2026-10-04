@@ -5,7 +5,9 @@ import { COUNTRIES, type CountryCode } from "@/lib/corridors";
 import { networkLabel } from "@/lib/format";
 import type { Recipient } from "@/lib/store";
 import { colors, fonts } from "@/lib/theme";
+import { RELATIONS } from "@/lib/geo";
 import { Flag } from "./flag";
+import { Chips } from "./form";
 import { Icon, type IconName } from "./icons";
 import { Button, Choice, Field, Label, Small } from "./ui";
 
@@ -19,7 +21,9 @@ export function RecipientForm({
   initial,
   submitLabel,
   onSubmit,
+  withRelation = false,
 }: {
+  withRelation?: boolean;
   country: CountryCode;
   networks: Network[];
   initial?: Partial<Recipient>;
@@ -33,6 +37,7 @@ export function RecipientForm({
   const [accountNumber, setAccountNumber] = useState(initial?.accountNumber ?? "");
   const [bankCode, setBankCode] = useState(initial?.bankCode ?? "");
   const [save, setSave] = useState(true);
+  const [relation, setRelation] = useState(initial?.relation ?? "");
   const [errors, setErrors] = useState<Record<string, string>>({});
   const type = networks.find((n) => n.id === network)?.type ?? "mobile_money";
   const bank = type === "bank";
@@ -53,14 +58,16 @@ export function RecipientForm({
     if (Object.keys(e).length) return;
     onSubmit(
       {
+        ...(initial ?? {}),
         id: initial?.id,
         country,
         fullName: fullName.trim(),
         network,
         phone: digits ? `${c.dialCode}${digits}` : "",
+        relation: relation || undefined,
         ...(bank
           ? { bankName: bankName.trim(), accountNumber: accountNumber.replace(/[\s-]/g, "").toUpperCase(), bankCode: bankCode.replace(/\s/g, "").toUpperCase() || undefined }
-          : {}),
+          : { bankName: undefined, accountNumber: undefined, bankCode: undefined }),
       },
       save,
     );
@@ -98,7 +105,14 @@ export function RecipientForm({
         }
       />
 
-      {!initial?.id ? (
+      {withRelation ? (
+        <>
+          <Label>Relation</Label>
+          <Chips options={RELATIONS.map((r) => ({ value: r, label: r }))} value={relation} onChange={(v) => setRelation(v === relation ? "" : v)} />
+        </>
+      ) : null}
+
+      {!initial?.id && !withRelation ? (
         <Pressable
           accessibilityRole="checkbox"
           accessibilityState={{ checked: save }}

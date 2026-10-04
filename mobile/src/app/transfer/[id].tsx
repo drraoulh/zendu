@@ -6,8 +6,7 @@ import { Flag } from "@/components/flag";
 import { Icon } from "@/components/icons";
 import { Badge, Button, Card, Divider, Header, IconButton, Notice, Screen, Small, SummaryRow } from "@/components/ui";
 import { api, type Transfer } from "@/lib/api";
-import { countryName, dateTime, eventTitle, money, networkLabel, rate, statusInfo, TERMINAL_STATUSES } from "@/lib/format";
-import { openSite } from "@/lib/links";
+import { countryName, dateTime, eventTitle, money, networkLabel, phone, rate, statusInfo, TERMINAL_STATUSES } from "@/lib/format";
 import { colors, fonts } from "@/lib/theme";
 
 const POLL_MS = 5000;
@@ -167,7 +166,7 @@ export default function TransferScreen() {
         <SummaryRow label="Pays" value={countryName(transfer.destCountry)} />
         <SummaryRow label="Réception" value={networkLabel(transfer.beneficiary.network)} />
         {transfer.beneficiary.accountMasked ? <SummaryRow label="Compte" value={transfer.beneficiary.accountMasked} /> : null}
-        {transfer.beneficiary.phone ? <SummaryRow label="Téléphone" value={`+${transfer.beneficiary.phone}`} /> : null}
+        {transfer.beneficiary.phone ? <SummaryRow label="Téléphone" value={phone(transfer.beneficiary.phone)} /> : null}
         <SummaryRow label="Créé le" value={dateTime(transfer.createdAt)} />
       </Card>
 
@@ -183,8 +182,14 @@ export default function TransferScreen() {
         </Card>
       ) : null}
 
-      {!awaiting ? <Button title="Voir le reçu" icon="history" variant="secondary" onPress={() => openSite(`/transfers/${transfer.id}/receipt`)} /> : null}
-      <Button title="Aide sur ce transfert" variant="ghost" icon="help" onPress={() => openSite("/aide")} style={{ marginTop: 6 }} />
+      {!awaiting ? <Button title="Voir le reçu" icon="history" variant="secondary" onPress={() => router.push({ pathname: "/receipt/[id]", params: { id: transfer.id } })} /> : null}
+      <Button
+        title="Aide sur ce transfert"
+        variant="ghost"
+        icon="help"
+        onPress={() => router.push({ pathname: "/help/contact", params: { subject: `Transfert ${transfer.reference}` } })}
+        style={{ marginTop: 6 }}
+      />
     </Screen>
   );
 }

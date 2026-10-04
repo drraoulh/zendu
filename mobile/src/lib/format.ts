@@ -100,3 +100,12 @@ const EVENT_TITLES: Record<string, string> = {
 export function eventTitle(type: string) {
   return EVENT_TITLES[type] ?? "Mise à jour";
 }
+
+/** « 237670000000 » → « +237 670 000 000 » (indicatifs des pays ouverts). */
+export function phone(digits: string) {
+  const d = digits.replace(/\D/g, "");
+  if (!d) return "";
+  const dial = ["237", "86", "1"].find((c) => d.startsWith(c)) ?? "";
+  const rest = d.slice(dial.length).replace(/(\d{3})(?=\d)/g, "$1 ");
+  return dial ? `+${dial} ${rest}` : `+${rest}`;
+}

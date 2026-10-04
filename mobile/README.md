@@ -18,24 +18,27 @@ Sur téléphone, l'API doit être joignable depuis l'appareil : utilisez l'URL V
 Côté serveur (`web/`), autorisez l'origine de l'app web dans `MOBILE_CORS_ORIGINS`
 (inutile pour les apps natives iOS/Android, qui ne sont pas soumises au CORS).
 
-## Parcours
+## Écrans (61 de la maquette)
 
-| Écran | Fichier |
-| --- | --- |
-| Présentation (3 écrans) | `src/app/welcome.tsx` |
-| Inscription (pays → identité → coordonnées) | `src/app/auth/signup.tsx` |
-| Connexion / mot de passe oublié | `src/app/auth/login.tsx`, `forgot.tsx` |
-| Vérification d'identité (document, selfie) | `src/app/kyc/index.tsx` |
-| Accueil + simulateur | `src/app/(tabs)/index.tsx` |
-| Envoyer · Historique · Services · Profil | `src/app/(tabs)/*` |
-| Bénéficiaire → récapitulatif → paiement | `src/app/send/*` |
-| Suivi en temps réel d'un transfert | `src/app/transfer/[id].tsx` |
+| Zone | Écrans | Dossier |
+| --- | --- | --- |
+| Accès | présentation (3), connexion, vérification en deux étapes, Face ID / empreinte, mot de passe oublié → courriel envoyé → nouveau mot de passe → succès, verrouillage par code PIN | `src/app/welcome.tsx`, `auth/`, `lock.tsx` |
+| Inscription | 8 étapes : coordonnées, code SMS, identité, adresse, mot de passe, pièce d'identité, photo, selfie, puis « Compte créé » | `auth/signup.tsx`, `kyc/` |
+| Transfert | accueil + simulateur, montant, destinataire (Mobile Money / banque / retrait), récapitulatif, paiement par carte, traitement, paiement réussi, suivi, reçu | `(tabs)/`, `send/`, `transfer/`, `receipt/` |
+| Historique | recherche, filtres, export ; notifications | `(tabs)/history.tsx`, `notifications.tsx` |
+| Destinataires | liste, fiche, ajout, modification | `recipients/` |
+| PWFINTECH | Découvrir, Finances + rendez-vous (créneaux réels), Technologies + projet, Shipping + devis + suivi de colis | `(tabs)/discover.tsx`, `services/` |
+| Compte | profil, informations, sécurité, mot de passe, appareils, moyens de paiement, ajout de carte, notifications, langue, parrainage, code PIN, aide, article, contact, documents légaux, déconnexion | `(tabs)/profile.tsx`, `account/`, `help/`, `legal.tsx` |
 
-Trajets ouverts : Canada ⇄ Cameroun ⇄ Chine (6 directions), devis en direct via `/api/quotes`.
+Les demandes de service (contact, devis Shipping, rendez-vous Finances, projet Technologies)
+sont envoyées à l'API du site (`/api/requests`) et apparaissent dans l'admin.
 
 ## État actuel (à brancher avant la production)
 
-- **Comptes** : stockés sur l'appareil (démo). À relier à Supabase Auth.
+- **Comptes** : stockés sur l'appareil (mot de passe et PIN hachés). À relier à Supabase Auth.
+- **Codes SMS / courriel** (inscription, 2 étapes, mot de passe oublié) : simulés, aucun message envoyé.
+- **Cartes** : seuls marque, 4 derniers chiffres et expiration sont gardés ; aucun débit en démo.
+- **Langues** : français ; anglais, espagnol et chinois à venir.
 - **KYC** : capture simulée. À remplacer par le SDK d'un prestataire KYC.
 - **Paiement** : mode démo (bouton « Simuler le paiement ») ; si `STRIPE_SECRET_KEY` est défini
   côté serveur, l'app ouvre la page de paiement Stripe.
