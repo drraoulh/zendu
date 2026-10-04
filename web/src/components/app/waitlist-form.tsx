@@ -100,14 +100,22 @@ export function WaitlistForm({
         <label htmlFor={`${id}-country`} className="text-sm font-semibold text-ink">
           {t("countryLabel")}
         </label>
-        <select id={`${id}-country`} value={country} onChange={(e) => setCountry(e.target.value)} className={field}>
-          <option value="">{t("countryNone")}</option>
-          {sorted.map((d) => (
-            <option key={d.code} value={d.code}>
-              {d.label}
-            </option>
-          ))}
-        </select>
+        <div className="relative">
+          <select
+            id={`${id}-country`}
+            value={country}
+            onChange={(e) => setCountry(e.target.value)}
+            className={`${field} cursor-pointer appearance-none pr-10`}
+          >
+            <option value="">{t("countryNone")}</option>
+            {sorted.map((d) => (
+              <option key={d.code} value={d.code}>
+                {d.label}
+              </option>
+            ))}
+          </select>
+          <Icon name="chevronDown" className="pointer-events-none absolute right-4 top-1/2 mt-[3px] h-4 w-4 -translate-y-1/2 text-muted" />
+        </div>
       </div>
 
       {/* Champ piège anti-robots : invisible et ignoré par les lecteurs d'écran. */}

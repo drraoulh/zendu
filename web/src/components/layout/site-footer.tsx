@@ -171,11 +171,11 @@ export function SiteFooter() {
             © {year} {appName} — {company.legalName ?? appFullName}. {t("rights")}
             {company.registration && <span className="block sm:inline"> {f("registration", { n: company.registration })}</span>}
           </p>
-          <div className="flex gap-5">
-            <Link href="/confidentialite" className="hover:text-white">
+          <div className="-my-2 flex flex-wrap gap-x-5 sm:my-0">
+            <Link href="/confidentialite" className="py-2 hover:text-white sm:py-0">
               {f("privacy")}
             </Link>
-            <Link href="/conditions" className="hover:text-white">
+            <Link href="/conditions" className="py-2 hover:text-white sm:py-0">
               {f("terms")}
             </Link>
           </div>

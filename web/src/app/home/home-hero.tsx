@@ -116,7 +116,10 @@ export function ShortcutsBand() {
         <ul className="grid grid-cols-2 gap-2.5 sm:grid-cols-3 sm:gap-3 lg:grid-cols-5">
           {SHORTCUTS.map((s) => {
             const cls =
-              "group flex h-full items-center gap-3 rounded-2xl border border-line bg-white p-3 transition hover:-translate-y-0.5 hover:border-brand/30 hover:shadow-card focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-brand/20 sm:p-3.5";
+              `group flex h-full rounded-2xl border border-line bg-white p-3 transition hover:-translate-y-0.5 hover:border-brand/30 hover:shadow-card focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-brand/20 sm:p-3.5 ${
+                // Très petits écrans : icône au-dessus du titre pour ne pas couper les mots un par un.
+                s.n === 1 ? "items-center gap-3" : "flex-col items-start gap-2 min-[375px]:flex-row min-[375px]:items-center min-[375px]:gap-3"
+              }`;
             const inner = (
               <>
                 <span className="grid h-10 w-10 shrink-0 place-items-center rounded-xl bg-brand-soft text-brand transition group-hover:bg-brand group-hover:text-white">

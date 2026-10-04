@@ -86,7 +86,7 @@ export function ApplicationContent({
       </section>
 
       <Container className="relative -mt-16 sm:-mt-20">
-        <div className="rounded-3xl border border-line bg-white p-6 shadow-float sm:p-10">
+        <div className="rounded-3xl border border-line bg-white p-5 shadow-float sm:p-10">
           <div className={`grid gap-10 ${qrSvg ? "md:grid-cols-[1fr_auto]" : ""}`}>
             <div>
               <h2 className="font-display text-2xl font-extrabold tracking-tight text-ink sm:text-3xl">{t("downloadTitle")}</h2>
@@ -102,7 +102,7 @@ export function ApplicationContent({
               <StoreBadges className="mt-6" />
 
               {!available && (
-                <div className="mt-8 rounded-3xl border border-brand/20 bg-surface-soft p-5 sm:p-6">
+                <div className="mt-8 rounded-3xl border border-brand/20 bg-surface-soft p-4 min-[375px]:p-5 sm:p-6">
                   <p className="inline-flex items-center gap-2 font-display text-sm font-bold uppercase tracking-[0.14em] text-brand">
                     <span className="live-dot" aria-hidden />
                     {t("comingSoonTitle")}

@@ -545,8 +545,8 @@ export function TransferCalculator({
             />
             <Row
               label={
-                <span className="inline-flex items-center gap-1.5">
-                  <Icon name="clock" className="h-4 w-4 text-brand" />
+                <span className="inline-flex items-center gap-1.5 whitespace-nowrap">
+                  <Icon name="clock" className="h-4 w-4 shrink-0 text-brand" />
                   {t("delivery")}
                 </span>
               }
