@@ -1,6 +1,7 @@
 import { router } from "expo-router";
 import { useEffect, useRef } from "react";
 import { Pressable, ScrollView, StyleSheet, Text, View } from "react-native";
+import { WstSymbol } from "@/components/brand";
 import { Flag } from "@/components/flag";
 import { Avatar } from "@/components/form";
 import { Icon } from "@/components/icons";
@@ -56,6 +57,7 @@ export default function Home() {
   return (
     <Screen edges={["top"]}>
       <View style={st.top}>
+        <WstSymbol size={34} />
         <Text style={st.hello} numberOfLines={1}>Bonjour {profile?.firstName}</Text>
         <Pressable accessibilityRole="button" accessibilityLabel={`Notifications, ${unread.length} non lues`} onPress={() => router.push("/notifications")} style={st.bell}>
           <Icon name="bell" color={colors.ink} size={20} />
@@ -151,7 +153,7 @@ export default function Home() {
 }
 
 const st = StyleSheet.create({
-  top: { flexDirection: "row", alignItems: "center", justifyContent: "space-between", gap: 12, marginTop: 4, marginBottom: 16 },
+  top: { flexDirection: "row", alignItems: "center", justifyContent: "space-between", gap: 10, marginTop: 4, marginBottom: 16 },
   hello: { flex: 1, fontFamily: fonts.display, fontSize: 24, color: colors.navy },
   bell: { width: 44, height: 44, borderRadius: 14, backgroundColor: colors.white, borderWidth: 1, borderColor: colors.line, alignItems: "center", justifyContent: "center" },
   badge: { position: "absolute", top: -4, right: -4, minWidth: 18, height: 18, borderRadius: 9, backgroundColor: colors.maple, alignItems: "center", justifyContent: "center", paddingHorizontal: 4 },

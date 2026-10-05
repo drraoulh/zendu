@@ -2,6 +2,7 @@ import * as Clipboard from "expo-clipboard";
 import { router, useLocalSearchParams } from "expo-router";
 import { useCallback, useEffect, useRef, useState } from "react";
 import { ActivityIndicator, StyleSheet, Text, View } from "react-native";
+import { WstWordmark } from "@/components/brand";
 import { Flag } from "@/components/flag";
 import { Icon } from "@/components/icons";
 import { Badge, Button, Card, Divider, Header, IconButton, Notice, Screen, Small, SummaryRow } from "@/components/ui";
@@ -100,6 +101,9 @@ export default function TransferScreen() {
       ) : null}
 
       <Card style={{ alignItems: "center", marginBottom: 14 }}>
+        <View style={{ marginBottom: 12 }}>
+          <WstWordmark size={20} />
+        </View>
         <View style={{ flexDirection: "row", alignItems: "center", gap: 8 }}>
           <Flag code={transfer.sourceCountry} size={22} />
           <Icon name="chev" size={16} color={colors.muted} />

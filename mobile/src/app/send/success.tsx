@@ -1,12 +1,12 @@
 import { router, useLocalSearchParams } from "expo-router";
 import { useEffect, useState } from "react";
 import { ActivityIndicator, Text, View, useWindowDimensions } from "react-native";
+import { WstWordmark } from "@/components/brand";
 import { Icon } from "@/components/icons";
 import { Button, Card, H1, P, Screen, Small, SummaryRow } from "@/components/ui";
 import { api, type Transfer } from "@/lib/api";
 import { findCorridor, useCorridors } from "@/lib/corridors";
 import { deliveryEstimate, etaLabel, money, networkLabel } from "@/lib/format";
-import { useShare } from "@/lib/share";
 import { useStore } from "@/lib/store";
 import { colors, fonts } from "@/lib/theme";
 
@@ -15,7 +15,6 @@ export default function Success() {
   const { resetDraft } = useStore();
   const [t, setT] = useState<Transfer | null>(null);
   const [failed, setFailed] = useState(false);
-  const sharer = useShare();
   const corridors = useCorridors();
   // Écran court (568 px) : trois rangées de boutons masquaient la moitié du récapitulatif ;
   // « Retour à l'accueil » passe alors sous le contenu.
@@ -57,12 +56,7 @@ export default function Success() {
 
   const eta = deliveryEstimate(findCorridor(corridors, t.corridorId).deliveryEstimate, t.beneficiary.network);
 
-  async function share() {
-    if (!t) return;
-    await sharer.share(
-      `WorldSoft Transfer — ${t.beneficiary.fullName} va recevoir ${money(t.receiveAmountXaf, t.receiveCurrency)} (${networkLabel(t.beneficiary.network)}). Référence ${t.reference}.`,
-    );
-  }
+  const first = t.beneficiary.fullName.split(" ")[0];
 
   return (
     <Screen
@@ -71,13 +65,23 @@ export default function Success() {
           <Button title="Suivre le transfert" onPress={() => router.replace({ pathname: "/transfer/[id]", params: { id: t.id } })} />
           <View style={{ flexDirection: "row", gap: 8 }}>
             <Button title="Voir le reçu" variant="secondary" size="sm" style={{ flex: 1 }} onPress={() => router.push({ pathname: "/receipt/[id]", params: { id: t.id, card: card ?? "" } })} />
-            <Button title={sharer.label} icon={sharer.copied ? "check" : "send"} variant="secondary" size="sm" style={{ flex: 1 }} onPress={share} />
+            <Button
+              title={`Prévenir ${first}`}
+              icon="send"
+              variant="secondary"
+              size="sm"
+              style={{ flex: 1 }}
+              onPress={() => router.push({ pathname: "/receipt/[id]", params: { id: t.id, card: card ?? "", mode: "recipient" } })}
+            />
           </View>
           {short ? null : <Button title="Retour à l'accueil" variant="ghost" onPress={() => router.replace("/(tabs)")} />}
         </View>
       }
     >
-      <View style={{ alignItems: "center", paddingTop: 30, gap: 8 }}>
+      <View style={{ alignItems: "center", paddingTop: short ? 4 : 12, gap: 8 }}>
+        <View style={{ marginBottom: short ? 4 : 14 }}>
+          <WstWordmark size={short ? 22 : 26} />
+        </View>
         <View style={{ width: 84, height: 84, borderRadius: 28, backgroundColor: colors.successSoft, alignItems: "center", justifyContent: "center" }}>
           <Icon name="check" color={colors.success} size={42} strokeWidth={2.4} />
         </View>

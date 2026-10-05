@@ -48,3 +48,30 @@ export function expiryValid(v: string) {
 export function cardLabel(c: SavedCard) {
   return `${c.brand} •••• ${c.last4}`;
 }
+
+/**
+ * Lit un texte collé ou rempli automatiquement (numéro, éventuellement suivi de l'expiration) :
+ * « 4242 4242 4242 4242 08/29 » → { number: "4242424242424242", exp: "08/29" }.
+ */
+export function parseCardText(text: string): { number?: string; exp?: string } {
+  const out: { number?: string; exp?: string } = {};
+  // La date d'abord (MM/AA ou MM/AAAA, séparée du numéro par un espace) : sinon ses chiffres seraient
+  // pris pour la fin du numéro.
+  const exp = /(?:^|\s)(0[1-9]|1[0-2])\s*[/\-.]\s*(\d{4}|\d{2})(?!\d)/.exec(text);
+  let rest = text;
+  if (exp) {
+    out.exp = `${exp[1]}/${exp[2].slice(-2)}`;
+    rest = text.slice(0, exp.index) + " " + text.slice(exp.index + exp[0].length);
+  }
+  const num = /\d(?:[ -]?\d){12,18}/.exec(rest);
+  if (num) {
+    const digits = num[0].replace(/\D/g, "");
+    if (digits.length >= 13 && digits.length <= 19) out.number = digits;
+  }
+  return out;
+}
+
+/** Longueur attendue du numéro selon la marque (Amex 15, autres 16). */
+export function expectedLength(number: string) {
+  return cardBrand(number) === "Amex" ? 15 : 16;
+}

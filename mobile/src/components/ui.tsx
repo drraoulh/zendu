@@ -1,5 +1,5 @@
 import { router } from "expo-router";
-import { useState, type ReactNode } from "react";
+import { useState, type ReactNode, type Ref } from "react";
 import {
   ActivityIndicator,
   KeyboardAvoidingView,
@@ -304,8 +304,10 @@ export function Field({
   style,
   onFocus,
   onBlur,
+  right,
+  ref,
   ...props
-}: TextInputProps & { label: string; error?: string | null; hint?: string; left?: ReactNode }) {
+}: TextInputProps & { label: string; error?: string | null; hint?: string; left?: ReactNode; right?: ReactNode; ref?: Ref<TextInput> }) {
   const [focused, setFocused] = useState(false);
   return (
     <View style={{ marginBottom: 14 }}>
@@ -313,6 +315,7 @@ export function Field({
       <View style={[styles.input, focused && { borderColor: colors.brand }, error ? { borderColor: colors.danger } : null]}>
         {left}
         <TextInput
+          ref={ref}
           placeholderTextColor="#8a94ad"
           accessibilityLabel={label}
           style={[styles.inputText, style]}
@@ -326,6 +329,7 @@ export function Field({
           }}
           {...props}
         />
+        {right}
       </View>
       {error ? <Text style={styles.error}>{error}</Text> : hint ? <Small style={{ marginTop: 4 }}>{hint}</Small> : null}
     </View>
