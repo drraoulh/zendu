@@ -8,7 +8,6 @@ import { colors, fonts } from "@/lib/theme";
 
 const TABS: { name: string; title: string; icon: IconName }[] = [
   { name: "index", title: "Accueil", icon: "home" },
-  { name: "send", title: "Envoyer", icon: "send" },
   { name: "history", title: "Historique", icon: "history" },
   { name: "parcels", title: "Colis", icon: "ship" },
   { name: "profile", title: "Profil", icon: "user" },

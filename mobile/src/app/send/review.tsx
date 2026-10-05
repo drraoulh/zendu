@@ -26,7 +26,7 @@ export default function Review() {
       .catch((e: Error) => setError(e.message));
   }, [draft.corridorId, draft.sendAmount, setDraft]);
 
-  if (!recipient) return <Redirect href="/(tabs)/send" />;
+  if (!recipient) return <Redirect href="/(tabs)" />;
 
   return (
     <Screen

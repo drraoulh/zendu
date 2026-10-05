@@ -16,7 +16,7 @@ export default function Pay() {
   const [adding, setAdding] = useState(cards.length === 0);
   const quote = draft.quote;
 
-  if (!draft.recipient || !quote) return <Redirect href="/(tabs)/send" />;
+  if (!draft.recipient || !quote) return <Redirect href="/(tabs)" />;
 
   function pay(cardId: string) {
     setDraft({ cardId });

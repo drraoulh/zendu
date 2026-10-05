@@ -6,7 +6,7 @@ import { countryName, etaLabel, money, parseAmount, rate } from "@/lib/format";
 import { colors, fonts, radius } from "@/lib/theme";
 import { Flag } from "./flag";
 import { Icon } from "./icons";
-import { Button, Divider, SummaryRow } from "./ui";
+import { Button } from "./ui";
 
 /**
  * Simulateur de transfert : choix du trajet, montant, devis en direct (API /api/quotes).
@@ -100,62 +100,74 @@ export function Simulator({
     onChange({ corridorId: next.id, sendAmount: amount, quote: null });
   }
 
-  // Jusqu'à ~400 px : écart réduit pour que « Cameroun » tienne en entier à côté du bouton d'inversion.
-  const narrow = useWindowDimensions().width < 400;
+  // Petits écrans (iPhone SE) : chiffres plus petits pour que « 80 770 » tienne à côté de la pastille.
+  const compact = useWindowDimensions().width < 360;
+  const amountSize = compact ? { fontSize: 24 } : null;
+  const sendUnit = corridor.sendCurrency === "XAF" ? "FCFA" : corridor.sendCurrency;
+  const receiveUnit = corridor.receiveCurrency === "XAF" ? "FCFA" : corridor.receiveCurrency;
 
   return (
     <View style={s.card}>
-      <View style={[s.route, narrow && { gap: 4 }]}>
-        <CountryButton label="De" code={corridor.source} onPress={() => setPicker("source")} />
+      <View style={s.row}>
+        <View style={s.amountCol}>
+          <Text style={s.fieldLabel}>Vous envoyez</Text>
+          <TextInput
+            value={text}
+            onChangeText={(t) => setText(t.replace(/[^\d.,]/g, ""))}
+            keyboardType="decimal-pad"
+            inputMode="decimal"
+            accessibilityLabel="Montant envoyé"
+            style={[s.amountInput, amountSize]}
+            maxLength={10}
+          />
+        </View>
+        <CountryPill compact={compact} code={corridor.source} unit={sendUnit} label="Pays d'envoi" onPress={() => setPicker("source")} />
+      </View>
+
+      <View style={s.middle}>
         <Pressable accessibilityRole="button" accessibilityLabel="Inverser le trajet" onPress={swap} style={s.swap} hitSlop={6}>
           <Icon name="swap" color={colors.brand} size={18} />
         </Pressable>
-        <CountryButton label="Vers" code={corridor.destination} onPress={() => setPicker("destination")} />
+        <View style={{ flex: 1, gap: 2 }}>
+          {error ? (
+            <Text style={s.error} accessibilityRole="alert">{error}</Text>
+          ) : current ? (
+            <>
+              <Text style={s.rateText}>
+                1 {current.sendCurrency} = {rate(current.rate)} {current.receiveCurrency}
+              </Text>
+              <Text style={s.hint}>
+                Frais {money(current.fee, current.sendCurrency)} · {etaLabel(current.deliveryEstimate)}
+              </Text>
+            </>
+          ) : (
+            <Text style={s.hint}>Calcul du taux…</Text>
+          )}
+        </View>
       </View>
 
-      <Text style={s.fieldLabel}>Vous envoyez</Text>
-      <View style={s.amountBox}>
-        <TextInput
-          value={text}
-          onChangeText={(t) => setText(t.replace(/[^\d.,]/g, ""))}
-          keyboardType="decimal-pad"
-          inputMode="decimal"
-          accessibilityLabel="Montant envoyé"
-          style={s.amountInput}
-          maxLength={10}
-        />
-        <Text style={s.currency}>{corridor.sendCurrency === "XAF" ? "FCFA" : corridor.sendCurrency}</Text>
+      <View style={[s.row, s.rowReceive]}>
+        <View style={s.amountCol}>
+          <Text style={s.fieldLabel}>Ils reçoivent</Text>
+          {loading ? (
+            <ActivityIndicator color={colors.brand} style={{ alignSelf: "flex-start", marginVertical: 10 }} />
+          ) : (
+            <Text style={[s.amountInput, amountSize, { color: colors.brand }]} numberOfLines={1} adjustsFontSizeToFit>
+              {current ? money(current.receiveAmount, current.receiveCurrency).replace(/\s\S+$/, "") : "—"}
+            </Text>
+          )}
+        </View>
+        <CountryPill compact={compact} code={corridor.destination} unit={receiveUnit} label="Pays de réception" onPress={() => setPicker("destination")} />
       </View>
 
-      <Text style={[s.fieldLabel, { marginTop: 14 }]}>Le bénéficiaire reçoit</Text>
-      <View style={[s.amountBox, { backgroundColor: colors.brandSoft, borderColor: colors.brandSoft }]}>
-        {loading ? (
-          <ActivityIndicator color={colors.brand} />
-        ) : (
-          <Text style={[s.amountInput, { color: colors.brand }]} numberOfLines={1} adjustsFontSizeToFit>
-            {current ? money(current.receiveAmount, current.receiveCurrency).replace(/\s\S+$/, "") : "—"}
-          </Text>
-        )}
-        <Text style={[s.currency, { color: colors.brand }]}>{corridor.receiveCurrency === "XAF" ? "FCFA" : corridor.receiveCurrency}</Text>
-      </View>
+      {current ? (
+        <View style={s.total}>
+          <Text style={s.hint}>Total à payer</Text>
+          <Text style={s.totalValue}>{money(current.total, current.sendCurrency)}</Text>
+        </View>
+      ) : null}
 
-      <View style={{ marginTop: 12 }}>
-        {error ? (
-          <Text style={s.error} accessibilityRole="alert">{error}</Text>
-        ) : current ? (
-          <>
-            <SummaryRow label="Taux appliqué" value={`1 ${current.sendCurrency} = ${rate(current.rate)} ${current.receiveCurrency}`} />
-            <SummaryRow label="Frais" value={money(current.fee, current.sendCurrency)} />
-            <Divider />
-            <SummaryRow label="Total à payer" value={money(current.total, current.sendCurrency)} strong />
-            <SummaryRow label="Délai estimé" value={etaLabel(current.deliveryEstimate)} />
-          </>
-        ) : (
-          <Text style={s.hint}>Calcul du devis…</Text>
-        )}
-      </View>
-
-      {onContinue ? <Button title={ctaLabel} icon="send" onPress={onContinue} disabled={!current} style={{ marginTop: 16 }} /> : null}
+      {onContinue ? <Button title={ctaLabel} icon="send" onPress={onContinue} disabled={!current} style={{ marginTop: 14 }} /> : null}
 
       <CountryPicker
         visible={picker != null}
@@ -168,24 +180,19 @@ export function Simulator({
   );
 }
 
-function CountryButton({ label, code, onPress }: { label: string; code: string; onPress: () => void }) {
-  // Écran étroit (< 400 px, ex. 375 px) : le drapeau monte à côté de « De / Vers » pour laisser toute la
-  // largeur au nom du pays ; sous 360 px, la police du nom réduit d'un point.
-  const width = useWindowDimensions().width;
-  const narrow = width < 400;
+/** Pastille pays + devise, comme sur les convertisseurs des applis de transfert. */
+function CountryPill({ code, unit, label, onPress, compact = false }: { code: string; unit: string; label: string; onPress: () => void; compact?: boolean }) {
   return (
-    <Pressable accessibilityRole="button" accessibilityLabel={`${label} ${countryName(code)}, modifier`} onPress={onPress} style={[s.country, narrow && { paddingHorizontal: 6 }]}>
-      <View style={{ flexDirection: "row", alignItems: "center", justifyContent: "space-between" }}>
-        <View style={{ flexDirection: "row", alignItems: "center", gap: 6 }}>
-          {narrow ? <Flag code={code} size={16} /> : null}
-          <Text style={s.countryLabel}>{label}</Text>
-        </View>
-        <Icon name="chevDown" size={14} color={colors.muted} />
-      </View>
-      <View style={{ flexDirection: "row", alignItems: "center", gap: 8 }}>
-        {narrow ? null : <Flag code={code} size={20} />}
-        <Text style={[s.countryName, width < 360 && { fontSize: 13 }]} numberOfLines={1}>{countryName(code)}</Text>
-      </View>
+    <Pressable
+      accessibilityRole="button"
+      accessibilityLabel={`${label} : ${countryName(code)}, ${unit}. Modifier`}
+      onPress={onPress}
+      hitSlop={4}
+      style={({ pressed }) => [s.pill, compact && { paddingHorizontal: 8, gap: 4 }, pressed && { opacity: 0.8 }]}
+    >
+      <Flag code={code} size={compact ? 18 : 22} />
+      <Text style={[s.pillText, compact && { fontSize: 13 }]}>{unit}</Text>
+      <Icon name="chevDown" size={14} color={colors.muted} />
     </Pressable>
   );
 }
@@ -233,17 +240,21 @@ function CountryPicker({
 export type { CorridorMeta };
 
 const s = StyleSheet.create({
-  card: { backgroundColor: colors.white, borderRadius: radius.xl, padding: 18, borderWidth: 1, borderColor: colors.line, shadowColor: colors.navy, shadowOpacity: 0.08, shadowRadius: 20, shadowOffset: { width: 0, height: 8 }, elevation: 3 },
-  route: { flexDirection: "row", alignItems: "center", gap: 8, marginBottom: 16 },
-  country: { flex: 1, backgroundColor: colors.bg, borderRadius: radius.md, paddingVertical: 10, paddingHorizontal: 9, gap: 4 },
-  countryLabel: { fontSize: 11, color: colors.muted, textTransform: "uppercase", letterSpacing: 0.6 },
-  countryName: { fontFamily: fonts.semibold, fontSize: 14, color: colors.ink, flexShrink: 1 },
+  card: { backgroundColor: colors.white, borderRadius: radius.xl, padding: 14, borderWidth: 1, borderColor: colors.line, shadowColor: colors.navy, shadowOpacity: 0.08, shadowRadius: 20, shadowOffset: { width: 0, height: 8 }, elevation: 3 },
+  row: { flexDirection: "row", alignItems: "center", gap: 10, backgroundColor: colors.bg, borderRadius: radius.lg, paddingHorizontal: 14, paddingVertical: 10 },
+  rowReceive: { backgroundColor: colors.brandSoft },
+  amountCol: { flex: 1, minWidth: 0 },
+  fieldLabel: { fontFamily: fonts.semibold, fontSize: 12, color: colors.muted },
+  // minWidth 0 : sans lui, sur le web, le champ garde la largeur par défaut d'un <input> et pousse la pastille hors du cadre.
+  amountInput: { minWidth: 0, fontFamily: fonts.display, fontSize: 30, color: colors.navy, paddingVertical: 4, ...(Platform.OS === "web" ? { outlineStyle: "none" as never } : null) },
+  pill: { flexDirection: "row", alignItems: "center", gap: 6, backgroundColor: colors.white, borderRadius: radius.pill, paddingHorizontal: 10, minHeight: 44, borderWidth: 1, borderColor: colors.line },
+  pillText: { fontFamily: fonts.heading, fontSize: 15, color: colors.ink },
+  middle: { flexDirection: "row", alignItems: "center", gap: 12, paddingVertical: 10, paddingHorizontal: 6 },
   swap: { width: 44, height: 44, borderRadius: 22, backgroundColor: colors.brandSoft, alignItems: "center", justifyContent: "center" },
-  fieldLabel: { fontFamily: fonts.semibold, fontSize: 13, color: colors.muted, marginBottom: 6 },
-  amountBox: { flexDirection: "row", alignItems: "center", borderWidth: 1.5, borderColor: colors.line, borderRadius: radius.md, paddingHorizontal: 14, minHeight: 60 },
-  // minWidth 0 : sans lui, sur le web, le champ garde la largeur par défaut d'un <input> et pousse la devise hors du cadre.
-  amountInput: { flex: 1, minWidth: 0, fontFamily: fonts.display, fontSize: 26, color: colors.navy, paddingVertical: 10, ...(Platform.OS === "web" ? { outlineStyle: "none" as never } : null) },
-  currency: { fontFamily: fonts.heading, fontSize: 16, color: colors.navy, marginLeft: 8 },
+  rateText: { fontFamily: fonts.heading, fontSize: 14, color: colors.ink },
+  total: { flexDirection: "row", justifyContent: "space-between", alignItems: "center", paddingHorizontal: 6, paddingTop: 12 },
+  totalValue: { fontFamily: fonts.heading, fontSize: 16, color: colors.ink },
+  countryName: { fontFamily: fonts.semibold, fontSize: 14, color: colors.ink, flexShrink: 1 },
   error: { color: colors.danger, fontSize: 14 },
   hint: { color: colors.muted, fontSize: 13 },
   backdrop: { flex: 1, backgroundColor: "rgba(4,15,51,0.45)", justifyContent: "flex-end" },

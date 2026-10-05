@@ -89,7 +89,7 @@ export default function History() {
               icon="history"
               title="Aucun transfert"
               text="Vos transferts apparaîtront ici, avec leur suivi en temps réel."
-              action={<Button title="Envoyer de l'argent" size="sm" onPress={() => router.push("/(tabs)/send")} />}
+              action={<Button title="Envoyer de l'argent" size="sm" onPress={() => router.push("/(tabs)")} />}
             />
           )}
         </Card>
