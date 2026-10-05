@@ -295,7 +295,7 @@ function FeesCard({ d }: { d: DestinationInfo }) {
         </p>
         <Link
           href={simulateHref(d.corridorId)}
-          className="inline-flex items-center gap-1 rounded-full bg-brand-soft px-3 py-1.5 text-xs font-semibold text-brand-strong hover:bg-brand hover:text-white"
+          className="inline-flex min-h-10 items-center gap-1 rounded-full bg-brand-soft px-3 py-1.5 text-xs font-semibold text-brand-strong hover:bg-brand hover:text-white"
         >
           {t("simulate")}
           <Icon name="arrowRight" className="h-3.5 w-3.5" />

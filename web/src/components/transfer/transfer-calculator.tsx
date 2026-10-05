@@ -570,7 +570,7 @@ export function TransferCalculator({
             )}
             <Link
               href="/frais"
-              className="inline-flex items-center gap-1 rounded text-xs font-semibold text-brand underline-offset-2 hover:text-brand-strong hover:underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand/40"
+              className="inline-flex min-h-10 items-center gap-1 rounded text-xs font-semibold text-brand underline-offset-2 sm:min-h-0 hover:text-brand-strong hover:underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand/40"
             >
               {t("allFees")}
               <Icon name="arrowRight" className="h-3.5 w-3.5" />

@@ -351,7 +351,7 @@ export function HelpArticleView({ slug, numbers }: { slug: string; numbers: Help
                     <li key={r.slug}>
                       <Link
                         href={`/aide/${r.slug}`}
-                        className="flex gap-2 rounded-xl px-2 py-2 text-sm text-muted transition hover:bg-surface-soft hover:text-brand-strong"
+                        className="flex gap-2 rounded-xl px-2 py-2.5 text-sm text-muted transition hover:bg-surface-soft hover:text-brand-strong"
                       >
                         <Icon name="arrowRight" className="mt-0.5 h-4 w-4 shrink-0 text-brand" />
                         {fill(articleText(r, locale).q, vars)}

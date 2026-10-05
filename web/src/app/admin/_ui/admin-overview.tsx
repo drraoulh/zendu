@@ -23,7 +23,7 @@ function Bars({ rows, total }: { rows: { label: string; count: number; href?: st
         <li key={r.label}>
           <div className="flex items-center justify-between gap-2 text-sm">
             {r.href ? (
-              <Link href={r.href} className="truncate text-ink hover:text-brand hover:underline">
+              <Link href={r.href} className="-my-2.5 truncate py-2.5 text-ink hover:text-brand hover:underline sm:my-0 sm:py-0">
                 {r.label}
               </Link>
             ) : (
@@ -116,7 +116,7 @@ export function AdminOverview({ data }: { data: Data | null }) {
           id="ov-customers"
           title={tc("ovCustomers")}
           actions={
-            <Link href="/admin/clients" className="text-sm font-semibold text-brand hover:underline">
+            <Link href="/admin/clients" className="inline-flex min-h-10 items-center text-sm font-semibold text-brand hover:underline sm:min-h-0">
               {t("seeAll")}
             </Link>
           }
@@ -143,7 +143,7 @@ export function AdminOverview({ data }: { data: Data | null }) {
           id="ov-kind"
           title={t("requestsByKind")}
           actions={
-            <Link href="/admin/demandes" className="text-sm font-semibold text-brand hover:underline">
+            <Link href="/admin/demandes" className="inline-flex min-h-10 items-center text-sm font-semibold text-brand hover:underline sm:min-h-0">
               {t("seeAll")}
             </Link>
           }
@@ -184,7 +184,7 @@ export function AdminOverview({ data }: { data: Data | null }) {
           id="ov-ship"
           title={t("shipmentsByStatus")}
           actions={
-            <Link href="/admin/colis" className="text-sm font-semibold text-brand hover:underline">
+            <Link href="/admin/colis" className="inline-flex min-h-10 items-center text-sm font-semibold text-brand hover:underline sm:min-h-0">
               {t("seeAll")}
             </Link>
           }
@@ -207,7 +207,7 @@ export function AdminOverview({ data }: { data: Data | null }) {
           id="ov-transfers"
           title={t("transfersByStatus")}
           actions={
-            <Link href="/admin/transferts" className="text-sm font-semibold text-brand hover:underline">
+            <Link href="/admin/transferts" className="inline-flex min-h-10 items-center text-sm font-semibold text-brand hover:underline sm:min-h-0">
               {t("seeAll")}
             </Link>
           }
@@ -229,7 +229,7 @@ export function AdminOverview({ data }: { data: Data | null }) {
         id="ov-recent"
         title={t("recentRequests")}
         actions={
-          <Link href="/admin/demandes" className="text-sm font-semibold text-brand hover:underline">
+          <Link href="/admin/demandes" className="inline-flex min-h-10 items-center text-sm font-semibold text-brand hover:underline sm:min-h-0">
             {t("seeAll")}
           </Link>
         }

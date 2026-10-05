@@ -84,7 +84,7 @@ export function ReceiptView({
       <div className="mx-auto flex max-w-2xl flex-wrap items-center justify-between gap-3 px-4 sm:px-6 print:hidden">
         <Link
           href={`/transfers/${transferId}`}
-          className="inline-flex items-center gap-1.5 text-sm font-semibold text-brand hover:text-brand-strong"
+          className="inline-flex min-h-10 items-center gap-1.5 text-sm font-semibold text-brand hover:text-brand-strong"
         >
           <Icon name="arrowRight" className="h-4 w-4 rotate-180" />
           {t("backToTransfer")}

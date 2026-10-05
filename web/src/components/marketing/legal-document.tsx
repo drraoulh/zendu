@@ -80,7 +80,7 @@ function LegalDocument<K extends string>({
         <li key={s.id}>
           <a
             href={`#${s.id}`}
-            className="flex gap-3 rounded-xl px-3 py-2 text-muted transition hover:bg-surface-soft hover:text-brand-strong"
+            className="flex gap-3 rounded-xl px-3 py-2.5 text-muted transition hover:bg-surface-soft hover:text-brand-strong"
           >
             <span className="w-5 shrink-0 font-display font-bold text-brand">{s.n}.</span>
             <span>{s.title}</span>
@@ -147,7 +147,7 @@ function LegalDocument<K extends string>({
                   className="mt-1 inline-block break-all text-sm font-semibold text-brand hover:text-brand-strong"
                 />
                 {!company.email && (
-                  <Link href="/contact" className="mt-1 block text-sm font-semibold text-brand hover:text-brand-strong">
+                  <Link href="/contact" className="mt-1 inline-flex min-h-10 items-center text-sm font-semibold text-brand hover:text-brand-strong">
                     {l("contactUs")}
                   </Link>
                 )}
@@ -156,7 +156,7 @@ function LegalDocument<K extends string>({
                 )}
               </div>
               <div className="flex flex-wrap gap-x-5 gap-y-2 text-sm font-semibold">
-                <Link href={other.href} className="inline-flex items-center gap-1.5 text-brand hover:text-brand-strong">
+                <Link href={other.href} className="inline-flex min-h-10 items-center gap-1.5 text-brand hover:text-brand-strong">
                   <span className="font-normal text-muted">{l("seeAlso")}</span>
                   {other.label}
                   <Icon name="arrowRight" className="h-4 w-4" />
@@ -164,7 +164,7 @@ function LegalDocument<K extends string>({
                 <button
                   type="button"
                   onClick={() => window.scrollTo({ top: 0, behavior: "smooth" })}
-                  className="text-muted hover:text-ink"
+                  className="min-h-10 text-muted hover:text-ink"
                 >
                   {l("backToTop")}
                 </button>

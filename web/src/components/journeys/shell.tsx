@@ -33,7 +33,7 @@ export function JourneyShell({
         <Container className="relative pb-24 pt-10 sm:pb-28 sm:pt-14">
           <Link
             href={back.href}
-            className="inline-flex items-center gap-1.5 rounded-full text-sm font-semibold text-white/75 transition hover:text-white focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-white/30"
+            className="inline-flex min-h-10 items-center gap-1.5 rounded-full text-sm font-semibold text-white/75 transition hover:text-white focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-white/30"
           >
             <Icon name="arrowRight" className="h-4 w-4 rotate-180" />
             {back.label}

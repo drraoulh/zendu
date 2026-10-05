@@ -130,7 +130,7 @@ export function RequestDetail({ request }: { request: AdminRequest }) {
 
   return (
     <div className="space-y-6">
-      <Link href="/admin/demandes" className="inline-flex items-center gap-1.5 text-sm font-semibold text-brand hover:underline">
+      <Link href="/admin/demandes" className="inline-flex min-h-10 items-center gap-1.5 text-sm font-semibold text-brand hover:underline">
         <Icon name="arrowRight" className="h-4 w-4 rotate-180" />
         {t("backRequests")}
       </Link>

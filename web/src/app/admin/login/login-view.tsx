@@ -92,7 +92,7 @@ export function LoginView({ mode, next, loggedOut }: { mode: AdminMode; next: st
             </>
           )}
 
-          <Link href="/" className="mt-6 inline-flex items-center gap-1.5 text-sm font-semibold text-brand hover:underline">
+          <Link href="/" className="mt-6 inline-flex min-h-10 items-center gap-1.5 text-sm font-semibold text-brand hover:underline">
             {t("backToSite")}
           </Link>
         </div>

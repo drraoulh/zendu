@@ -61,7 +61,7 @@ export function CustomerDetail({ initial }: { initial: Detail }) {
 
   return (
     <div className="space-y-6">
-      <Link href="/admin/clients" className="inline-flex items-center gap-1.5 text-sm font-semibold text-brand hover:underline">
+      <Link href="/admin/clients" className="inline-flex min-h-10 items-center gap-1.5 text-sm font-semibold text-brand hover:underline">
         ← {t("back")}
       </Link>
       <PageTitle

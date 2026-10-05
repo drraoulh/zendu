@@ -144,7 +144,7 @@ export function TransferTracker({
           <div className="flex flex-wrap items-center justify-between gap-3">
             <Link
               href="/history"
-              className="inline-flex items-center gap-1.5 text-sm font-semibold text-white/75 hover:text-white"
+              className="inline-flex min-h-10 items-center gap-1.5 text-sm font-semibold text-white/75 hover:text-white"
             >
               <Icon name="arrowRight" className="h-4 w-4 rotate-180" />
               {t("myTransfers")}

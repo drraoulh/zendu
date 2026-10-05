@@ -354,7 +354,7 @@ export function ArrowLink({ href, children, light = false }: { href: string; chi
   return (
     <Link
       href={href}
-      className={`inline-flex items-center gap-1.5 text-sm font-semibold transition ${
+      className={`inline-flex min-h-10 items-center gap-1.5 text-sm font-semibold transition ${
         light ? "text-sky hover:text-white" : "text-brand hover:text-brand-strong"
       }`}
     >

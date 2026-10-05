@@ -149,7 +149,7 @@ export function ApplicationContent({
             ))}
           </div>
           <div className="mt-10 text-center">
-            <Link href="/transfert" className="inline-flex items-center gap-2 font-semibold text-brand hover:underline">
+            <Link href="/transfert" className="inline-flex min-h-10 items-center gap-2 font-semibold text-brand hover:underline">
               {t("alsoSimulate")}
               <Icon name="arrowRight" className="h-4 w-4" />
             </Link>
