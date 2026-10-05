@@ -11,9 +11,7 @@ import { useStore } from "@/lib/store";
 
 const SUBJECTS = [
   { value: "transfert", label: "Transfert" },
-  { value: "shipping", label: "Shipping" },
-  { value: "finances", label: "Finances" },
-  { value: "technologies", label: "Technologies" },
+  { value: "shipping", label: "Colis" },
   { value: "autre", label: "Autre" },
 ] as const;
 

@@ -162,7 +162,7 @@ export default function Kyc() {
         <ListItem icon="send" title="Envoyer de l'argent" subtitle="Mobile Money, virement bancaire, retrait" />
         <ListItem icon="user" title="Enregistrer vos destinataires" subtitle="Vos proches, en un geste" />
         <ListItem icon="history" title="Suivre chaque transfert" subtitle="Étapes en temps réel et reçus" />
-        <ListItem icon="grid" title="Découvrir PWFINTECH" subtitle="Finances, Technologies et Shipping" />
+        <ListItem icon="ship" title="Suivre vos colis" subtitle="Avec votre numéro de suivi PWS-…" />
       </Card>
       {bioMessage ? (
         <View style={{ marginTop: 12 }}>

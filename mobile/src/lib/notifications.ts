@@ -38,9 +38,9 @@ export function buildNotifications(transfers: Transfer[], profile: Profile | nul
   }
   for (const r of requests) {
     const titles: Record<ServiceRequest["kind"], string> = {
-      shipping_quote: "Demande de devis Shipping reçue",
-      finance_appointment: "Rendez-vous Finances confirmé",
-      tech_project: "Demande Technologies envoyée",
+      shipping_quote: "Demande d'expédition reçue",
+      finance_appointment: "Rendez-vous confirmé",
+      tech_project: "Demande envoyée",
       contact: "Message envoyé au support",
     };
     list.push({ id: `req:${r.reference}`, icon: r.kind === "shipping_quote" ? "ship" : r.kind === "finance_appointment" ? "finance" : r.kind === "tech_project" ? "tech" : "mail", tone: "brand", title: titles[r.kind], text: `Référence ${r.reference}`, at: r.createdAt });

@@ -21,9 +21,9 @@ const SLIDES: { icon: IconName; title: string; text: string }[] = [
     text: "Vous voyez le taux, les frais et le total avant de payer, puis chaque étape jusqu'à la livraison.",
   },
   {
-    icon: "grid",
-    title: "Découvrez aussi l'univers PWFINTECH",
-    text: "WorldSoft Transfer est une solution PWFINTECH. Depuis l'appli, découvrez aussi ses pôles Finances, Technologies et Shipping.",
+    icon: "ship",
+    title: "Suivez aussi vos colis",
+    text: "Vous expédiez avec PWFINTECH ? Suivez votre colis étape par étape avec son numéro de suivi, directement dans l'appli.",
   },
 ];
 

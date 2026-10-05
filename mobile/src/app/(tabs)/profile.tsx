@@ -1,13 +1,13 @@
 import { router, type Href } from "expo-router";
 import { useState } from "react";
-import { Pressable, Text, View, useWindowDimensions } from "react-native";
+import { Text, View } from "react-native";
 import { PoweredBy } from "@/components/brand";
 import { Avatar, ConfirmDialog, SectionTitle } from "@/components/form";
-import { Icon, type IconName } from "@/components/icons";
+import { Icon } from "@/components/icons";
 import { Badge, Card, ListItem, Screen, Small } from "@/components/ui";
 import { referralCode, useSession } from "@/lib/session";
 import { useStore } from "@/lib/store";
-import { colors, fonts, radius } from "@/lib/theme";
+import { colors, fonts } from "@/lib/theme";
 
 const LANG: Record<string, string> = { fr: "Français", en: "English", es: "Español", zh: "中文" };
 
@@ -15,7 +15,6 @@ export default function Profile() {
   const { profile, settings, signOut } = useSession();
   const { cards, recipients } = useStore();
   const [confirm, setConfirm] = useState(false);
-  const narrow = useWindowDimensions().width < 360;
   if (!profile) return null;
   const kyc = profile.kyc;
   const card = cards.find((c) => c.isDefault) ?? cards[0];
@@ -49,26 +48,11 @@ export default function Profile() {
         <Icon name="chev" color={colors.brand} size={18} />
       </Card>
 
-      <SectionTitle>Découvrir PWFINTECH</SectionTitle>
-      {narrow ? (
-        // Sur 320 px, « Technologies » ne tient pas dans une tuile d'un tiers de largeur.
-        <Card style={{ paddingVertical: 4 }}>
-          <ListItem icon="finance" title="Finances" onPress={go("/services/finances")} />
-          <ListItem icon="tech" title="Technologies" onPress={go("/services/technologies")} />
-          <ListItem icon="ship" title="Shipping" onPress={go("/services/shipping")} />
-        </Card>
-      ) : (
-        <View style={{ flexDirection: "row", gap: 10 }}>
-          <Tile icon="finance" label="Finances" onPress={go("/services/finances")} />
-          <Tile icon="tech" label="Technologies" onPress={go("/services/technologies")} />
-          <Tile icon="ship" label="Shipping" onPress={go("/services/shipping")} />
-        </View>
-      )}
-
       <SectionTitle>Compte</SectionTitle>
       <Card style={{ paddingVertical: 4 }}>
         <ListItem icon="id" tone="neutral" title="Informations personnelles" onPress={go("/account/info")} />
         <ListItem icon="wallet" tone="neutral" title="Moyens de paiement" subtitle={card ? `•••• ${card.last4}` : "Aucune carte"} onPress={go("/account/payment-methods")} />
+        <ListItem icon="ship" tone="neutral" title="Suivre un colis" onPress={go("/(tabs)/parcels")} />
         <ListItem icon="user" tone="neutral" title="Mes destinataires" subtitle={`${recipients.length} enregistré${recipients.length > 1 ? "s" : ""}`} onPress={go("/recipients")} />
         {kyc === "none" || kyc === "rejected" ? <ListItem icon="shield" tone="warn" title="Vérifier mon identité" onPress={go("/kyc")} /> : null}
       </Card>
@@ -110,21 +94,5 @@ export default function Profile() {
         }}
       />
     </Screen>
-  );
-}
-
-function Tile({ icon, label, onPress }: { icon: IconName; label: string; onPress: () => void }) {
-  return (
-    <Pressable
-      accessibilityRole="button"
-      onPress={onPress}
-      style={({ pressed }) => [
-        { flex: 1, backgroundColor: colors.white, borderRadius: radius.md, borderWidth: 1, borderColor: colors.line, padding: 12, alignItems: "center", gap: 6 },
-        pressed && { opacity: 0.85 },
-      ]}
-    >
-      <Icon name={icon} color={colors.brand} />
-      <Text style={{ fontFamily: fonts.semibold, fontSize: 12, color: colors.ink }} numberOfLines={1}>{label}</Text>
-    </Pressable>
   );
 }

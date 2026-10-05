@@ -15,8 +15,7 @@ export default function NotificationSettings() {
       <Card style={{ paddingVertical: 4 }}>
         <ToggleRow icon="send" label="Statut des transferts" sub="Paiement reçu, versé, livré" value={n.transfers} onChange={set("transfers")} />
         <ToggleRow icon="finance" label="Alertes de taux" sub="Quand le taux devient favorable" value={n.rates} onChange={set("rates")} />
-        <ToggleRow icon="ship" label="Shipping" sub="Étapes de vos colis" value={n.shipping} onChange={set("shipping")} />
-        <ToggleRow icon="clock" label="Rendez-vous finances" sub="Rappel la veille du rendez-vous" value={n.finance} onChange={set("finance")} />
+        <ToggleRow icon="ship" label="Colis" sub="Étapes de vos colis" value={n.shipping} onChange={set("shipping")} />
         <ToggleRow icon="bell" label="Offres et nouveautés" sub="Au plus une fois par mois" value={n.offers} onChange={set("offers")} />
       </Card>
       <SectionTitle>Canaux</SectionTitle>

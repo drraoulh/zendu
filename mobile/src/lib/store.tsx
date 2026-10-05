@@ -8,7 +8,7 @@ export type Recipient = BeneficiaryInput & { id: string; country: string; relati
 /** Carte enregistrée : seuls la marque, les 4 derniers chiffres et l'expiration sont conservés. */
 export type SavedCard = { id: string; brand: "Visa" | "Mastercard" | "Amex" | "Carte"; last4: string; exp: string; holder: string; isDefault: boolean };
 
-/** Demande de service envoyée depuis l'appli (Shipping, Finances, Technologies, Contact). */
+/** Demande de service envoyée depuis l'appli (contact, réinitialisation…). */
 export type ServiceRequest = {
   reference: string;
   kind: "shipping_quote" | "finance_appointment" | "tech_project" | "contact";

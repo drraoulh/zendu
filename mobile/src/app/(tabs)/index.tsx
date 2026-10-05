@@ -1,23 +1,17 @@
-import { router, type Href } from "expo-router";
+import { router } from "expo-router";
 import { useEffect, useRef } from "react";
-import { Pressable, StyleSheet, Text, View, useWindowDimensions } from "react-native";
+import { Pressable, StyleSheet, Text, View } from "react-native";
 import { WstSymbol } from "@/components/brand";
-import { Icon, type IconName } from "@/components/icons";
+import { Icon } from "@/components/icons";
 import { Simulator } from "@/components/simulator";
 import { TransferRow } from "@/components/transfer-row";
 import { Button, Card, Empty, H2, Screen, Small } from "@/components/ui";
 import { defaultCorridorFor, SAMPLE_AMOUNT } from "@/lib/corridors";
 import { useSession } from "@/lib/session";
 import { useStore } from "@/lib/store";
-import { colors, fonts, radius } from "@/lib/theme";
+import { colors, fonts } from "@/lib/theme";
 import { useNotifications } from "@/lib/use-notifications";
 import { useMyTransfers } from "@/lib/use-transfers";
-
-const POLES: { icon: IconName; label: string; href: Href }[] = [
-  { icon: "finance", label: "Finances", href: "/services/finances" },
-  { icon: "tech", label: "Technologies", href: "/services/technologies" },
-  { icon: "ship", label: "Shipping", href: "/services/shipping" },
-];
 
 export default function Home() {
   const { profile } = useSession();
@@ -25,8 +19,6 @@ export default function Home() {
   const { items, loading } = useMyTransfers(3);
   const { unread } = useNotifications();
   const kyc = profile?.kyc ?? "none";
-  // Écrans étroits (iPhone SE 1re gén.) : « Technologies » ne tient pas sur un tiers de largeur.
-  const narrow = useWindowDimensions().width < 360;
 
   // Premier affichage pour ce compte : trajet au départ de son pays de résidence.
   const seeded = useRef<string | null>(null);
@@ -85,28 +77,16 @@ export default function Home() {
 
       <Simulator key={draft.corridorId.split("-")[0]} corridorId={draft.corridorId} amount={draft.sendAmount} onChange={(n) => setDraft(n)} onContinue={startSend} ctaLabel="Envoyer" />
 
-      <View style={st.sectionHead}>
-        <H2 style={{ fontSize: 18 }}>Découvrir PWFINTECH</H2>
-        <Pressable onPress={() => router.push("/(tabs)/discover")} hitSlop={8}>
-          <Text style={st.link}>En savoir plus</Text>
-        </Pressable>
-      </View>
-      <View style={{ flexDirection: narrow ? "column" : "row", gap: narrow ? 8 : 10 }}>
-        {POLES.map((p) => (
-          <Pressable
-            key={p.label}
-            accessibilityRole="button"
-            onPress={() => router.push(p.href)}
-            style={({ pressed }) => [st.pole, narrow && st.poleRow, pressed && { opacity: 0.85 }]}
-          >
-            <View style={st.poleIcon}>
-              <Icon name={p.icon} color={colors.brand} />
-            </View>
-            <Text style={[st.poleLabel, narrow && { flex: 1, fontSize: 14 }]} numberOfLines={1}>{p.label}</Text>
-            {narrow ? <Icon name="chev" color={colors.muted} size={18} /> : null}
-          </Pressable>
-        ))}
-      </View>
+      <Card onPress={() => router.push("/(tabs)/parcels")} style={{ marginTop: 16, flexDirection: "row", alignItems: "center", gap: 12 }}>
+        <View style={st.poleIcon}>
+          <Icon name="ship" color={colors.brand} />
+        </View>
+        <View style={{ flex: 1 }}>
+          <Text style={st.poleLabel}>Suivre un colis</Text>
+          <Small>Saisissez votre numéro PWS-… pour voir où en est votre envoi.</Small>
+        </View>
+        <Icon name="chev" color={colors.muted} size={18} />
+      </Card>
 
       <View style={st.sectionHead}>
         <H2 style={{ fontSize: 18 }}>Transferts récents</H2>
@@ -142,8 +122,6 @@ const st = StyleSheet.create({
   hello: { fontFamily: fonts.display, fontSize: 26, color: colors.navy },
   sectionHead: { flexDirection: "row", justifyContent: "space-between", alignItems: "center", marginTop: 24, marginBottom: 10 },
   link: { color: colors.brand, fontFamily: fonts.semibold, fontSize: 14 },
-  pole: { flex: 1, backgroundColor: colors.white, borderRadius: radius.md, borderWidth: 1, borderColor: colors.line, padding: 10, gap: 8, alignItems: "flex-start" },
-  poleRow: { flexDirection: "row", alignItems: "center", gap: 12 },
   poleIcon: { width: 38, height: 38, borderRadius: 12, backgroundColor: colors.brandSoft, alignItems: "center", justifyContent: "center" },
-  poleLabel: { fontFamily: fonts.semibold, fontSize: 12, color: colors.ink },
+  poleLabel: { fontFamily: fonts.heading, fontSize: 15, color: colors.ink, marginBottom: 2 },
 });

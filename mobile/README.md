@@ -18,7 +18,7 @@ Sur téléphone, l'API doit être joignable depuis l'appareil : utilisez l'URL V
 Côté serveur (`web/`), autorisez l'origine de l'app web dans `MOBILE_CORS_ORIGINS`
 (inutile pour les apps natives iOS/Android, qui ne sont pas soumises au CORS).
 
-## Écrans (61 de la maquette)
+## Écrans
 
 | Zone | Écrans | Dossier |
 | --- | --- | --- |
@@ -27,11 +27,12 @@ Côté serveur (`web/`), autorisez l'origine de l'app web dans `MOBILE_CORS_ORIG
 | Transfert | accueil + simulateur, montant, destinataire (Mobile Money / banque / retrait), récapitulatif, paiement par carte, traitement, paiement réussi, suivi, reçu | `(tabs)/`, `send/`, `transfer/`, `receipt/` |
 | Historique | recherche, filtres, export ; notifications | `(tabs)/history.tsx`, `notifications.tsx` |
 | Destinataires | liste, fiche, ajout, modification | `recipients/` |
-| PWFINTECH | Découvrir, Finances + rendez-vous (créneaux réels), Technologies + projet, Shipping + devis + suivi de colis | `(tabs)/discover.tsx`, `services/` |
+| Colis | suivi d'un envoi par son numéro PWS-… (onglet Colis), recherches récentes | `(tabs)/parcels.tsx` |
 | Compte | profil, informations, sécurité, mot de passe, appareils, moyens de paiement, ajout de carte, notifications, langue, parrainage, code PIN, aide, article, contact, documents légaux, déconnexion | `(tabs)/profile.tsx`, `account/`, `help/`, `legal.tsx` |
 
-Les demandes de service (contact, devis Shipping, rendez-vous Finances, projet Technologies)
-sont envoyées à l'API du site (`/api/requests`) et apparaissent dans l'admin.
+L'appli se limite au **transfert d'argent** et au **suivi de colis**. Les services Finances,
+Technologies et les demandes d'expédition restent sur le site PWFINTECH. Les messages envoyés
+depuis « Nous contacter » arrivent dans l'admin (`/admin/demandes`).
 
 ## État actuel (à brancher avant la production)
 

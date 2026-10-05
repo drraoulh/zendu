@@ -1,13 +1,12 @@
 import type { IconName } from "@/components/icons";
 
-export type HelpCategory = "transferts" | "paiements" | "compte" | "shipping" | "services";
+export type HelpCategory = "transferts" | "paiements" | "compte" | "shipping";
 
 export const HELP_CATEGORIES: { id: HelpCategory; label: string; icon: IconName }[] = [
   { id: "transferts", label: "Transferts", icon: "send" },
   { id: "paiements", label: "Paiements", icon: "wallet" },
   { id: "compte", label: "Compte & sécurité", icon: "lock" },
-  { id: "shipping", label: "Shipping", icon: "ship" },
-  { id: "services", label: "Finances & Technologies", icon: "grid" },
+  { id: "shipping", label: "Colis", icon: "ship" },
 ];
 
 export type HelpArticle = {
@@ -106,23 +105,15 @@ export const HELP_ARTICLES: HelpArticle[] = [
     ],
   },
   {
-    slug: "shipping-devis",
+    slug: "suivi-colis",
     category: "shipping",
-    title: "Comment obtenir un devis d'expédition ?",
-    intro: "Depuis Découvrir → Shipping, décrivez votre colis : départ, destination, poids et contenu.",
+    faq: true,
+    title: "Comment suivre mon colis ?",
+    intro: "Ouvrez l'onglet Colis et saisissez le numéro de suivi (PWS-…) indiqué sur votre reçu d'expédition.",
     sections: [
-      { title: "Aérien ou maritime", text: "L'aérien est plus rapide pour les colis légers ; le maritime est plus économique pour les envois volumineux." },
-      { title: "Suivi", text: "Une fois le colis expédié, suivez-le avec son numéro PWS-… dans l'appli." },
-    ],
-  },
-  {
-    slug: "services-pwfintech",
-    category: "services",
-    title: "Les services Finances et Technologies",
-    intro: "PWFINTECH accompagne aussi vos projets financiers et numériques.",
-    sections: [
-      { title: "Finances", text: "Conseil budgétaire, épargne, accompagnement des PME et éducation financière, sur rendez-vous en visio ou par téléphone." },
-      { title: "Technologies", text: "Sites web, applis mobiles, solutions de paiement et conseil IT. Décrivez votre projet, l'équipe vous recontacte." },
+      { title: "Étapes du suivi", text: "Colis reçu, en transit, dédouanement, en livraison, puis livré. Chaque étape affiche sa date et son lieu." },
+      { title: "Numéro introuvable", text: "Vérifiez le numéro sur votre reçu. Il peut falloir quelques heures après le dépôt pour qu'il apparaisse." },
+      { title: "Expédier un colis", text: "Les demandes d'expédition se font sur le site PWFINTECH ou auprès de l'équipe." },
     ],
   },
 ];

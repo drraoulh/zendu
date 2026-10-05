@@ -1,9 +1,11 @@
-import { useState } from "react";
+import { useLocalSearchParams } from "expo-router";
+import { useEffect, useState } from "react";
 import { Text, View } from "react-native";
 import { Icon } from "@/components/icons";
-import { Badge, Button, Card, Field, Header, Notice, Screen, Small, SummaryRow } from "@/components/ui";
+import { Badge, Button, Card, Field, H1, ListItem, Notice, P, Screen, Small, SummaryRow } from "@/components/ui";
 import { api, type Shipment } from "@/lib/api";
 import { dateTime } from "@/lib/format";
+import { storage } from "@/lib/storage";
 import { colors, fonts } from "@/lib/theme";
 
 const STATUS: Record<string, { label: string; tone: "brand" | "success" | "warn" | "danger" }> = {
@@ -17,18 +19,32 @@ const STATUS: Record<string, { label: string; tone: "brand" | "success" | "warn"
 
 const ORDER = ["received", "in_transit", "customs", "out_for_delivery", "delivered"];
 
-export default function Tracking() {
-  const [number, setNumber] = useState("");
+const KEY_RECENT = "wst.parcels";
+
+/** Onglet Colis : suivi d'un envoi Shipping par son numéro (PWS-…), numéros récents mémorisés. */
+export default function Parcels() {
+  const params = useLocalSearchParams<{ number?: string }>();
+  const [number, setNumber] = useState(params.number ?? "");
+  const [recent, setRecent] = useState<string[]>([]);
   const [shipment, setShipment] = useState<Shipment | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [busy, setBusy] = useState(false);
 
-  async function search() {
+  useEffect(() => {
+    void storage.get<string[]>(KEY_RECENT).then((l) => setRecent(l ?? []));
+  }, []);
+
+  async function search(value = number) {
     setError(null);
-    if (!number.trim()) return setError("Saisissez votre numéro de suivi (PWS-…)");
+    if (!value.trim()) return setError("Saisissez votre numéro de suivi (PWS-…)");
+    setNumber(value);
     setBusy(true);
     try {
-      setShipment((await api.trackShipment(number.trim())).shipment);
+      const found = (await api.trackShipment(value.trim())).shipment;
+      setShipment(found);
+      const next = [found.number, ...recent.filter((n) => n !== found.number)].slice(0, 5);
+      setRecent(next);
+      void storage.set(KEY_RECENT, next);
     } catch (e) {
       setShipment(null);
       setError(e instanceof Error ? e.message : "Colis introuvable");
@@ -41,14 +57,24 @@ export default function Tracking() {
   const reached = shipment ? ORDER.indexOf(shipment.status) : -1;
 
   return (
-    <Screen>
-      <Header title="Suivi de colis" />
-      <Field label="Numéro de suivi" value={number} onChangeText={setNumber} placeholder="PWS-12345" autoCapitalize="characters" onSubmitEditing={search} />
-      <Button title="Suivre" icon="ship" onPress={search} loading={busy} />
+    <Screen edges={["top"]}>
+      <H1 style={{ marginTop: 8 }}>Suivi de colis</H1>
+      <P style={{ marginTop: 6, marginBottom: 18 }}>Saisissez le numéro de suivi indiqué sur votre reçu d&apos;expédition PWFINTECH.</P>
+      <Field label="Numéro de suivi" value={number} onChangeText={setNumber} placeholder="PWS-12345" autoCapitalize="characters" onSubmitEditing={() => search()} />
+      <Button title="Suivre" icon="ship" onPress={() => search()} loading={busy} />
       {error ? (
         <View style={{ marginTop: 12 }}>
           <Notice tone="danger" icon="alert" text={error} />
         </View>
+      ) : null}
+
+      {!shipment && recent.length ? (
+        <Card style={{ paddingVertical: 4, marginTop: 16 }}>
+          <Small style={{ paddingHorizontal: 4, paddingTop: 8 }}>RECHERCHES RÉCENTES</Small>
+          {recent.map((n) => (
+            <ListItem key={n} icon="ship" title={n} onPress={() => search(n)} />
+          ))}
+        </Card>
       ) : null}
 
       {shipment && st ? (
