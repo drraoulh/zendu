@@ -13,6 +13,19 @@ export default function Review() {
   const [quote, setQuote] = useState<Quote | null>(draft.quote);
   const [error, setError] = useState<string | null>(null);
   const recipient = draft.recipient;
+  // Interac n'existe que pour les envois payés en dollars canadiens.
+  const interacOk = quote ? quote.sendCurrency === "CAD" : draft.corridorId.startsWith("CA-");
+  const method = interacOk ? draft.payMethod : "card";
+
+  function next() {
+    if (method === "interac") {
+      setDraft({ payMethod: "interac", cardId: null });
+      router.push("/send/processing");
+    } else {
+      setDraft({ payMethod: "card" });
+      router.push("/send/pay");
+    }
+  }
 
   // Devis rafraîchi à l'ouverture : c'est ce montant que le serveur appliquera.
   useEffect(() => {
@@ -33,7 +46,12 @@ export default function Review() {
     <Screen
       footer={
         <View style={{ gap: 6 }}>
-          <Button title={quote ? `Payer ${money(quote.total, quote.sendCurrency)}` : "Payer"} icon="lock" onPress={() => router.push("/send/pay")} disabled={!quote} />
+          <Button
+            title={quote ? `${method === "interac" ? "Payer par Interac" : "Payer"} ${money(quote.total, quote.sendCurrency)}` : "Payer"}
+            icon="lock"
+            onPress={next}
+            disabled={!quote}
+          />
           <Small style={{ textAlign: "center" }}>Paiement sécurisé · reçu envoyé par courriel</Small>
         </View>
       }
@@ -71,6 +89,15 @@ export default function Review() {
       </Card>
 
       <H1 style={{ fontSize: 18, marginBottom: 10 }}>Payer avec</H1>
+      {interacOk ? (
+        <Choice
+          leading={<PaymentLogo id="INTERAC" size={22} />}
+          label="Virement Interac"
+          description="Le moins cher · depuis votre appli bancaire"
+          selected={method === "interac"}
+          onPress={() => setDraft({ payMethod: "interac" })}
+        />
+      ) : null}
       <Choice
         leading={
           <View style={{ flexDirection: "row", gap: 4 }}>
@@ -78,14 +105,11 @@ export default function Review() {
             <PaymentLogo id="MASTERCARD" size={22} />
           </View>
         }
-        label="Carte bancaire"
-        description="Visa, Mastercard"
-        selected
-        onPress={() => undefined}
+        label="Carte de débit"
+        description="Visa Débit, Mastercard Débit · cartes de crédit non acceptées"
+        selected={method === "card"}
+        onPress={() => setDraft({ payMethod: "card" })}
       />
-      <View style={{ opacity: 0.55 }}>
-        <Choice leading={<PaymentLogo id="INTERAC" size={22} />} label="Virement Interac" description="Bientôt disponible" selected={false} onPress={() => undefined} />
-      </View>
       {error ? <Notice tone="danger" icon="alert" text={error} /> : null}
     </Screen>
   );

@@ -44,6 +44,16 @@ export const adminMessages = defineMessages({
     statusPaymentDetected: "Paiement reçu",
     statusPayoutQueued: "Payout en file",
     statusPayoutSent: "Versement en cours",
+    interacQueueTitle: "Virements Interac à confirmer",
+    interacQueueHint:
+      "Vérifiez sur le compte de dépôt qu'un virement du montant exact est arrivé avec la référence en message, puis confirmez : le versement au bénéficiaire part aussitôt.",
+    interacDeclared: "Le client indique l'avoir envoyé · {date}",
+    interacNotDeclared: "Pas encore signalé comme envoyé par le client",
+    interacExpected: "Attendu",
+    interacMessage: "Message (référence)",
+    interacRefLabel: "Référence Interac du virement (facultatif)",
+    interacReceived: "Virement reçu",
+    interacMismatch: "Montant ou message incorrect",
     bankQueueTitle: "Virements bancaires à traiter",
     bankQueueHint:
       "MTN MoMo ne paie pas les comptes bancaires : émettez le virement depuis votre banque, puis clôturez-le ici.",
@@ -112,6 +122,16 @@ export const adminMessages = defineMessages({
     statusPaymentDetected: "Payment received",
     statusPayoutQueued: "Payout queued",
     statusPayoutSent: "Payout in progress",
+    interacQueueTitle: "Interac transfers to confirm",
+    interacQueueHint:
+      "Check the deposit account for a transfer of the exact amount with the reference as its message, then confirm: the payout to the recipient starts right away.",
+    interacDeclared: "Customer says it was sent · {date}",
+    interacNotDeclared: "Not yet reported as sent by the customer",
+    interacExpected: "Expected",
+    interacMessage: "Message (reference)",
+    interacRefLabel: "Interac transfer reference (optional)",
+    interacReceived: "Transfer received",
+    interacMismatch: "Wrong amount or message",
     bankQueueTitle: "Bank transfers to process",
     bankQueueHint:
       "MTN MoMo can't pay bank accounts: send the transfer from your bank, then close it here.",

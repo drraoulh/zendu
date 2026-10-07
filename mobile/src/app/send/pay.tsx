@@ -61,7 +61,8 @@ export default function Pay() {
         </>
       ) : (
         <>
-          <H2 style={{ fontSize: 17, marginBottom: 10 }}>Nouvelle carte</H2>
+          <H2 style={{ fontSize: 17, marginBottom: 4 }}>Nouvelle carte de débit</H2>
+          <Small style={{ marginBottom: 12 }}>Visa Débit ou Mastercard Débit. Les cartes de crédit ne sont pas acceptées.</Small>
           <CardForm
             defaultHolder={profile ? `${profile.firstName} ${profile.lastName}` : ""}
             submitLabel={`Payer ${money(quote.total, quote.sendCurrency)}`}
@@ -74,7 +75,7 @@ export default function Pay() {
         <Notice
           tone="neutral"
           icon="info"
-          text="Version de démonstration : aucune carte n'est débitée. Avec Stripe activé sur le serveur, le paiement se fait sur la page sécurisée de Stripe."
+          text="Version de démonstration : aucune carte n'est débitée."
         />
       </View>
     </Screen>

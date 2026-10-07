@@ -10,6 +10,8 @@ import { adminMessages } from "@/i18n/admin";
 import { formatMoney } from "@/lib/money";
 import { MANUAL_BANK_PROVIDER } from "@/lib/bank";
 import { BankQueue } from "./bank-queue";
+import { InteracQueue } from "./interac-queue";
+import { INTERAC_PROVIDER } from "@/lib/providers/interac";
 
 export type AdminTransferRow = {
   id: string;
@@ -27,6 +29,10 @@ export type AdminTransferRow = {
   recipientBankName: string | null;
   recipientAccountMasked: string | null;
   payoutProvider: string;
+  payInProvider: string;
+  senderEmail: string;
+  /** Virement Interac : moment où le client a indiqué l'avoir envoyé. */
+  interacDeclaredAt: string | null;
   createdAt: string;
 };
 
@@ -75,6 +81,7 @@ export function AdminDashboard({
     new Intl.DateTimeFormat(nl, { dateStyle: "medium", timeStyle: "short" }).format(new Date(iso));
 
   const rows = transfers ?? [];
+  const interacQueue = rows.filter((r) => r.payInProvider === INTERAC_PROVIDER && r.status === "awaiting_payment");
   const bankQueue = rows.filter(
     (r) =>
       r.isBank &&
@@ -184,11 +191,14 @@ export function AdminDashboard({
             <div className="mt-8 grid gap-6 xl:grid-cols-[minmax(0,1fr)_18rem]">
               {/* Transferts */}
               <section aria-labelledby="admin-recent" className="min-w-0">
+                {interacQueue.length > 0 && <InteracQueue rows={interacQueue} nl={nl} date={date} />}
                 {(bankQueue.length > 0 || payoutMode === "momo") && (
-                  <BankQueue rows={bankQueue} nl={nl} date={date} />
+                  <div className={interacQueue.length > 0 ? "mt-6" : ""}>
+                    <BankQueue rows={bankQueue} nl={nl} date={date} />
+                  </div>
                 )}
 
-                <h2 id="admin-recent" className={`font-display text-xl font-bold text-ink ${bankQueue.length > 0 || payoutMode === "momo" ? "mt-8" : ""}`}>
+                <h2 id="admin-recent" className={`font-display text-xl font-bold text-ink ${interacQueue.length > 0 || bankQueue.length > 0 || payoutMode === "momo" ? "mt-8" : ""}`}>
                   {t("recent")}
                 </h2>
 

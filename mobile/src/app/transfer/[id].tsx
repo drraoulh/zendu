@@ -140,7 +140,16 @@ export default function TransferScreen() {
 
       {awaiting ? (
         <View style={{ gap: 10, marginBottom: 14 }}>
-          {mock ? (
+          {transfer.interac ? (
+            <>
+              <Notice tone="warn" icon="clock" text="En attente de votre virement Interac. Le versement part dès sa réception ; cet écran se met à jour automatiquement." />
+              <Button
+                title="Voir les instructions du virement"
+                icon="bank"
+                onPress={() => router.push({ pathname: "/send/interac", params: { id: transfer.id } })}
+              />
+            </>
+          ) : mock ? (
             <>
               <Notice tone="warn" icon="info" text="Mode démonstration : aucun paiement réel n'est prélevé." />
               <Button title={`Simuler le paiement de ${money(transfer.totalCad, transfer.sendCurrency)}`} icon="wallet" onPress={simulatePay} loading={busy} />

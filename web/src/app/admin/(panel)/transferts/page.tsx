@@ -14,7 +14,7 @@ export const metadata: Metadata = {
 async function loadTransfers(): Promise<AdminTransferRow[] | null> {
   return prisma.transfer
     .findMany({
-      include: { beneficiary: true },
+      include: { beneficiary: true, events: { where: { type: "interac_declared" }, select: { createdAt: true }, take: 1 } },
       orderBy: { createdAt: "desc" },
       take: 30,
     })
@@ -36,6 +36,9 @@ async function loadTransfers(): Promise<AdminTransferRow[] | null> {
         // Numéro masqué dans la liste ; le complet s'affiche à la demande (GET bank-payout, session admin).
         recipientAccountMasked: maskAccount(t.beneficiary.accountNumber),
         payoutProvider: t.payoutProvider,
+        payInProvider: t.payInProvider,
+        senderEmail: t.senderEmail,
+        interacDeclaredAt: t.events[0]?.createdAt.toISOString() ?? null,
         createdAt: t.createdAt.toISOString(),
       })),
     )

@@ -64,6 +64,8 @@ export type Transfer = {
   totalCad: number;
   payInProvider: string;
   createdAt: string;
+  /** Virement Interac en attente : où et comment envoyer l'argent. */
+  interac?: InteracInstructions;
   beneficiary: {
     fullName: string;
     phone: string;
@@ -76,7 +78,21 @@ export type Transfer = {
   events?: TransferEvent[];
 };
 
-export type PayInSession = { provider: "stripe" | "mock"; checkoutUrl?: string; sessionId: string };
+export type InteracInstructions = {
+  /** Adresse de dépôt PWFINTECH (null tant qu'elle n'est pas configurée sur le serveur). */
+  email: string | null;
+  amount: number;
+  currency: "CAD";
+  /** Référence à mettre en message du virement. */
+  message: string;
+  expiresAt: string;
+  /** Mode démo : la réception peut être simulée depuis l'appli. */
+  simulate: boolean;
+};
+
+export type PayMethod = "interac" | "card";
+
+export type PayInSession = { provider: "stripe" | "mock" | "interac"; checkoutUrl?: string; sessionId: string; interac?: InteracInstructions };
 
 export type BeneficiaryInput = {
   fullName: string;
@@ -222,11 +238,14 @@ export const api = {
     senderName: string;
     senderEmail: string;
     beneficiary: BeneficiaryInput;
+    payMethod: PayMethod;
   }) => request<{ transfer: Transfer; payIn: PayInSession }>("/api/transfers", { method: "POST", body: JSON.stringify(input) }),
   transfer: (id: string) => request<Transfer>(`/api/transfers/${encodeURIComponent(id)}`),
   submitRequest: (input: { kind: ServiceKind; name: string; email: string; phone?: string; payload: Record<string, unknown> }) =>
     request<{ ok: true; reference: string }>("/api/requests", { method: "POST", body: JSON.stringify({ ...input, locale: "fr" }) }),
   slots: (date: string) => request<{ date: string; slots: string[]; timezone: string }>(`/api/appointments/slots?date=${date}`),
   trackShipment: (number: string) => request<{ shipment: Shipment }>(`/api/shipments/track?number=${encodeURIComponent(number)}`),
+  interacDeclare: (id: string) =>
+    request<{ ok: true; status: string }>(`/api/transfers/${encodeURIComponent(id)}/interac`, { method: "POST", body: JSON.stringify({ action: "declare" }) }),
   simulatePay: (id: string) => request<Transfer>(`/api/transfers/${encodeURIComponent(id)}/simulate-pay`, { method: "POST" }),
 };

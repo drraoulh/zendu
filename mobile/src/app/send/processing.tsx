@@ -23,13 +23,14 @@ export default function Processing() {
   const card = cards.find((c) => c.id === draft.cardId);
   const recipient = draft.recipient;
   const quote = draft.quote;
+  const interac = draft.payMethod === "interac";
 
   useEffect(() => {
     if (started.current || !recipient || !profile || !quote) return;
     started.current = true;
     void (async () => {
       try {
-        await new Promise((r) => setTimeout(r, 700));
+        await new Promise((r) => setTimeout(r, interac ? 300 : 700));
         setPhase(1);
         const { transfer, payIn } = await api.createTransfer({
           corridorId: draft.corridorId,
@@ -44,6 +45,7 @@ export default function Processing() {
             accountNumber: recipient.accountNumber,
             bankCode: recipient.bankCode,
           },
+          payMethod: interac ? "interac" : "card",
         });
         setReference(transfer.reference);
         addTransfer({ id: transfer.id, reference: transfer.reference, createdAt: transfer.createdAt });
@@ -52,6 +54,12 @@ export default function Processing() {
           saveRecipient(person);
         }
         setPhase(2);
+        // Interac : le transfert attend le virement du client → écran des instructions.
+        if (payIn.provider === "interac") {
+          router.dismissAll();
+          router.replace({ pathname: "/send/interac", params: { id: transfer.id } });
+          return;
+        }
         if (payIn.provider === "stripe" && payIn.checkoutUrl) {
           await WebBrowser.openBrowserAsync(payIn.checkoutUrl);
           router.dismissAll();
@@ -67,21 +75,27 @@ export default function Processing() {
         setError(e instanceof Error ? e.message : "Paiement impossible");
       }
     })();
-  }, [recipient, profile, quote, draft.corridorId, draft.sendAmount, draft.saveRecipient, addTransfer, saveRecipient, card]);
+  }, [recipient, profile, quote, interac, draft.corridorId, draft.sendAmount, draft.saveRecipient, addTransfer, saveRecipient, card]);
 
   if (!recipient || !quote) return <Redirect href="/(tabs)" />;
 
-  const steps = [
-    { title: "Autorisation de la carte", sub: `${card ? cardLabel(card) : "Carte"} · ${money(quote.total, quote.sendCurrency)}` },
-    { title: "Création du transfert", sub: phase > 1 ? "Créé" : phase === 1 ? "En cours…" : "À venir" },
-    { title: `Envoi vers ${networkLabel(recipient.network)}`, sub: phase > 2 ? "Lancé" : phase === 2 ? "En cours…" : "À venir" },
-  ];
+  const steps = interac
+    ? [
+        { title: "Vérification du montant", sub: money(quote.total, quote.sendCurrency) },
+        { title: "Création du transfert", sub: phase > 1 ? "Créé" : phase === 1 ? "En cours…" : "À venir" },
+        { title: "Instructions du virement Interac", sub: phase > 1 ? "Prêtes" : "À venir" },
+      ]
+    : [
+        { title: "Autorisation de la carte", sub: `${card ? cardLabel(card) : "Carte"} · ${money(quote.total, quote.sendCurrency)}` },
+        { title: "Création du transfert", sub: phase > 1 ? "Créé" : phase === 1 ? "En cours…" : "À venir" },
+        { title: `Envoi vers ${networkLabel(recipient.network)}`, sub: phase > 2 ? "Lancé" : phase === 2 ? "En cours…" : "À venir" },
+      ];
 
   return (
     <Screen>
       <View style={{ alignItems: "center", paddingTop: 50, gap: 10 }}>
         {error ? <Icon name="alert" size={48} color={colors.danger} /> : <ActivityIndicator size="large" color={colors.brand} />}
-        <H1 style={{ textAlign: "center" }}>{error ? "Paiement interrompu" : "Traitement du paiement"}</H1>
+        <H1 style={{ textAlign: "center" }}>{error ? "Paiement interrompu" : interac ? "Préparation du virement" : "Traitement du paiement"}</H1>
         <P style={{ textAlign: "center" }}>{error ? "Aucun montant n'a été débité." : "Ne fermez pas l'application. Cela prend généralement quelques secondes."}</P>
       </View>
       <Card style={{ marginTop: 24 }}>

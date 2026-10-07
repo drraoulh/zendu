@@ -2,6 +2,7 @@ import { NextResponse } from "next/server";
 import { markPaymentDetected } from "@/lib/transfer-service";
 import { prisma } from "@/lib/prisma";
 import { publicTransfer } from "@/lib/bank";
+import { INTERAC_PROVIDER, interacSimulationAllowed } from "@/lib/providers/interac";
 
 type Params = { params: Promise<{ id: string }> };
 
@@ -14,8 +15,10 @@ export async function POST(_request: Request, { params }: Params) {
     return NextResponse.json({ error: "Introuvable" }, { status: 404 });
   }
 
-  // Réservé au mode démo : un vrai paiement (Stripe) n'est confirmé que par son webhook.
-  if (transfer.payInProvider !== "mock") {
+  // Réservé au mode démo : un vrai paiement n'est confirmé que par son webhook (carte) ou par l'équipe
+  // (Interac, dès qu'une vraie adresse de dépôt est configurée).
+  const demoInterac = transfer.payInProvider === INTERAC_PROVIDER && interacSimulationAllowed();
+  if (transfer.payInProvider !== "mock" && !demoInterac) {
     return NextResponse.json({ error: "Simulation indisponible" }, { status: 403 });
   }
 

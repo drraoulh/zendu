@@ -107,6 +107,9 @@ export function CardForm({ defaultHolder, submitLabel, onSubmit }: { defaultHold
   function submit() {
     const e: Record<string, string> = {};
     if (!numberOk) e.number = "Numéro de carte invalide";
+    // Débit uniquement (comme les services de transfert les moins chers) : Amex n'émet que des cartes
+    // de crédit. Les autres cartes de crédit sont refusées par le prestataire de paiement.
+    else if (brand === "Amex") e.number = "American Express n'est pas une carte de débit";
     if (!expiryValid(exp)) e.exp = "Date invalide ou dépassée";
     if (!/^\d{3,4}$/.test(cvc)) e.cvc = brand === "Amex" ? "4 chiffres" : "3 chiffres";
     if (holder.trim().length < 2) e.holder = "Nom requis";

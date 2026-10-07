@@ -1,5 +1,9 @@
+import type { InteracInstructions } from "./interac";
+
 export type PayInSession = {
-  provider: "stripe" | "mock";
+  provider: "stripe" | "mock" | "interac";
+  /** Virement Interac : où et comment envoyer l'argent. */
+  interac?: InteracInstructions;
   checkoutUrl?: string;
   clientSecret?: string;
   sessionId: string;

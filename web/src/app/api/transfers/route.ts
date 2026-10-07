@@ -6,6 +6,7 @@ import { createReference } from "@/lib/money";
 import { getPayInMode } from "@/lib/providers/payin";
 import { mockPayIn } from "@/lib/providers/mock-payin";
 import { createStripePayIn } from "@/lib/providers/stripe";
+import { INTERAC_PROVIDER, interacInstructions } from "@/lib/providers/interac";
 import { getPayoutMode } from "@/lib/providers/payout";
 import { getCorridor, getCountry } from "@/lib/corridors";
 import { isBankNetwork, MANUAL_BANK_PROVIDER, MOCK_BANK_PROVIDER, publicTransfer } from "@/lib/bank";
@@ -22,6 +23,8 @@ const createSchema = z.object({
   senderName: z.string().trim().min(2).max(120).optional(),
   senderEmail: z.string().trim().toLowerCase().pipe(z.email().max(254)).optional(),
   beneficiary: beneficiaryInputSchema,
+  /** "interac" : virement Interac (envois depuis le Canada en CAD) ; "card" : carte de débit. */
+  payMethod: z.enum(["card", "interac"]).default("card"),
 });
 
 /** Libellés lisibles des erreurs de validation (le premier est renvoyé dans `error`). */
@@ -114,6 +117,10 @@ export async function POST(request: Request) {
       corridorId: data.corridorId,
       sendAmount,
     });
+    if (data.payMethod === "interac" && quoteData.sendCurrency !== "CAD") {
+      return NextResponse.json({ error: "Le virement Interac n'est possible que pour les envois depuis le Canada (CAD)." }, { status: 400 });
+    }
+    const interac = data.payMethod === "interac";
     const reference = createReference();
     const appUrl = process.env.NEXT_PUBLIC_APP_URL ?? "http://localhost:3000";
 
@@ -152,7 +159,7 @@ export async function POST(request: Request) {
         rate: quoteData.rate,
         feeCad: quoteData.fee,
         totalCad: quoteData.total,
-        payInProvider: getPayInMode(),
+        payInProvider: interac ? INTERAC_PROVIDER : getPayInMode(),
         // MoMo ne paie pas de comptes bancaires : simulation en démo, traitement manuel sinon.
         payoutProvider: bank
           ? getPayoutMode() === "momo"
@@ -164,12 +171,23 @@ export async function POST(request: Request) {
         events: {
           create: {
             type: "created",
-            message: `Transfert ${quoteData.corridorId} créé — en attente de paiement`,
+            message: interac
+              ? `Transfert ${quoteData.corridorId} créé — en attente du virement Interac`
+              : `Transfert ${quoteData.corridorId} créé — en attente de paiement`,
           },
         },
       },
       include: { beneficiary: true },
     });
+
+    if (interac) {
+      const payInRef = `interac_${transfer.reference}`;
+      await prisma.transfer.update({ where: { id: transfer.id }, data: { payInRef } });
+      return NextResponse.json({
+        transfer: publicTransfer(transfer),
+        payIn: { provider: "interac", sessionId: payInRef, interac: interacInstructions(transfer) },
+      });
+    }
 
     const payIn =
       getPayInMode() === "stripe" ? createStripePayIn() : mockPayIn;

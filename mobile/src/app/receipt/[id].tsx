@@ -138,7 +138,7 @@ export default function Receipt() {
             <Line label="Total payé" value={money(t.totalCad, t.sendCurrency)} strong />
             <View style={r.sep} />
             <Line label="Référence" value={t.reference} strong />
-            {params.card ? <Line label="Payé avec" value={params.card} logo={cardLogoId(params.card.split(" ")[0])} /> : null}
+            {params.card ? <Line label="Payé avec" value={params.card} logo={params.card.startsWith("Virement Interac") ? "INTERAC" : cardLogoId(params.card.split(" ")[0])} /> : null}
           </View>
           <View style={r.foot}>
             <Icon name="shield" color={colors.muted} size={14} />

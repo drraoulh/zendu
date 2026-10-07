@@ -1,5 +1,5 @@
 import { createContext, useCallback, useContext, useEffect, useMemo, useRef, useState, type ReactNode } from "react";
-import type { BeneficiaryInput, Quote } from "./api";
+import type { BeneficiaryInput, PayMethod, Quote } from "./api";
 import { storage } from "./storage";
 
 /** Bénéficiaire enregistré sur l'appareil (le numéro de compte complet n'est gardé que localement). */
@@ -28,6 +28,8 @@ export type Draft = {
   /** Nouveau bénéficiaire à enregistrer, mais seulement une fois le transfert créé. */
   saveRecipient: boolean;
   cardId: string | null;
+  /** Interac (envois en CAD, le moins cher) ou carte de débit. */
+  payMethod: PayMethod;
 };
 
 type StoreValue = {
@@ -57,7 +59,7 @@ const KEY_REQUESTS = "wst.requests";
 const KEY_READ = "wst.read";
 
 export const DEFAULT_CORRIDOR = "CA-CM";
-const EMPTY_DRAFT: Draft = { corridorId: DEFAULT_CORRIDOR, sendAmount: 200, quote: null, recipient: null, recipientFromHome: false, saveRecipient: false, cardId: null };
+const EMPTY_DRAFT: Draft = { corridorId: DEFAULT_CORRIDOR, sendAmount: 200, quote: null, recipient: null, recipientFromHome: false, saveRecipient: false, cardId: null, payMethod: "interac" };
 
 const StoreContext = createContext<StoreValue | null>(null);
 
