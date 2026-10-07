@@ -7,11 +7,11 @@ import type { Recipient } from "@/lib/store";
 import { colors, fonts } from "@/lib/theme";
 import { RELATIONS } from "@/lib/geo";
 import { Flag } from "./flag";
+import { PaymentLogo } from "./payment-logo";
 import { Chips } from "./form";
-import { Icon, type IconName } from "./icons";
+import { Icon } from "./icons";
 import { Button, Choice, Field, Label, Small } from "./ui";
 
-const NETWORK_ICON: Record<Network["type"], IconName> = { mobile_money: "phone", bank: "bank", cash: "cash" };
 
 const PHONE_DIGITS: Record<CountryCode, [number, number]> = { CA: [10, 10], CM: [9, 9], CN: [11, 11] };
 
@@ -79,7 +79,7 @@ export function RecipientForm({
 
       <Label>Mode de réception</Label>
       {networks.map((n) => (
-        <Choice key={n.id} icon={NETWORK_ICON[n.type]} label={networkLabel(n.id)} selected={network === n.id} onPress={() => setNetwork(n.id)} />
+        <Choice key={n.id} leading={<PaymentLogo id={n.id} size={26} />} label={networkLabel(n.id)} selected={network === n.id} onPress={() => setNetwork(n.id)} />
       ))}
 
       <View style={{ height: 6 }} />

@@ -15,7 +15,7 @@ export default function HomePage() {
       destName: to.name,
       sendCurrency: from.currency,
       receiveCurrency: to.currency,
-      networks: to.networks.map((n) => ({ label: n.label, type: n.type })),
+      networks: to.networks.map((n) => ({ id: n.id, label: n.label, type: n.type })),
       fast: c.deliveryEstimate === "A few minutes",
     };
   });

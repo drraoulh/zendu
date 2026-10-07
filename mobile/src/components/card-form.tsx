@@ -4,11 +4,11 @@ import { cardBrand, expectedLength, expiryValid, formatCardNumber, formatExpiry,
 import type { SavedCard } from "@/lib/store";
 import { colors, fonts, radius } from "@/lib/theme";
 import { WstSymbol } from "./brand";
+import { cardLogoId, PaymentLogo } from "./payment-logo";
 import { Checkbox } from "./form";
 import { Icon } from "./icons";
 import { Button, Field, Small } from "./ui";
 
-const BRAND_LABEL: Record<SavedCard["brand"], string> = { Visa: "VISA", Mastercard: "mastercard", Amex: "AMEX", Carte: "" };
 
 /**
  * Saisie d'une carte, avec remplissage automatique :
@@ -98,7 +98,14 @@ export function CardForm({ defaultHolder, submitLabel, onSubmit }: { defaultHold
           <>
             <View style={c.top}>
               <WstSymbol size={30} negative />
-              <Text style={[c.brand, brand === "Mastercard" && { fontFamily: fonts.heading, letterSpacing: 0 }]}>{BRAND_LABEL[brand] || "VISA · MASTERCARD"}</Text>
+              {brand === "Carte" ? (
+                <View style={{ flexDirection: "row", gap: 6 }}>
+                  <PaymentLogo id="VISA" size={24} bordered={false} />
+                  <PaymentLogo id="MASTERCARD" size={24} bordered={false} />
+                </View>
+              ) : (
+                <PaymentLogo id={cardLogoId(brand)} size={30} bordered={false} />
+              )}
             </View>
             <View style={c.chip} />
             <Text style={c.number}>{shown}</Text>
@@ -211,7 +218,6 @@ export function CardForm({ defaultHolder, submitLabel, onSubmit }: { defaultHold
 const c = StyleSheet.create({
   visual: { backgroundColor: colors.navy, borderRadius: radius.lg, padding: 20, gap: 14, marginBottom: 14, minHeight: 196, overflow: "hidden", shadowColor: colors.navy, shadowOpacity: 0.25, shadowRadius: 18, shadowOffset: { width: 0, height: 10 }, elevation: 6 },
   top: { flexDirection: "row", justifyContent: "space-between", alignItems: "center" },
-  brand: { color: colors.white, fontFamily: fonts.display, fontSize: 16, letterSpacing: 1 },
   chip: { width: 40, height: 30, borderRadius: 6, backgroundColor: "#d9b866" },
   number: { color: colors.white, fontFamily: fonts.heading, fontSize: 20, letterSpacing: 1.5 },
   caption: { color: "rgba(255,255,255,0.55)", fontSize: 9, letterSpacing: 1 },

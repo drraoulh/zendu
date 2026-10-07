@@ -10,6 +10,7 @@ import { countryName, dateTime, money, networkLabel, phone, rate, statusInfo } f
 import { openSite } from "@/lib/links";
 import { shareViewAsImage } from "@/lib/share-image";
 import { colors, fonts, radius } from "@/lib/theme";
+import { cardLogoId, PaymentLogo } from "@/components/payment-logo";
 
 type Mode = "mine" | "recipient";
 
@@ -129,7 +130,7 @@ export default function Receipt() {
           </View>
           <View style={r.body}>
             <Party label="Expéditeur" name={t.senderName} line={`${t.senderEmail} · ${countryName(t.sourceCountry)}`} />
-            <Party label="Destinataire" name={ben.fullName} line={`${benLine} · ${countryName(t.destCountry)}`} />
+            <Party label="Destinataire" name={ben.fullName} line={`${benLine} · ${countryName(t.destCountry)}`} logo={ben.network} />
             <View style={r.sep} />
             <Line label="Montant envoyé" value={money(t.sendAmountCad, t.sendCurrency)} />
             <Line label="Frais" value={money(t.feeCad, t.sendCurrency)} />
@@ -137,7 +138,7 @@ export default function Receipt() {
             <Line label="Total payé" value={money(t.totalCad, t.sendCurrency)} strong />
             <View style={r.sep} />
             <Line label="Référence" value={t.reference} strong />
-            {params.card ? <Line label="Payé avec" value={params.card} /> : null}
+            {params.card ? <Line label="Payé avec" value={params.card} logo={cardLogoId(params.card.split(" ")[0])} /> : null}
           </View>
           <View style={r.foot}>
             <Icon name="shield" color={colors.muted} size={14} />
@@ -149,21 +150,27 @@ export default function Receipt() {
   );
 }
 
-function Party({ label, name, line }: { label: string; name: string; line: string }) {
+function Party({ label, name, line, logo }: { label: string; name: string; line: string; logo?: string }) {
   return (
-    <View style={{ marginBottom: 12 }}>
-      <Text style={r.section}>{label.toUpperCase()}</Text>
-      <Text style={r.name}>{name}</Text>
-      <Small>{line}</Small>
+    <View style={{ marginBottom: 12, flexDirection: "row", gap: 12, alignItems: "center" }}>
+      <View style={{ flex: 1 }}>
+        <Text style={r.section}>{label.toUpperCase()}</Text>
+        <Text style={r.name}>{name}</Text>
+        <Small>{line}</Small>
+      </View>
+      {logo ? <PaymentLogo id={logo} size={26} /> : null}
     </View>
   );
 }
 
-function Line({ label, value, strong = false }: { label: string; value: string; strong?: boolean }) {
+function Line({ label, value, strong = false, logo }: { label: string; value: string; strong?: boolean; logo?: string }) {
   return (
     <View style={r.line}>
       <Text style={r.lineLabel}>{label}</Text>
-      <Text style={[r.lineValue, strong && { fontFamily: fonts.heading }]}>{value}</Text>
+      <View style={{ flexDirection: "row", alignItems: "center", gap: 8, flexShrink: 1 }}>
+        {logo ? <PaymentLogo id={logo} size={18} /> : null}
+        <Text style={[r.lineValue, strong && { fontFamily: fonts.heading }]}>{value}</Text>
+      </View>
     </View>
   );
 }

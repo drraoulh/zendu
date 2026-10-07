@@ -1,13 +1,11 @@
 import { router } from "expo-router";
 import { useState } from "react";
-import { View } from "react-native";
-import { Flag } from "@/components/flag";
+import { PaymentLogo } from "@/components/payment-logo";
 import { RecipientForm } from "@/components/recipient-form";
 import { Button, Card, H1, H2, Header, ListItem, P, Screen, Steps } from "@/components/ui";
 import { findCorridor, useCorridors, type CountryCode } from "@/lib/corridors";
 import { countryName, networkLabel, phone } from "@/lib/format";
 import { useStore, type Recipient } from "@/lib/store";
-import { colors } from "@/lib/theme";
 
 export default function ChooseRecipient() {
   const { draft, setDraft, recipients, saveRecipient } = useStore();
@@ -37,11 +35,7 @@ export default function ChooseRecipient() {
                 title={r.fullName}
                 subtitle={`${networkLabel(r.network)} · ${r.network === "BANK" ? r.bankName ?? "" : phone(r.phone ?? "")}`}
                 onPress={() => choose(r)}
-                leading={
-                  <View style={{ width: 42, height: 42, borderRadius: 14, backgroundColor: colors.bg, alignItems: "center", justifyContent: "center" }}>
-                    <Flag code={r.country} size={24} />
-                  </View>
-                }
+                leading={<PaymentLogo id={r.network} size={28} />}
               />
             ))}
           </Card>

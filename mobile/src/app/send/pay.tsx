@@ -8,6 +8,7 @@ import { money } from "@/lib/format";
 import { useSession } from "@/lib/session";
 import { useStore } from "@/lib/store";
 import { colors, fonts } from "@/lib/theme";
+import { cardLogoId, PaymentLogo } from "@/components/payment-logo";
 
 export default function Pay() {
   const { profile } = useSession();
@@ -50,7 +51,7 @@ export default function Pay() {
         <>
           <H2 style={{ fontSize: 17, marginBottom: 10 }}>Carte enregistrée</H2>
           {cards.map((c) => (
-            <Choice key={c.id} icon="wallet" label={cardLabel(c)} description={`Expire ${c.exp} · ${c.holder}`} selected={selected === c.id} onPress={() => setSelected(c.id)} />
+            <Choice key={c.id} leading={<PaymentLogo id={cardLogoId(c.brand)} size={24} />} label={cardLabel(c)} description={`Expire ${c.exp} · ${c.holder}`} selected={selected === c.id} onPress={() => setSelected(c.id)} />
           ))}
           <Button title="Ajouter une nouvelle carte" icon="plus" variant="secondary" onPress={() => setAdding(true)} />
         </>

@@ -11,10 +11,10 @@ import { useT } from "@/i18n/define";
 import { capitalize, countriesMessages, countryPhrase, groupByDelivery } from "@/i18n/countries";
 import type { CountryInfo, DestinationInfo } from "./destinations";
 import { useInfoLabels } from "./shared";
+import { PaymentLogo } from "@/components/ui/payment-logo";
 
 type Other = { code: string; name: string; currency: string };
 
-const TYPE_ICON: Record<string, IconName> = { mobile_money: "phone", bank: "card", cash: "wallet" };
 const MODE_KEY: Record<string, "modeINTERAC" | "modeALIPAY" | "modeWECHAT" | "modeBANK" | "modeCASH"> = {
   INTERAC: "modeINTERAC",
   ALIPAY: "modeALIPAY",
@@ -130,13 +130,7 @@ export function CountryContent({ country: c, others }: { country: CountryInfo; o
           <ul className="mt-8 grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
             {c.networks.map((n) => (
               <li key={n.id} className="flex flex-col rounded-3xl border border-line bg-white p-6 shadow-card">
-                <span
-                  className={`grid h-11 w-11 place-items-center rounded-2xl ${
-                    n.type === "mobile_money" ? "bg-brand text-white" : "bg-brand-soft text-brand"
-                  }`}
-                >
-                  <Icon name={TYPE_ICON[n.type] ?? "wallet"} className="h-5 w-5" />
-                </span>
+                <PaymentLogo id={n.id} size={36} title={L.network(n)} />
                 <h3 className="mt-4 font-display text-lg font-bold text-ink">{L.network(n)}</h3>
                 <p className="mt-3 flex-1 text-sm leading-relaxed text-muted">{modeText(n.id, n.label)}</p>
                 <p className="mt-4 inline-flex items-center gap-1.5 text-xs font-semibold text-ink">

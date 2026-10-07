@@ -6,6 +6,7 @@ import { api, type Quote } from "@/lib/api";
 import { countryName, deliveryEstimate, etaLabel, money, networkLabel, phone, rate } from "@/lib/format";
 import { useStore } from "@/lib/store";
 import { colors, fonts } from "@/lib/theme";
+import { PaymentLogo } from "@/components/payment-logo";
 
 export default function Review() {
   const { draft, setDraft } = useStore();
@@ -45,7 +46,10 @@ export default function Review() {
         <Text style={{ color: colors.white, fontFamily: fonts.display, fontSize: 30, marginTop: 6 }}>
           {quote ? money(quote.receiveAmount, quote.receiveCurrency) : "…"}
         </Text>
-        <Small style={{ color: "rgba(255,255,255,0.75)", marginTop: 4, textAlign: "center" }}>
+        <View style={{ marginTop: 10 }}>
+          <PaymentLogo id={recipient.network} size={26} />
+        </View>
+        <Small style={{ color: "rgba(255,255,255,0.75)", marginTop: 6, textAlign: "center" }}>
           {networkLabel(recipient.network)}
           {recipient.phone ? ` · ${phone(recipient.phone)}` : recipient.bankName ? ` · ${recipient.bankName}` : ""} · {countryName(recipient.country)}
         </Small>
@@ -67,9 +71,20 @@ export default function Review() {
       </Card>
 
       <H1 style={{ fontSize: 18, marginBottom: 10 }}>Payer avec</H1>
-      <Choice icon="wallet" label="Carte bancaire" description="Visa, Mastercard" selected onPress={() => undefined} />
+      <Choice
+        leading={
+          <View style={{ flexDirection: "row", gap: 4 }}>
+            <PaymentLogo id="VISA" size={22} />
+            <PaymentLogo id="MASTERCARD" size={22} />
+          </View>
+        }
+        label="Carte bancaire"
+        description="Visa, Mastercard"
+        selected
+        onPress={() => undefined}
+      />
       <View style={{ opacity: 0.55 }}>
-        <Choice icon="bank" label="Virement Interac" description="Bientôt disponible" selected={false} onPress={() => undefined} />
+        <Choice leading={<PaymentLogo id="INTERAC" size={22} />} label="Virement Interac" description="Bientôt disponible" selected={false} onPress={() => undefined} />
       </View>
       {error ? <Notice tone="danger" icon="alert" text={error} /> : null}
     </Screen>

@@ -11,6 +11,7 @@ import { colors, fonts } from "@/lib/theme";
 import { useMyTransfers } from "@/lib/use-transfers";
 import { corridorFor, recipientDetail } from "@/lib/recipients";
 import { useSession } from "@/lib/session";
+import { PaymentLogo } from "@/components/payment-logo";
 
 export default function RecipientDetail() {
   const { id } = useLocalSearchParams<{ id: string }>();
@@ -64,7 +65,7 @@ export default function RecipientDetail() {
         </View>
       </View>
       <Card style={{ marginBottom: 12 }}>
-        <SummaryRow label="Mode de réception" value={networkLabel(r.network)} />
+        <SummaryRow label="Mode de réception" value={networkLabel(r.network)} valueIcon={<PaymentLogo id={r.network} size={20} />} />
         {r.network === "BANK" && r.bankName ? <SummaryRow label="Banque" value={r.bankName} /> : null}
         <SummaryRow label={r.network === "BANK" ? "Compte" : "Numéro"} value={recipientDetail(r) || "—"} />
         <SummaryRow label="Envois" value={String(sent.length)} />

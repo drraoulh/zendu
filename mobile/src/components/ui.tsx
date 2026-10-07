@@ -234,11 +234,32 @@ export function Notice({ text, tone = "brand", icon = "info", title }: { text: s
   );
 }
 
-export function SummaryRow({ label, value, strong = false, highlight = false }: { label: string; value: string; strong?: boolean; highlight?: boolean }) {
+export function SummaryRow({
+  label,
+  value,
+  strong = false,
+  highlight = false,
+  valueIcon,
+}: {
+  label: string;
+  value: string;
+  strong?: boolean;
+  highlight?: boolean;
+  /** Logo ou icône affiché devant la valeur (ex. logo MTN MoMo). */
+  valueIcon?: ReactNode;
+}) {
+  const text = <Text style={[styles.rowValue, strong && { fontFamily: fonts.heading }, highlight && { color: colors.brand, fontFamily: fonts.heading }]}>{value}</Text>;
   return (
     <View style={styles.row}>
       <Text style={styles.rowLabel}>{label}</Text>
-      <Text style={[styles.rowValue, strong && { fontFamily: fonts.heading }, highlight && { color: colors.brand, fontFamily: fonts.heading }]}>{value}</Text>
+      {valueIcon ? (
+        <View style={{ flexDirection: "row", alignItems: "center", gap: 8, flexShrink: 1, justifyContent: "flex-end" }}>
+          {valueIcon}
+          {text}
+        </View>
+      ) : (
+        text
+      )}
     </View>
   );
 }
@@ -342,12 +363,15 @@ export function Choice({
   onPress,
   icon,
   description,
+  leading,
 }: {
   label: string;
   selected: boolean;
   onPress: () => void;
   icon?: IconName;
   description?: string;
+  /** Élément affiché à gauche à la place de l'icône (ex. logo de l'opérateur). */
+  leading?: ReactNode;
 }) {
   return (
     <Pressable
@@ -356,7 +380,7 @@ export function Choice({
       onPress={onPress}
       style={[styles.choice, selected && { borderColor: colors.brand, backgroundColor: colors.brandSoft }]}
     >
-      {icon ? <Icon name={icon} color={selected ? colors.brand : colors.muted} size={20} /> : null}
+      {leading ?? (icon ? <Icon name={icon} color={selected ? colors.brand : colors.muted} size={20} /> : null)}
       <View style={{ flex: 1 }}>
         <Text style={[styles.listTitle, { fontSize: 15 }]}>{label}</Text>
         {description ? <Small>{description}</Small> : null}

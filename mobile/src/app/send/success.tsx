@@ -9,6 +9,7 @@ import { findCorridor, useCorridors } from "@/lib/corridors";
 import { deliveryEstimate, etaLabel, money, networkLabel } from "@/lib/format";
 import { useStore } from "@/lib/store";
 import { colors, fonts } from "@/lib/theme";
+import { PaymentLogo } from "@/components/payment-logo";
 
 export default function Success() {
   const { id, card } = useLocalSearchParams<{ id: string; card?: string }>();
@@ -88,7 +89,10 @@ export default function Success() {
         <H1 style={{ textAlign: "center" }}>Paiement réussi</H1>
         <P style={{ textAlign: "center" }}>{t.beneficiary.fullName} recevra</P>
         <Text style={{ fontFamily: fonts.display, fontSize: 32, color: colors.brand }}>{money(t.receiveAmountXaf, t.receiveCurrency)}</Text>
-        <Small>via {networkLabel(t.beneficiary.network)}</Small>
+        <View style={{ flexDirection: "row", alignItems: "center", gap: 8 }}>
+          <PaymentLogo id={t.beneficiary.network} size={22} />
+          <Small>via {networkLabel(t.beneficiary.network)}</Small>
+        </View>
       </View>
       <Card style={{ marginTop: 20 }}>
         <SummaryRow label="Référence" value={t.reference} strong />

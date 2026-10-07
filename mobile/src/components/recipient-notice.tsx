@@ -1,3 +1,4 @@
+import type { ReactNode } from "react";
 import { StyleSheet, Text, View } from "react-native";
 import type { Transfer } from "@/lib/api";
 import { countryName, etaLabel, money, networkLabel, phone, statusInfo } from "@/lib/format";
@@ -5,6 +6,7 @@ import { colors, fonts, radius } from "@/lib/theme";
 import { PoweredBy, WstWordmark } from "./brand";
 import { Flag } from "./flag";
 import { Icon } from "./icons";
+import { PaymentLogo } from "./payment-logo";
 
 export function etaFor(t: Transfer) {
   if (t.beneficiary.network === "BANK") return "1-2 business days";
@@ -64,7 +66,7 @@ export function RecipientNotice({ transfer: t }: { transfer: Transfer }) {
         </View>
 
         <View style={s.rows}>
-          <Row label="Réception" value={where} />
+          <Row label="Réception" value={where} icon={<PaymentLogo id={ben.network} size={20} />} />
           <Row label={delivered ? "Statut" : "Délai estimé"} value={delivered ? "Livré" : etaLabel(etaFor(t))} />
           <Row label="Référence" value={t.reference} strong />
         </View>
@@ -76,10 +78,11 @@ export function RecipientNotice({ transfer: t }: { transfer: Transfer }) {
   );
 }
 
-function Row({ label, value, strong = false }: { label: string; value: string; strong?: boolean }) {
+function Row({ label, value, strong = false, icon }: { label: string; value: string; strong?: boolean; icon?: ReactNode }) {
   return (
     <View style={s.row}>
       <Text style={s.rowLabel}>{label}</Text>
+      {icon}
       <Text style={[s.rowValue, strong && { fontFamily: fonts.heading }]} numberOfLines={2}>
         {value}
       </Text>

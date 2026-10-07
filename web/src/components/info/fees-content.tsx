@@ -12,6 +12,7 @@ import { feesPage } from "@/i18n/info";
 import { capitalize, countryPhrase, groupByDelivery } from "@/i18n/countries";
 import type { DestinationInfo } from "./destinations";
 import { useInfoLabels } from "./shared";
+import { PaymentLogo } from "@/components/ui/payment-logo";
 
 export function FeesContent({ destinations }: { destinations: DestinationInfo[] }) {
   const t = useT(feesPage);
@@ -280,10 +281,11 @@ function NetworkChips({ d }: { d: DestinationInfo }) {
       {d.networks.map((n) => (
         <li
           key={n.id}
-          className={`rounded-full px-2.5 py-1 text-xs font-semibold ${
+          className={`inline-flex items-center gap-1.5 rounded-full py-1 pl-1 pr-2.5 text-xs font-semibold ${
             n.type === "mobile_money" ? "bg-brand-soft text-brand-strong" : "bg-surface-soft text-ink/80"
           }`}
         >
+          <PaymentLogo id={n.id} size={16} title="" />
           {L.network(n)}
         </li>
       ))}

@@ -9,6 +9,7 @@ import { Badge, Button, Card, Divider, Header, IconButton, Notice, Screen, Small
 import { api, type Transfer } from "@/lib/api";
 import { countryName, dateTime, eventTitle, money, networkLabel, phone, rate, statusInfo, TERMINAL_STATUSES } from "@/lib/format";
 import { colors, fonts } from "@/lib/theme";
+import { PaymentLogo } from "@/components/payment-logo";
 
 const POLL_MS = 5000;
 const STEPS = ["Transfert créé", "Paiement reçu", "Versement envoyé", "Livré"];
@@ -168,7 +169,7 @@ export default function TransferScreen() {
         <Divider />
         <SummaryRow label="Bénéficiaire" value={transfer.beneficiary.fullName} />
         <SummaryRow label="Pays" value={countryName(transfer.destCountry)} />
-        <SummaryRow label="Réception" value={networkLabel(transfer.beneficiary.network)} />
+        <SummaryRow label="Réception" value={networkLabel(transfer.beneficiary.network)} valueIcon={<PaymentLogo id={transfer.beneficiary.network} size={20} />} />
         {transfer.beneficiary.accountMasked ? <SummaryRow label="Compte" value={transfer.beneficiary.accountMasked} /> : null}
         {transfer.beneficiary.phone ? <SummaryRow label="Téléphone" value={phone(transfer.beneficiary.phone)} /> : null}
         <SummaryRow label="Créé le" value={dateTime(transfer.createdAt)} />

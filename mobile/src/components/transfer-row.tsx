@@ -4,6 +4,7 @@ import type { Transfer } from "@/lib/api";
 import { countryName, dateTime, money, statusInfo } from "@/lib/format";
 import { colors, fonts } from "@/lib/theme";
 import { Flag } from "./flag";
+import { PaymentLogo } from "./payment-logo";
 import { Badge, ListItem } from "./ui";
 
 export function TransferRow({ transfer }: { transfer: Transfer }) {
@@ -16,8 +17,11 @@ export function TransferRow({ transfer }: { transfer: Transfer }) {
     <ListItem
       onPress={() => router.push({ pathname: "/transfer/[id]", params: { id: transfer.id } })}
       leading={
-        <View style={{ width: 42, height: 42, borderRadius: 14, backgroundColor: colors.bg, alignItems: "center", justifyContent: "center" }}>
-          <Flag code={transfer.destCountry} size={26} />
+        <View style={{ width: 46, height: 42, justifyContent: "center" }}>
+          <PaymentLogo id={transfer.beneficiary.network} size={28} />
+          <View style={{ position: "absolute", right: -2, bottom: 0, borderRadius: 3, borderWidth: 1.5, borderColor: colors.white }}>
+            <Flag code={transfer.destCountry} size={14} />
+          </View>
         </View>
       }
       title={transfer.beneficiary.fullName}

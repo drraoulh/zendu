@@ -13,6 +13,7 @@ import { Icon } from "@/components/ui/icon";
 import { Container, Section, SectionHeading } from "@/components/ui/layout";
 import { useT } from "@/i18n/define";
 import { homeMessages } from "@/i18n/home";
+import { PaymentLogo } from "@/components/ui/payment-logo";
 
 type HomeKey = keyof typeof homeMessages.fr;
 
@@ -24,7 +25,7 @@ export type HomeRoute = {
   destName: string;
   sendCurrency: string;
   receiveCurrency: string;
-  networks: Array<{ label: string; type: string }>;
+  networks: Array<{ id: string; label: string; type: string }>;
   fast: boolean;
 };
 
@@ -78,7 +79,8 @@ export function DestinationsSection({ routes }: { routes: HomeRoute[] }) {
                   </span>
                   <span className="flex flex-wrap gap-1.5">
                     {r.networks.map((n) => (
-                      <span key={n.label} className="rounded-full bg-brand-soft px-2 py-0.5 text-[11px] font-semibold text-brand-strong">
+                      <span key={n.label} className="inline-flex items-center gap-1 rounded-full bg-brand-soft py-0.5 pl-0.5 pr-2 text-[11px] font-semibold text-brand-strong">
+                        <PaymentLogo id={n.id} size={14} title="" />
                         {n.type === "bank" ? t("netBank") : n.type === "cash" ? t("netCash") : n.label}
                       </span>
                     ))}
