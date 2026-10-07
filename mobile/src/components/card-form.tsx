@@ -100,11 +100,11 @@ export function CardForm({ defaultHolder, submitLabel, onSubmit }: { defaultHold
               <WstSymbol size={30} negative />
               {brand === "Carte" ? (
                 <View style={{ flexDirection: "row", gap: 6 }}>
-                  <PaymentLogo id="VISA" size={24} bordered={false} />
-                  <PaymentLogo id="MASTERCARD" size={24} bordered={false} />
+                  <PaymentLogo id="VISA" size={24} />
+                  <PaymentLogo id="MASTERCARD" size={24} />
                 </View>
               ) : (
-                <PaymentLogo id={cardLogoId(brand)} size={30} bordered={false} />
+                <PaymentLogo id={cardLogoId(brand)} size={30} />
               )}
             </View>
             <View style={c.chip} />
