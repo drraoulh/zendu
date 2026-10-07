@@ -36,14 +36,18 @@ export default function Pay() {
       }
     >
       <Header title="Paiement par carte" />
-      <Card style={{ marginBottom: 16, flexDirection: "row", justifyContent: "space-between", alignItems: "center" }}>
-        <View>
+      <Card style={{ marginBottom: 16, flexDirection: "row", flexWrap: "wrap", justifyContent: "space-between", alignItems: "center", gap: 10 }}>
+        <View style={{ flexGrow: 1, flexShrink: 1, minWidth: 140 }}>
           <Small>TOTAL À PAYER</Small>
-          <Text style={{ fontFamily: fonts.display, fontSize: 26, color: colors.navy }}>{money(quote.total, quote.sendCurrency)}</Text>
+          <Text style={{ fontFamily: fonts.display, fontSize: 26, color: colors.navy }} numberOfLines={1} adjustsFontSizeToFit minimumFontScale={0.7}>
+            {money(quote.total, quote.sendCurrency)}
+          </Text>
         </View>
-        <View style={{ alignItems: "flex-end" }}>
-          <Small>{draft.recipient.fullName} reçoit</Small>
-          <Text style={{ fontFamily: fonts.heading, color: colors.brand }}>{money(quote.receiveAmount, quote.receiveCurrency)}</Text>
+        <View style={{ flexShrink: 1, alignItems: "flex-end", maxWidth: "100%" }}>
+          <Small numberOfLines={1}>{draft.recipient.fullName} reçoit</Small>
+          <Text style={{ fontFamily: fonts.heading, color: colors.brand }} numberOfLines={1}>
+            {money(quote.receiveAmount, quote.receiveCurrency)}
+          </Text>
         </View>
       </Card>
 

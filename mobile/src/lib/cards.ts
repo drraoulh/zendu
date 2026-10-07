@@ -75,3 +75,39 @@ export function parseCardText(text: string): { number?: string; exp?: string } {
 export function expectedLength(number: string) {
   return cardBrand(number) === "Amex" ? 15 : 16;
 }
+
+/** Confusions fréquentes de la reconnaissance de texte sur les chiffres embossés. */
+const OCR_DIGIT: Record<string, string> = { O: "0", o: "0", D: "0", Q: "0", I: "1", l: "1", "|": "1", Z: "2", S: "5", s: "5", B: "8", G: "6", b: "6" };
+const NOT_A_NAME =
+  /\b(VALID|THRU|FROM|UNTIL|EXP|EXPIRES?|MONTH|YEAR|DEBIT|CREDIT|CARD|CARTE|VISA|MASTERCARD|AMERICAN|EXPRESS|BANK|BANQUE|MEMBER|SINCE|PLATINUM|GOLD|CLASSIC|WORLD|ELITE|INFINITE|SIGNATURE|BUSINESS|PREPAID|INTERNATIONAL|ELECTRONIC|USE|ONLY|CLIENT|DESJARDINS|RBC|TD|BMO|SCOTIA|CIBC|NATIONALE|AFRILAND|ECOBANK|SGC|UBA|BICEC|SCB|CHINA|UNIONPAY)\b/;
+
+/**
+ * Lit les textes reconnus sur la photo d'une carte (une entrée par bloc) :
+ * numéro (contrôlé par Luhn), expiration (la plus lointaine si « valide du … au … ») et titulaire.
+ */
+export function parseScannedCard(blocks: string[]): { number?: string; exp?: string; holder?: string } {
+  const lines = blocks.flatMap((b) => b.split(/\n/)).map((l) => l.trim()).filter(Boolean);
+  const out: { number?: string; exp?: string; holder?: string } = {};
+
+  // Numéro : on corrige les lettres prises pour des chiffres, puis on garde le premier numéro valide,
+  // d'abord ligne par ligne, puis sur le texte entier (numéro coupé en plusieurs blocs).
+  const fix = (s: string) => s.replace(/[OoDQIl|ZSsBGb]/g, (ch) => OCR_DIGIT[ch] ?? ch);
+  for (const candidate of [...lines, lines.join(" ")]) {
+    for (const m of fix(candidate).matchAll(/\d(?:[ -]?\d){12,18}/g)) {
+      const digits = m[0].replace(/\D/g, "");
+      if (luhn(digits)) {
+        out.number = digits;
+        break;
+      }
+    }
+    if (out.number) break;
+  }
+
+  const dates = [...fix(lines.join(" ")).matchAll(/(?<!\d)(0[1-9]|1[0-2])\s?[/\-.]\s?(\d{4}|\d{2})(?!\d)/g)].map((m) => `${m[1]}/${m[2].slice(-2)}`);
+  const latest = dates.sort((a, b) => Number(a.slice(3) + a.slice(0, 2)) - Number(b.slice(3) + b.slice(0, 2))).pop();
+  if (latest) out.exp = latest;
+
+  const holder = lines.find((l) => /^[A-ZÀ-Ý][A-ZÀ-Ý' .-]{3,}$/.test(l) && /\s/.test(l) && !NOT_A_NAME.test(l));
+  if (holder) out.holder = holder.replace(/\s+/g, " ");
+  return out;
+}

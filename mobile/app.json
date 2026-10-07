@@ -33,6 +33,14 @@
       "expo-secure-store",
       "expo-web-browser",
       [
+        "expo-camera",
+        {
+          "cameraPermission": "WorldSoft Transfer utilise l'appareil photo pour scanner votre carte bancaire. Les photos restent sur votre téléphone.",
+          "recordAudioAndroid": false,
+          "microphonePermission": false
+        }
+      ],
+      [
         "expo-local-authentication",
         {
           "faceIDPermission": "WorldSoft Transfer utilise Face ID pour vous connecter et valider vos envois."

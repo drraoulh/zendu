@@ -1,9 +1,10 @@
-import { useRef, useState } from "react";
-import { Platform, Pressable, StyleSheet, Text, TextInput, View } from "react-native";
+import { useCallback, useRef, useState } from "react";
+import { Alert, Platform, Pressable, StyleSheet, Text, TextInput, View } from "react-native";
 import { cardBrand, expectedLength, expiryValid, formatCardNumber, formatExpiry, luhn, parseCardText } from "@/lib/cards";
 import type { SavedCard } from "@/lib/store";
 import { colors, fonts, radius } from "@/lib/theme";
 import { WstSymbol } from "./brand";
+import { cardScanAvailable, CardScanner, type ScannedCard } from "./card-scanner";
 import { cardLogoId, PaymentLogo } from "./payment-logo";
 import { Checkbox } from "./form";
 import { Icon } from "./icons";
@@ -12,8 +13,8 @@ import { Button, Field, Small } from "./ui";
 
 /**
  * Saisie d'une carte, avec remplissage automatique :
- * - les champs sont déclarés « carte bancaire » : iOS et Android proposent les cartes enregistrées
- *   et, selon l'appareil, « Scanner une carte » (appareil photo) au-dessus du clavier ;
+ * - « Scanner ma carte » : l'appareil photo lit le numéro, l'expiration et le nom (sur le téléphone) ;
+ * - les champs sont déclarés « carte bancaire » : iOS et Android proposent aussi les cartes enregistrées ;
  * - un numéro collé avec sa date (« 4242 4242 4242 4242 08/29 ») remplit les deux champs ;
  * - le curseur passe tout seul au champ suivant.
  * Seuls la marque, les 4 derniers chiffres et l'expiration sont conservés : le numéro complet et le CVC
@@ -27,7 +28,10 @@ export function CardForm({ defaultHolder, submitLabel, onSubmit }: { defaultHold
   const [isDefault, setIsDefault] = useState(true);
   const [errors, setErrors] = useState<Record<string, string>>({});
   const [back, setBack] = useState(false);
-  const [autofilled, setAutofilled] = useState(false);
+  const [autofilled, setAutofilled] = useState<"" | "paste" | "scan">("");
+  const [scanning, setScanning] = useState(false);
+  // Taille du numéro selon la largeur de la carte dessinée (19 caractères doivent tenir sur une ligne).
+  const [numberSize, setNumberSize] = useState(20);
   const numberRef = useRef<TextInput>(null);
   const expRef = useRef<TextInput>(null);
   const cvcRef = useRef<TextInput>(null);
@@ -44,7 +48,7 @@ export function CardForm({ defaultHolder, submitLabel, onSubmit }: { defaultHold
     if (parsed.number && parsed.exp) {
       setNumber(formatCardNumber(parsed.number));
       setExp(parsed.exp);
-      setAutofilled(true);
+      setAutofilled("paste");
       cvcRef.current?.focus();
       return;
     }
@@ -52,6 +56,26 @@ export function CardForm({ defaultHolder, submitLabel, onSubmit }: { defaultHold
     setNumber(next);
     const d = next.replace(/\D/g, "");
     if (d.length === expectedLength(next) && luhn(next)) expRef.current?.focus();
+  }
+
+  const onScanned = useCallback((card: ScannedCard) => {
+    setScanning(false);
+    setNumber(formatCardNumber(card.number));
+    if (card.exp) setExp(card.exp);
+    if (card.holder) setHolder(card.holder);
+    setErrors({});
+    setAutofilled("scan");
+    // Laisse la fenêtre de la caméra se fermer avant d'ouvrir le clavier.
+    setTimeout(() => (card.exp ? cvcRef : expRef).current?.focus(), 400);
+  }, []);
+  const closeScanner = useCallback(() => setScanning(false), []);
+
+  function startScan() {
+    if (cardScanAvailable) return setScanning(true);
+    Alert.alert(
+      "Scan indisponible ici",
+      "Le scan de carte fonctionne dans l'application installée (APK Android ou version iPhone). Dans Expo Go, saisissez la carte ou utilisez le remplissage automatique du clavier.",
+    );
   }
 
   function onExp(v: string) {
@@ -83,7 +107,12 @@ export function CardForm({ defaultHolder, submitLabel, onSubmit }: { defaultHold
 
   return (
     <View>
-      <View style={c.visual} accessibilityElementsHidden importantForAccessibility="no-hide-descendants">
+      <View
+        style={c.visual}
+        accessibilityElementsHidden
+        importantForAccessibility="no-hide-descendants"
+        onLayout={(e) => setNumberSize(Math.max(13, Math.min(20, Math.floor((e.nativeEvent.layout.width - 40) / 14))))}
+      >
         {back ? (
           <>
             <View style={c.strip} />
@@ -108,7 +137,9 @@ export function CardForm({ defaultHolder, submitLabel, onSubmit }: { defaultHold
               )}
             </View>
             <View style={c.chip} />
-            <Text style={c.number}>{shown}</Text>
+            <Text style={[c.number, { fontSize: numberSize, letterSpacing: numberSize * 0.075 }]} numberOfLines={1}>
+              {shown}
+            </Text>
             <View style={{ flexDirection: "row", justifyContent: "space-between", gap: 12 }}>
               <View style={{ flex: 1 }}>
                 <Text style={c.caption}>TITULAIRE</Text>
@@ -116,7 +147,7 @@ export function CardForm({ defaultHolder, submitLabel, onSubmit }: { defaultHold
               </View>
               <View>
                 <Text style={c.caption}>EXPIRE</Text>
-                <Text style={c.meta}>{exp || "MM/AA"}</Text>
+                <Text style={c.meta} numberOfLines={1}>{exp || "MM/AA"}</Text>
               </View>
             </View>
           </>
@@ -124,24 +155,26 @@ export function CardForm({ defaultHolder, submitLabel, onSubmit }: { defaultHold
       </View>
 
       {Platform.OS !== "web" ? (
-        <Pressable accessibilityRole="button" onPress={() => numberRef.current?.focus()} style={c.scan}>
+        <Pressable accessibilityRole="button" accessibilityLabel="Scanner ma carte avec l'appareil photo" onPress={startScan} style={({ pressed }) => [c.scan, pressed && { opacity: 0.85 }]}>
           <View style={c.scanIcon}>
-            <Icon name="camera" color={colors.brand} size={22} />
+            <Icon name="camera" color={colors.white} size={22} />
           </View>
           <View style={{ flex: 1 }}>
-            <Text style={c.scanTitle}>Scanner ou remplir automatiquement</Text>
-            <Small>
-              Touchez le numéro : votre téléphone propose vos cartes enregistrées ou « Scanner une carte » au-dessus du clavier.
-            </Small>
+            <Text style={c.scanTitle}>Scanner ma carte</Text>
+            <Small>Numéro, date et nom remplis avec l&apos;appareil photo</Small>
           </View>
+          <Icon name="chev" color={colors.brand} size={18} />
         </Pressable>
       ) : null}
       {autofilled ? (
         <View style={c.filled} accessibilityRole="alert">
           <Icon name="check" color={colors.success} size={16} strokeWidth={2.6} />
-          <Small style={{ color: colors.success, flex: 1 }}>Numéro et date remplis automatiquement. Ajoutez le CVC.</Small>
+          <Small style={{ color: colors.success, flex: 1 }}>
+            {autofilled === "scan" ? "Carte scannée : vérifiez les informations puis ajoutez le CVC." : "Numéro et date remplis automatiquement. Ajoutez le CVC."}
+          </Small>
         </View>
       ) : null}
+      {Platform.OS !== "web" ? <CardScanner visible={scanning} onClose={closeScanner} onScanned={onScanned} /> : null}
 
       <Field
         ref={numberRef}
@@ -227,7 +260,7 @@ const c = StyleSheet.create({
   cvcBox: { backgroundColor: colors.white, paddingHorizontal: 12, paddingVertical: 4, borderRadius: 4, borderWidth: 1, borderColor: colors.danger },
   cvcText: { fontFamily: fonts.heading, color: colors.ink, letterSpacing: 2 },
   scan: { flexDirection: "row", alignItems: "center", gap: 12, backgroundColor: colors.brandSoft, borderRadius: radius.md, padding: 12, marginBottom: 14 },
-  scanIcon: { width: 44, height: 44, borderRadius: 14, backgroundColor: colors.white, alignItems: "center", justifyContent: "center" },
+  scanIcon: { width: 44, height: 44, borderRadius: 14, backgroundColor: colors.brand, alignItems: "center", justifyContent: "center" },
   scanTitle: { fontFamily: fonts.heading, fontSize: 14, color: colors.ink, marginBottom: 2 },
   filled: { flexDirection: "row", alignItems: "center", gap: 8, backgroundColor: colors.successSoft, borderRadius: radius.sm, padding: 10, marginBottom: 12 },
   secure: { flexDirection: "row", alignItems: "center", justifyContent: "center", gap: 6, marginTop: 10 },
