@@ -32,6 +32,18 @@ export function CardForm({ defaultHolder, submitLabel, onSubmit }: { defaultHold
   const [scanning, setScanning] = useState(false);
   // Taille du numéro selon la largeur de la carte dessinée (19 caractères doivent tenir sur une ligne).
   const [numberSize, setNumberSize] = useState(20);
+  // Pendant la saisie (clavier ouvert), la carte dessinée devient un bandeau compact pour laisser
+  // les champs visibles au-dessus du clavier sur les petits écrans.
+  const [typing, setTyping] = useState(false);
+  const blurTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const typingOn = () => {
+    if (blurTimer.current) clearTimeout(blurTimer.current);
+    setTyping(true);
+  };
+  // Petit délai : passer d'un champ à l'autre ne doit pas faire réapparaître la grande carte.
+  const typingOff = () => {
+    blurTimer.current = setTimeout(() => setTyping(false), 150);
+  };
   const numberRef = useRef<TextInput>(null);
   const expRef = useRef<TextInput>(null);
   const cvcRef = useRef<TextInput>(null);
@@ -107,8 +119,17 @@ export function CardForm({ defaultHolder, submitLabel, onSubmit }: { defaultHold
 
   return (
     <View>
+      {typing ? (
+        <View style={c.compact} accessibilityElementsHidden importantForAccessibility="no-hide-descendants">
+          {brand === "Carte" ? <PaymentLogo id="CARD" size={22} /> : <PaymentLogo id={cardLogoId(brand)} size={22} />}
+          <Text style={c.compactNumber} numberOfLines={1}>
+            {back ? `CVC ${cvc ? "•".repeat(cvc.length) : "•••"}` : digits ? `•••• ${digits.slice(-4).padStart(4, "•")}` : "•••• ••••"}
+          </Text>
+          <Text style={c.compactExp}>{exp || "MM/AA"}</Text>
+        </View>
+      ) : null}
       <View
-        style={c.visual}
+        style={[c.visual, typing && { display: "none" }]}
         accessibilityElementsHidden
         importantForAccessibility="no-hide-descendants"
         onLayout={(e) => setNumberSize(Math.max(13, Math.min(20, Math.floor((e.nativeEvent.layout.width - 40) / 14))))}
@@ -154,7 +175,7 @@ export function CardForm({ defaultHolder, submitLabel, onSubmit }: { defaultHold
         )}
       </View>
 
-      {Platform.OS !== "web" ? (
+      {Platform.OS !== "web" && !typing ? (
         <Pressable accessibilityRole="button" accessibilityLabel="Scanner ma carte avec l'appareil photo" onPress={startScan} style={({ pressed }) => [c.scan, pressed && { opacity: 0.85 }]}>
           <View style={c.scanIcon}>
             <Icon name="camera" color={colors.white} size={22} />
@@ -187,6 +208,8 @@ export function CardForm({ defaultHolder, submitLabel, onSubmit }: { defaultHold
         textContentType="creditCardNumber"
         returnKeyType="next"
         onSubmitEditing={() => expRef.current?.focus()}
+        onFocus={typingOn}
+        onBlur={typingOff}
         error={errors.number}
         right={numberOk ? <Icon name="check" color={colors.success} size={18} strokeWidth={2.6} /> : null}
       />
@@ -201,6 +224,8 @@ export function CardForm({ defaultHolder, submitLabel, onSubmit }: { defaultHold
             keyboardType="number-pad"
             autoComplete="cc-exp"
             textContentType="creditCardExpiration"
+            onFocus={typingOn}
+            onBlur={typingOff}
             error={errors.exp}
           />
         </View>
@@ -215,8 +240,14 @@ export function CardForm({ defaultHolder, submitLabel, onSubmit }: { defaultHold
             secureTextEntry
             autoComplete="cc-csc"
             textContentType="creditCardSecurityCode"
-            onFocus={() => setBack(true)}
-            onBlur={() => setBack(false)}
+            onFocus={() => {
+              setBack(true);
+              typingOn();
+            }}
+            onBlur={() => {
+              setBack(false);
+              typingOff();
+            }}
             error={errors.cvc}
           />
         </View>
@@ -234,6 +265,8 @@ export function CardForm({ defaultHolder, submitLabel, onSubmit }: { defaultHold
         autoCapitalize="characters"
         returnKeyType="done"
         onSubmitEditing={submit}
+        onFocus={typingOn}
+        onBlur={typingOff}
         error={errors.holder}
       />
       <Checkbox checked={isDefault} onChange={setIsDefault}>
@@ -255,6 +288,9 @@ const c = StyleSheet.create({
   number: { color: colors.white, fontFamily: fonts.heading, fontSize: 20, letterSpacing: 1.5 },
   caption: { color: "rgba(255,255,255,0.55)", fontSize: 9, letterSpacing: 1 },
   meta: { color: "rgba(255,255,255,0.85)", fontFamily: fonts.semibold, fontSize: 12, letterSpacing: 0.6 },
+  compact: { flexDirection: "row", alignItems: "center", gap: 12, backgroundColor: colors.navy, borderRadius: radius.md, paddingHorizontal: 14, paddingVertical: 12, marginBottom: 14 },
+  compactNumber: { flex: 1, color: colors.white, fontFamily: fonts.heading, fontSize: 15, letterSpacing: 1 },
+  compactExp: { color: "rgba(255,255,255,0.8)", fontFamily: fonts.semibold, fontSize: 13 },
   strip: { height: 40, backgroundColor: "#0a0f24", marginHorizontal: -20, marginTop: 4 },
   cvcRow: { flexDirection: "row", justifyContent: "flex-end", backgroundColor: "rgba(255,255,255,0.9)", borderRadius: 6, padding: 8 },
   cvcBox: { backgroundColor: colors.white, paddingHorizontal: 12, paddingVertical: 4, borderRadius: 4, borderWidth: 1, borderColor: colors.danger },

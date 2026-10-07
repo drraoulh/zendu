@@ -37,7 +37,7 @@ export default function Success() {
           failed ? (
             <View style={{ gap: 8 }}>
               <Button title="Suivre le transfert" onPress={() => router.replace({ pathname: "/transfer/[id]", params: { id } })} />
-              <Button title="Retour à l'accueil" variant="ghost" onPress={() => router.replace("/(tabs)")} />
+              <Button title="Retour à l'accueil" variant="ghost" onPress={() => router.dismissTo("/(tabs)")} />
             </View>
           ) : undefined
         }
@@ -75,7 +75,7 @@ export default function Success() {
               onPress={() => router.push({ pathname: "/receipt/[id]", params: { id: t.id, card: card ?? "", mode: "recipient" } })}
             />
           </View>
-          {short ? null : <Button title="Retour à l'accueil" variant="ghost" onPress={() => router.replace("/(tabs)")} />}
+          {short ? null : <Button title="Retour à l'accueil" variant="ghost" onPress={() => router.dismissTo("/(tabs)")} />}
         </View>
       }
     >
@@ -101,7 +101,7 @@ export default function Success() {
         {card ? <SummaryRow label="Payé avec" value={card} /> : null}
       </Card>
       <Small style={{ textAlign: "center", marginTop: 12 }}>Un reçu a été envoyé à {t.senderEmail}.</Small>
-      {short ? <Button title="Retour à l'accueil" variant="ghost" style={{ marginTop: 8 }} onPress={() => router.replace("/(tabs)")} /> : null}
+      {short ? <Button title="Retour à l'accueil" variant="ghost" style={{ marginTop: 8 }} onPress={() => router.dismissTo("/(tabs)")} /> : null}
     </Screen>
   );
 }

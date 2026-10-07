@@ -2,10 +2,8 @@ import { router } from "expo-router";
 import { useState, type ReactNode, type Ref } from "react";
 import {
   ActivityIndicator,
-  KeyboardAvoidingView,
   Platform,
   Pressable,
-  ScrollView,
   StyleSheet,
   Text,
   TextInput,
@@ -15,7 +13,8 @@ import {
   type TextStyle,
   type ViewStyle,
 } from "react-native";
-import { SafeAreaView, type Edge } from "react-native-safe-area-context";
+import { KeyboardAvoidingView, KeyboardAwareScrollView, KeyboardStickyView } from "react-native-keyboard-controller";
+import { SafeAreaView, useSafeAreaInsets, type Edge } from "react-native-safe-area-context";
 import { colors, fonts, radius } from "@/lib/theme";
 import { Icon, type IconName } from "./icons";
 
@@ -46,23 +45,37 @@ export function Screen({
   contentStyle?: StyleProp<ViewStyle>;
   footer?: ReactNode;
 }) {
-  const body = scroll ? (
-    <ScrollView
-      contentContainerStyle={[styles.content, contentStyle]}
-      keyboardShouldPersistTaps="handled"
-      showsVerticalScrollIndicator={false}
-    >
-      {children}
-    </ScrollView>
-  ) : (
-    <View style={[styles.content, { flex: 1 }, contentStyle]}>{children}</View>
-  );
+  // Clavier (iOS et Android bord à bord) : le champ actif défile au-dessus du clavier et le pied de page
+  // (bouton principal) reste collé juste au-dessus, au lieu d'être recouvert.
+  const insets = useSafeAreaInsets();
+  const [footerHeight, setFooterHeight] = useState(0);
+  const bottomInset = edges.includes("bottom") ? insets.bottom : 0;
+  const footerView = footer ? (
+    <KeyboardStickyView offset={{ closed: 0, opened: bottomInset }} onLayout={(e) => setFooterHeight(e.nativeEvent.layout.height)} style={[styles.footer, { backgroundColor: background }]}>
+      {footer}
+    </KeyboardStickyView>
+  ) : null;
   return (
     <SafeAreaView edges={edges} style={{ flex: 1, backgroundColor: background }}>
-      <KeyboardAvoidingView style={{ flex: 1 }} behavior={Platform.OS === "ios" ? "padding" : undefined}>
-        {body}
-        {footer ? <View style={styles.footer}>{footer}</View> : null}
-      </KeyboardAvoidingView>
+      {scroll ? (
+        <>
+          <KeyboardAwareScrollView
+            contentContainerStyle={[styles.content, contentStyle]}
+            keyboardShouldPersistTaps="handled"
+            showsVerticalScrollIndicator={false}
+            bottomOffset={footerHeight + 16}
+            extraKeyboardSpace={footer ? footerHeight - bottomInset : 0}
+          >
+            {children}
+          </KeyboardAwareScrollView>
+          {footerView}
+        </>
+      ) : (
+        <KeyboardAvoidingView style={{ flex: 1 }} behavior="padding" keyboardVerticalOffset={-bottomInset}>
+          <View style={[styles.content, { flex: 1 }, contentStyle]}>{children}</View>
+          {footer ? <View style={styles.footer}>{footer}</View> : null}
+        </KeyboardAvoidingView>
+      )}
     </SafeAreaView>
   );
 }

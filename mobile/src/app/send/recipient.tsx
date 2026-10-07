@@ -8,14 +8,16 @@ import { countryName, networkLabel, phone } from "@/lib/format";
 import { useStore, type Recipient } from "@/lib/store";
 
 export default function ChooseRecipient() {
-  const { draft, setDraft, recipients, saveRecipient } = useStore();
+  const { draft, setDraft, recipients } = useStore();
   const corridor = findCorridor(useCorridors(), draft.corridorId);
   const country = corridor.destination as CountryCode;
   const saved = recipients.filter((r) => r.country === country);
   const [adding, setAdding] = useState(saved.length === 0);
 
-  function choose(r: Recipient) {
-    setDraft({ recipient: r });
+  // Un nouveau bénéficiaire n'est enregistré qu'une fois le transfert créé (voir processing.tsx) :
+  // un envoi commencé puis abandonné ne laisse pas de contact dans la liste.
+  function choose(r: Recipient, save = false) {
+    setDraft({ recipient: r, recipientFromHome: false, saveRecipient: save });
     router.push("/send/review");
   }
 
@@ -48,7 +50,7 @@ export default function ChooseRecipient() {
             country={country}
             networks={corridor.networks}
             submitLabel="Continuer"
-            onSubmit={(r, save) => choose(save ? saveRecipient(r) : { ...r, id: "draft" })}
+            onSubmit={(r, save) => choose({ ...r, id: "draft" }, save)}
           />
           {saved.length ? <Button title="Choisir un bénéficiaire enregistré" variant="ghost" onPress={() => setAdding(false)} style={{ marginTop: 6 }} /> : null}
         </>

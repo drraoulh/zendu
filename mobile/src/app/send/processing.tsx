@@ -15,7 +15,7 @@ type Phase = 0 | 1 | 2 | 3;
 
 export default function Processing() {
   const { profile } = useSession();
-  const { draft, cards, addTransfer } = useStore();
+  const { draft, cards, addTransfer, saveRecipient } = useStore();
   const [phase, setPhase] = useState<Phase>(0);
   const [reference, setReference] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
@@ -47,6 +47,10 @@ export default function Processing() {
         });
         setReference(transfer.reference);
         addTransfer({ id: transfer.id, reference: transfer.reference, createdAt: transfer.createdAt });
+        if (draft.saveRecipient && recipient.id === "draft") {
+          const { id: _draftId, ...person } = recipient;
+          saveRecipient(person);
+        }
         setPhase(2);
         if (payIn.provider === "stripe" && payIn.checkoutUrl) {
           await WebBrowser.openBrowserAsync(payIn.checkoutUrl);
@@ -63,7 +67,7 @@ export default function Processing() {
         setError(e instanceof Error ? e.message : "Paiement impossible");
       }
     })();
-  }, [recipient, profile, quote, draft.corridorId, draft.sendAmount, addTransfer, card]);
+  }, [recipient, profile, quote, draft.corridorId, draft.sendAmount, draft.saveRecipient, addTransfer, saveRecipient, card]);
 
   if (!recipient || !quote) return <Redirect href="/(tabs)" />;
 

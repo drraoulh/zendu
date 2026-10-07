@@ -42,10 +42,10 @@ export default function Kyc() {
     const res = await authenticate(`Activer ${biometricLabel(kind)}`);
     if (!res.ok) return setBioMessage(res.error);
     await updateSettings({ biometric: true });
-    router.replace("/(tabs)");
+    router.dismissTo("/(tabs)");
   }
 
-  const exit = () => router.replace("/(tabs)");
+  const exit = () => router.dismissTo("/(tabs)");
 
   if (step === 6) {
     return (

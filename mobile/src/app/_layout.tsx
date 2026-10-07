@@ -3,6 +3,7 @@ import { Stack } from "expo-router";
 import * as SplashScreen from "expo-splash-screen";
 import { StatusBar } from "expo-status-bar";
 import { useEffect } from "react";
+import { KeyboardProvider } from "react-native-keyboard-controller";
 import { SafeAreaProvider } from "react-native-safe-area-context";
 import { SessionProvider, useSession } from "@/lib/session";
 import { StoreProvider } from "@/lib/store";
@@ -19,12 +20,14 @@ export default function RootLayout() {
 
   return (
     <SafeAreaProvider>
-      <SessionProvider>
-        <StoreProvider>
-          <StatusBar style="dark" />
-          <Navigator fontsReady={fontsLoaded || Boolean(fontError)} />
-        </StoreProvider>
-      </SessionProvider>
+      <KeyboardProvider>
+        <SessionProvider>
+          <StoreProvider>
+            <StatusBar style="dark" />
+            <Navigator fontsReady={fontsLoaded || Boolean(fontError)} />
+          </StoreProvider>
+        </SessionProvider>
+      </KeyboardProvider>
     </SafeAreaProvider>
   );
 }

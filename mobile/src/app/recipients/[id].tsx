@@ -36,7 +36,7 @@ export default function RecipientDetail() {
 
   function send() {
     if (!r) return;
-    setDraft({ recipient: r, corridorId: corridorFor(profile?.country ?? "CA", r), quote: null });
+    setDraft({ recipient: r, recipientFromHome: true, saveRecipient: false, corridorId: corridorFor(profile?.country ?? "CA", r), quote: null });
     router.push("/(tabs)");
   }
 

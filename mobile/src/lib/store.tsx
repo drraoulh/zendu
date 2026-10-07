@@ -1,4 +1,4 @@
-import { createContext, useCallback, useContext, useEffect, useMemo, useState, type ReactNode } from "react";
+import { createContext, useCallback, useContext, useEffect, useMemo, useRef, useState, type ReactNode } from "react";
 import type { BeneficiaryInput, Quote } from "./api";
 import { storage } from "./storage";
 
@@ -23,6 +23,10 @@ export type Draft = {
   sendAmount: number;
   quote: Quote | null;
   recipient: Recipient | null;
+  /** Bénéficiaire choisi d'un geste sur l'accueil (gardé) ou pendant un envoi (oublié si l'envoi est abandonné). */
+  recipientFromHome: boolean;
+  /** Nouveau bénéficiaire à enregistrer, mais seulement une fois le transfert créé. */
+  saveRecipient: boolean;
   cardId: string | null;
 };
 
@@ -53,7 +57,7 @@ const KEY_REQUESTS = "wst.requests";
 const KEY_READ = "wst.read";
 
 export const DEFAULT_CORRIDOR = "CA-CM";
-const EMPTY_DRAFT: Draft = { corridorId: DEFAULT_CORRIDOR, sendAmount: 200, quote: null, recipient: null, cardId: null };
+const EMPTY_DRAFT: Draft = { corridorId: DEFAULT_CORRIDOR, sendAmount: 200, quote: null, recipient: null, recipientFromHome: false, saveRecipient: false, cardId: null };
 
 const StoreContext = createContext<StoreValue | null>(null);
 
@@ -64,6 +68,10 @@ function uid() {
 export function StoreProvider({ children }: { children: ReactNode }) {
   const [draft, setDraftState] = useState<Draft>(EMPTY_DRAFT);
   const [recipients, setRecipients] = useState<Recipient[]>([]);
+  const recipientsRef = useRef(recipients);
+  useEffect(() => {
+    recipientsRef.current = recipients;
+  }, [recipients]);
   const [transfers, setTransfers] = useState<SentTransfer[]>([]);
   const [cards, setCards] = useState<SavedCard[]>([]);
   const [requests, setRequests] = useState<ServiceRequest[]>([]);
@@ -134,7 +142,11 @@ export function StoreProvider({ children }: { children: ReactNode }) {
   const resetDraft = useCallback(() => setDraftState((d) => ({ ...EMPTY_DRAFT, corridorId: d.corridorId })), []);
 
   const saveRecipient = useCallback((r: Omit<Recipient, "id"> & { id?: string }) => {
-    const saved: Recipient = { ...r, id: r.id ?? uid() };
+    // Même personne déjà enregistrée (même pays, réseau et numéro ou compte) : on la met à jour.
+    const same = (x: Recipient) =>
+      x.country === r.country && x.network === r.network && (r.network === "BANK" ? x.accountNumber === r.accountNumber : x.phone === r.phone);
+    const dup = r.id ? undefined : recipientsRef.current.find(same);
+    const saved: Recipient = { ...r, id: r.id ?? dup?.id ?? uid() };
     setRecipients((list) => {
       const next = [saved, ...list.filter((x) => x.id !== saved.id)].slice(0, 20);
       void storage.set(KEY_RECIPIENTS, next);

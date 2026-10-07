@@ -1,5 +1,5 @@
-import { router } from "expo-router";
-import { useEffect, useRef } from "react";
+import { router, useFocusEffect } from "expo-router";
+import { useCallback, useEffect, useRef } from "react";
 import { Pressable, ScrollView, StyleSheet, Text, View } from "react-native";
 import { WstSymbol } from "@/components/brand";
 import { Flag } from "@/components/flag";
@@ -41,6 +41,14 @@ export default function Home() {
     }
   }, [profile, draft.corridorId, setDraft]);
 
+  // Retour à l'accueil après un envoi commencé puis abandonné : on oublie le bénéficiaire choisi
+  // pendant cet envoi (sinon « Envoyer à … » le reproposait). Celui touché ici sur l'accueil reste.
+  useFocusEffect(
+    useCallback(() => {
+      if (draft.recipient && !draft.recipientFromHome) setDraft({ recipient: null, saveRecipient: false, cardId: null });
+    }, [draft.recipient, draft.recipientFromHome, setDraft]),
+  );
+
   function startSend() {
     if (todo) return router.push("/kyc");
     if (kyc === "pending") return;
@@ -51,7 +59,7 @@ export default function Home() {
     if (selected?.id === r.id) return setDraft({ recipient: null });
     const corridorId = corridorFor(home, r);
     const sameCurrency = corridorId.split("-")[0] === draft.corridorId.split("-")[0];
-    setDraft({ recipient: r, corridorId, quote: null, ...(sameCurrency ? {} : { sendAmount: SAMPLE_AMOUNT[{ CA: "CAD", CM: "XAF", CN: "CNY" }[home] ?? "CAD"] ?? 200 }) });
+    setDraft({ recipient: r, recipientFromHome: true, saveRecipient: false, corridorId, quote: null, ...(sameCurrency ? {} : { sendAmount: SAMPLE_AMOUNT[{ CA: "CAD", CM: "XAF", CN: "CNY" }[home] ?? "CAD"] ?? 200 }) });
   }
 
   return (
