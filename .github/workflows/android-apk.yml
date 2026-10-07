@@ -1,0 +1,62 @@
+# Construit l'APK Android de WorldSoft Transfer (installable directement sur un téléphone).
+# Le fichier est à télécharger dans l'onglet Actions → ce workflow → « Artifacts ».
+# L'URL de l'API est intégrée à la construction : variable de dépôt EXPO_PUBLIC_API_URL
+# (Settings → Secrets and variables → Actions → Variables), sinon https://zendu-vert.vercel.app.
+name: APK Android
+
+on:
+  workflow_dispatch:
+  push:
+    branches: [claude/loving-meitner-akjeks]
+    paths: ["mobile/**", ".github/workflows/android-apk.yml"]
+
+concurrency:
+  group: android-apk-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  apk:
+    runs-on: ubuntu-latest
+    timeout-minutes: 60
+    env:
+      EXPO_PUBLIC_API_URL: ${{ vars.EXPO_PUBLIC_API_URL || 'https://zendu-vert.vercel.app' }}
+      EXPO_PUBLIC_SITE_URL: ${{ vars.EXPO_PUBLIC_SITE_URL }}
+      EXPO_PUBLIC_COMPANY_EMAIL: ${{ vars.EXPO_PUBLIC_COMPANY_EMAIL }}
+      EXPO_PUBLIC_COMPANY_PHONE: ${{ vars.EXPO_PUBLIC_COMPANY_PHONE }}
+      EXPO_PUBLIC_COMPANY_WHATSAPP: ${{ vars.EXPO_PUBLIC_COMPANY_WHATSAPP }}
+    defaults:
+      run:
+        working-directory: mobile
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+          cache-dependency-path: mobile/package-lock.json
+
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: 17
+
+      - uses: gradle/actions/setup-gradle@v4
+
+      - run: npm ci
+
+      - name: Projet natif Android
+        run: npx expo prebuild --platform android --no-install
+
+      - name: Compilation de l'APK
+        working-directory: mobile/android
+        run: ./gradlew assembleRelease --no-daemon -PreactNativeArchitectures=arm64-v8a,armeabi-v7a
+
+      - name: Nom du fichier
+        run: mv android/app/build/outputs/apk/release/app-release.apk "WorldSoft-Transfer-${GITHUB_SHA::7}.apk"
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: WorldSoft-Transfer-APK
+          path: mobile/WorldSoft-Transfer-*.apk
+          retention-days: 30
