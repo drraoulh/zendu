@@ -30,6 +30,19 @@ export async function verifyPassword(password: string, stored: string): Promise<
   return actual.length === expected.length && timingSafeEqual(actual, expected);
 }
 
+let dummyHash: Promise<string> | null = null;
+
+/**
+ * Comme verifyPassword, mais calcule aussi un scrypt quand le compte n'existe pas : la durée de la
+ * réponse ne révèle pas si un courriel est inscrit.
+ */
+export async function checkLoginPassword(password: string, stored: string | null | undefined): Promise<boolean> {
+  if (stored) return verifyPassword(password, stored);
+  dummyHash ??= hashPassword(randomBytes(16).toString("hex"));
+  await verifyPassword(password, await dummyHash);
+  return false;
+}
+
 /** Règles communes à l'appli : 8 caractères, majuscule, minuscule, chiffre, caractère spécial. */
 export function passwordProblem(password: string): string | null {
   if (password.length < 8) return "Le mot de passe doit contenir au moins 8 caractères.";

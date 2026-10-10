@@ -150,11 +150,28 @@ export type DeviceSession = { id: string; device: string | null; createdAt: stri
 
 export class ApiError extends Error {
   status: number;
-  constructor(message: string, status: number) {
+  /** Code d'erreur du serveur (ex. "invalid_code", "challenge_expired"), s'il y en a un. */
+  code?: string;
+  constructor(message: string, status: number, code?: string) {
     super(message);
     this.status = status;
+    this.code = code;
   }
 }
+
+/** Étape 1 de la connexion (mot de passe correct) : code à 6 chiffres envoyé, à vérifier par verify2fa. */
+export type LoginChallenge = {
+  challengeId: string;
+  channel: "sms" | "email";
+  /** Destination masquée (« +1 •••• 42 », « d•••@exemple.com »). */
+  destination: string;
+  expiresAt: string;
+  /** Secondes avant de pouvoir redemander un code. */
+  resendAfter: number;
+  attemptsLeft: number;
+  /** Mode démo du serveur uniquement (aucun fournisseur SMS / courriel) : le code à saisir. */
+  demoCode?: string;
+};
 
 function errorMessage(data: unknown): string | null {
   if (!data || typeof data !== "object") return null;
@@ -206,14 +223,21 @@ async function request<T>(path: string, init?: RequestInit & { token?: string | 
   }
   const data = await res.json().catch(() => null);
   if (res.status === 401 && token && path.startsWith("/api/me")) onUnauthorized?.();
-  if (!res.ok) throw new ApiError(errorMessage(data) ?? "Une erreur est survenue.", res.status);
+  if (!res.ok) {
+    const code = data && typeof data === "object" && typeof (data as { code?: unknown }).code === "string" ? (data as { code: string }).code : undefined;
+    throw new ApiError(errorMessage(data) ?? "Une erreur est survenue.", res.status, code);
+  }
   return data as T;
 }
 
 export const api = {
   signup: (input: SignupInput) => request<{ token: string; customer: Customer }>("/api/auth/signup", { method: "POST", body: JSON.stringify(input) }),
   login: (email: string, password: string, device?: string) =>
-    request<{ token: string; customer: Customer }>("/api/auth/login", { method: "POST", body: JSON.stringify({ email, password, device }) }),
+    request<LoginChallenge>("/api/auth/login", { method: "POST", body: JSON.stringify({ email, password, device }), token: null }),
+  verify2fa: (challengeId: string, code: string) =>
+    request<{ token: string; customer: Customer }>("/api/auth/verify-2fa", { method: "POST", body: JSON.stringify({ challengeId, code }), token: null }),
+  resend2fa: (challengeId: string, channel?: "sms" | "email") =>
+    request<LoginChallenge>("/api/auth/resend-2fa", { method: "POST", body: JSON.stringify({ challengeId, channel }), token: null }),
   logout: (token: string) => request<{ ok: true }>("/api/auth/logout", { method: "POST", token }),
   passwordReset: (email: string) => request<{ ok: true }>("/api/auth/password-reset", { method: "POST", body: JSON.stringify({ email }) }),
   me: (token?: string) => request<{ customer: Customer }>("/api/me", token ? { token } : undefined),
@@ -227,7 +251,7 @@ export const api = {
   revokeSession: (id: string) => request<{ ok: true }>(`/api/me/sessions/${encodeURIComponent(id)}`, { method: "DELETE" }),
   revokeOtherSessions: () => request<{ ok: true; revoked: number }>("/api/me/sessions", { method: "DELETE" }),
   corridors: () => request<CorridorMeta[]>("/api/quotes?meta=corridors"),
-  /** `network` (mode de réception) : seul le retrait en espèces change le prix. */
+  /** `network` : mode de réception, transmis pour un éventuel prix par mode (sans effet aujourd'hui). */
   quote: (corridorId: string, amount: number, mode: "send" | "receive" = "send", network?: string) =>
     request<Quote>("/api/quotes", {
       method: "POST",

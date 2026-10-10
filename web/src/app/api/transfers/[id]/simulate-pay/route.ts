@@ -3,17 +3,24 @@ import { markPaymentDetected } from "@/lib/transfer-service";
 import { prisma } from "@/lib/prisma";
 import { publicTransfer } from "@/lib/bank";
 import { INTERAC_PROVIDER, interacSimulationAllowed } from "@/lib/providers/interac";
+import { transferAccess } from "../_access";
 
 type Params = { params: Promise<{ id: string }> };
 
-/** Demo endpoint: simulate Canada pay-in success (mock provider). */
-export async function POST(_request: Request, { params }: Params) {
+/**
+ * Démo : simule la réception du paiement (fournisseur mock, ou Interac sans adresse de dépôt).
+ * Transfert d'un client : réservé à son propriétaire (Bearer) ou à l'équipe ; envoi sans compte :
+ * le lien de suivi suffit (uniquement en mode démo, voir plus bas).
+ */
+export async function POST(request: Request, { params }: Params) {
   const { id } = await params;
   const transfer = await prisma.transfer.findUnique({ where: { id } });
 
   if (!transfer) {
     return NextResponse.json({ error: "Introuvable" }, { status: 404 });
   }
+  const access = await transferAccess(request, transfer);
+  if (access instanceof NextResponse) return access;
 
   // Réservé au mode démo : un vrai paiement n'est confirmé que par son webhook (carte) ou par l'équipe
   // (Interac, dès qu'une vraie adresse de dépôt est configurée).
@@ -34,7 +41,9 @@ export async function POST(_request: Request, { params }: Params) {
       id,
       transfer.payInRef ?? `demo_pay_${id}`,
     );
-    return NextResponse.json(updated ? publicTransfer(updated) : updated);
+    if (!updated) return NextResponse.json(updated);
+    // Accès public : le tracker web recharge ensuite la vue masquée via GET.
+    return NextResponse.json(access === "full" ? publicTransfer(updated) : { id: updated.id, status: updated.status });
   } catch (error) {
     const message = error instanceof Error ? error.message : "Erreur paiement";
     return NextResponse.json({ error: message }, { status: 400 });

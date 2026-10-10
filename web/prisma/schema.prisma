@@ -198,6 +198,7 @@ model Customer {
   adminNote          String?
   lastLoginAt        DateTime?
   sessions           CustomerSession[]
+  otpChallenges      OtpChallenge[]
   transfers          Transfer[]
   createdAt          DateTime          @default(now())
   updatedAt          DateTime          @updatedAt
@@ -220,4 +221,28 @@ model CustomerSession {
   revokedAt  DateTime?
 
   @@index([customerId])
+}
+
+/// Défi de vérification en deux étapes (connexion) : seul le hash du code à 6 chiffres est stocké.
+/// L'identifiant (aléatoire, 192 bits) est renvoyé à l'appli après le mot de passe ; la session
+/// n'est créée qu'après POST /api/auth/verify-2fa avec le bon code (5 essais, 10 minutes).
+model OtpChallenge {
+  id         String    @id
+  customerId String
+  customer   Customer  @relation(fields: [customerId], references: [id], onDelete: Cascade)
+  purpose    String    @default("login")
+  /// "sms" | "email"
+  channel    String    @default("sms")
+  codeHash   String
+  attempts   Int       @default(0)
+  sends      Int       @default(1)
+  device     String?
+  ip         String?
+  lastSentAt DateTime  @default(now())
+  expiresAt  DateTime
+  consumedAt DateTime?
+  createdAt  DateTime  @default(now())
+
+  @@index([customerId])
+  @@index([expiresAt])
 }

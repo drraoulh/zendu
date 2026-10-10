@@ -14,7 +14,7 @@ export async function POST(request: Request) {
   const body = (await request.json().catch(() => ({}))) as { email?: unknown };
   const email = emailSchema.safeParse(body.email);
   if (!email.success) return NextResponse.json({ ok: false, error: "Adresse courriel invalide" }, { status: 400 });
-  if (!rateLimit(`reset:${clientIp(request)}`, 5)) {
+  if (!rateLimit(`reset:${clientIp(request)}`, 5) || !rateLimit(`reset:${email.data}`, 3)) {
     return NextResponse.json({ ok: false, code: "rate_limited", error: "Trop de demandes. Réessayez plus tard." }, { status: 429 });
   }
   try {

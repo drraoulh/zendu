@@ -49,7 +49,25 @@ function withCors(response: NextResponse, origin: string): NextResponse {
   return response;
 }
 
+/** En-têtes de sécurité communs (pages et API). Pas de CSP stricte : scripts inline de Next / Tailwind. */
+function withSecurityHeaders(response: NextResponse, pathname: string): NextResponse {
+  const h = response.headers;
+  h.set("X-Content-Type-Options", "nosniff");
+  h.set("Referrer-Policy", "strict-origin-when-cross-origin");
+  h.set("X-Frame-Options", "DENY");
+  h.set("Content-Security-Policy", "frame-ancestors 'none'");
+  h.set("Permissions-Policy", "camera=(), microphone=(), geolocation=(), payment=()");
+  if (process.env.NODE_ENV === "production") h.set("Strict-Transport-Security", "max-age=31536000; includeSubDomains");
+  // Données de compte, jetons, transferts : jamais en cache (navigateur, proxy, CDN).
+  if (/^\/api\/(auth|me|transfers|admin)(\/|$)/.test(pathname)) h.set("Cache-Control", "no-store");
+  return response;
+}
+
 export async function middleware(request: NextRequest) {
+  return withSecurityHeaders(await route(request), request.nextUrl.pathname);
+}
+
+async function route(request: NextRequest): Promise<NextResponse> {
   const { pathname, searchParams } = request.nextUrl;
 
   if (PUBLIC_API.test(pathname)) {

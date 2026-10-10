@@ -3,7 +3,7 @@ import { z } from "zod";
 import { publicCustomer, requireCustomer, verifyPassword } from "@/lib/customer-auth";
 import { profileErrorMessage, profilePatchSchema } from "@/lib/customer-input";
 import { prisma } from "@/lib/prisma";
-import { isUniqueViolation, zodIssues } from "@/lib/requests";
+import { isUniqueViolation, rateLimit, zodIssues } from "@/lib/requests";
 
 export const dynamic = "force-dynamic";
 
@@ -42,6 +42,9 @@ export async function DELETE(request: Request) {
   const authed = await requireCustomer(request);
   if (authed instanceof NextResponse) return authed;
   const body = (await request.json().catch(() => ({}))) as { password?: unknown };
+  if (!rateLimit(`me-delete:${authed.customer.id}`, 5)) {
+    return NextResponse.json({ ok: false, code: "rate_limited", error: "Trop de tentatives. Réessayez dans une heure." }, { status: 429 });
+  }
   if (typeof body.password !== "string" || !(await verifyPassword(body.password, authed.customer.passwordHash))) {
     return NextResponse.json({ ok: false, error: "Mot de passe incorrect." }, { status: 403 });
   }

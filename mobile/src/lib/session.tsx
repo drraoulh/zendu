@@ -2,7 +2,7 @@ import * as Crypto from "expo-crypto";
 import * as Device from "expo-device";
 import { createContext, useCallback, useContext, useEffect, useMemo, useRef, useState, type ReactNode } from "react";
 import { Platform } from "react-native";
-import { api, setAuthToken, setUnauthorizedHandler, type Customer, type SignupInput } from "./api";
+import { api, ApiError, setAuthToken, setUnauthorizedHandler, type Customer, type LoginChallenge, type SignupInput } from "./api";
 import { storage } from "./storage";
 
 /**
@@ -40,7 +40,8 @@ export const DEFAULT_SETTINGS: Settings = {
   notifications: { transfers: true, rates: true, shipping: true, finance: true, offers: false, push: true, email: true, sms: false },
 };
 
-type Pending = { token: string; customer: Customer; password: string };
+/** Connexion en cours : mot de passe validé par le serveur, code à 6 chiffres à saisir. */
+type Pending = { challenge: LoginChallenge; email: string; password: string };
 
 type Result = { ok: true } | { ok: false; error: string };
 
@@ -52,12 +53,15 @@ type SessionValue = {
   /** Vrai quand un PIN ou la biométrie protège l'appli et qu'elle n'a pas encore été déverrouillée. */
   locked: boolean;
   /** Connexion en cours (après le mot de passe, avant le code de vérification). */
-  pending: { phone: string; email: string; mustChangePassword: boolean } | null;
+  pending: (LoginChallenge & { email: string }) | null;
   signUp: (p: Omit<SignupInput, "device" | "password">, password: string) => Promise<Result>;
-  /** Étape 1 : mot de passe. needsCode = vérification en deux étapes à faire ensuite. */
+  /** Étape 1 : mot de passe. Le serveur envoie alors un code (vérification en deux étapes obligatoire). */
   startSignIn: (email: string, password: string) => Promise<Result & { needsCode?: boolean; mustChangePassword?: boolean }>;
-  /** Étape 2 : code validé → session active. */
-  completeSignIn: () => Promise<{ mustChangePassword: boolean }>;
+  /** Étape 2 : code vérifié par le serveur → session active. restart = défi expiré, revenir à la connexion. */
+  completeSignIn: (code: string) => Promise<({ ok: true; mustChangePassword: boolean } | { ok: false; error: string; restart?: boolean })>;
+  /** Nouveau code, éventuellement sur l'autre canal (SMS / courriel). */
+  resendCode: (channel?: "sms" | "email") => Promise<Result & { demoCode?: string }>;
+  cancelSignIn: () => void;
   signOut: () => Promise<void>;
   deleteAccount: (password: string) => Promise<Result>;
   refresh: () => Promise<void>;
@@ -186,7 +190,7 @@ export function SessionProvider({ children }: { children: ReactNode }) {
       settings,
       onboarded,
       locked: Boolean(token && profile && !unlocked && ((settings.pin && pinHash) || settings.biometric) && Platform.OS !== "web"),
-      pending: pending ? { phone: pending.customer.phone, email: pending.customer.email, mustChangePassword: pending.customer.mustChangePassword } : null,
+      pending: pending ? { ...pending.challenge, email: pending.email } : null,
       signUp: async (p, password) => {
         try {
           const r = await api.signup({ ...p, password, device: deviceName() });
@@ -198,25 +202,39 @@ export function SessionProvider({ children }: { children: ReactNode }) {
       },
       startSignIn: async (email, password) => {
         try {
-          const r = await api.login(email.trim().toLowerCase(), password, deviceName());
-          if (settings.twoFactor) {
-            setPending({ token: r.token, customer: r.customer, password });
-            return { ok: true, needsCode: true, mustChangePassword: r.customer.mustChangePassword };
-          }
-          tempPassword.current = r.customer.mustChangePassword ? password : null;
-          await commit(r.token, r.customer);
-          return { ok: true, needsCode: false, mustChangePassword: r.customer.mustChangePassword };
+          const normalized = email.trim().toLowerCase();
+          const challenge = await api.login(normalized, password, deviceName());
+          setPending({ challenge, email: normalized, password });
+          return { ok: true, needsCode: true };
         } catch (e) {
           return { ok: false, error: message(e) };
         }
       },
-      completeSignIn: async () => {
-        if (!pending) return { mustChangePassword: false };
-        tempPassword.current = pending.customer.mustChangePassword ? pending.password : null;
-        await commit(pending.token, pending.customer);
-        setPending(null);
-        return { mustChangePassword: pending.customer.mustChangePassword };
+      completeSignIn: async (code) => {
+        if (!pending) return { ok: false, error: "Connexion expirée. Reconnectez-vous.", restart: true };
+        try {
+          const r = await api.verify2fa(pending.challenge.challengeId, code);
+          tempPassword.current = r.customer.mustChangePassword ? pending.password : null;
+          await commit(r.token, r.customer);
+          setPending(null);
+          return { ok: true, mustChangePassword: r.customer.mustChangePassword };
+        } catch (e) {
+          const restart = e instanceof ApiError && (e.status === 410 || e.status === 403);
+          if (restart) setPending(null);
+          return { ok: false, error: message(e), restart };
+        }
       },
+      resendCode: async (channel) => {
+        if (!pending) return { ok: false, error: "Connexion expirée. Reconnectez-vous." };
+        try {
+          const challenge = await api.resend2fa(pending.challenge.challengeId, channel);
+          setPending({ ...pending, challenge });
+          return { ok: true, demoCode: challenge.demoCode };
+        } catch (e) {
+          return { ok: false, error: message(e) };
+        }
+      },
+      cancelSignIn: () => setPending(null),
       signOut: async () => {
         if (token) await api.logout(token).catch(() => undefined);
         await clearSession();
