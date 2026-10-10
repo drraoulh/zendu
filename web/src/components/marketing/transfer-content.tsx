@@ -137,7 +137,6 @@ export function TransferContent() {
                     [
                       ["phone", "etaMobile", "etaMobileValue"],
                       ["card", "etaBank", "etaBankValue"],
-                      ["wallet", "etaCash", "etaCashValue"],
                     ] as const
                   ).map(([icon, label, value]) => (
                     <div key={label} className="flex items-center justify-between gap-4 py-3.5">
@@ -183,12 +182,6 @@ export function TransferContent() {
               title={t("payBankTitle")}
               text={t("payBankText")}
               count={t("payCountries", { n: byType.bank.countries })}
-            />
-            <PayoutCard
-              icon="wallet"
-              title={t("payCashTitle")}
-              text={t("payCashText")}
-              count={t("payCountries", { n: byType.cash.countries })}
             />
           </ul>
 

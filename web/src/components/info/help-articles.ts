@@ -133,11 +133,11 @@ export const HELP_ARTICLES: HelpArticle[] = [
     links: ["linkFees", "linkCountries"],
     fr: {
       q: "Combien de temps prend un transfert ?",
-      a: "Le délai dépend du mode de réception :\n- Mobile money : en général quelques minutes une fois le paiement confirmé.\n- Virement bancaire : en général 1 à 2 jours ouvrables.\n- Retrait en espèces : selon la destination, le délai est indiqué avant l'envoi.\n\nCes délais sont des estimations. Une vérification de sécurité, un jour férié, l'opérateur ou la banque du destinataire peuvent les allonger. Le délai estimé est toujours affiché avant que vous confirmiez.",
+      a: "Le délai dépend du mode de réception :\n- Mobile money : en général quelques minutes une fois le paiement confirmé.\n- Virement bancaire : en général 1 à 2 jours ouvrables.\n\nCes délais sont des estimations. Une vérification de sécurité, un jour férié, l'opérateur ou la banque du destinataire peuvent les allonger. Le délai estimé est toujours affiché avant que vous confirmiez.",
     },
     en: {
       q: "How long does a transfer take?",
-      a: "It depends on the payout method:\n- Mobile money: usually a few minutes once payment is confirmed.\n- Bank transfer: usually 1–2 business days.\n- Cash pickup: depends on the destination; the estimate is shown before you send.\n\nThese are estimates. A security check, a public holiday, or the recipient's operator or bank can make them longer. The estimated delivery time is always shown before you confirm.",
+      a: "It depends on the payout method:\n- Mobile money: usually a few minutes once payment is confirmed.\n- Bank transfer: usually 1–2 business days.\n\nThese are estimates. A security check, a public holiday, or the recipient's operator or bank can make them longer. The estimated delivery time is always shown before you confirm.",
     },
   },
   {
@@ -146,11 +146,11 @@ export const HELP_ARTICLES: HelpArticle[] = [
     links: ["linkCountries"],
     fr: {
       q: "Comment mon proche reçoit-il l'argent ?",
-      a: "Selon le pays, trois modes peuvent être proposés :\n- Mobile money (MTN MoMo, Orange Money, Wave, M-Pesa, Airtel Money…) : l'argent arrive sur le portefeuille lié au numéro de téléphone du destinataire.\n- Compte bancaire : virement sur le compte du destinataire.\n- Retrait en espèces : le destinataire se présente dans un point de retrait avec une pièce d'identité.\n\nLes modes disponibles pour chaque pays sont indiqués sur sa fiche et dans l'application.",
+      a: "Selon le pays, deux modes sont proposés :\n- Mobile money (MTN MoMo, Orange Money, Wave, M-Pesa, Airtel Money…) : l'argent arrive sur le portefeuille lié au numéro de téléphone du destinataire.\n- Compte bancaire : virement sur le compte du destinataire.\n\nLes modes disponibles pour chaque pays sont indiqués sur sa fiche et dans l'application.",
     },
     en: {
       q: "How does my recipient get the money?",
-      a: "Depending on the country, up to three methods are offered:\n- Mobile money (MTN MoMo, Orange Money, Wave, M-Pesa, Airtel Money…): the money goes to the wallet linked to the recipient's phone number.\n- Bank account: a transfer to the recipient's account.\n- Cash pickup: the recipient goes to a pickup point with an ID.\n\nThe methods available for each country are shown on its page and in the app.",
+      a: "Depending on the country, two methods are offered:\n- Mobile money (MTN MoMo, Orange Money, Wave, M-Pesa, Airtel Money…): the money goes to the wallet linked to the recipient's phone number.\n- Bank account: a transfer to the recipient's account.\n\nThe methods available for each country are shown on its page and in the app.",
     },
   },
   {

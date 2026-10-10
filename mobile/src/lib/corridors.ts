@@ -20,7 +20,6 @@ const NETWORKS: Record<CountryCode, Network[]> = {
     { id: "MTN", label: "MTN MoMo", type: "mobile_money" },
     { id: "ORANGE", label: "Orange Money", type: "mobile_money" },
     { id: "BANK", label: "Bank account", type: "bank" },
-    { id: "CASH", label: "Cash pickup", type: "cash" },
   ],
   CN: [
     { id: "ALIPAY", label: "Alipay", type: "mobile_money" },

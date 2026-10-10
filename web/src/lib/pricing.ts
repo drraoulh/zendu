@@ -1,15 +1,18 @@
 import { roundMoney } from "./money";
 
 /**
- * Tarification « sans frais », comme Taptap Send : aucun frais affiché sur les envois vers mobile money,
- * portefeuille (Alipay, WeChat Pay, Interac) ou compte bancaire ; la rémunération est la marge sur le
- * taux de change (FX_MARGIN_PERCENT, ajustable par trajet). Seul le retrait en espèces a des frais fixes.
+ * Tarifs par trajet, alignés sur le marché (vérifié en octobre 2026) :
+ * - vers le Cameroun : AUCUN frais, comme Taptap Send et LemFi ; la rémunération est la marge de change ;
+ * - vers la Chine : petit frais fixe, comme Remitly (1,49 $ depuis le Canada) — le versement sur
+ *   WeChat Pay / Alipay coûte plus cher (partenaires agréés) et tous les concurrents facturent ce trajet ;
+ * - vers le Canada : petit frais fixe pour couvrir le virement Interac ou bancaire au bénéficiaire.
+ * Le retrait en espèces n'est pas proposé.
  *
- * Réglages (variables d'environnement, toutes facultatives) :
+ * Réglages (variables d'environnement, facultatives) :
  * - FX_MARGIN_PERCENT : marge par défaut sur le taux moyen (1,5 %).
- * - FEE_CASH_CAD / FEE_CASH_XAF / FEE_CASH_CNY : frais du retrait en espèces, dans la devise d'envoi.
- * - CORRIDOR_PRICING : JSON par trajet, ex. {"CA-CM":{"marginPercent":1.8},"CN-CM":{"feeFlat":5,"feePercent":0.5}}
- *   (feeFlat dans la devise d'envoi ; s'applique à tous les modes de réception du trajet, espèces en plus).
+ * - CORRIDOR_PRICING : JSON par trajet pour remplacer ces valeurs, ex.
+ *   {"CA-CN":{"feeFlat":0.99},"CA-CM":{"marginPercent":1.8},"CM-CA":{"feeFlat":0,"feePercent":0.5}}
+ *   (feeFlat dans la devise d'envoi, feePercent en % du montant envoyé, marginPercent en %).
  */
 export type Pricing = {
   feeFlat: number;
@@ -17,15 +20,23 @@ export type Pricing = {
   marginPercent: number;
 };
 
-const CASH_FEE_DEFAULT: Record<string, number> = { CAD: 2.99, XAF: 1500, CNY: 20 };
+/** Frais fixes par défaut, dans la devise d'envoi (0 = « Gratuit »). */
+const DEFAULT_FEE_FLAT: Record<string, number> = {
+  "CA-CM": 0,
+  "CN-CM": 0,
+  "CA-CN": 1.49,
+  "CM-CN": 1000,
+  "CM-CA": 1000,
+  "CN-CA": 10,
+};
 
 function num(raw: unknown, fallback: number): number {
   const n = Number(raw);
-  return Number.isFinite(n) && n >= 0 ? n : fallback;
+  return raw !== undefined && raw !== null && raw !== "" && Number.isFinite(n) && n >= 0 ? n : fallback;
 }
 
 export function defaultMarginPercent(): number {
-  return num(process.env.FX_MARGIN_PERCENT ?? "1.5", 1.5);
+  return num(process.env.FX_MARGIN_PERCENT, 1.5);
 }
 
 function corridorOverrides(): Record<string, Partial<Pricing>> {
@@ -38,20 +49,14 @@ function corridorOverrides(): Record<string, Partial<Pricing>> {
   }
 }
 
-function cashFee(currency: string): number {
-  return num(process.env[`FEE_CASH_${currency}`], CASH_FEE_DEFAULT[currency] ?? 0);
-}
-
-/** Tarif d'un trajet, pour un mode de réception donné (sans mode : tarif le plus bas, « à partir de »). */
-export function pricingFor(corridorId: string, sendCurrency: string, network?: string | null): Pricing {
+/** Tarif d'un trajet (le mode de réception ne change pas le prix). */
+export function pricingFor(corridorId: string): Pricing {
   const o = corridorOverrides()[corridorId] ?? {};
-  const base: Pricing = {
-    feeFlat: num(o.feeFlat, 0),
+  return {
+    feeFlat: num(o.feeFlat, DEFAULT_FEE_FLAT[corridorId] ?? 0),
     feePercent: num(o.feePercent, 0),
     marginPercent: num(o.marginPercent, defaultMarginPercent()),
   };
-  if (network?.toUpperCase() === "CASH") base.feeFlat = roundMoney(base.feeFlat + cashFee(sendCurrency), sendCurrency);
-  return base;
 }
 
 export function computeFee(sendAmount: number, currency: string, p: Pricing) {

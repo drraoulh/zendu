@@ -121,12 +121,12 @@ export const feesPage = defineMessages({
     ctaApp: "Télécharger l'app",
 
     howEyebrow: "Comment ça marche",
-    howTitle: "Sans frais d'envoi, un taux transparent",
+    howTitle: "Des frais réduits, un taux transparent",
     howSubtitle: "Pas de frais cachés : tout est affiché avant que vous payiez.",
-    how1Title: "Aucuns frais d'envoi",
+    how1Title: "Frais d'envoi",
     how1Text:
-      "Pas de frais sur les envois vers mobile money, portefeuille (Alipay, WeChat Pay, Interac) ou compte bancaire. Seul le retrait en espèces a des frais fixes, affichés avant le paiement.",
-    how2Title: "Notre seule rémunération : le taux",
+      "Aucun frais vers le Cameroun (MTN MoMo, Orange Money, compte bancaire). Vers la Chine et le Canada, un petit frais fixe couvre le versement sur Alipay, WeChat Pay, Interac ou compte bancaire. Il est toujours affiché avant le paiement.",
+    how2Title: "Marge de change",
     how2Text:
       "Le taux appliqué est le taux du marché diminué d'une marge de {margin} %. Cette marge est comprise dans le taux affiché : rien d'autre n'est ajouté.",
     how3Title: "Total affiché avant paiement",
@@ -174,13 +174,13 @@ export const feesPage = defineMessages({
     staleRates: "taux de référence",
 
     faqTitle: "Questions sur les frais",
-    faq1Q: "Y a-t-il vraiment zéro frais ?",
+    faq1Q: "Les frais sont-ils les mêmes pour tous les pays ?",
     faq1A:
-      "Oui pour les envois vers mobile money, portefeuille et compte bancaire. Seul le retrait en espèces a des frais fixes. Ce qui change d'un pays à l'autre, c'est le taux de change et le délai de réception.",
+      "Non. Les envois vers le Cameroun sont sans frais. Vers la Chine et le Canada, un petit frais fixe s'applique, car le versement sur ces réseaux coûte plus cher. Le taux de change et le délai varient aussi selon le pays.",
     faq2Q: "Pourquoi le montant reçu change-t-il d'un jour à l'autre ?",
     faq2A:
       "Parce que le taux du marché évolue. Le taux est fixé au moment où vous confirmez le devis dans l'app, et reste garanti pendant sa durée de validité.",
-    faq3Q: "Comment PWFINTECH se rémunère-t-elle sans frais ?",
+    faq3Q: "Comment PWFINTECH se rémunère-t-elle sur les envois sans frais ?",
     faq3A:
       "Par la marge de change, indiquée ci-dessus et déjà comprise dans le taux affiché. Comparez toujours le montant reçu : c'est le chiffre qui compte.",
     faq4Q: "Où voir le montant exact avant d'envoyer ?",
@@ -203,10 +203,10 @@ export const feesPage = defineMessages({
     howEyebrow: "How it works",
     howTitle: "Pricing in three parts",
     howSubtitle: "No hidden fees: everything is shown before you pay.",
-    how1Title: "No transfer fees",
+    how1Title: "Transfer fee",
     how1Text:
-      "No fees on transfers to mobile money, wallets (Alipay, WeChat Pay, Interac) or bank accounts. Only cash pickup has a fixed fee, shown before you pay.",
-    how2Title: "We only earn on the rate",
+      "No fee to Cameroon (MTN MoMo, Orange Money, bank account). To China and Canada, a small fixed fee covers the payout to Alipay, WeChat Pay, Interac or a bank account. It is always shown before you pay.",
+    how2Title: "Exchange margin",
     how2Text:
       "The rate applied is the market rate minus a {margin}% margin. This margin is included in the rate shown: nothing else is added.",
     how3Title: "Total shown before payment",
@@ -254,13 +254,13 @@ export const feesPage = defineMessages({
     staleRates: "reference rates",
 
     faqTitle: "Questions about fees",
-    faq1Q: "Are there really zero fees?",
+    faq1Q: "Are fees the same for every country?",
     faq1A:
-      "Yes for transfers to mobile money, wallets and bank accounts. Only cash pickup has a fixed fee. What changes from one country to another is the exchange rate and the delivery time.",
+      "No. Transfers to Cameroon are fee-free. To China and Canada a small fixed fee applies, because paying out on those networks costs more. The exchange rate and delivery time also vary by country.",
     faq2Q: "Why does the amount received change from day to day?",
     faq2A:
       "Because the market rate moves. The rate is locked when you confirm the quote in the app and stays guaranteed for its validity period.",
-    faq3Q: "How does PWFINTECH earn money without fees?",
+    faq3Q: "How does PWFINTECH earn money on fee-free transfers?",
     faq3A:
       "Through the exchange margin shown above, already included in the displayed rate. Always compare the amount received: that's the number that matters.",
     faq4Q: "Where can I see the exact amount before sending?",
@@ -276,7 +276,7 @@ export const feesPage = defineMessages({
     heroTitle: "Comisiones, tasas y plazos",
     ctaSimulate: "Abrir el simulador",
     ctaApp: "Descargar la app",
-    howTitle: "Sin comisión de envío, una tasa transparente",
+    howTitle: "Comisiones reducidas, una tasa transparente",
     colCountry: "País",
     colCurrency: "Moneda",
     colDelivery: "Plazo",
@@ -288,7 +288,7 @@ export const feesPage = defineMessages({
     heroTitle: "费用、汇率与到账时间",
     ctaSimulate: "打开试算器",
     ctaApp: "下载应用",
-    howTitle: "零手续费，汇率透明",
+    howTitle: "低手续费，汇率透明",
     colCountry: "国家",
     colCurrency: "货币",
     colDelivery: "到账时间",
@@ -306,7 +306,7 @@ export const countriesPage = defineMessages({
     heroEyebrow: "Pays desservis",
     heroTitle: "Envoyez de l'argent dans nos {count} pays",
     heroSubtitle:
-      "Depuis le Canada, avec WorldSoft Transfer : mobile money, compte bancaire ou retrait en espèces selon le pays. Choisissez une destination pour voir ses modes de réception, ses délais et ses frais.",
+      "Depuis le Canada, avec WorldSoft Transfer : mobile money, portefeuille (Alipay, WeChat Pay, Interac) ou compte bancaire selon le pays. Choisissez une destination pour voir ses modes de réception, ses délais et ses frais.",
     searchLabel: "Rechercher une destination",
     searchPh: "Nom du pays, devise ou réseau…",
     countLabel: "{n} pays",
@@ -321,7 +321,7 @@ export const countriesPage = defineMessages({
     heroEyebrow: "Destinations",
     heroTitle: "Send money across our {count} countries",
     heroSubtitle:
-      "From Canada, with WorldSoft Transfer: mobile money, bank account or cash pickup depending on the country. Pick a destination to see its payout methods, delivery times and fees.",
+      "From Canada, with WorldSoft Transfer: mobile money, wallet (Alipay, WeChat Pay, Interac) or bank account depending on the country. Pick a destination to see its payout methods, delivery times and fees.",
     searchLabel: "Search a destination",
     searchPh: "Country, currency or network…",
     countLabel: "{n} countries",

@@ -7,7 +7,7 @@ export type QuoteInput = {
   corridorId?: string;
   sendAmount?: number;
   receiveAmount?: number;
-  /** Mode de réception (MTN, ORANGE, BANK, CASH…) : seul le retrait en espèces change le prix. */
+  /** Mode de réception (MTN, ORANGE, BANK…) : accepté pour plus tard, sans effet sur le prix aujourd'hui. */
   network?: string | null;
 };
 
@@ -59,7 +59,7 @@ export async function buildQuote(input: QuoteInput): Promise<QuoteResult> {
   const source = getCountry(corridor.source);
   const dest = getCountry(corridor.destination);
   const fx = await getFxRate(source.currency, dest.currency);
-  const pricing = pricingFor(corridorId, source.currency, input.network);
+  const pricing = pricingFor(corridorId);
   const rate = customerRate(fx.midRate, pricing.marginPercent);
 
   let send: number;

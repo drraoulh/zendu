@@ -219,7 +219,6 @@ export function PayoutScreen() {
     { label: "MTN MoMo", icon: "phone", on: true },
     { label: "Orange Money", icon: "phone" },
     { label: t("scrBank"), d: BANK },
-    { label: t("scrCash"), icon: "wallet" },
   ];
   return (
     <>

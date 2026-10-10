@@ -37,7 +37,7 @@ export const homeMessages = defineMessages({
     s1Pitch:
       "Notre application pour envoyer de l'argent entre le Canada, le Cameroun et la Chine, dans les deux sens. Simulez ici, envoyez dans l'app.",
     s1b1: "Taux, frais et délai affichés avant paiement",
-    s1b2: "Mobile money, compte bancaire ou retrait",
+    s1b2: "Mobile money, portefeuille ou compte bancaire",
     s1b3: "Suivi de chaque étape et reçu détaillé",
     s2Title: "Finances",
     s2Pitch: "Un accompagnement pour mieux gérer votre budget, épargner et préparer vos projets.",
@@ -70,7 +70,7 @@ export const homeMessages = defineMessages({
     step1Title: "Simulez",
     step1Text: "Choisissez le pays de destination et le montant : le taux, les frais et le montant reçu s'affichent instantanément.",
     step2Title: "Ajoutez le bénéficiaire",
-    step2Text: "Dans l'app, indiquez son nom, son numéro et le mode de réception : mobile money, banque ou retrait.",
+    step2Text: "Dans l'app, indiquez son nom, son numéro et le mode de réception : mobile money, portefeuille ou banque.",
     step3Title: "Payez en sécurité",
     step3Text: "Réglez votre transfert dans l'application. Le montant total est confirmé avant validation.",
     step4Title: "Suivez l'envoi",
@@ -138,7 +138,7 @@ export const homeMessages = defineMessages({
     appText:
       "WorldSoft Transfer est l'application de transfert d'argent de PWFINTECH. Simulez, ajoutez vos destinataires, payez et suivez chaque envoi depuis votre téléphone.",
     appPoint1: "Taux, frais et délai affichés avant de payer",
-    appPoint2: "Mobile money, virement bancaire ou retrait",
+    appPoint2: "Mobile money, portefeuille ou virement bancaire",
     appPoint3: "Suivi de chaque étape, reçu détaillé",
     appLink: "Télécharger l'application",
     appProduct: "Découvrir WorldSoft Transfer",
@@ -178,7 +178,7 @@ export const homeMessages = defineMessages({
     s1Pitch:
       "Our app to send money between Canada, Cameroon and China, both ways. Simulate here, send in the app.",
     s1b1: "Rate, fees and delivery time shown before you pay",
-    s1b2: "Mobile money, bank account or cash pickup",
+    s1b2: "Mobile money, wallet or bank account",
     s1b3: "Tracking at every step and a detailed receipt",
     s2Title: "Finances",
     s2Pitch: "Guidance to help you manage your budget, save and prepare your projects.",
@@ -211,7 +211,7 @@ export const homeMessages = defineMessages({
     step1Title: "Simulate",
     step1Text: "Pick the destination country and amount: the rate, fees and amount received appear instantly.",
     step2Title: "Add your recipient",
-    step2Text: "In the app, enter their name, phone number and how they receive: mobile money, bank or cash pickup.",
+    step2Text: "In the app, enter their name, phone number and how they receive: mobile money, wallet or bank.",
     step3Title: "Pay securely",
     step3Text: "Pay for your transfer in the app. The total is confirmed before you validate.",
     step4Title: "Track it",
@@ -279,7 +279,7 @@ export const homeMessages = defineMessages({
     appText:
       "WorldSoft Transfer is PWFINTECH's money transfer app. Simulate, add your recipients, pay and track every transfer from your phone.",
     appPoint1: "Rate, fees and delivery time shown before you pay",
-    appPoint2: "Mobile money, bank transfer or cash pickup",
+    appPoint2: "Mobile money, wallet or bank transfer",
     appPoint3: "Tracking at every step, detailed receipt",
     appLink: "Download the app",
     appProduct: "Discover WorldSoft Transfer",

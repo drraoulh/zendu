@@ -70,7 +70,7 @@ export const aboutPage = defineMessages({
     wstText2:
       "Le site web reste votre point de départ : il présente les frais, les pays desservis et le simulateur, qui utilise le même calcul que l'application.",
     wstPoint1: "Frais et taux affichés avant chaque paiement",
-    wstPoint2: "Mobile money, compte bancaire ou retrait selon le pays",
+    wstPoint2: "Mobile money, portefeuille ou compte bancaire selon le pays",
     wstPoint3: "Suivi de chaque transfert avec une référence unique",
     wstCtaApp: "Découvrir l'application",
     wstCtaFees: "Frais et délais",
@@ -164,7 +164,7 @@ export const aboutPage = defineMessages({
     wstText2:
       "The website remains your starting point: it presents fees, destinations and the simulator, which uses the same calculation as the app.",
     wstPoint1: "Fees and rate shown before every payment",
-    wstPoint2: "Mobile money, bank account or cash pickup depending on the country",
+    wstPoint2: "Mobile money, wallet or bank account depending on the country",
     wstPoint3: "Every transfer tracked with a unique reference",
     wstCtaApp: "Discover the app",
     wstCtaFees: "Fees and delivery",

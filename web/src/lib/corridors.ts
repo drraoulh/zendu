@@ -162,7 +162,7 @@ const ALL_COUNTRIES: Record<string, Country> = {
     phoneRegex: /^(237)?6\d{8}$/,
     phoneHint: "Ex: 2376XXXXXXXX",
     role: "destination",
-    networks: [MM.mtn, MM.orange, MM.bank, MM.cash],
+    networks: [MM.mtn, MM.orange, MM.bank],
   },
   SN: {
     code: "SN",
@@ -173,7 +173,7 @@ const ALL_COUNTRIES: Record<string, Country> = {
     phoneRegex: /^(221)?7\d{8}$/,
     phoneHint: "Ex: 2217XXXXXXXX",
     role: "destination",
-    networks: [MM.orange, MM.wave, MM.bank, MM.cash],
+    networks: [MM.orange, MM.wave, MM.bank],
   },
   CI: {
     code: "CI",
@@ -184,7 +184,7 @@ const ALL_COUNTRIES: Record<string, Country> = {
     phoneRegex: /^(225)?0?\d{9,10}$/,
     phoneHint: "Ex: 22507XXXXXXXX",
     role: "destination",
-    networks: [MM.mtn, MM.orange, MM.wave, MM.bank, MM.cash],
+    networks: [MM.mtn, MM.orange, MM.wave, MM.bank],
   },
   NG: {
     code: "NG",
@@ -195,7 +195,7 @@ const ALL_COUNTRIES: Record<string, Country> = {
     phoneRegex: /^(234)?[789]\d{9}$/,
     phoneHint: "Ex: 234801XXXXXXX",
     role: "destination",
-    networks: [MM.bank, MM.mtn, MM.cash],
+    networks: [MM.bank, MM.mtn],
   },
   GH: {
     code: "GH",
@@ -206,7 +206,7 @@ const ALL_COUNTRIES: Record<string, Country> = {
     phoneRegex: /^(233)?0?\d{9}$/,
     phoneHint: "Ex: 23324XXXXXXX",
     role: "destination",
-    networks: [MM.mtn, MM.vodafone, MM.bank, MM.cash],
+    networks: [MM.mtn, MM.vodafone, MM.bank],
   },
   KE: {
     code: "KE",
@@ -228,7 +228,7 @@ const ALL_COUNTRIES: Record<string, Country> = {
     phoneRegex: /^(256)?7\d{8}$/,
     phoneHint: "Ex: 2567XXXXXXXX",
     role: "destination",
-    networks: [MM.mtn, MM.airtel, MM.bank, MM.cash],
+    networks: [MM.mtn, MM.airtel, MM.bank],
   },
   TZ: {
     code: "TZ",
@@ -239,7 +239,7 @@ const ALL_COUNTRIES: Record<string, Country> = {
     phoneRegex: /^(255)?[67]\d{8}$/,
     phoneHint: "Ex: 2557XXXXXXXX",
     role: "destination",
-    networks: [MM.mpesa, MM.airtel, MM.bank, MM.cash],
+    networks: [MM.mpesa, MM.airtel, MM.bank],
   },
   ZA: {
     code: "ZA",
@@ -250,7 +250,7 @@ const ALL_COUNTRIES: Record<string, Country> = {
     phoneRegex: /^(27)?0?\d{9}$/,
     phoneHint: "Ex: 2782XXXXXXX",
     role: "destination",
-    networks: [MM.bank, MM.cash],
+    networks: [MM.bank],
   },
   CD: {
     code: "CD",
@@ -261,7 +261,7 @@ const ALL_COUNTRIES: Record<string, Country> = {
     phoneRegex: /^(243)?0?\d{9}$/,
     phoneHint: "Ex: 2438XXXXXXXX",
     role: "destination",
-    networks: [MM.orange, MM.airtel, MM.bank, MM.cash],
+    networks: [MM.orange, MM.airtel, MM.bank],
   },
   ML: {
     code: "ML",
@@ -272,7 +272,7 @@ const ALL_COUNTRIES: Record<string, Country> = {
     phoneRegex: /^(223)?\d{8}$/,
     phoneHint: "Ex: 2237XXXXXXX",
     role: "destination",
-    networks: [MM.orange, MM.wave, MM.bank, MM.cash],
+    networks: [MM.orange, MM.wave, MM.bank],
   },
   BF: {
     code: "BF",
@@ -283,7 +283,7 @@ const ALL_COUNTRIES: Record<string, Country> = {
     phoneRegex: /^(226)?\d{8}$/,
     phoneHint: "Ex: 2267XXXXXXX",
     role: "destination",
-    networks: [MM.orange, MM.wave, MM.bank, MM.cash],
+    networks: [MM.orange, MM.wave, MM.bank],
   },
   TG: {
     code: "TG",
@@ -294,7 +294,7 @@ const ALL_COUNTRIES: Record<string, Country> = {
     phoneRegex: /^(228)?\d{8}$/,
     phoneHint: "Ex: 2289XXXXXXX",
     role: "destination",
-    networks: [MM.mtn, MM.wave, MM.bank, MM.cash],
+    networks: [MM.mtn, MM.wave, MM.bank],
   },
   BJ: {
     code: "BJ",
@@ -305,7 +305,7 @@ const ALL_COUNTRIES: Record<string, Country> = {
     phoneRegex: /^(229)?\d{8,10}$/,
     phoneHint: "Ex: 2299XXXXXXX",
     role: "destination",
-    networks: [MM.mtn, MM.orange, MM.bank, MM.cash],
+    networks: [MM.mtn, MM.orange, MM.bank],
   },
   GA: {
     code: "GA",
@@ -316,7 +316,7 @@ const ALL_COUNTRIES: Record<string, Country> = {
     phoneRegex: /^(241)?0?\d{7,8}$/,
     phoneHint: "Ex: 2410XXXXXXX",
     role: "destination",
-    networks: [MM.airtel, MM.bank, MM.cash],
+    networks: [MM.airtel, MM.bank],
   },
   CG: {
     code: "CG",
@@ -327,7 +327,7 @@ const ALL_COUNTRIES: Record<string, Country> = {
     phoneRegex: /^(242)?0?\d{8,9}$/,
     phoneHint: "Ex: 2420XXXXXXX",
     role: "destination",
-    networks: [MM.mtn, MM.airtel, MM.bank, MM.cash],
+    networks: [MM.mtn, MM.airtel, MM.bank],
   },
   RW: {
     code: "RW",
@@ -338,7 +338,7 @@ const ALL_COUNTRIES: Record<string, Country> = {
     phoneRegex: /^(250)?7\d{8}$/,
     phoneHint: "Ex: 2507XXXXXXXX",
     role: "destination",
-    networks: [MM.mtn, MM.airtel, MM.bank, MM.cash],
+    networks: [MM.mtn, MM.airtel, MM.bank],
   },
   MA: {
     code: "MA",
@@ -349,7 +349,7 @@ const ALL_COUNTRIES: Record<string, Country> = {
     phoneRegex: /^(212)?0?[67]\d{8}$/,
     phoneHint: "Ex: 2126XXXXXXXX",
     role: "destination",
-    networks: [MM.bank, MM.cash],
+    networks: [MM.bank],
   },
   IN: {
     code: "IN",
@@ -360,7 +360,7 @@ const ALL_COUNTRIES: Record<string, Country> = {
     phoneRegex: /^(91)?[6-9]\d{9}$/,
     phoneHint: "Ex: 9198XXXXXXXX",
     role: "destination",
-    networks: [MM.bank, MM.cash],
+    networks: [MM.bank],
   },
   PH: {
     code: "PH",
@@ -371,7 +371,7 @@ const ALL_COUNTRIES: Record<string, Country> = {
     phoneRegex: /^(63)?9\d{9}$/,
     phoneHint: "Ex: 63917XXXXXXX",
     role: "destination",
-    networks: [MM.bank, MM.cash],
+    networks: [MM.bank],
   },
   HT: {
     code: "HT",
@@ -382,7 +382,7 @@ const ALL_COUNTRIES: Record<string, Country> = {
     phoneRegex: /^(509)?\d{8}$/,
     phoneHint: "Ex: 5093XXXXXXX",
     role: "destination",
-    networks: [MM.cash, MM.bank],
+    networks: [MM.bank],
   },
 };
 
