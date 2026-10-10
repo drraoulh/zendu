@@ -1,10 +1,10 @@
 import { router } from "expo-router";
 import { useState } from "react";
-import { RefreshControl, ScrollView, View } from "react-native";
+import { ActivityIndicator, RefreshControl, ScrollView, View } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
-import { Chips } from "@/components/form";
+import { Chips, SectionTitle } from "@/components/form";
 import { TransferRow } from "@/components/transfer-row";
-import { Button, Card, Empty, Field, H1, Notice, Small } from "@/components/ui";
+import { Button, Card, Empty, Field, H1, Notice } from "@/components/ui";
 import type { Transfer } from "@/lib/api";
 import { countryName, dateTime, money, networkLabel, statusInfo } from "@/lib/format";
 import { useShare } from "@/lib/share";
@@ -24,6 +24,22 @@ function group(t: Transfer): Filter {
   if (t.status === "delivered") return "delivered";
   if (["payout_failed", "payment_mismatch", "expired", "cancelled"].includes(t.status)) return "issue";
   return "progress";
+}
+
+const MONTH_NAMES = ["janvier", "février", "mars", "avril", "mai", "juin", "juillet", "août", "septembre", "octobre", "novembre", "décembre"];
+
+/** Transferts regroupés par mois (« Octobre 2026 »), dans l'ordre de la liste. */
+function byMonth(list: Transfer[]) {
+  const groups: { label: string; items: Transfer[] }[] = [];
+  for (const t of list) {
+    const d = new Date(t.createdAt);
+    const name = Number.isNaN(d.getTime()) ? "" : `${MONTH_NAMES[d.getMonth()]} ${d.getFullYear()}`;
+    const label = name.charAt(0).toUpperCase() + name.slice(1);
+    const last = groups[groups.length - 1];
+    if (last?.label === label) last.items.push(t);
+    else groups.push({ label, items: [t] });
+  }
+  return groups;
 }
 
 function csv(list: Transfer[]) {
@@ -73,26 +89,44 @@ export default function History() {
           </>
         ) : null}
         {failed ? (
-          <View style={{ marginBottom: 12 }}>
-            <Notice tone="danger" icon="alert" text="Impossible de charger vos transferts. Vérifiez votre connexion." />
+          <View style={{ marginBottom: 12, gap: 8 }}>
+            <Notice
+              tone="danger"
+              icon="alert"
+              text={items.length ? "Impossible d'actualiser vos transferts. La liste affichée peut ne pas être à jour." : "Impossible de charger vos transferts. Vérifiez votre connexion."}
+            />
+            <Button title="Réessayer" icon="refresh" size="sm" variant="secondary" onPress={reload} loading={loading} />
           </View>
         ) : null}
-        <Card style={{ paddingVertical: 6 }}>
-          {list.length ? (
-            list.map((t) => <TransferRow key={t.id} transfer={t} />)
-          ) : loading && !items.length ? (
-            <Small style={{ padding: 12 }}>Chargement…</Small>
-          ) : items.length ? (
-            <Empty icon="history" title="Aucun résultat" text="Essayez un autre nom, une autre référence ou un autre filtre." />
-          ) : (
-            <Empty
-              icon="history"
-              title="Aucun transfert"
-              text="Vos transferts apparaîtront ici, avec leur suivi en temps réel."
-              action={<Button title="Envoyer de l'argent" size="sm" onPress={() => router.push("/(tabs)")} />}
-            />
-          )}
-        </Card>
+        {list.length ? (
+          byMonth(list).map((g) => (
+            <View key={g.label}>
+              <SectionTitle>{g.label}</SectionTitle>
+              <Card style={{ paddingVertical: 6 }}>
+                {g.items.map((t) => (
+                  <TransferRow key={t.id} transfer={t} />
+                ))}
+              </Card>
+            </View>
+          ))
+        ) : failed && !items.length ? null : (
+          <Card style={{ paddingVertical: 6 }}>
+            {loading && !items.length ? (
+              <View style={{ padding: 24, alignItems: "center" }}>
+                <ActivityIndicator color={colors.brand} accessibilityLabel="Chargement" />
+              </View>
+            ) : items.length ? (
+              <Empty icon="history" title="Aucun résultat" text="Essayez un autre nom, une autre référence ou un autre filtre." />
+            ) : (
+              <Empty
+                icon="history"
+                title="Aucun transfert"
+                text="Vos transferts apparaîtront ici, avec leur suivi en temps réel."
+                action={<Button title="Envoyer de l'argent" size="sm" onPress={() => router.push("/(tabs)")} />}
+              />
+            )}
+          </Card>
+        )}
       </ScrollView>
     </SafeAreaView>
   );

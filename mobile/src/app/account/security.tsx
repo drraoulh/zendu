@@ -49,7 +49,9 @@ export default function Security() {
     else setMessage(res.error);
   }
 
-  const strong = settings.twoFactor && (settings.biometric || settings.pin);
+  // La vérification en deux étapes est imposée par le serveur à chaque connexion : seul le verrouillage
+  // de l'appli (PIN ou biométrie) reste au choix de l'utilisateur.
+  const strong = settings.biometric || settings.pin;
 
   return (
     <Screen>
@@ -58,13 +60,13 @@ export default function Security() {
         tone={strong ? "success" : "warn"}
         icon="shield"
         title={strong ? "Votre compte est bien protégé" : "Renforcez la protection de votre compte"}
-        text={strong ? "Deux étapes et verrouillage de l'appli activés." : "Activez la vérification en deux étapes et un verrouillage (PIN ou biométrie)."}
+        text={strong ? "Vérification en deux étapes et verrouillage de l'appli activés." : "La vérification en deux étapes est active. Ajoutez un verrouillage de l'appli (PIN ou biométrie)."}
       />
 
       <SectionTitle>Connexion</SectionTitle>
       <Card style={{ paddingVertical: 4 }}>
         <ListItem icon="lock" tone="neutral" title="Changer le mot de passe" subtitle={since(profile?.passwordChangedAt ?? profile?.createdAt)} onPress={() => router.push("/account/password")} />
-        <ToggleRow icon="phone" label="Vérification en deux étapes" sub="Code par SMS à chaque connexion" value={settings.twoFactor} onChange={(v) => updateSettings({ twoFactor: v })} />
+        <ListItem icon="shield" tone="success" title="Vérification en deux étapes" subtitle="Toujours active : un code à chaque connexion" />
         <ToggleRow icon="face" label="Face ID / empreinte" sub="Pour ouvrir l'appli et vous connecter" value={settings.biometric} onChange={toggleBiometric} />
       </Card>
       {message ? <Small style={{ marginTop: 8 }}>{message}</Small> : null}

@@ -75,9 +75,10 @@ export const HELP_ARTICLES: HelpArticle[] = [
     slug: "payer-carte",
     category: "paiements",
     title: "Comment payer mon transfert ?",
-    intro: "Vous payez par carte Visa ou Mastercard. Le virement Interac arrive bientôt.",
+    intro: "Depuis le Canada, payez par virement Interac (le moins cher) ou par carte de débit. Depuis le Cameroun ou la Chine, par carte.",
     sections: [
-      { title: "Sécurité", text: "Le paiement est protégé par 3-D Secure. Seuls les 4 derniers chiffres de votre carte sont conservés." },
+      { title: "Virement Interac", text: "Envoyez le montant exact depuis votre banque en indiquant la référence du transfert (PW-…) en message. Le versement part dès la réception du virement." },
+      { title: "Carte", text: "Le paiement est protégé par 3-D Secure. Seuls les 4 derniers chiffres de votre carte sont conservés." },
       { title: "Reçu", text: "Un reçu est envoyé par courriel et reste disponible dans l'appli." },
     ],
   },

@@ -1,4 +1,4 @@
-import { useLocalSearchParams } from "expo-router";
+import { router, useLocalSearchParams } from "expo-router";
 import { useEffect, useState } from "react";
 import { Text, View } from "react-native";
 import { Icon } from "@/components/icons";
@@ -77,6 +77,17 @@ export default function Parcels() {
         </Card>
       ) : null}
 
+      {!shipment && !recent.length ? (
+        <Card style={{ marginTop: 16, flexDirection: "row", gap: 12, alignItems: "center" }} onPress={() => router.push({ pathname: "/help/[slug]", params: { slug: "suivi-colis" } })}>
+          <Icon name="help" color={colors.brand} size={20} />
+          <View style={{ flex: 1 }}>
+            <Text style={{ fontFamily: fonts.heading, color: colors.ink }}>Où trouver mon numéro ?</Text>
+            <Small>Il commence par PWS- et figure sur votre reçu d&apos;expédition. Il peut apparaître quelques heures après le dépôt.</Small>
+          </View>
+          <Icon name="chev" color={colors.muted} size={18} />
+        </Card>
+      ) : null}
+
       {shipment && st ? (
         <>
           <Card style={{ marginTop: 16, marginBottom: 12 }}>
@@ -118,6 +129,12 @@ export default function Parcels() {
                   </View>
                 ))}
           </Card>
+          {shipment.status === "exception" ? (
+            <View style={{ gap: 10, marginBottom: 12 }}>
+              <Notice tone="danger" icon="alert" text="Un incident bloque ce colis. Notre équipe logistique vous contacte ; vous pouvez aussi nous écrire avec le numéro de suivi." />
+              <Button title="Contacter le support" icon="mail" variant="secondary" onPress={() => router.push({ pathname: "/help/contact", params: { subject: `Colis ${shipment.number}` } })} />
+            </View>
+          ) : null}
           {shipment.weightKg ? (
             <Card>
               <SummaryRow label="Poids" value={`${shipment.weightKg} kg`} />

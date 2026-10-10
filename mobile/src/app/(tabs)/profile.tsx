@@ -7,6 +7,7 @@ import { Icon } from "@/components/icons";
 import { Badge, Card, ListItem, Screen, Small } from "@/components/ui";
 import { referralCode, useSession } from "@/lib/session";
 import { useStore } from "@/lib/store";
+import { dateTime } from "@/lib/format";
 import { colors, fonts } from "@/lib/theme";
 
 const LANG: Record<string, string> = { fr: "Français", en: "English", es: "Español", zh: "中文" };
@@ -54,7 +55,23 @@ export default function Profile() {
         <ListItem icon="wallet" tone="neutral" title="Moyens de paiement" subtitle={card ? `•••• ${card.last4}` : "Aucune carte"} onPress={go("/account/payment-methods")} />
         <ListItem icon="ship" tone="neutral" title="Suivre un colis" onPress={go("/(tabs)/parcels")} />
         <ListItem icon="user" tone="neutral" title="Mes destinataires" subtitle={`${recipients.length} enregistré${recipients.length > 1 ? "s" : ""}`} onPress={go("/recipients")} />
-        {kyc === "none" || kyc === "rejected" ? <ListItem icon="shield" tone="warn" title="Vérifier mon identité" onPress={go("/kyc")} /> : null}
+        <ListItem
+          icon="shield"
+          tone={kyc === "verified" ? "success" : kyc === "rejected" ? "danger" : "warn"}
+          title="Vérification d'identité"
+          subtitle={
+            kyc === "verified"
+              ? `Vérifiée${profile.kycVerifiedAt ? ` le ${dateTime(profile.kycVerifiedAt).split(" · ")[0]}` : ""}`
+              : kyc === "pending"
+                ? "En cours d'examen · nous vous prévenons dès qu'elle est terminée"
+                : kyc === "rejected"
+                  ? profile.kycNote ?? "Refusée · recommencez avec un document valide"
+                  : "À faire avant votre premier envoi · 2 min"
+          }
+          subtitleLines={3}
+          onPress={kyc === "none" || kyc === "rejected" ? go("/kyc") : undefined}
+        />
+        <ListItem icon="send" tone="neutral" title="Limites d'envoi" subtitle="Minimum et maximum par envoi" onPress={go("/account/limits")} />
       </Card>
 
       <SectionTitle>Paramètres</SectionTitle>

@@ -12,6 +12,9 @@ import { MANUAL_BANK_PROVIDER } from "@/lib/bank";
 import { BankQueue } from "./bank-queue";
 import { InteracQueue } from "./interac-queue";
 import { INTERAC_PROVIDER } from "@/lib/providers/interac";
+import { Field, inputClass } from "../../_ui/kit";
+import { filterMessages } from "./filter-messages";
+import { STATUS_GROUPS, type TransferFilters } from "./filters";
 
 export type AdminTransferRow = {
   id: string;
@@ -59,14 +62,23 @@ const NUMBER_LOCALE: Record<string, string> = { fr: "fr-CA", en: "en-CA", es: "e
 
 export function AdminDashboard({
   transfers,
+  results,
+  filters = {},
+  resultsLimit = 100,
   payInMode,
   payoutMode,
 }: {
   transfers: AdminTransferRow[] | null;
+  /** Résultats de la recherche (undefined sans recherche, null si la base est indisponible). */
+  results?: AdminTransferRow[] | null;
+  filters?: TransferFilters;
+  resultsLimit?: number;
   payInMode: string;
   payoutMode: string;
 }) {
   const t = useT(adminMessages);
+  const tf = useT(filterMessages);
+  const filtering = results !== undefined;
   const { locale } = useI18n();
   const nl = NUMBER_LOCALE[locale] ?? "fr-CA";
 
@@ -81,6 +93,8 @@ export function AdminDashboard({
     new Intl.DateTimeFormat(nl, { dateStyle: "medium", timeStyle: "short" }).format(new Date(iso));
 
   const rows = transfers ?? [];
+  // Liste affichée : résultats de la recherche, sinon les transferts récents.
+  const list = results ?? (filtering ? [] : rows);
   const interacQueue = rows.filter((r) => r.payInProvider === INTERAC_PROVIDER && r.status === "awaiting_payment");
   const bankQueue = rows.filter(
     (r) =>
@@ -199,10 +213,49 @@ export function AdminDashboard({
                 )}
 
                 <h2 id="admin-recent" className={`font-display text-xl font-bold text-ink ${interacQueue.length > 0 || bankQueue.length > 0 || payoutMode === "momo" ? "mt-8" : ""}`}>
-                  {t("recent")}
+                  {filtering ? tf("resultsTitle") : t("recent")}
                 </h2>
 
-                {rows.length === 0 ? (
+                <form method="get" action="/admin/transferts" role="search" className="mt-4 rounded-3xl border border-line bg-white p-4 shadow-card">
+                  <div className="grid gap-3 sm:grid-cols-[minmax(0,1.6fr)_minmax(0,1fr)_auto] sm:items-end">
+                    <Field id="t-q" label={tf("search")}>
+                      <input id="t-q" name="q" type="search" defaultValue={filters.q ?? ""} placeholder={tf("searchPlaceholder")} className={inputClass} />
+                    </Field>
+                    <Field id="t-status" label={tf("status")}>
+                      <select id="t-status" name="status" defaultValue={filters.status ?? ""} className={inputClass}>
+                        <option value="">{tf("all")}</option>
+                        {(Object.keys(STATUS_GROUPS) as (keyof typeof STATUS_GROUPS)[]).map((g) => (
+                          <option key={g} value={g}>
+                            {tf(g)}
+                          </option>
+                        ))}
+                      </select>
+                    </Field>
+                    <div className="flex gap-2">
+                      <Button type="submit" size="md" className="flex-1 sm:flex-none">
+                        {tf("apply")}
+                      </Button>
+                      {filtering && (
+                        <ButtonLink href="/admin/transferts" variant="ghost" size="md">
+                          {tf("reset")}
+                        </ButtonLink>
+                      )}
+                    </div>
+                  </div>
+                  {filtering && results && (
+                    <p role="status" className="mt-3 text-xs font-semibold text-muted">
+                      {results.length >= resultsLimit ? tf("resultsCapped", { n: resultsLimit }) : tf("results", { n: results.length })}
+                    </p>
+                  )}
+                </form>
+
+                {filtering && results === null ? (
+                  <p role="alert" className="mt-4 rounded-3xl border border-danger/25 bg-white p-6 text-sm text-danger shadow-card">
+                    {t("dbErrorText")}
+                  </p>
+                ) : filtering && list.length === 0 ? (
+                  <p className="mt-4 rounded-3xl border border-line bg-white p-8 text-center text-sm text-muted shadow-card">{tf("noResults")}</p>
+                ) : list.length === 0 ? (
                   <div className="mt-4 rounded-3xl border border-dashed border-line bg-white p-10 text-center">
                     <span className="mx-auto inline-flex h-12 w-12 items-center justify-center rounded-2xl bg-brand-soft text-brand">
                       <Icon name="receipt" />
@@ -227,7 +280,7 @@ export function AdminDashboard({
                           </tr>
                         </thead>
                         <tbody className="divide-y divide-line">
-                          {rows.map((r) => (
+                          {list.map((r) => (
                             <tr key={r.id} className="transition hover:bg-surface-soft/50">
                               <td className="px-4 py-3 align-top">
                                 <span className="font-mono text-xs font-semibold text-ink">{r.reference}</span>
@@ -266,7 +319,7 @@ export function AdminDashboard({
 
                     {/* Cartes (mobile) */}
                     <ul className="mt-4 space-y-3 md:hidden">
-                      {rows.map((r) => (
+                      {list.map((r) => (
                         <li key={r.id}>
                           <Link
                             href={`/transfers/${r.id}`}

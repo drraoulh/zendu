@@ -23,7 +23,7 @@ import { useMyTransfers } from "@/lib/use-transfers";
 export default function Home() {
   const { profile } = useSession();
   const { draft, setDraft, recipients } = useStore();
-  const { items, loading } = useMyTransfers(3);
+  const { items, loading, failed, reload } = useMyTransfers(3);
   const { unread } = useNotifications();
   const kyc = profile?.kyc ?? "none";
   const todo = kyc === "none" || kyc === "rejected";
@@ -154,7 +154,16 @@ export default function Home() {
           ))}
         </Card>
       ) : (
-        <Small style={{ paddingHorizontal: 4 }}>{loading ? "Chargement…" : "Vos envois apparaîtront ici, avec leur suivi en temps réel."}</Small>
+        <View style={{ flexDirection: "row", alignItems: "center", justifyContent: "space-between", gap: 12, paddingHorizontal: 4 }}>
+          <Small style={{ flex: 1 }}>
+            {loading ? "Chargement…" : failed ? "Impossible de charger votre activité. Vérifiez votre connexion." : "Vos envois apparaîtront ici, avec leur suivi en temps réel."}
+          </Small>
+          {failed && !loading ? (
+            <Pressable accessibilityRole="button" onPress={reload} hitSlop={8}>
+              <Text style={st.link}>Réessayer</Text>
+            </Pressable>
+          ) : null}
+        </View>
       )}
     </Screen>
   );

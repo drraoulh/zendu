@@ -21,7 +21,8 @@ export default function Contact() {
   const params = useLocalSearchParams<{ subject?: string }>();
   const { profile } = useSession();
   const { addRequest } = useStore();
-  const [subject, setSubject] = useState<Subject>("transfert");
+  // Ouvert depuis le suivi d'un colis (« Colis PWS-… ») : sujet « Colis » déjà choisi.
+  const [subject, setSubject] = useState<Subject>(params.subject?.startsWith("Colis") ? "shipping" : "transfert");
   const [title, setTitle] = useState(params.subject ?? "");
   const [message, setMessage] = useState("");
   const [busy, setBusy] = useState(false);

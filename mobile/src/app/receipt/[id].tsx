@@ -1,12 +1,12 @@
 import { useLocalSearchParams } from "expo-router";
-import { useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import { ActivityIndicator, Pressable, StyleSheet, Text, View } from "react-native";
 import { PoweredBy, WstWordmark } from "@/components/brand";
 import { Icon } from "@/components/icons";
 import { RecipientNotice, recipientMessage } from "@/components/recipient-notice";
 import { Button, Header, Notice, Screen, Small } from "@/components/ui";
 import { api, type Transfer } from "@/lib/api";
-import { countryName, dateTime, money, networkLabel, phone, rate, statusInfo } from "@/lib/format";
+import { countryName, dateTime, feeLabel, money, networkLabel, phone, rate, statusInfo } from "@/lib/format";
 import { openSite } from "@/lib/links";
 import { shareViewAsImage } from "@/lib/share-image";
 import { colors, fonts, radius } from "@/lib/theme";
@@ -23,15 +23,27 @@ export default function Receipt() {
   const mineRef = useRef<View>(null);
   const noticeRef = useRef<View>(null);
 
+  const fetchTransfer = useCallback(() => api.transfer(params.id).then(setT).catch((e: Error) => setError(e.message)), [params.id]);
   useEffect(() => {
-    api.transfer(params.id).then(setT).catch((e: Error) => setError(e.message));
-  }, [params.id]);
+    void fetchTransfer();
+  }, [fetchTransfer]);
+  const load = () => {
+    setError(null);
+    void fetchTransfer();
+  };
 
   if (!t) {
     return (
       <Screen>
         <Header title="Reçu" />
-        {error ? <Notice tone="danger" icon="alert" text={error} /> : <ActivityIndicator color={colors.brand} style={{ marginTop: 80 }} />}
+        {error ? (
+          <View style={{ gap: 12 }}>
+            <Notice tone="danger" icon="alert" text={error} />
+            <Button title="Réessayer" icon="refresh" size="sm" variant="secondary" onPress={load} />
+          </View>
+        ) : (
+          <ActivityIndicator color={colors.brand} style={{ marginTop: 80 }} />
+        )}
       </Screen>
     );
   }
@@ -39,6 +51,9 @@ export default function Receipt() {
   const info = statusInfo(t.status);
   const ben = t.beneficiary;
   const first = ben.fullName.split(" ")[0];
+  const deliveredAt = t.events?.find((e) => e.type === "delivered")?.createdAt;
+  // Moyen de paiement : celui choisi pendant l'envoi (carte précise) ou, à défaut, celui du transfert.
+  const paidWith = params.card ?? ({ interac_manual: "Virement Interac", interac: "Virement Interac", stripe: "Carte de débit" } as Record<string, string>)[t.payInProvider];
   const benLine = [networkLabel(ben.network), ben.accountMasked ?? (ben.phone ? phone(ben.phone) : null)].filter(Boolean).join(" · ");
 
   function receiptText() {
@@ -51,10 +66,12 @@ export default function Receipt() {
       `Expéditeur : ${t.senderName} — ${countryName(t.sourceCountry)}`,
       `Destinataire : ${ben.fullName} — ${benLine} — ${countryName(t.destCountry)}`,
       `Montant envoyé : ${money(t.sendAmountCad, t.sendCurrency)}`,
-      `Frais : ${money(t.feeCad, t.sendCurrency)}`,
+      `Frais : ${feeLabel(t.feeCad, t.sendCurrency)}`,
       `Total payé : ${money(t.totalCad, t.sendCurrency)}`,
       `Taux : 1 ${t.sendCurrency} = ${rate(t.rate)} ${t.receiveCurrency}`,
       `Montant reçu : ${money(t.receiveAmountXaf, t.receiveCurrency)}`,
+      ...(paidWith ? [`Payé avec : ${paidWith}`] : []),
+      ...(deliveredAt ? [`Livré le : ${dateTime(deliveredAt)}`] : []),
     ].join("\n");
   }
 
@@ -133,12 +150,15 @@ export default function Receipt() {
             <Party label="Destinataire" name={ben.fullName} line={`${benLine} · ${countryName(t.destCountry)}`} logo={ben.network} />
             <View style={r.sep} />
             <Line label="Montant envoyé" value={money(t.sendAmountCad, t.sendCurrency)} />
-            <Line label="Frais" value={money(t.feeCad, t.sendCurrency)} />
+            <Line label="Frais" value={feeLabel(t.feeCad, t.sendCurrency)} />
             <Line label="Taux de change" value={`1 ${t.sendCurrency} = ${rate(t.rate)} ${t.receiveCurrency}`} />
             <Line label="Total payé" value={money(t.totalCad, t.sendCurrency)} strong />
             <View style={r.sep} />
             <Line label="Référence" value={t.reference} strong />
-            {params.card ? <Line label="Payé avec" value={params.card} logo={params.card.startsWith("Virement Interac") ? "INTERAC" : cardLogoId(params.card.split(" ")[0])} /> : null}
+            {paidWith ? (
+              <Line label="Payé avec" value={paidWith} logo={paidWith.startsWith("Virement Interac") ? "INTERAC" : cardLogoId((params.card ?? "").split(" ")[0])} />
+            ) : null}
+            {deliveredAt ? <Line label="Livré le" value={dateTime(deliveredAt)} /> : null}
           </View>
           <View style={r.foot}>
             <Icon name="shield" color={colors.muted} size={14} />
