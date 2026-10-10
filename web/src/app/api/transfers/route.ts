@@ -116,6 +116,7 @@ export async function POST(request: Request) {
     const quoteData = await buildQuote({
       corridorId: data.corridorId,
       sendAmount,
+      network: normalized.data.network,
     });
     if (data.payMethod === "interac" && quoteData.sendCurrency !== "CAD") {
       return NextResponse.json({ error: "Le virement Interac n'est possible que pour les envois depuis le Canada (CAD)." }, { status: 400 });

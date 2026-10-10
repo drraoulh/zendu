@@ -137,7 +137,7 @@ export function Simulator({
                 1 {current.sendCurrency} = {rate(current.rate)} {current.receiveCurrency}
               </Text>
               <Text style={s.hint}>
-                Frais {money(current.fee, current.sendCurrency)} · {etaLabel(current.deliveryEstimate)}
+                {current.fee > 0 ? `Frais ${money(current.fee, current.sendCurrency)}` : "Sans frais"} · {etaLabel(current.deliveryEstimate)}
               </Text>
             </>
           ) : (

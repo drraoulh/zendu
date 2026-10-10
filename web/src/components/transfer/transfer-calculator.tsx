@@ -530,14 +530,20 @@ export function TransferCalculator({
               compact ? "space-y-1.5 px-4 py-3" : "space-y-2 p-4"
             }`}
           >
-            <Row label={t("flatFee")} value={showQuote ? formatMoney(showQuote.feeFlat, showQuote.sendCurrency, tag) : null} />
+            {/* Sans frais (cas général) : une seule ligne « Gratuit » ; détail fixe + % seulement s'il y a des frais. */}
+            {showQuote && showQuote.fee > 0 && showQuote.feePercent > 0 ? (
+              <>
+                <Row label={t("flatFee")} value={formatMoney(showQuote.feeFlat, showQuote.sendCurrency, tag)} />
+                <Row
+                  label={t("percentFee", { p: new Intl.NumberFormat(tag, { maximumFractionDigits: 2 }).format(showQuote.feePercent) })}
+                  value={formatMoney(showQuote.feeVariable, showQuote.sendCurrency, tag)}
+                />
+              </>
+            ) : null}
             <Row
-              label={t("percentFee", {
-                p: showQuote ? new Intl.NumberFormat(tag, { maximumFractionDigits: 2 }).format(showQuote.feePercent) : "–",
-              })}
-              value={showQuote ? formatMoney(showQuote.feeVariable, showQuote.sendCurrency, tag) : null}
+              label={t("totalFees")}
+              value={showQuote ? (showQuote.fee === 0 ? t("feeFree") : formatMoney(showQuote.fee, showQuote.sendCurrency, tag)) : null}
             />
-            <Row label={t("totalFees")} value={showQuote ? formatMoney(showQuote.fee, showQuote.sendCurrency, tag) : null} />
             <Row
               strong
               label={t("total")}

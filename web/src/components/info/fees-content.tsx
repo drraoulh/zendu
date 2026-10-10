@@ -98,7 +98,7 @@ export function FeesContent({ destinations }: { destinations: DestinationInfo[] 
                   </h3>
                   <dl className="mt-5 grid gap-3 text-sm">
                     <Row label={t("exampleSend")} value={L.money(q100.sendAmount, sendCurrency)} />
-                    <Row label={t("exampleFee", { flat, percent })} value={`+ ${L.money(q100.fee, sendCurrency)}`} />
+                    <Row label={t("exampleFee", { flat, percent })} value={q100.fee === 0 ? t("feeFree") : `+ ${L.money(q100.fee, sendCurrency)}`} />
                     <div className="border-t border-white/15" />
                     <Row label={t("exampleTotal")} value={L.money(q100.total, sendCurrency)} strong />
                     <Row label={t("exampleRate")} value={t("rateLine", { from: sendCurrency, rate: L.number(q100.rate, 4), to: sample.currency })} />
@@ -176,7 +176,7 @@ export function FeesContent({ destinations }: { destinations: DestinationInfo[] 
                             <td className="px-3 py-4 text-xs text-muted"><DeliveryLines d={d} /></td>
                             {d.quotes.map((quote) => (
                               <td key={quote.sendAmount} className="px-3 py-4">
-                                <span className="block font-semibold text-ink">{L.money(quote.fee, d.sendCurrency)}</span>
+                                <span className="block font-semibold text-ink">{quote.fee === 0 ? t("feeFree") : L.money(quote.fee, d.sendCurrency)}</span>
                                 <span className="block text-xs text-muted">{t("receiveApprox", { amount: L.money(quote.receiveAmount, d.currency) })}</span>
                               </td>
                             ))}
@@ -215,7 +215,7 @@ export function FeesContent({ destinations }: { destinations: DestinationInfo[] 
                           {d.quotes.map((quote) => (
                             <div key={quote.sendAmount} className="flex min-w-0 items-baseline justify-between gap-3 sm:block">
                               <dt className="text-xs text-muted sm:text-[11px]">{L.money(quote.sendAmount, d.sendCurrency)}</dt>
-                              <dd className="break-words text-sm font-semibold text-ink sm:mt-0.5">{L.money(quote.fee, d.sendCurrency)}</dd>
+                              <dd className="break-words text-sm font-semibold text-ink sm:mt-0.5">{quote.fee === 0 ? t("feeFree") : L.money(quote.fee, d.sendCurrency)}</dd>
                             </div>
                           ))}
                         </dl>

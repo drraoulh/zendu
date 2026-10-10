@@ -1,12 +1,14 @@
 import { roundMoney } from "./money";
 import { getFxRate, type FxSnapshot } from "./fx";
 import { getCorridor, getCountry } from "./corridors";
-import { computeTransferFee } from "./fees";
+import { computeFee, customerRate, pricingFor } from "./pricing";
 
 export type QuoteInput = {
   corridorId?: string;
   sendAmount?: number;
   receiveAmount?: number;
+  /** Mode de réception (MTN, ORANGE, BANK, CASH…) : seul le retrait en espèces change le prix. */
+  network?: string | null;
 };
 
 export type QuoteResult = {
@@ -57,7 +59,8 @@ export async function buildQuote(input: QuoteInput): Promise<QuoteResult> {
   const source = getCountry(corridor.source);
   const dest = getCountry(corridor.destination);
   const fx = await getFxRate(source.currency, dest.currency);
-  const rate = fx.customerRate;
+  const pricing = pricingFor(corridorId, source.currency, input.network);
+  const rate = customerRate(fx.midRate, pricing.marginPercent);
 
   let send: number;
   let receive: number;
@@ -81,11 +84,8 @@ export async function buildQuote(input: QuoteInput): Promise<QuoteResult> {
     throw new QuoteLimitError("amount_too_high", corridor.maxSend, source.currency);
   }
 
-  const feeParts = computeTransferFee(send, source.currency);
-  const fee =
-    corridor.feeSend > 0
-      ? roundMoney(corridor.feeSend, source.currency)
-      : feeParts.total;
+  const feeParts = computeFee(send, source.currency, pricing);
+  const fee = corridor.feeSend > 0 ? roundMoney(corridor.feeSend, source.currency) : feeParts.total;
 
   const ttlMinutes = Number(process.env.QUOTE_TTL_MINUTES ?? "15");
 
@@ -104,7 +104,7 @@ export async function buildQuote(input: QuoteInput): Promise<QuoteResult> {
     feeVariable: feeParts.variable,
     feePercent: feeParts.percent,
     total: roundMoney(send + fee, source.currency),
-    marginPercent: fx.marginPercent,
+    marginPercent: pricing.marginPercent,
     deliveryEstimate: corridor.deliveryEstimate,
     expiresAt: new Date(Date.now() + ttlMinutes * 60_000),
     fx,

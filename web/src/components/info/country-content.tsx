@@ -38,7 +38,7 @@ export function CountryContent({ country: c, others }: { country: CountryInfo; o
   const modeText = (id: string, label: string) => (MODE_KEY[id] ? t(MODE_KEY[id]) : t("modeMOBILE", { network: label }));
 
   const example = mainInbound?.quotes[0]
-    ? `${L.money(mainInbound.quotes[0].sendAmount, mainInbound.sendCurrency)} → ${L.money(mainInbound.quotes[0].fee, mainInbound.sendCurrency)}`
+    ? `${L.money(mainInbound.quotes[0].sendAmount, mainInbound.sendCurrency)} → ${mainInbound.quotes[0].fee === 0 ? t("feeFree") : L.money(mainInbound.quotes[0].fee, mainInbound.sendCurrency)}`
     : "—";
 
   const facts: Array<{ icon: IconName; label: string; value: React.ReactNode }> = [
@@ -311,7 +311,7 @@ function FeesCard({ d }: { d: DestinationInfo }) {
               <tr key={q.sendAmount}>
                 <th scope="row" className="px-4 py-4 font-semibold text-ink sm:px-5">{L.money(q.sendAmount, d.sendCurrency)}</th>
                 <td className="px-2 py-4 text-ink sm:px-3">
-                  {L.money(q.fee, d.sendCurrency)}
+                  {q.fee === 0 ? t("feeFree") : L.money(q.fee, d.sendCurrency)}
                   <span className="block text-xs text-muted sm:hidden">= {L.money(q.total, d.sendCurrency)}</span>
                 </td>
                 <td className="hidden px-3 py-4 text-ink sm:table-cell">{L.money(q.total, d.sendCurrency)}</td>

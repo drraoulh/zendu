@@ -21,6 +21,7 @@ export async function POST(request: Request) {
       receiveAmount?: number;
       sendAmountCad?: number;
       receiveAmountXaf?: number;
+      network?: string;
     };
     if (!body || typeof body !== "object") {
       return NextResponse.json({ error: "Requête invalide" }, { status: 400 });
@@ -35,6 +36,7 @@ export async function POST(request: Request) {
         (body.receiveAmountXaf != null
           ? Number(body.receiveAmountXaf)
           : undefined),
+      network: typeof body.network === "string" ? body.network.slice(0, 20) : undefined,
     });
     return NextResponse.json(serialize(quote));
   } catch (error) {
@@ -77,6 +79,7 @@ export async function GET(request: Request) {
         searchParams.get("receive") != null
           ? Number(searchParams.get("receive"))
           : undefined,
+      network: searchParams.get("network")?.slice(0, 20),
     });
     return NextResponse.json(serialize(quote));
   } catch (error) {

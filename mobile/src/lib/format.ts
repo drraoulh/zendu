@@ -120,3 +120,8 @@ export function phone(digits: string) {
   if (dial === "86" && n.length === 11) rest = `${n.slice(0, 3)} ${n.slice(3, 7)} ${n.slice(7)}`;
   return dial ? `+${dial} ${rest}` : `+${rest}`;
 }
+
+/** Frais d'un envoi : « Gratuit » quand il n'y en a pas (cas général : la marge est dans le taux). */
+export function feeLabel(fee: number, currency: string) {
+  return fee > 0 ? money(fee, currency) : "Gratuit";
+}

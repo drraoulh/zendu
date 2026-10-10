@@ -3,7 +3,7 @@ import { useEffect, useState } from "react";
 import { Text, View } from "react-native";
 import { Button, Card, Choice, Divider, H1, Header, Notice, Screen, Small, Steps, SummaryRow } from "@/components/ui";
 import { api, type Quote } from "@/lib/api";
-import { countryName, deliveryEstimate, etaLabel, money, networkLabel, phone, rate } from "@/lib/format";
+import { countryName, deliveryEstimate, etaLabel, feeLabel, money, networkLabel, phone, rate } from "@/lib/format";
 import { useStore } from "@/lib/store";
 import { colors, fonts } from "@/lib/theme";
 import { PaymentLogo } from "@/components/payment-logo";
@@ -31,14 +31,14 @@ export default function Review() {
   useEffect(() => {
     if (!draft.sendAmount) return;
     api
-      .quote(draft.corridorId, draft.sendAmount)
+      .quote(draft.corridorId, draft.sendAmount, "send", recipient?.network)
       .then((q) => {
         setQuote(q);
         // Le paiement et le reçu reprennent ce devis à jour.
         setDraft({ quote: q });
       })
       .catch((e: Error) => setError(e.message));
-  }, [draft.corridorId, draft.sendAmount, setDraft]);
+  }, [draft.corridorId, draft.sendAmount, recipient?.network, setDraft]);
 
   if (!recipient) return <Redirect href="/(tabs)" />;
 
@@ -78,10 +78,13 @@ export default function Review() {
           <>
             <SummaryRow label="Vous envoyez" value={money(quote.sendAmount, quote.sendCurrency)} />
             <SummaryRow label="Taux de change" value={`1 ${quote.sendCurrency} = ${rate(quote.rate)} ${quote.receiveCurrency}`} />
-            <SummaryRow label="Frais" value={money(quote.fee, quote.sendCurrency)} />
+            <SummaryRow label="Frais" value={feeLabel(quote.fee, quote.sendCurrency)} />
             <Divider />
             <SummaryRow label="Total à payer" value={money(quote.total, quote.sendCurrency)} strong />
             <SummaryRow label="Délai estimé" value={etaLabel(deliveryEstimate(quote.deliveryEstimate, recipient.network))} />
+            {quote.fee === 0 ? (
+              <Small style={{ marginTop: 8 }}>Sans frais d&apos;envoi : notre rémunération est déjà comprise dans le taux de change affiché.</Small>
+            ) : null}
           </>
         ) : (
           <Small>Calcul du devis…</Small>

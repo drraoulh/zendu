@@ -227,10 +227,11 @@ export const api = {
   revokeSession: (id: string) => request<{ ok: true }>(`/api/me/sessions/${encodeURIComponent(id)}`, { method: "DELETE" }),
   revokeOtherSessions: () => request<{ ok: true; revoked: number }>("/api/me/sessions", { method: "DELETE" }),
   corridors: () => request<CorridorMeta[]>("/api/quotes?meta=corridors"),
-  quote: (corridorId: string, amount: number, mode: "send" | "receive" = "send") =>
+  /** `network` (mode de réception) : seul le retrait en espèces change le prix. */
+  quote: (corridorId: string, amount: number, mode: "send" | "receive" = "send", network?: string) =>
     request<Quote>("/api/quotes", {
       method: "POST",
-      body: JSON.stringify(mode === "send" ? { corridorId, sendAmount: amount } : { corridorId, receiveAmount: amount }),
+      body: JSON.stringify({ corridorId, network, ...(mode === "send" ? { sendAmount: amount } : { receiveAmount: amount }) }),
     }),
   createTransfer: (input: {
     corridorId: string;

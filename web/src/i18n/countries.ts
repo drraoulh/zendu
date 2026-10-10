@@ -3,6 +3,7 @@ import { defineMessages } from "@/i18n/define";
 /** /pays et /pays/[code] — trois pays ouverts : Canada, Cameroun, Chine. */
 export const countriesMessages = defineMessages({
   fr: {
+    feeFree: "Gratuit",
     heroEyebrow: "Nos pays",
     heroTitle: "Canada, Cameroun, Chine : envoyez dans les deux sens",
     heroSubtitle:
@@ -87,6 +88,7 @@ export const countriesMessages = defineMessages({
     help: "Centre d'aide",
   },
   en: {
+    feeFree: "Free",
     heroEyebrow: "Our countries",
     heroTitle: "Canada, Cameroon, China: send both ways",
     heroSubtitle:

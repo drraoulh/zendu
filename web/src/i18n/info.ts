@@ -112,6 +112,7 @@ export const infoCommon = defineMessages({
 
 export const feesPage = defineMessages({
   fr: {
+    feeFree: "Gratuit",
     heroEyebrow: "Tarifs WorldSoft Transfer",
     heroTitle: "Frais, taux et délais",
     heroSubtitle:
@@ -120,20 +121,20 @@ export const feesPage = defineMessages({
     ctaApp: "Télécharger l'app",
 
     howEyebrow: "Comment ça marche",
-    howTitle: "Une tarification en trois éléments",
+    howTitle: "Sans frais d'envoi, un taux transparent",
     howSubtitle: "Pas de frais cachés : tout est affiché avant que vous payiez.",
-    how1Title: "Frais d'envoi",
+    how1Title: "Aucuns frais d'envoi",
     how1Text:
-      "Une part fixe de {flat} plus {percent} % du montant envoyé. Les frais sont ajoutés au montant : votre proche reçoit l'intégralité du montant converti.",
-    how2Title: "Marge de change",
+      "Pas de frais sur les envois vers mobile money, portefeuille (Alipay, WeChat Pay, Interac) ou compte bancaire. Seul le retrait en espèces a des frais fixes, affichés avant le paiement.",
+    how2Title: "Notre seule rémunération : le taux",
     how2Text:
-      "Le taux appliqué est le taux du marché diminué d'une marge de {margin} %. Cette marge est déjà comprise dans le taux affiché : il n'y a pas de frais de conversion en plus.",
+      "Le taux appliqué est le taux du marché diminué d'une marge de {margin} %. Cette marge est comprise dans le taux affiché : rien d'autre n'est ajouté.",
     how3Title: "Total affiché avant paiement",
     how3Text:
       "Avant de confirmer, l'app récapitule le montant envoyé, les frais, le total payé, le taux et le montant reçu. Le taux est garanti pendant la durée de validité du devis.",
     exampleTitle: "Exemple pour {amount}",
     exampleSend: "Montant envoyé",
-    exampleFee: "Frais ({flat} + {percent} %)",
+    exampleFee: "Frais d'envoi",
     exampleTotal: "Total payé",
     exampleReceive: "Montant reçu au {country}",
     exampleRate: "Taux appliqué",
@@ -173,15 +174,15 @@ export const feesPage = defineMessages({
     staleRates: "taux de référence",
 
     faqTitle: "Questions sur les frais",
-    faq1Q: "Les frais sont-ils les mêmes pour tous les pays ?",
+    faq1Q: "Y a-t-il vraiment zéro frais ?",
     faq1A:
-      "Les frais d'envoi dépendent de la devise d'envoi et du montant (part fixe + pourcentage). Ce qui change d'un pays à l'autre, c'est le taux de change et le délai de réception.",
+      "Oui pour les envois vers mobile money, portefeuille et compte bancaire. Seul le retrait en espèces a des frais fixes. Ce qui change d'un pays à l'autre, c'est le taux de change et le délai de réception.",
     faq2Q: "Pourquoi le montant reçu change-t-il d'un jour à l'autre ?",
     faq2A:
       "Parce que le taux du marché évolue. Le taux est fixé au moment où vous confirmez le devis dans l'app, et reste garanti pendant sa durée de validité.",
-    faq3Q: "Puis-je payer moins de frais en envoyant plus ?",
+    faq3Q: "Comment PWFINTECH se rémunère-t-elle sans frais ?",
     faq3A:
-      "La part fixe est la même quel que soit le montant : en proportion, elle pèse moins sur un envoi plus important. Le pourcentage, lui, s'applique à tout le montant.",
+      "Par la marge de change, indiquée ci-dessus et déjà comprise dans le taux affiché. Comparez toujours le montant reçu : c'est le chiffre qui compte.",
     faq4Q: "Où voir le montant exact avant d'envoyer ?",
     faq4A:
       "Dans le simulateur du site et dans l'application WorldSoft Transfer : ils utilisent le même calcul. Le récapitulatif final s'affiche toujours avant le paiement.",
@@ -191,6 +192,7 @@ export const feesPage = defineMessages({
     ctaAppPage: "Page de l'application",
   },
   en: {
+    feeFree: "Free",
     heroEyebrow: "WorldSoft Transfer pricing",
     heroTitle: "Fees, rates and delivery times",
     heroSubtitle:
@@ -201,18 +203,18 @@ export const feesPage = defineMessages({
     howEyebrow: "How it works",
     howTitle: "Pricing in three parts",
     howSubtitle: "No hidden fees: everything is shown before you pay.",
-    how1Title: "Transfer fee",
+    how1Title: "No transfer fees",
     how1Text:
-      "A fixed part of {flat} plus {percent}% of the amount sent. Fees are added on top: your recipient gets the full converted amount.",
-    how2Title: "Exchange margin",
+      "No fees on transfers to mobile money, wallets (Alipay, WeChat Pay, Interac) or bank accounts. Only cash pickup has a fixed fee, shown before you pay.",
+    how2Title: "We only earn on the rate",
     how2Text:
-      "The rate applied is the market rate minus a {margin}% margin. This margin is already included in the rate shown: there is no extra conversion fee.",
+      "The rate applied is the market rate minus a {margin}% margin. This margin is included in the rate shown: nothing else is added.",
     how3Title: "Total shown before payment",
     how3Text:
       "Before you confirm, the app summarizes the amount sent, fees, total paid, rate and amount received. The rate is guaranteed for the validity period of the quote.",
     exampleTitle: "Example for {amount}",
     exampleSend: "Amount sent",
-    exampleFee: "Fee ({flat} + {percent}%)",
+    exampleFee: "Transfer fee",
     exampleTotal: "Total paid",
     exampleReceive: "Amount received in {country}",
     exampleRate: "Rate applied",
@@ -252,15 +254,15 @@ export const feesPage = defineMessages({
     staleRates: "reference rates",
 
     faqTitle: "Questions about fees",
-    faq1Q: "Are fees the same for every country?",
+    faq1Q: "Are there really zero fees?",
     faq1A:
-      "Transfer fees depend on the sending currency and the amount (fixed part + percentage). What changes from one country to another is the exchange rate and the delivery time.",
+      "Yes for transfers to mobile money, wallets and bank accounts. Only cash pickup has a fixed fee. What changes from one country to another is the exchange rate and the delivery time.",
     faq2Q: "Why does the amount received change from day to day?",
     faq2A:
       "Because the market rate moves. The rate is locked when you confirm the quote in the app and stays guaranteed for its validity period.",
-    faq3Q: "Do I pay less in fees if I send more?",
+    faq3Q: "How does PWFINTECH earn money without fees?",
     faq3A:
-      "The fixed part is the same whatever the amount, so proportionally it weighs less on a larger transfer. The percentage applies to the whole amount.",
+      "Through the exchange margin shown above, already included in the displayed rate. Always compare the amount received: that's the number that matters.",
     faq4Q: "Where can I see the exact amount before sending?",
     faq4A:
       "In the website simulator and in the WorldSoft Transfer app: they use the same calculation. The final summary is always shown before payment.",
@@ -274,7 +276,7 @@ export const feesPage = defineMessages({
     heroTitle: "Comisiones, tasas y plazos",
     ctaSimulate: "Abrir el simulador",
     ctaApp: "Descargar la app",
-    howTitle: "Una tarifa en tres elementos",
+    howTitle: "Sin comisión de envío, una tasa transparente",
     colCountry: "País",
     colCurrency: "Moneda",
     colDelivery: "Plazo",
@@ -286,7 +288,7 @@ export const feesPage = defineMessages({
     heroTitle: "费用、汇率与到账时间",
     ctaSimulate: "打开试算器",
     ctaApp: "下载应用",
-    howTitle: "三部分构成的收费",
+    howTitle: "零手续费，汇率透明",
     colCountry: "国家",
     colCurrency: "货币",
     colDelivery: "到账时间",
