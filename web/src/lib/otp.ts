@@ -1,7 +1,7 @@
 import { createHmac, randomBytes, randomInt, timingSafeEqual } from "node:crypto";
 import type { Customer } from "@prisma/client";
 import { prisma } from "@/lib/prisma";
-import { deliverOtp, type OtpChannel } from "@/lib/otp-delivery";
+import { deliverOtp, resolveChannel, type OtpChannel } from "@/lib/otp-delivery";
 
 /**
  * Vérification en deux étapes à la connexion (défis OtpChallenge).
@@ -82,7 +82,7 @@ export async function createLoginChallenge(
   });
   if (recent >= OTP_MAX_PER_HOUR) throw new OtpRateLimitError("Trop de tentatives de connexion. Réessayez dans une heure.");
 
-  const channel = opts.channel ?? "sms";
+  const channel = resolveChannel(opts.channel ?? "sms");
   const id = randomBytes(24).toString("base64url");
   const code = newCode();
   const expiresAt = new Date(Date.now() + OTP_TTL_MINUTES * 60_000);
@@ -136,7 +136,7 @@ export async function resendLoginChallenge(challengeId: string, channel?: OtpCha
   if (wait > 0) return { ok: false, code: "resend_too_soon", retryAfter: wait };
   if (ch.sends >= OTP_MAX_SENDS) return { ok: false, code: "resend_limit" };
 
-  const nextChannel = channel ?? (ch.channel === "email" ? "email" : "sms");
+  const nextChannel = resolveChannel(channel ?? (ch.channel === "email" ? "email" : "sms"));
   const code = newCode();
   const expiresAt = new Date(Math.min(now + OTP_TTL_MINUTES * 60_000, ch.createdAt.getTime() + OTP_MAX_LIFETIME_MS));
   // Mise à jour conditionnelle : deux renvois simultanés ne peuvent pas dépasser la limite.

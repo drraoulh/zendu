@@ -1,7 +1,7 @@
 /**
  * Envoi des codes de vérification (connexion en deux étapes).
  *
- * Fournisseur : OTP_WEBHOOK_URL — le serveur y envoie en POST JSON
+ * Fournisseurs : Brevo (BREVO_API_KEY, voir plus bas), sinon OTP_WEBHOOK_URL — le serveur y envoie en POST JSON
  *   { channel: "sms" | "email", to, code, purpose, expiresMinutes, firstName, locale }
  * avec `Authorization: Bearer <OTP_WEBHOOK_SECRET>` (fonction Supabase, Zapier/Make, petit service
  * Twilio / Resend…). Le webhook doit répondre 2xx une fois le message accepté.
@@ -40,9 +40,43 @@ function webhookUrl(): string | null {
   return process.env.OTP_WEBHOOK_URL?.trim() || null;
 }
 
+/* ---------------------------------------------------------------------------------------------- */
+/* Brevo (https://developers.brevo.com) : courriel transactionnel, et SMS si BREVO_SMS_SENDER est    */
+/* défini (crédits SMS achetés chez Brevo). Variables : BREVO_API_KEY, BREVO_SENDER_EMAIL,          */
+/* BREVO_SENDER_NAME, BREVO_SMS_SENDER (11 caractères max, ex. « PAULWORLD »).                       */
+/* ---------------------------------------------------------------------------------------------- */
+
+function brevo() {
+  const key = process.env.BREVO_API_KEY?.trim();
+  if (!key) return null;
+  return {
+    key,
+    base: (process.env.BREVO_API_URL?.trim() || "https://api.brevo.com/v3").replace(/\/$/, ""),
+    senderEmail: process.env.BREVO_SENDER_EMAIL?.trim() || "",
+    senderName: process.env.BREVO_SENDER_NAME?.trim() || "WorldSoft Transfer",
+    smsSender: process.env.BREVO_SMS_SENDER?.trim().slice(0, 11) || "",
+  };
+}
+
+function canSend(channel: OtpChannel): boolean {
+  const b = brevo();
+  if (channel === "email" && b?.senderEmail) return true;
+  if (channel === "sms" && b?.smsSender) return true;
+  return webhookUrl() !== null;
+}
+
 /** Un fournisseur d'envoi est-il configuré ? */
 export function otpProviderConfigured(): boolean {
-  return webhookUrl() !== null;
+  return canSend("email") || canSend("sms");
+}
+
+/**
+ * Canal réellement utilisé : si le canal demandé n'a pas de fournisseur (ex. SMS sans crédits Brevo)
+ * mais que l'autre en a un, on bascule dessus (le code part alors par courriel).
+ */
+export function resolveChannel(requested: OtpChannel): OtpChannel {
+  if (canSend(requested) || !otpProviderConfigured()) return requested;
+  return requested === "sms" ? "email" : "sms";
 }
 
 /** Mode démo : pas de fournisseur et OTP_DEMO ≠ "false" (le code est alors renvoyé à l'appli). */
@@ -50,7 +84,81 @@ export function otpDemoMode(): boolean {
   return !otpProviderConfigured() && process.env.OTP_DEMO?.trim().toLowerCase() !== "false";
 }
 
+const SEND_FAILED = "Envoi du code impossible. Réessayez dans un instant.";
+
+function emailHtml(m: OtpMessage) {
+  const name = m.firstName.replace(/[<>&"]/g, "");
+  return `<!doctype html><html lang="fr"><body style="margin:0;background:#f5f8ff;font-family:Arial,Helvetica,sans-serif;color:#0a1838">
+<table role="presentation" width="100%" cellpadding="0" cellspacing="0"><tr><td align="center" style="padding:32px 16px">
+<table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="max-width:480px;background:#ffffff;border-radius:16px;padding:32px">
+<tr><td style="font-size:20px;font-weight:bold;color:#061a52">WorldSoft <span style="color:#0b4dff">Transfer</span></td></tr>
+<tr><td style="padding-top:24px;font-size:16px">Bonjour ${name},</td></tr>
+<tr><td style="padding-top:8px;font-size:15px;color:#4a5878">Voici votre code de connexion :</td></tr>
+<tr><td style="padding:20px 0"><div style="font-size:34px;font-weight:bold;letter-spacing:8px;color:#061a52;background:#eef3ff;border-radius:12px;padding:16px;text-align:center">${m.code}</div></td></tr>
+<tr><td style="font-size:14px;color:#4a5878">Il expire dans ${m.expiresMinutes} minutes. Ne le communiquez à personne : l'équipe ne vous le demandera jamais.</td></tr>
+<tr><td style="padding-top:16px;font-size:13px;color:#8090ad">Vous n'avez pas essayé de vous connecter ? Changez votre mot de passe depuis l'application.</td></tr>
+</table></td></tr></table></body></html>`;
+}
+
+async function brevoPost(path: string, key: string, body: unknown, base: string) {
+  let res: Response;
+  try {
+    res = await fetch(`${base}${path}`, {
+      method: "POST",
+      headers: { "api-key": key, "Content-Type": "application/json", Accept: "application/json" },
+      body: JSON.stringify(body),
+      signal: AbortSignal.timeout(8000),
+    });
+  } catch {
+    throw new OtpDeliveryError("otp_send_failed", SEND_FAILED);
+  }
+  if (!res.ok) {
+    // Ni la clé ni le code ne sont journalisés : seulement le statut et le message d'erreur de Brevo.
+    const detail = await res.text().catch(() => "");
+    console.error("[otp] Brevo a refusé l'envoi", path, res.status, detail.slice(0, 200));
+    throw new OtpDeliveryError("otp_send_failed", SEND_FAILED);
+  }
+}
+
+async function sendWithBrevo(message: OtpMessage): Promise<boolean> {
+  const b = brevo();
+  if (!b) return false;
+  if (message.channel === "email" && b.senderEmail) {
+    await brevoPost(
+      "/smtp/email",
+      b.key,
+      {
+        sender: { email: b.senderEmail, name: b.senderName },
+        to: [{ email: message.to, name: message.firstName }],
+        subject: "Votre code de connexion WorldSoft Transfer",
+        htmlContent: emailHtml(message),
+        textContent: `Bonjour ${message.firstName},\n\nVotre code de connexion WorldSoft Transfer : ${message.code}\nIl expire dans ${message.expiresMinutes} minutes. Ne le communiquez à personne.`,
+        tags: ["otp-login"],
+      },
+      b.base,
+    );
+    return true;
+  }
+  if (message.channel === "sms" && b.smsSender) {
+    await brevoPost(
+      "/transactionalSMS/sms",
+      b.key,
+      {
+        sender: b.smsSender,
+        recipient: message.to.replace(/[^\d]/g, ""),
+        content: `WorldSoft Transfer : votre code est ${message.code}. Valable ${message.expiresMinutes} min. Ne le partagez avec personne.`,
+        type: "transactional",
+        tag: "otp-login",
+      },
+      b.base,
+    );
+    return true;
+  }
+  return false;
+}
+
 export async function deliverOtp(message: OtpMessage): Promise<OtpDelivery> {
+  if (await sendWithBrevo(message)) return { delivered: true };
   const url = webhookUrl();
   if (url) {
     let res: Response;
@@ -65,11 +173,11 @@ export async function deliverOtp(message: OtpMessage): Promise<OtpDelivery> {
         signal: AbortSignal.timeout(8000),
       });
     } catch {
-      throw new OtpDeliveryError("otp_send_failed", "Envoi du code impossible. Réessayez dans un instant.");
+      throw new OtpDeliveryError("otp_send_failed", SEND_FAILED);
     }
     if (!res.ok) {
       console.error("[otp] webhook refusé", res.status, message.channel);
-      throw new OtpDeliveryError("otp_send_failed", "Envoi du code impossible. Réessayez dans un instant.");
+      throw new OtpDeliveryError("otp_send_failed", SEND_FAILED);
     }
     return { delivered: true };
   }
