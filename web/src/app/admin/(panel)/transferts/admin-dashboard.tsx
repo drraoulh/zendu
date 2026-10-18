@@ -8,7 +8,7 @@ import { Icon, type IconName } from "@/components/ui/icon";
 import { useT } from "@/i18n/define";
 import { adminMessages } from "@/i18n/admin";
 import { formatMoney } from "@/lib/money";
-import { MANUAL_BANK_PROVIDER } from "@/lib/bank";
+import { isManualPayoutProvider } from "@/lib/bank";
 import { BankQueue } from "./bank-queue";
 import { InteracQueue } from "./interac-queue";
 import { INTERAC_PROVIDER } from "@/lib/providers/interac";
@@ -98,8 +98,7 @@ export function AdminDashboard({
   const interacQueue = rows.filter((r) => r.payInProvider === INTERAC_PROVIDER && r.status === "awaiting_payment");
   const bankQueue = rows.filter(
     (r) =>
-      r.isBank &&
-      r.payoutProvider === MANUAL_BANK_PROVIDER &&
+      isManualPayoutProvider(r.payoutProvider) &&
       (r.status === "payout_queued" || r.status === "payout_sent"),
   );
   const recipientLine = (r: AdminTransferRow) =>

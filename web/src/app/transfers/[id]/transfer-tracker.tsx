@@ -3,7 +3,7 @@
 import { useCallback, useEffect, useRef, useState, type ReactNode } from "react";
 import Link from "next/link";
 import { contact } from "@/lib/brand";
-import { isBankNetwork, MANUAL_BANK_PROVIDER } from "@/lib/bank";
+import { isBankNetwork, isManualPayoutProvider } from "@/lib/bank";
 import { Button, ButtonLink } from "@/components/ui/button";
 import { Container } from "@/components/ui/layout";
 import { Icon } from "@/components/ui/icon";
@@ -132,8 +132,8 @@ export function TransferTracker({
   const events = [...(transfer.events ?? [])].reverse();
   const ben = transfer.beneficiary;
   const bank = isBankNetwork(ben.network, ben.country ?? to);
-  // Virement bancaire en mode réel : traité par un opérateur, pas de bouton « Lancer le versement ».
-  const manualBank = bank && transfer.payoutProvider === MANUAL_BANK_PROVIDER;
+  // Versement fait par un opérateur (banque ou portefeuille non intégré) : pas de bouton « Lancer le versement ».
+  const manualBank = isManualPayoutProvider(transfer.payoutProvider ?? "");
 
   return (
     <div className="bg-bg pb-16">

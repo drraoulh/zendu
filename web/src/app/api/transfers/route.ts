@@ -7,9 +7,9 @@ import { getPayInMode } from "@/lib/providers/payin";
 import { mockPayIn } from "@/lib/providers/mock-payin";
 import { createStripePayIn } from "@/lib/providers/stripe";
 import { INTERAC_PROVIDER, interacInstructions } from "@/lib/providers/interac";
-import { getPayoutMode } from "@/lib/providers/payout";
+import { payoutProviderFor } from "@/lib/providers/payout";
 import { getCorridor, getCountry } from "@/lib/corridors";
-import { isBankNetwork, MANUAL_BANK_PROVIDER, MOCK_BANK_PROVIDER, publicTransfer } from "@/lib/bank";
+import { publicTransfer } from "@/lib/bank";
 import { beneficiaryInputSchema, normalizeBeneficiary } from "@/lib/beneficiary-input";
 import { requireAdmin } from "@/lib/admin-auth";
 import { getCustomer, hasBearer } from "@/lib/customer-auth";
@@ -111,7 +111,6 @@ export async function POST(request: Request) {
     if (!normalized.ok) {
       return NextResponse.json({ error: normalized.error }, { status: 400 });
     }
-    const bank = isBankNetwork(normalized.data.network, corridor.destination);
 
     const quoteData = await buildQuote({
       corridorId: data.corridorId,
@@ -161,12 +160,8 @@ export async function POST(request: Request) {
         feeCad: quoteData.fee,
         totalCad: quoteData.total,
         payInProvider: interac ? INTERAC_PROVIDER : getPayInMode(),
-        // MoMo ne paie pas de comptes bancaires : simulation en démo, traitement manuel sinon.
-        payoutProvider: bank
-          ? getPayoutMode() === "momo"
-            ? MANUAL_BANK_PROVIDER
-            : MOCK_BANK_PROVIDER
-          : getPayoutMode(),
+        // MTN MoMo seulement pour MTN au Cameroun ; le reste est simulé en démo, versé par l'équipe sinon.
+        payoutProvider: payoutProviderFor(normalized.data.network, corridor.destination),
         quoteId: quote.id,
         beneficiaryId: beneficiary.id,
         events: {

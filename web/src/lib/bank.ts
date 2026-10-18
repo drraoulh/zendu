@@ -6,6 +6,13 @@ export const BANK_DELIVERY_ESTIMATE = "1-2 business days";
 /** Fournisseurs de versement bancaire enregistrés dans Transfer.payoutProvider. */
 export const MOCK_BANK_PROVIDER = "mock_bank";
 export const MANUAL_BANK_PROVIDER = "manual_bank";
+/** Portefeuille sans intégration réelle (Orange Money, Alipay, WeChat Pay, Interac…) en production : l'équipe le verse. */
+export const MANUAL_PAYOUT_PROVIDER = "manual_payout";
+
+/** Versement à faire par l'équipe (virement bancaire ou portefeuille non intégré). */
+export function isManualPayoutProvider(provider: string): boolean {
+  return provider === MANUAL_BANK_PROVIDER || provider === MANUAL_PAYOUT_PROVIDER;
+}
 
 /** Type du réseau de réception (mobile_money / bank / cash) pour un pays donné. */
 export function networkType(networkId: string, countryCode?: string | null): PayoutNetwork["type"] {

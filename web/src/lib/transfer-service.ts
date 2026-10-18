@@ -1,10 +1,10 @@
 import { prisma } from "@/lib/prisma";
 import { assertTransition } from "@/lib/transfer-machine";
-import { getPayoutMode } from "@/lib/providers/payout";
+import { payoutProviderFor } from "@/lib/providers/payout";
 import { mockMomo } from "@/lib/providers/mock-momo";
 import { createMomoPayout } from "@/lib/providers/momo";
 import { mockBank } from "@/lib/providers/mock-bank";
-import { isBankNetwork, MANUAL_BANK_PROVIDER, maskAccount, MOCK_BANK_PROVIDER } from "@/lib/bank";
+import { isBankNetwork, isManualPayoutProvider, maskAccount } from "@/lib/bank";
 
 const WITH_EVENTS = {
   beneficiary: true,
@@ -70,24 +70,25 @@ export async function queueAndRunPayout(transferId: string) {
 
   const b = current.beneficiary;
   const bank = isBankNetwork(b.network, b.country);
+  const route = payoutProviderFor(b.network, b.country);
 
-  // MTN MoMo ne sait pas payer un compte bancaire : en mode réel, le virement reste
-  // « payout_queued » et un opérateur le réalise puis le clôture (voir completeManualBankPayout).
-  if (bank && getPayoutMode() === "momo") {
-    if (current.payoutProvider !== MANUAL_BANK_PROVIDER) {
-      await prisma.transfer.update({
-        where: { id: transferId },
-        data: { payoutProvider: MANUAL_BANK_PROVIDER },
-      });
+  // Pas d'intégration réelle pour ce réseau (virement bancaire, Orange Money, Alipay, WeChat Pay,
+  // Interac…) alors que les versements réels sont actifs : le transfert reste « payout_queued » et un
+  // opérateur le verse puis le clôture (voir completeManualBankPayout). Jamais de simulation ici.
+  if (isManualPayoutProvider(route)) {
+    if (current.payoutProvider !== route) {
+      await prisma.transfer.update({ where: { id: transferId }, data: { payoutProvider: route } });
     }
     const already = await prisma.transferEvent.findFirst({
-      where: { transferId, type: "bank_manual" },
+      where: { transferId, type: { in: ["bank_manual", "payout_manual"] } },
     });
     if (!already) {
       await addEvent(
         transferId,
-        "bank_manual",
-        `Virement bancaire à traiter manuellement — ${b.bankName ?? "banque"} ${maskAccount(b.accountNumber) ?? ""}`.trim(),
+        bank ? "bank_manual" : "payout_manual",
+        bank
+          ? `Virement bancaire à traiter manuellement — ${b.bankName ?? "banque"} ${maskAccount(b.accountNumber) ?? ""}`.trim()
+          : `Versement ${b.network} à faire par l'équipe`,
       );
     }
     return prisma.transfer.findUnique({ where: { id: transferId }, include: WITH_EVENTS });
@@ -96,18 +97,15 @@ export async function queueAndRunPayout(transferId: string) {
   assertTransition(current.status, "payout_sent");
   await prisma.transfer.update({
     where: { id: transferId },
-    data: {
-      status: "payout_sent",
-      payoutProvider: bank ? MOCK_BANK_PROVIDER : getPayoutMode(),
-    },
+    data: { status: "payout_sent", payoutProvider: route },
   });
   await addEvent(
     transferId,
     "payout_sent",
-    bank ? "Virement bancaire simulé (mode démo)" : "Appel disbursement MoMo",
+    route === "momo" ? "Appel disbursement MTN MoMo" : bank ? "Virement bancaire simulé (mode démo)" : "Versement simulé (mode démo)",
   );
 
-  const provider = bank ? mockBank : getPayoutMode() === "momo" ? createMomoPayout() : mockMomo;
+  const provider = route === "momo" ? createMomoPayout() : bank ? mockBank : mockMomo;
 
   try {
     const result = await provider.disburse({
@@ -179,11 +177,8 @@ export async function completeManualBankPayout(
     include: { beneficiary: true },
   });
   if (!transfer) throw new Error("Transfert introuvable");
-  if (!isBankNetwork(transfer.beneficiary.network, transfer.beneficiary.country)) {
-    throw new Error("Ce transfert n'est pas un virement bancaire");
-  }
-  if (transfer.payoutProvider !== MANUAL_BANK_PROVIDER) {
-    throw new Error("Ce virement n'est pas en traitement manuel");
+  if (!isManualPayoutProvider(transfer.payoutProvider)) {
+    throw new Error("Ce versement n'est pas en traitement manuel");
   }
   if (transfer.status !== "payout_queued" && transfer.status !== "payout_sent") {
     throw new Error("Ce virement a déjà été traité ou n'est pas encore payé.");

@@ -1,3 +1,5 @@
+import { isBankNetwork, MANUAL_BANK_PROVIDER, MANUAL_PAYOUT_PROVIDER, MOCK_BANK_PROVIDER } from "@/lib/bank";
+
 export type PayoutRequest = {
   transferId: string;
   reference: string;
@@ -26,4 +28,18 @@ export function getPayoutMode(): "momo" | "mock_momo" {
     process.env.MTN_API_KEY
     ? "momo"
     : "mock_momo";
+}
+
+/**
+ * Qui verse l'argent à ce bénéficiaire ?
+ * - Démo (aucune clé MTN) : tout est simulé (mock_momo pour les portefeuilles, mock_bank pour les banques).
+ * - Clés MTN présentes : l'API MTN MoMo ne sert QUE pour MTN au Cameroun. Tout le reste (Orange Money,
+ *   Alipay, WeChat Pay, Interac, banques) passe en versement manuel par l'équipe, jamais en simulation :
+ *   un transfert réel ne doit pas être marqué « livré » sans qu'un versement ait eu lieu.
+ */
+export function payoutProviderFor(network: string, country: string): string {
+  const bank = isBankNetwork(network, country);
+  if (getPayoutMode() !== "momo") return bank ? MOCK_BANK_PROVIDER : "mock_momo";
+  if (network === "MTN" && country === "CM") return "momo";
+  return bank ? MANUAL_BANK_PROVIDER : MANUAL_PAYOUT_PROVIDER;
 }

@@ -131,7 +131,9 @@ function BankQueueItem({
           <p className="mt-0.5 text-xs text-muted">{date(row.createdAt)}</p>
           <p className="mt-2 font-medium text-ink">{row.recipientName}</p>
           <p className="text-sm text-muted">
-            {[row.recipientBankName, row.recipientAccountMasked].filter(Boolean).join(" ")}
+            {row.isBank
+              ? [row.recipientBankName, row.recipientAccountMasked].filter(Boolean).join(" ")
+              : `${row.recipientNetwork} · ${row.recipientPhone ? `+${row.recipientPhone}` : "—"}`}
           </p>
         </div>
         <p className="shrink-0 text-right font-display text-lg font-extrabold text-ink">
