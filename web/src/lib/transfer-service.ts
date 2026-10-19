@@ -249,3 +249,26 @@ export async function completeManualBankPayout(
 
   return prisma.transfer.findUnique({ where: { id: transferId }, include: WITH_EVENTS });
 }
+
+
+/** Statuts depuis lesquels l'équipe peut annuler un transfert (paiement absent, faux, ou versement impossible). */
+const CANCELLABLE = ["awaiting_payment", "payment_mismatch", "payout_failed"] as const;
+
+/**
+ * Annulation par l'équipe (admin). Le remboursement Interac se fait depuis le compte de réception ;
+ * `note` garde sa référence ou le motif. Atomique : un double clic n'annule qu'une fois.
+ */
+export async function cancelTransfer(transferId: string, note: string) {
+  const reason = note.trim().slice(0, 300) || "Annulé par l'équipe";
+  const { count } = await prisma.transfer.updateMany({
+    where: { id: transferId, status: { in: [...CANCELLABLE] } },
+    data: { status: "cancelled", failureReason: reason },
+  });
+  if (!count) {
+    const t = await prisma.transfer.findUnique({ where: { id: transferId }, select: { status: true } });
+    if (!t) throw new Error("Transfert introuvable");
+    throw new Error(`Ce transfert ne peut pas être annulé (statut « ${t.status} »). Rechargez la page.`);
+  }
+  await addEvent(transferId, "cancelled", `Annulé par l'équipe — ${reason}`);
+  return prisma.transfer.findUnique({ where: { id: transferId }, include: WITH_EVENTS });
+}

@@ -72,6 +72,24 @@ function IssueItem({ row, nl, date }: { row: AdminTransferRow; nl: string; date:
     }
   }
 
+  async function cancel() {
+    if (busy) return;
+    const note = window.prompt(t("promptCancel", { ref: row.reference, amount: paid }));
+    if (note === null) return;
+    setBusy(true);
+    setMessage(null);
+    try {
+      await adminAction(`/api/transfers/${row.id}/cancel`, { body: { note } }, t);
+      setDone(true);
+      setMessage({ ok: true, text: t("actionDone", { ref: row.reference }) });
+      router.refresh();
+    } catch (err) {
+      setMessage({ ok: false, text: t("actionError", { error: err instanceof Error ? err.message : "?" }) });
+    } finally {
+      setBusy(false);
+    }
+  }
+
   return (
     <li className="rounded-2xl border border-line p-4">
       <div className="flex flex-wrap items-start justify-between gap-3">
@@ -107,10 +125,17 @@ function IssueItem({ row, nl, date }: { row: AdminTransferRow; nl: string; date:
         </p>
         <CopyButton value={row.senderEmail} label={t("issueContact")} />
       </div>
-      {!done && (mismatch ? canConfirm : true) && (
-        <Button size="md" variant="secondary" className="mt-3 w-full sm:w-auto" disabled={busy} aria-busy={busy} onClick={() => void act()}>
-          {mismatch ? t("issueReceived") : t("issueRetry")}
-        </Button>
+      {!done && (
+        <div className="mt-3 flex flex-wrap gap-2">
+          {(mismatch ? canConfirm : true) && (
+            <Button size="md" variant="secondary" className="w-full sm:w-auto" disabled={busy} aria-busy={busy} onClick={() => void act()}>
+              {mismatch ? t("issueReceived") : t("issueRetry")}
+            </Button>
+          )}
+          <Button size="md" variant="danger" className="w-full sm:w-auto" disabled={busy} onClick={() => void cancel()}>
+            {t("issueCancel")}
+          </Button>
+        </div>
       )}
       {message && (
         <p

@@ -8,9 +8,10 @@ import { mockPayIn } from "@/lib/providers/mock-payin";
 import { createStripePayIn } from "@/lib/providers/stripe";
 import { INTERAC_PROVIDER, interacInstructions } from "@/lib/providers/interac";
 import { payoutProviderFor } from "@/lib/providers/payout";
-import { payMethodsFor } from "@/lib/mode";
+import { isLiveMode, payMethodsFor, transferLimits } from "@/lib/mode";
+import { getFxRate, rateIsTrustworthy } from "@/lib/fx";
 import { getCorridor, getCountry } from "@/lib/corridors";
-import { publicTransfer } from "@/lib/bank";
+import { isBankNetwork, publicTransfer } from "@/lib/bank";
 import { beneficiaryInputSchema, normalizeBeneficiary } from "@/lib/beneficiary-input";
 import { requireAdmin } from "@/lib/admin-auth";
 import { getCustomer, hasBearer } from "@/lib/customer-auth";
@@ -85,6 +86,13 @@ export async function POST(request: Request) {
         { status: 401 },
       );
     }
+    // Mode réel : uniquement depuis un compte client à l'identité vérifiée (jamais d'envoi anonyme).
+    if (!authed && isLiveMode()) {
+      return NextResponse.json(
+        { error: "Créez un compte et vérifiez votre identité pour envoyer de l'argent.", code: "account_required" },
+        { status: 401 },
+      );
+    }
     if (authed && authed.customer.kycStatus !== "verified") {
       return NextResponse.json(
         { error: "Votre identité doit être vérifiée avant d'envoyer de l'argent.", code: "kyc_required" },
@@ -113,6 +121,11 @@ export async function POST(request: Request) {
       return NextResponse.json({ error: normalized.error }, { status: 400 });
     }
 
+    // Mode réel : taux frais exigé (jamais le taux de secours ni un cache ancien).
+    const live = isLiveMode();
+    if (live) {
+      await getFxRate(getCountry(corridor.source).currency, getCountry(corridor.destination).currency, true).catch(() => null);
+    }
     const quoteData = await buildQuote({
       corridorId: data.corridorId,
       sendAmount,
@@ -133,6 +146,53 @@ export async function POST(request: Request) {
         { status: 400 },
       );
     }
+    if (live && !rateIsTrustworthy(quoteData.fx)) {
+      return NextResponse.json(
+        { error: "Le taux de change est momentanément indisponible. Réessayez dans quelques minutes.", code: "rate_unavailable" },
+        { status: 503 },
+      );
+    }
+
+    const limits = transferLimits();
+    // Portefeuilles MTN / Orange : un versement trop gros serait refusé par l'opérateur.
+    if (!isBankNetwork(normalized.data.network, corridor.destination) && quoteData.receiveCurrency === "XAF" && quoteData.receiveAmount > limits.mobileMoneyMaxXaf) {
+      return NextResponse.json(
+        {
+          error: `Vers un portefeuille Mobile Money, le maximum est de ${limits.mobileMoneyMaxXaf.toLocaleString("fr-FR")} FCFA par envoi. Réduisez le montant ou choisissez un compte bancaire.`,
+          code: "wallet_limit",
+        },
+        { status: 400 },
+      );
+    }
+
+    // Plafonds par client (24 h et 30 jours), sur les envois payés en dollars canadiens.
+    if (live && authed && quoteData.sendCurrency === "CAD") {
+      const sumSince = async (ms: number) =>
+        (
+          await prisma.transfer.aggregate({
+            _sum: { totalCad: true },
+            where: {
+              customerId: authed.customer.id,
+              sendCurrency: "CAD",
+              status: { notIn: ["expired", "cancelled"] },
+              createdAt: { gte: new Date(Date.now() - ms) },
+            },
+          })
+        )._sum.totalCad ?? 0;
+      const [day, month] = await Promise.all([sumSince(86_400_000), sumSince(30 * 86_400_000)]);
+      const over = day + quoteData.total > limits.dailyCad ? { left: limits.dailyCad - day, period: "24 heures", max: limits.dailyCad } : month + quoteData.total > limits.monthlyCad ? { left: limits.monthlyCad - month, period: "30 jours", max: limits.monthlyCad } : null;
+      if (over) {
+        const left = Math.max(0, Math.floor(over.left * 100) / 100);
+        return NextResponse.json(
+          {
+            error: `Plafond atteint : ${over.max.toLocaleString("fr-FR")} $ par ${over.period}. Vous pouvez encore envoyer ${left.toLocaleString("fr-FR")} $ sur cette période.`,
+            code: "customer_limit",
+          },
+          { status: 400 },
+        );
+      }
+    }
+
     const interac = data.payMethod === "interac";
     const reference = createReference();
     const appUrl = process.env.NEXT_PUBLIC_APP_URL ?? "http://localhost:3000";

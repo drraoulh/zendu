@@ -6,9 +6,9 @@ import { formatMoney } from "@/lib/money";
  * connexion : BREVO_API_KEY, BREVO_SENDER_EMAIL, BREVO_SENDER_NAME). Sans Brevo : rien n'est envoyé.
  * Un échec d'envoi n'empêche jamais le transfert d'avancer (seulement journalisé, sans donnée perso).
  */
-export type NotifyKind = "payment_detected" | "delivered" | "payout_failed" | "payment_mismatch" | "expired";
+export type NotifyKind = "payment_detected" | "delivered" | "payout_failed" | "payment_mismatch" | "expired" | "cancelled";
 
-export const NOTIFY_KINDS: readonly string[] = ["payment_detected", "delivered", "payout_failed", "payment_mismatch", "expired"];
+export const NOTIFY_KINDS: readonly string[] = ["payment_detected", "delivered", "payout_failed", "payment_mismatch", "expired", "cancelled"];
 
 const esc = (s: string) => s.replace(/[<>&"]/g, "");
 
@@ -24,6 +24,8 @@ function content(kind: NotifyKind, t: { reference: string; receiveAmountXaf: num
       return { subject: `Problème de versement — transfert ${t.reference}`, text: `Le versement à ${who} n'a pas abouti${t.failureReason ? ` (${t.failureReason})` : ""}. Notre équipe vous contacte pour le relancer ou vous rembourser.` };
     case "payment_mismatch":
       return { subject: `Paiement à vérifier — transfert ${t.reference}`, text: `Le paiement reçu ne correspond pas au transfert (montant ou message). Notre équipe vous contacte.` };
+    case "cancelled":
+      return { subject: `Transfert annulé — ${t.reference}`, text: `Votre transfert a été annulé${t.failureReason ? ` (${t.failureReason})` : ""}. Si vous l'aviez payé, le remboursement vous est envoyé par virement Interac. Une question ? Répondez à ce courriel avec la référence ${t.reference}.` };
     case "expired":
       return { subject: `Transfert expiré — ${t.reference}`, text: `Nous n'avons pas reçu votre paiement dans le délai prévu : le transfert a été annulé. Si vous avez déjà payé, contactez-nous avec la référence ${t.reference}.` };
   }

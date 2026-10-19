@@ -82,6 +82,9 @@ export const adminMessages = defineMessages({
     issueContact: "Client",
     issueReceived: "Paiement maintenant complet",
     issueRetry: "Relancer le versement",
+    issueCancel: "Annuler et rembourser",
+    promptCancel:
+      "Annuler le transfert {ref} ?\n\nRemboursez d'abord le client par virement Interac ({amount}) depuis le compte de réception, puis indiquez ici la référence du remboursement ou le motif :",
     confirmIssueReceived: "Confirmer que le paiement du transfert {ref} est maintenant complet ({amount}) ?\n\nLe versement part aussitôt.",
     confirmRetry:
       "Relancer le versement de {receive} à {recipient} ?\n\nVérifiez d'abord que le premier versement n'a pas abouti, pour ne pas payer deux fois.",
@@ -192,6 +195,9 @@ export const adminMessages = defineMessages({
     issueContact: "Customer",
     issueReceived: "Payment now complete",
     issueRetry: "Retry payout",
+    issueCancel: "Cancel and refund",
+    promptCancel:
+      "Cancel transfer {ref}?\n\nFirst refund the customer by Interac e-Transfer ({amount}) from the receiving account, then enter the refund reference or reason here:",
     confirmIssueReceived: "Confirm that payment for transfer {ref} is now complete ({amount})?\n\nThe payout starts right away.",
     confirmRetry:
       "Retry the payout of {receive} to {recipient}?\n\nFirst check that the first payout did not go through, so you don't pay twice.",

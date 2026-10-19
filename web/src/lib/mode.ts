@@ -27,3 +27,23 @@ export function payMethodsFor(sourceCountry: string): PayMethod[] {
   if (!live) methods.push("card");
   return methods;
 }
+
+function envNumber(name: string, fallback: number): number {
+  const n = Number(process.env[name]);
+  return process.env[name] && Number.isFinite(n) && n > 0 ? n : fallback;
+}
+
+/**
+ * Plafonds de sécurité (mode réel) :
+ * - par client sur 24 h et 30 jours, en dollars canadiens (envois payés en CAD) ;
+ * - par versement Mobile Money, en FCFA (limites des portefeuilles MTN / Orange).
+ * Réglables : TRANSFER_DAILY_LIMIT_CAD (3 000), TRANSFER_MONTHLY_LIMIT_CAD (10 000),
+ * MOBILE_MONEY_MAX_XAF (500 000).
+ */
+export function transferLimits() {
+  return {
+    dailyCad: envNumber("TRANSFER_DAILY_LIMIT_CAD", 3000),
+    monthlyCad: envNumber("TRANSFER_MONTHLY_LIMIT_CAD", 10000),
+    mobileMoneyMaxXaf: envNumber("MOBILE_MONEY_MAX_XAF", 500000),
+  };
+}

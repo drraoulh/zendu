@@ -208,3 +208,16 @@ export async function getFxRate(
 export async function getCadXafRate(forceRefresh = false) {
   return getFxRate("CAD", "XAF", forceRefresh);
 }
+
+/**
+ * Taux utilisable pour un vrai transfert ? Refuse un taux de secours, un cache de plus de 30 min,
+ * ou un taux qui s'écarte de plus de 25 % de la référence connue (donnée aberrante d'une API gratuite).
+ */
+export function rateIsTrustworthy(fx: FxSnapshot, now = Date.now()): boolean {
+  if (fx.source === "fallback") return false;
+  const age = now - new Date(fx.fetchedAt).getTime();
+  if (fx.stale && age > 30 * 60_000) return false;
+  const ref = FALLBACKS[cacheKey(fx.from, fx.to)];
+  if (ref && Math.abs(fx.midRate / ref - 1) > 0.25) return false;
+  return Number.isFinite(fx.midRate) && fx.midRate > 0;
+}
