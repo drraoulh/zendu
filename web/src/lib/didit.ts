@@ -42,6 +42,8 @@ export async function createDiditSession(customer: Pick<Customer, "id">): Promis
         workflow_id: process.env.DIDIT_WORKFLOW_ID!.trim(),
         // Notre identifiant client : jamais le courriel ni le nom.
         vendor_data: customer.id,
+        // Page de vérification en français.
+        language: "fr",
         callback: process.env.DIDIT_CALLBACK_URL?.trim() || `${appUrl}/kyc/termine`,
       }),
       signal: AbortSignal.timeout(10_000),
