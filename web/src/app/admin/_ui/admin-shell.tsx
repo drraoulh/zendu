@@ -69,7 +69,7 @@ export function AdminShell({ devOpen, children }: { devOpen: boolean; children: 
       </section>
 
       <Container className="mt-6 lg:grid lg:grid-cols-[13rem_minmax(0,1fr)] lg:gap-8">
-        <nav aria-label={t("navLabel")} className="lg:sticky lg:top-24 lg:self-start">
+        <nav aria-label={t("navLabel")} className="lg:sticky lg:top-6 lg:self-start">
           <ul className="-mx-1 flex gap-2 overflow-x-auto px-1 pb-2 lg:mx-0 lg:flex-col lg:overflow-visible lg:px-0 lg:pb-0">
             {NAV.map((item) => {
               const active = isActive(item.href);

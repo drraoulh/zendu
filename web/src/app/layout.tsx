@@ -5,6 +5,7 @@ import { AuthProvider } from "@/components/auth-provider";
 import { SiteHeader } from "@/components/layout/site-header";
 import { SiteFooter } from "@/components/layout/site-footer";
 import { DemoBanner } from "@/components/layout/demo-banner";
+import { SiteChrome } from "@/components/layout/site-chrome";
 import { isLiveMode } from "@/lib/mode";
 import { appFullName, appName, logo } from "@/lib/brand";
 import "./globals.css";
@@ -59,10 +60,14 @@ export default function RootLayout({ children }: Readonly<{ children: React.Reac
       <body className="flex min-h-screen flex-col">
         <I18nProvider>
           <AuthProvider>
-            <SiteHeader />
-            {demo && <DemoBanner />}
+            <SiteChrome>
+              <SiteHeader />
+              {demo && <DemoBanner />}
+            </SiteChrome>
             <main className="flex-1">{children}</main>
-            <SiteFooter />
+            <SiteChrome>
+              <SiteFooter />
+            </SiteChrome>
           </AuthProvider>
         </I18nProvider>
       </body>
