@@ -64,7 +64,7 @@ export function ReferContent() {
             <Icon name="gift" className="h-7 w-7" />
           </span>
           <p className="mt-4 text-sm font-semibold text-muted">{t("yourCode")}</p>
-          <p className="mt-2 break-all rounded-2xl border-2 border-dashed border-brand/30 bg-brand-soft/60 px-4 py-4 font-display text-2xl font-black tracking-[0.12em] text-navy sm:text-3xl">
+          <p className="mt-2 break-all rounded-2xl border-2 border-dashed border-brand/30 bg-brand-soft/60 px-4 py-4 font-display text-lg font-black tracking-[0.08em] text-navy min-[400px]:text-2xl sm:text-3xl sm:tracking-[0.12em]">
             {CODE}
           </p>
           <div className="mt-6 grid gap-2 sm:grid-cols-2">

@@ -14,6 +14,9 @@ import { TransferTimeline } from "@/components/transfer-app/transfer-timeline";
 import { isFailure } from "@/components/transfer-app/status";
 import { corridorCodes, type TransferDTO } from "@/components/transfer-app/types";
 import { useTransferLabels } from "@/components/transfer-app/use-transfer-labels";
+import { useT } from "@/i18n/define";
+import { INTERAC_PROVIDER } from "@/lib/providers/interac";
+import { trackerMessages } from "./tracker-messages";
 
 const TERMINAL = ["delivered", "cancelled", "expired"];
 const POLL_MS = 2500;
@@ -22,16 +25,22 @@ export function TransferTracker({
   id,
   initial,
   demo,
+  admin = false,
   deliveryEstimate,
   notice,
 }: {
   id: string;
   initial: TransferDTO | null;
+  /** Mode démo : simulation du paiement possible. Jamais en mode réel. */
   demo: boolean;
+  /** Équipe connectée : peut lancer le versement (route réservée à l'admin). */
+  admin?: boolean;
   deliveryEstimate: string;
   notice: "paid" | "cancelled" | null;
 }) {
   const { t, money, network, country, dateTime, eta, eventTitle } = useTransferLabels();
+  const tt = useT(trackerMessages);
+  const [copiedField, setCopiedField] = useState<string | null>(null);
   const [transfer, setTransfer] = useState<TransferDTO | null>(initial);
   const [loadFailed, setLoadFailed] = useState(false);
   const [actionError, setActionError] = useState<string | null>(null);
@@ -45,7 +54,8 @@ export function TransferTracker({
       if (!res.ok) throw new Error(String(res.status));
       const data = (await res.json()) as TransferDTO;
       statusRef.current = data.status;
-      setTransfer(data);
+      // La réponse de suivi peut omettre les instructions Interac : on garde celles déjà connues.
+      setTransfer((prev) => ({ ...data, interac: data.interac ?? prev?.interac }));
       setLoadFailed(false);
     } catch {
       setLoadFailed(true);
@@ -78,6 +88,16 @@ export function TransferTracker({
       setActionError(err instanceof Error ? err.message : t("errorGeneric"));
     } finally {
       setBusy(false);
+    }
+  }
+
+  async function copyValue(key: string, value: string) {
+    try {
+      await navigator.clipboard.writeText(value);
+      setCopiedField(key);
+      setTimeout(() => setCopiedField(null), 1500);
+    } catch {
+      /* la valeur reste sélectionnable */
     }
   }
 
@@ -134,6 +154,10 @@ export function TransferTracker({
   const bank = isBankNetwork(ben.network, ben.country ?? to);
   // Versement fait par un opérateur (banque ou portefeuille non intégré) : pas de bouton « Lancer le versement ».
   const manualBank = isManualPayoutProvider(transfer.payoutProvider ?? "");
+  const interac = transfer.payInProvider === INTERAC_PROVIDER ? transfer.interac : undefined;
+  // Simulation seulement en démo, et seulement pour un paiement simulable (mock ou Interac sans dépôt réel).
+  const canSimulate = demo && (transfer.payInProvider === "mock" || transfer.payInProvider === INTERAC_PROVIDER);
+  const expired = status === "expired";
 
   return (
     <div className="bg-bg pb-16">
@@ -200,9 +224,52 @@ export function TransferTracker({
         <div className="grid gap-6 lg:grid-cols-[1.35fr_1fr] lg:items-start">
           <div className="space-y-6">
             {/* Action principale selon le statut */}
-            {awaiting && (
-              <ActionCard tone="brand" icon="card" title={t("payTitle")} body={demo ? t("payDemo") : t("payLive")}>
-                {demo && (
+            {awaiting && interac && (
+              <ActionCard tone="brand" icon="card" title={tt("interacTitle")} body={tt("interacBody")}>
+                {interac.email ? (
+                  <dl className="divide-y divide-line rounded-2xl border border-line bg-white px-4">
+                    {(
+                      [
+                        ["email", tt("interacEmail"), interac.email, interac.email],
+                        ["amount", tt("interacAmount"), interac.amount.toFixed(2), money(interac.amount, interac.currency)],
+                        ["message", tt("interacMessage"), interac.message, interac.message],
+                      ] as const
+                    ).map(([key, label, value, display]) => (
+                      <div key={key} className="flex items-center justify-between gap-3 py-2.5">
+                        <div className="min-w-0">
+                          <dt className="text-xs text-muted">{label}</dt>
+                          <dd className="select-all break-all font-display text-base font-bold text-ink">{display}</dd>
+                        </div>
+                        <button
+                          type="button"
+                          onClick={() => void copyValue(key, value)}
+                          className="inline-flex min-h-9 shrink-0 items-center gap-1 rounded-full border border-line px-3 py-1 text-xs font-semibold text-brand hover:border-brand/40"
+                        >
+                          <Icon name="check" className={`h-3.5 w-3.5 ${copiedField === key ? "" : "hidden"}`} />
+                          {copiedField === key ? tt("copied") : tt("copy")}
+                        </button>
+                      </div>
+                    ))}
+                  </dl>
+                ) : (
+                  <p className="rounded-xl bg-warn/10 px-3 py-2 text-sm font-medium text-[#8a5d06]">{tt("interacNoAddress")}</p>
+                )}
+                <p className="mt-3 text-xs text-muted">{tt("interacDeadline", { date: dateTime(interac.expiresAt) })}</p>
+                {canSimulate && (
+                  <div className="mt-4">
+                    <p className="mb-2 text-xs text-muted">{t("payDemo")}</p>
+                    <Button size="lg" className="w-full sm:w-auto" disabled={busy} onClick={() => void runAction("simulate-pay")}>
+                      {busy ? t("processing") : t("simulatePay")}
+                      {!busy && <Icon name="arrowRight" className="h-4 w-4" />}
+                    </Button>
+                  </div>
+                )}
+              </ActionCard>
+            )}
+
+            {awaiting && !interac && (
+              <ActionCard tone="brand" icon="card" title={t("payTitle")} body={canSimulate ? t("payDemo") : t("payLive")}>
+                {canSimulate && (
                   <Button size="lg" className="w-full sm:w-auto" disabled={busy} onClick={() => void runAction("simulate-pay")}>
                     {busy ? t("processing") : t("simulatePay")}
                     {!busy && <Icon name="arrowRight" className="h-4 w-4" />}
@@ -212,15 +279,24 @@ export function TransferTracker({
             )}
 
             {payoutReady && manualBank && (
-              <ActionCard tone="brand" icon="info" title={t("bankManualTitle")} body={t("bankManualBody")} />
+              <ActionCard
+                tone="brand"
+                icon="info"
+                title={bank ? t("bankManualTitle") : tt("manualTitle")}
+                body={bank ? t("bankManualBody") : tt("manualBody", { network: network(ben.network) })}
+              />
             )}
 
-            {payoutReady && !manualBank && (
+            {payoutReady && !manualBank && admin && (
               <ActionCard tone="brand" icon="transfer" title={t("payoutTitle")} body={t("payoutHint")}>
                 <Button size="lg" className="w-full sm:w-auto" disabled={busy} onClick={() => void runAction("payout")}>
                   {busy ? t("processing") : t("triggerPayout")}
                 </Button>
               </ActionCard>
+            )}
+
+            {payoutReady && !manualBank && !admin && (
+              <ActionCard tone="brand" icon="transfer" title={tt("payoutWaitTitle")} body={tt("payoutWaitBody")} />
             )}
 
             {delivered && (
@@ -237,7 +313,16 @@ export function TransferTracker({
               </ActionCard>
             )}
 
-            {failed && (
+            {expired && (
+              <ActionCard
+                tone="danger"
+                icon="info"
+                title={tt("expiredTitle")}
+                body={tt("expiredBody", { email: contact.email, ref: transfer.reference })}
+              />
+            )}
+
+            {failed && !expired && (
               <ActionCard
                 tone="danger"
                 icon="info"
@@ -300,7 +385,7 @@ export function TransferTracker({
               {bank && ben.bankName && <SummaryRow label={t("bankName")} value={ben.bankName} />}
               {bank && ben.accountMasked && <SummaryRow label={t("bankAccount")} value={ben.accountMasked} />}
               {bank && ben.bankCode && <SummaryRow label={t("bankCode")} value={ben.bankCode} />}
-              {ben.phone && <SummaryRow label={t("phone")} value={`+${ben.phone}`} />}
+              {ben.phone && <SummaryRow label={t("phone")} value={/^\d/.test(ben.phone) ? `+${ben.phone}` : ben.phone} />}
               <SummaryRow label={t("estimate")} value={eta(deliveryEstimate)} />
               <SummaryRow label={t("sourceCountry")} value={country(from)} />
             </dl>
@@ -343,7 +428,7 @@ function ActionCard({
   return (
     <section className={`animate-rise rounded-3xl border p-6 shadow-card ${ring}`}>
       <div className="flex items-start gap-4">
-        <span className={`grid h-11 w-11 shrink-0 place-items-center rounded-2xl ${iconBg}`}>
+        <span className={`hidden h-11 w-11 shrink-0 place-items-center rounded-2xl sm:grid ${iconBg}`}>
           <Icon name={icon} className="h-5 w-5" />
         </span>
         <div className="min-w-0 flex-1">

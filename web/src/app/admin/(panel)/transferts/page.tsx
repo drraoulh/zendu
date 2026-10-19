@@ -2,11 +2,12 @@ import type { Metadata } from "next";
 import type { Prisma } from "@prisma/client";
 import { prisma } from "@/lib/prisma";
 import { getPayInMode } from "@/lib/providers/payin";
-import { getPayoutMode } from "@/lib/providers/payout";
+import { getPayoutMode, momoLiveReady } from "@/lib/providers/payout";
 import { isBankNetwork, MANUAL_BANK_PROVIDER, MANUAL_PAYOUT_PROVIDER, maskAccount } from "@/lib/bank";
 import { INTERAC_PROVIDER } from "@/lib/providers/interac";
 import { expireStaleTransfers } from "@/lib/transfer-service";
 import { isLiveMode } from "@/lib/mode";
+import { COUNTRIES } from "@/lib/corridors";
 import { AdminDashboard, type AdminTransferRow } from "./admin-dashboard";
 import { parseTransferFilters, STATUS_GROUPS, type TransferFilters } from "./filters";
 
@@ -36,6 +37,11 @@ function filterWhere(f: TransferFilters): Prisma.TransferWhereInput {
   return and.length ? { AND: and } : {};
 }
 
+function nationalNumber(phone: string, country: string): string {
+  const dial = COUNTRIES[country]?.dialCode;
+  return dial && phone.startsWith(dial) ? phone.slice(dial.length) : phone;
+}
+
 async function loadTransfers(where: Prisma.TransferWhereInput = {}, take = 30): Promise<AdminTransferRow[] | null> {
   return prisma.transfer
     .findMany({
@@ -57,6 +63,9 @@ async function loadTransfers(where: Prisma.TransferWhereInput = {}, take = 30): 
         recipientName: t.beneficiary.fullName,
         recipientPhone: t.beneficiary.phone,
         recipientNetwork: t.beneficiary.network,
+        recipientCountry: t.beneficiary.country,
+        // Numéro sans l'indicatif, tel qu'on le saisit dans l'appli de versement du pays.
+        recipientNational: nationalNumber(t.beneficiary.phone, t.beneficiary.country),
         isBank: isBankNetwork(t.beneficiary.network, t.beneficiary.country),
         recipientBankName: t.beneficiary.bankName,
         // Numéro masqué dans la liste ; le complet s'affiche à la demande (GET bank-payout, session admin).
@@ -64,6 +73,7 @@ async function loadTransfers(where: Prisma.TransferWhereInput = {}, take = 30): 
         payoutProvider: t.payoutProvider,
         payInProvider: t.payInProvider,
         senderEmail: t.senderEmail,
+        failureReason: t.failureReason,
         interacDeclaredAt: t.events[0]?.createdAt.toISOString() ?? null,
         createdAt: t.createdAt.toISOString(),
       })),
@@ -99,6 +109,8 @@ export default async function AdminPage({ searchParams }: Props) {
             events: { some: { type: "interac_declared" } },
           },
           { payoutProvider: { in: [MANUAL_BANK_PROVIDER, MANUAL_PAYOUT_PROVIDER] }, status: { in: ["payout_queued", "payout_sent"] } },
+          // À régulariser : paiement non conforme ou versement en échec récents.
+          { status: { in: ["payment_mismatch", "payout_failed"] }, updatedAt: { gte: new Date(Date.now() - 30 * 86400_000) } },
         ],
       },
       200,
@@ -112,8 +124,10 @@ export default async function AdminPage({ searchParams }: Props) {
       results={results}
       filters={filters}
       resultsLimit={RESULTS_LIMIT}
-      payInMode={getPayInMode()}
-      payoutMode={getPayoutMode()}
+      // Mode réel : encaissement Interac confirmé par l'équipe ; versement MTN automatique seulement
+      // avec des clés de production, sinon manuel. Jamais « mock » affiché en mode réel.
+      payInMode={isLiveMode() ? "interac" : getPayInMode()}
+      payoutMode={isLiveMode() ? (momoLiveReady() ? "momo" : "manual") : getPayoutMode()}
     />
   );
 }

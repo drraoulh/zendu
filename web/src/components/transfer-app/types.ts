@@ -41,6 +41,8 @@ export type TransferDTO = {
     bankCode?: string | null;
   };
   events?: TransferEventDTO[];
+  /** Virement Interac : instructions de paiement (adresse, montant, message, échéance). */
+  interac?: { email: string | null; amount: number; currency: string; message: string; expiresAt: string; simulate: boolean };
 };
 
 export function corridorCodes(corridorId?: string | null): [string, string] {

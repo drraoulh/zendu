@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { Suspense } from "react";
 import { SendFlow } from "./send-flow";
+import { isLiveMode } from "@/lib/mode";
 
 export const metadata: Metadata = {
   title: "Envoyer de l'argent",
@@ -16,7 +17,7 @@ export default function SendPage() {
         </div>
       }
     >
-      <SendFlow />
+      <SendFlow live={isLiveMode()} />
     </Suspense>
   );
 }

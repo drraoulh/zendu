@@ -170,7 +170,7 @@ export function ReceiptView({
                   {t("bankCode")} : {receipt.recipient.bankCode}
                 </p>
               )}
-              {receipt.recipient.phone && <p className="text-sm text-muted">+{receipt.recipient.phone}</p>}
+              {receipt.recipient.phone && <p className="text-sm text-muted">{/^\d/.test(receipt.recipient.phone) ? `+${receipt.recipient.phone}` : receipt.recipient.phone}</p>}
               <p className="mt-1 text-sm text-muted">
                 {network(receipt.recipient.network)} · {country(receipt.destCountry)}
               </p>

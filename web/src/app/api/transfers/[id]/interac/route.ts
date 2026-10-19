@@ -60,7 +60,12 @@ export async function POST(request: Request, { params }: Params) {
 
     assertTransition(transfer.status, "payment_mismatch");
     const reason = body.reason || "Montant ou message du virement Interac incorrect";
-    await prisma.transfer.update({ where: { id }, data: { status: "payment_mismatch", failureReason: reason } });
+    // Conditionnel : un double clic n'enregistre (et ne notifie) qu'une fois.
+    const { count } = await prisma.transfer.updateMany({
+      where: { id, status: transfer.status },
+      data: { status: "payment_mismatch", failureReason: reason },
+    });
+    if (!count) throw new Error("Ce transfert vient d'être traité par ailleurs. Rechargez la page.");
     await prisma.transferEvent.create({ data: { transferId: id, type: "payment_mismatch", message: reason } });
     await notifyCustomer(id, "payment_mismatch");
     const updated = await prisma.transfer.findUnique({ where: { id }, include: { beneficiary: true } });

@@ -123,7 +123,7 @@ export async function listCustomers(f: CustomerFilters) {
     prisma.customer.findMany({
       where,
       include: { _count: { select: { transfers: true } } },
-      // Dossiers KYC à traiter en premier, puis les plus récents.
+      // Les plus récents d'abord ; les dossiers à vérifier ont leur bandeau et leur filtre (kyc=pending).
       orderBy: [{ createdAt: "desc" }],
       skip: (page - 1) * CUSTOMERS_PAGE_SIZE,
       take: CUSTOMERS_PAGE_SIZE,
@@ -230,6 +230,10 @@ export const customerPatchSchema = z
   .strict();
 
 export async function patchCustomer(id: string, patch: z.infer<typeof customerPatchSchema>) {
+  // Un refus d'identité est toujours motivé : le client voit ce motif dans l'appli.
+  if (patch.kycStatus === "rejected" && !patch.kycNote?.trim()) {
+    throw new AdminInputError("Indiquez le motif du refus.", 400);
+  }
   const data: Prisma.CustomerUpdateInput = { ...patch };
   if (patch.kycStatus) data.kycReviewedAt = patch.kycStatus === "verified" || patch.kycStatus === "rejected" ? new Date() : null;
   try {

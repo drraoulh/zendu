@@ -11,10 +11,11 @@ import { useAdminT } from "./kit";
 
 const NAV: { href: string; key: "navOverview" | "navRequests" | "navShipments" | "navTransfers" | "navCustomers"; icon: IconName }[] = [
   { href: "/admin", key: "navOverview", icon: "chart" },
+  // Outil quotidien (virements à vérifier, versements à faire) : en tête, visible sans défiler sur mobile.
+  { href: "/admin/transferts", key: "navTransfers", icon: "transfer" },
   { href: "/admin/clients", key: "navCustomers", icon: "users" },
   { href: "/admin/demandes", key: "navRequests", icon: "mail" },
   { href: "/admin/colis", key: "navShipments", icon: "box" },
-  { href: "/admin/transferts", key: "navTransfers", icon: "transfer" },
 ];
 
 /** Cadre de l'espace équipe : bandeau, navigation latérale (onglets sur mobile), déconnexion. */

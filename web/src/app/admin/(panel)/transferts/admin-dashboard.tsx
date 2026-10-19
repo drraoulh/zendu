@@ -11,6 +11,7 @@ import { formatMoney } from "@/lib/money";
 import { isManualPayoutProvider } from "@/lib/bank";
 import { BankQueue } from "./bank-queue";
 import { InteracQueue } from "./interac-queue";
+import { IssuesQueue } from "./issues-queue";
 import { INTERAC_PROVIDER } from "@/lib/providers/interac";
 import { Field, inputClass } from "../../_ui/kit";
 import { filterMessages } from "./filter-messages";
@@ -28,12 +29,16 @@ export type AdminTransferRow = {
   recipientName: string;
   recipientPhone: string;
   recipientNetwork: string;
+  recipientCountry: string;
+  /** Numéro du bénéficiaire sans l'indicatif du pays. */
+  recipientNational: string;
   isBank: boolean;
   recipientBankName: string | null;
   recipientAccountMasked: string | null;
   payoutProvider: string;
   payInProvider: string;
   senderEmail: string;
+  failureReason: string | null;
   /** Virement Interac : moment où le client a indiqué l'avoir envoyé. */
   interacDeclaredAt: string | null;
   createdAt: string;
@@ -110,6 +115,10 @@ export function AdminDashboard({
       isManualPayoutProvider(r.payoutProvider) &&
       (r.status === "payout_queued" || r.status === "payout_sent"),
   );
+  const issuesQueue = work.filter((r) => r.status === "payment_mismatch" || r.status === "payout_failed");
+  // En mode réel la file reste visible même vide (l'équipe sait qu'il n'y a rien à verser).
+  const showBankQueue = bankQueue.length > 0 || live || payoutMode === "momo";
+  const hasQueues = interacQueue.length > 0 || showBankQueue || issuesQueue.length > 0;
   const recipientLine = (r: AdminTransferRow) =>
     r.isBank
       ? [r.recipientBankName, r.recipientAccountMasked].filter(Boolean).join(" ") || r.recipientNetwork
@@ -144,11 +153,12 @@ export function AdminDashboard({
 
   const modePill = (label: string, mode: string) => {
     const mock = mode.startsWith("mock");
+    const manual = mode === "manual" || mode === "interac";
     return (
       <span className="inline-flex items-center gap-2 rounded-full border border-line bg-white px-3 py-1.5 text-xs font-semibold text-ink">
         <span className={`h-2 w-2 rounded-full ${mock ? "bg-warn" : "bg-success"}`} aria-hidden />
         {label} : <code className="font-mono">{mode}</code>
-        <span className="text-muted">({mock ? t("modeMock") : t("modeLive")})</span>
+        <span className="text-muted">({mock ? t("modeMock") : manual ? t("modeManual") : t("modeLive")})</span>
       </span>
     );
   };
@@ -219,14 +229,16 @@ export function AdminDashboard({
             <div className="mt-8 grid gap-6 xl:grid-cols-[minmax(0,1fr)_18rem]">
               {/* Transferts */}
               <section aria-labelledby="admin-recent" className="min-w-0">
-                {interacQueue.length > 0 && <InteracQueue rows={interacQueue} nl={nl} date={date} />}
-                {(bankQueue.length > 0 || payoutMode === "momo") && (
-                  <div className={interacQueue.length > 0 ? "mt-6" : ""}>
-                    <BankQueue rows={bankQueue} nl={nl} date={date} />
+                {/* Files de travail : à vérifier (Interac), à verser, à régulariser. */}
+                {hasQueues && (
+                  <div className="space-y-6">
+                    {interacQueue.length > 0 && <InteracQueue rows={interacQueue} nl={nl} date={date} />}
+                    {showBankQueue && <BankQueue rows={bankQueue} nl={nl} date={date} />}
+                    {issuesQueue.length > 0 && <IssuesQueue rows={issuesQueue} nl={nl} date={date} />}
                   </div>
                 )}
 
-                <h2 id="admin-recent" className={`font-display text-xl font-bold text-ink ${interacQueue.length > 0 || bankQueue.length > 0 || payoutMode === "momo" ? "mt-8" : ""}`}>
+                <h2 id="admin-recent" className={`font-display text-xl font-bold text-ink ${hasQueues ? "mt-8" : ""}`}>
                   {filtering ? tf("resultsTitle") : t("recent")}
                 </h2>
 
@@ -275,9 +287,11 @@ export function AdminDashboard({
                       <Icon name="receipt" />
                     </span>
                     <p className="mt-3 text-sm text-muted">{t("empty")}</p>
-                    <ButtonLink href="/send" size="sm" className="mt-4">
-                      {t("emptyCta")}
-                    </ButtonLink>
+                    {!live && (
+                      <ButtonLink href="/send" size="sm" className="mt-4">
+                        {t("emptyCta")}
+                      </ButtonLink>
+                    )}
                   </div>
                 ) : (
                   <>

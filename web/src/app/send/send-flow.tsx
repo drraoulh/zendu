@@ -66,7 +66,8 @@ function groupAccount(value: string) {
   return normalizeAccountNumber(value).replace(/(.{4})(?=.)/g, "$1 ");
 }
 
-export function SendFlow() {
+/** `live` : mode réel — envois depuis le Canada seulement, payés par virement Interac (voir lib/mode.ts). */
+export function SendFlow({ live = false }: { live?: boolean }) {
   const router = useRouter();
   const params = useSearchParams();
   const { user } = useAuth();
@@ -75,8 +76,10 @@ export function SendFlow() {
 
   const initialCorridor = useMemo(() => {
     const requested = params.get("corridor");
-    return requested && CORRIDORS.some((c) => c.id === requested && c.active) ? requested : DEFAULT_CORRIDOR;
-  }, [params]);
+    return requested && CORRIDORS.some((c) => c.id === requested && c.active && (!live || c.source === "CA"))
+      ? requested
+      : DEFAULT_CORRIDOR;
+  }, [params, live]);
   const initialAmount = useMemo(() => {
     const n = Number(params.get("amount") ?? "100");
     return Number.isFinite(n) && n > 0 ? String(n) : "100";
@@ -111,7 +114,11 @@ export function SendFlow() {
   const isBank = networks.find((n) => n.id === activeNetwork)?.type === "bank";
   const bankSuggestions = BANK_SUGGESTIONS[dest.code] ?? [];
 
-  const sourceOptions = useMemo(() => [...new Set(CORRIDORS.map((c) => c.source))], []);
+  // Mode réel : seul l'encaissement Interac (Canada) existe, les autres pays d'envoi sont fermés.
+  const sourceOptions = useMemo(
+    () => [...new Set(CORRIDORS.filter((c) => !live || c.source === "CA").map((c) => c.source))],
+    [live],
+  );
   const destOptions = useMemo(
     () => CORRIDORS.filter((c) => c.source === corridor.source && c.active).map((c) => c.destination),
     [corridor.source],
@@ -250,6 +257,8 @@ export function SendFlow() {
         body: JSON.stringify({
           corridorId,
           sendAmount: currentQuote.sendAmount,
+          // Depuis le Canada : virement Interac (seul moyen réel) ; ailleurs, carte simulée en démo.
+          payMethod: corridor.source === "CA" ? "interac" : "card",
           senderName: senderName.trim(),
           senderEmail: senderEmail.trim(),
           beneficiary: {

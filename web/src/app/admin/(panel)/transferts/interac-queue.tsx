@@ -11,6 +11,7 @@ import { useT } from "@/i18n/define";
 import { adminMessages } from "@/i18n/admin";
 import { formatMoney } from "@/lib/money";
 import type { AdminTransferRow } from "./admin-dashboard";
+import { adminAction, CopyRow, rawAmount } from "./queue-kit";
 
 /**
  * Virements Interac en attente (payInProvider "interac_manual") : l'équipe vérifie la réception sur le
@@ -21,7 +22,7 @@ export function InteracQueue({ rows, nl, date }: { rows: AdminTransferRow[]; nl:
   // Ceux que le client a déclarés envoyés d'abord : ce sont ceux à vérifier en priorité.
   const sorted = [...rows].sort((a, b) => Number(!!b.interacDeclaredAt) - Number(!!a.interacDeclaredAt));
   return (
-    <section aria-labelledby="admin-interac-queue" className="rounded-3xl border border-brand/25 bg-white p-5 shadow-card sm:p-6">
+    <section aria-labelledby="admin-interac-queue" className="rounded-3xl border border-brand/25 bg-white p-4 shadow-card sm:p-6">
       <h2 id="admin-interac-queue" className="flex flex-wrap items-center gap-2 font-display text-lg font-bold text-ink">
         <PaymentLogo id="INTERAC" size={24} title="" />
         {t("interacQueueTitle")}
@@ -41,21 +42,35 @@ function InteracItem({ row, nl, date }: { row: AdminTransferRow; nl: string; dat
   const t = useT(adminMessages);
   const router = useRouter();
   const [interacRef, setInteracRef] = useState("");
+  const [reason, setReason] = useState("");
   const [busy, setBusy] = useState(false);
+  // Action réussie : boutons retirés pour éviter un second envoi pendant le rechargement.
+  const [done, setDone] = useState(false);
   const [message, setMessage] = useState<{ ok: boolean; text: string } | null>(null);
+  const late = row.status === "expired";
+  const expected = formatMoney(row.totalCad, row.sendCurrency, nl);
+  const receive = formatMoney(row.receiveAmountXaf, row.receiveCurrency, nl);
 
   async function act(action: "received" | "mismatch") {
+    const question =
+      action === "received"
+        ? t("confirmReceived", { amount: expected, sender: row.senderName, ref: row.reference, receive, recipient: row.recipientName })
+        : t("confirmMismatch", { ref: row.reference });
+    if (busy || !window.confirm(question)) return;
     setBusy(true);
     setMessage(null);
     try {
-      const res = await fetch(`/api/transfers/${row.id}/interac`, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(action === "received" ? { action, interacReference: interacRef.trim() || undefined } : { action }),
-        cache: "no-store",
-      });
-      const data = await res.json().catch(() => ({}));
-      if (!res.ok) throw new Error(typeof data?.error === "string" ? data.error : String(res.status));
+      await adminAction(
+        `/api/transfers/${row.id}/interac`,
+        {
+          body:
+            action === "received"
+              ? { action, interacReference: interacRef.trim() || undefined }
+              : { action, reason: reason.trim() || undefined },
+        },
+        t,
+      );
+      setDone(true);
       setMessage({ ok: true, text: t("actionDone", { ref: row.reference }) });
       router.refresh();
     } catch (err) {
@@ -78,40 +93,67 @@ function InteracItem({ row, nl, date }: { row: AdminTransferRow; nl: string; dat
         </div>
         <div className="shrink-0 text-right">
           <p className="text-xs text-muted">{t("interacExpected")}</p>
-          <p className="font-display text-lg font-extrabold text-ink">{formatMoney(row.totalCad, row.sendCurrency, nl)}</p>
+          <p className="font-display text-lg font-extrabold text-ink">{expected}</p>
         </div>
       </div>
 
-      <dl className="mt-3 grid gap-x-4 gap-y-1 rounded-xl bg-surface-soft p-3 text-sm sm:grid-cols-[auto_1fr]">
-        <dt className="text-muted">{t("interacMessage")}</dt>
-        <dd className="font-mono font-semibold text-ink">{row.reference}</dd>
+      <dl className="mt-3 divide-y divide-line rounded-xl bg-surface-soft px-3">
+        <CopyRow label={t("interacMessage")} value={row.reference} />
+        <CopyRow label={t("interacExpected")} value={rawAmount(row.totalCad)} display={expected} />
       </dl>
+      <p className="mt-2 text-xs text-muted">
+        {t("interacFor")} <span className="font-semibold text-ink">{row.recipientName}</span> · {row.recipientNetwork} ·{" "}
+        <span className="whitespace-nowrap">{receive}</span>
+      </p>
+      {late && (
+        <p className="mt-2 rounded-xl bg-warn/10 px-3 py-2 text-xs font-semibold text-[#7a5308]">{t("interacLate")}</p>
+      )}
       <p className={`mt-2 flex items-center gap-1.5 text-xs font-semibold ${row.interacDeclaredAt ? "text-brand" : "text-muted"}`}>
         {row.interacDeclaredAt ? <Icon name="check" className="h-3.5 w-3.5" /> : null}
         {row.interacDeclaredAt ? t("interacDeclared", { date: date(row.interacDeclaredAt) }) : t("interacNotDeclared")}
       </p>
 
-      <div className="mt-3">
-        <label htmlFor={`interac-ref-${row.id}`} className="block text-xs font-medium text-muted">
-          {t("interacRefLabel")}
-        </label>
-        <input
-          id={`interac-ref-${row.id}`}
-          value={interacRef}
-          onChange={(e) => setInteracRef(e.target.value)}
-          maxLength={80}
-          className="mt-1 w-full rounded-xl border border-line px-3 py-2 text-sm text-ink outline-none focus:border-brand focus:ring-2 focus:ring-brand/20 sm:max-w-sm"
-        />
-      </div>
-      <div className="mt-3 flex flex-wrap gap-2">
-        <Button size="sm" disabled={busy} onClick={() => void act("received")}>
-          <Icon name="check" className="h-4 w-4" />
-          {t("interacReceived")}
-        </Button>
-        <Button size="sm" variant="danger" disabled={busy} onClick={() => void act("mismatch")}>
-          {t("interacMismatch")}
-        </Button>
-      </div>
+      {!done && (
+        <>
+          <div className="mt-3 grid gap-3 sm:grid-cols-2">
+            <div>
+              <label htmlFor={`interac-ref-${row.id}`} className="block text-xs font-medium text-muted">
+                {t("interacRefLabel")}
+              </label>
+              <input
+                id={`interac-ref-${row.id}`}
+                value={interacRef}
+                onChange={(e) => setInteracRef(e.target.value)}
+                maxLength={80}
+                autoComplete="off"
+                className="mt-1 w-full rounded-xl border border-line px-3 py-2.5 text-sm text-ink outline-none focus:border-brand focus:ring-2 focus:ring-brand/20"
+              />
+            </div>
+            <div>
+              <label htmlFor={`interac-reason-${row.id}`} className="block text-xs font-medium text-muted">
+                {t("interacReasonLabel")}
+              </label>
+              <input
+                id={`interac-reason-${row.id}`}
+                value={reason}
+                onChange={(e) => setReason(e.target.value)}
+                maxLength={300}
+                autoComplete="off"
+                className="mt-1 w-full rounded-xl border border-line px-3 py-2.5 text-sm text-ink outline-none focus:border-brand focus:ring-2 focus:ring-brand/20"
+              />
+            </div>
+          </div>
+          <div className="mt-3 flex flex-col gap-2 sm:flex-row sm:flex-wrap">
+            <Button size="md" disabled={busy} aria-busy={busy} onClick={() => void act("received")}>
+              <Icon name="check" className="h-4 w-4" />
+              {t("interacReceived")}
+            </Button>
+            <Button size="md" variant="danger" disabled={busy} onClick={() => void act("mismatch")}>
+              {t("interacMismatch")}
+            </Button>
+          </div>
+        </>
+      )}
 
       {message && (
         <p

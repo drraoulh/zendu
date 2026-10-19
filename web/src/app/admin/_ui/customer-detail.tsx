@@ -10,6 +10,8 @@ import type { AdminCustomer, AdminCustomerSession, AdminCustomerTransfer } from 
 import { useTransferLabels } from "@/components/transfer-app/use-transfer-labels";
 import { AccountBadge, COUNTRY_LABEL, KycBadge, useCustomersT } from "./customers-kit";
 import { adminFetch, Field, inputClass, Message, PageTitle, Panel, useAdminT } from "./kit";
+import { useT } from "@/i18n/define";
+import { adminKycMessages } from "@/i18n/admin";
 
 type Detail = { customer: AdminCustomer; transfers: AdminCustomerTransfer[]; sessions: AdminCustomerSession[]; totals: Record<string, number> };
 
@@ -25,6 +27,7 @@ function Row({ label, children }: { label: string; children: ReactNode }) {
 export function CustomerDetail({ initial }: { initial: Detail }) {
   const router = useRouter();
   const { t } = useCustomersT();
+  const tk = useT(adminKycMessages);
   const { dateTime, label, nl } = useAdminT();
   const { status: transferStatus } = useTransferLabels();
   const [c, setC] = useState(initial.customer);
@@ -58,6 +61,18 @@ export function CustomerDetail({ initial }: { initial: Detail }) {
 
   const a = c.address;
   const name = `${c.firstName} ${c.lastName}`;
+  // Action sensible : confirmation explicite (évite un clic involontaire, surtout sur téléphone).
+  const confirmed = (question: string) => busy === null && window.confirm(question);
+
+  function reject() {
+    const reason = kycNote.trim();
+    if (!reason) {
+      setMsg({ ok: false, text: tk("reasonRequired") });
+      document.getElementById("kyc-note")?.focus();
+      return;
+    }
+    if (confirmed(tk("confirmReject", { name, reason }))) void patch("reject", { kycStatus: "rejected", kycNote: reason });
+  }
 
   return (
     <div className="space-y-6">
@@ -84,10 +99,13 @@ export function CustomerDetail({ initial }: { initial: Detail }) {
             <Row label={t("kycReviewed")}>{c.kycReviewedAt ? dateTime(c.kycReviewedAt) : "—"}</Row>
           </dl>
           <Field id="kyc-note" label={t("kycNoteLabel")} className="mt-3">
-            <input id="kyc-note" value={kycNote} onChange={(e) => setKycNote(e.target.value)} className={inputClass} maxLength={500} />
+            <textarea id="kyc-note" rows={2} value={kycNote} onChange={(e) => setKycNote(e.target.value)} className={inputClass} maxLength={500} />
           </Field>
           <div className="mt-4 flex flex-wrap gap-2">
-            <Button size="sm" disabled={busy !== null || c.kycStatus === "verified"} onClick={() => patch("approve", { kycStatus: "verified", kycNote: kycNote || null })}>
+            <Button size="sm" disabled={busy !== null || c.kycStatus === "verified"} onClick={() => {
+                // Validation : l'ancien motif de refus est effacé (il ne doit plus s'afficher au client).
+                if (confirmed(tk("confirmApprove", { name }))) void patch("approve", { kycStatus: "verified", kycNote: null }).then(() => setKycNote(""));
+              }}>
               <Icon name="check" className="h-4 w-4" />
               {t("approve")}
             </Button>
@@ -95,11 +113,13 @@ export function CustomerDetail({ initial }: { initial: Detail }) {
               size="sm"
               variant="danger"
               disabled={busy !== null || c.kycStatus === "rejected"}
-              onClick={() => patch("reject", { kycStatus: "rejected", kycNote: kycNote || null })}
+              onClick={reject}
             >
               {t("reject")}
             </Button>
-            <Button size="sm" variant="secondary" disabled={busy !== null || c.kycStatus === "none"} onClick={() => patch("resetkyc", { kycStatus: "none" })}>
+            <Button size="sm" variant="secondary" disabled={busy !== null || c.kycStatus === "none"} onClick={() => {
+                if (confirmed(tk("confirmReset", { name }))) void patch("resetkyc", { kycStatus: "none" });
+              }}>
               {t("resetKyc")}
             </Button>
           </div>
@@ -127,7 +147,9 @@ export function CustomerDetail({ initial }: { initial: Detail }) {
           {c.mustChangePassword && <p className="mb-3 rounded-xl bg-warn/10 px-3 py-2 text-sm text-[#7a5308]">{t("mustChange")}</p>}
           <div className="flex flex-wrap gap-2">
             {c.status === "active" ? (
-              <Button size="sm" variant="danger" disabled={busy !== null} onClick={() => patch("suspend", { status: "suspended" }).then(() => setSessions([]))}>
+              <Button size="sm" variant="danger" disabled={busy !== null} onClick={() => {
+                if (confirmed(tk("confirmSuspend", { name }))) void patch("suspend", { status: "suspended" }).then(() => setSessions([]));
+              }}>
                 <Icon name="lock" className="h-4 w-4" />
                 {t("suspend")}
               </Button>
@@ -141,6 +163,7 @@ export function CustomerDetail({ initial }: { initial: Detail }) {
               variant="secondary"
               disabled={busy !== null}
               onClick={() =>
+                confirmed(tk("confirmPassword", { name })) &&
                 run("password", async () => {
                   const r = await adminFetch<{ temporaryPassword: string }>(`${base}/password`, "POST");
                   setTemp(r.temporaryPassword);

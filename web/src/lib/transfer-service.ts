@@ -49,14 +49,17 @@ export async function markPaymentDetected(transferId: string, payInRef: string) 
 
   assertTransition(transfer.status, "payment_detected");
 
-  await prisma.transfer.update({
-    where: { id: transferId },
+  // Mise à jour conditionnelle : deux confirmations simultanées (double clic, webhook rejoué)
+  // ne déclenchent jamais deux versements.
+  const { count } = await prisma.transfer.updateMany({
+    where: { id: transferId, status: transfer.status },
     data: {
       status: "payment_detected",
       payInRef,
       paidAt: new Date(),
     },
   });
+  if (!count) throw new Error("Ce transfert vient d'être traité par ailleurs. Rechargez la page.");
   await addEvent(transferId, "payment_detected", `Paiement détecté (${payInRef})`);
 
   if (process.env.AUTO_PAYOUT !== "false") {
@@ -76,13 +79,19 @@ export async function queueAndRunPayout(transferId: string) {
   });
   if (!transfer) throw new Error("Transfert introuvable");
 
-  if (transfer.status === "payment_detected") {
+  // Versement en échec relancé par l'équipe (payout_failed → payout_queued).
+  if (transfer.status === "payment_detected" || transfer.status === "payout_failed") {
     assertTransition(transfer.status, "payout_queued");
-    await prisma.transfer.update({
-      where: { id: transferId },
-      data: { status: "payout_queued" },
+    const { count } = await prisma.transfer.updateMany({
+      where: { id: transferId, status: transfer.status },
+      data: { status: "payout_queued", ...(transfer.status === "payout_failed" ? { failureReason: null } : {}) },
     });
-    await addEvent(transferId, "payout_queued", "Payout mis en file");
+    if (!count) throw new Error("Ce transfert vient d'être traité par ailleurs. Rechargez la page.");
+    await addEvent(
+      transferId,
+      "payout_queued",
+      transfer.status === "payout_failed" ? "Versement relancé par l'équipe" : "Payout mis en file",
+    );
   }
 
   const current = await prisma.transfer.findUnique({
@@ -121,10 +130,12 @@ export async function queueAndRunPayout(transferId: string) {
   }
 
   assertTransition(current.status, "payout_sent");
-  await prisma.transfer.update({
-    where: { id: transferId },
+  // Un seul appel au fournisseur par transfert, même si deux requêtes arrivent en même temps.
+  const claimed = await prisma.transfer.updateMany({
+    where: { id: transferId, status: "payout_queued" },
     data: { status: "payout_sent", payoutProvider: route },
   });
+  if (!claimed.count) return prisma.transfer.findUnique({ where: { id: transferId }, include: WITH_EVENTS });
   await addEvent(
     transferId,
     "payout_sent",
@@ -207,34 +218,33 @@ export async function completeManualBankPayout(
     throw new Error("Ce versement n'est pas en traitement manuel");
   }
   if (transfer.status !== "payout_queued" && transfer.status !== "payout_sent") {
-    throw new Error("Ce virement a déjà été traité ou n'est pas encore payé.");
+    throw new Error("Ce versement a déjà été clôturé ou le paiement n'est pas encore confirmé. Rechargez la page.");
   }
 
   const ref = input.bankReference?.trim() || null;
 
+  const bank = isBankNetwork(transfer.beneficiary.network, transfer.beneficiary.country);
+  const what = bank ? "Virement bancaire" : `Versement ${transfer.beneficiary.network}`;
+  // Mise à jour conditionnelle : un double clic ne clôture (et ne notifie) qu'une fois.
+  const claim = async (data: { status: string; failureReason?: string; deliveredAt?: Date }) => {
+    const { count } = await prisma.transfer.updateMany({
+      where: { id: transferId, status: transfer.status },
+      data: { ...data, payoutRef: ref ?? transfer.payoutRef },
+    });
+    if (!count) throw new Error("Ce versement vient d'être clôturé par ailleurs. Rechargez la page.");
+  };
+
   if (input.outcome === "failed") {
     assertTransition(transfer.status, "payout_failed");
-    const reason = input.reason?.trim() || "Virement bancaire refusé";
-    await prisma.transfer.update({
-      where: { id: transferId },
-      data: { status: "payout_failed", failureReason: reason, payoutRef: ref ?? transfer.payoutRef },
-    });
+    const reason = input.reason?.trim() || (bank ? "Virement bancaire refusé" : "Versement impossible");
+    await claim({ status: "payout_failed", failureReason: reason });
     await addEvent(transferId, "payout_failed", reason);
   } else {
+    await claim({ status: "delivered", deliveredAt: new Date() });
     if (transfer.status === "payout_queued") {
-      assertTransition(transfer.status, "payout_sent");
-      await prisma.transfer.update({
-        where: { id: transferId },
-        data: { status: "payout_sent", payoutRef: ref ?? transfer.payoutRef },
-      });
-      await addEvent(transferId, "payout_sent", `Virement bancaire émis par un opérateur${ref ? ` (${ref})` : ""}`);
+      await addEvent(transferId, "payout_sent", `${what} effectué par un opérateur${ref ? ` (${ref})` : ""}`);
     }
-    assertTransition("payout_sent", "delivered");
-    await prisma.transfer.update({
-      where: { id: transferId },
-      data: { status: "delivered", deliveredAt: new Date(), payoutRef: ref ?? transfer.payoutRef },
-    });
-    await addEvent(transferId, "delivered", "Virement bancaire confirmé par un opérateur");
+    await addEvent(transferId, "delivered", `${what} confirmé par un opérateur`);
   }
 
   return prisma.transfer.findUnique({ where: { id: transferId }, include: WITH_EVENTS });

@@ -22,10 +22,11 @@ const ALLOWED: Record<TransferStatus, TransferStatus[]> = {
   payout_queued: ["payout_sent", "payout_failed"],
   payout_sent: ["delivered", "payout_failed"],
   delivered: [],
-  payment_mismatch: ["awaiting_payment", "cancelled"],
+  // Paiement non conforme régularisé (complément reçu, message corrigé) : l'équipe le confirme.
+  payment_mismatch: ["awaiting_payment", "payment_detected", "cancelled"],
   payout_failed: ["payout_queued", "cancelled"],
   // Virement Interac arrivé en retard : l'équipe peut encore le confirmer.
-  expired: ["payment_detected"],
+  expired: ["payment_detected", "payment_mismatch"],
   cancelled: [],
 };
 
@@ -35,7 +36,8 @@ export function canTransition(from: TransferStatus, to: TransferStatus): boolean
 
 export function assertTransition(from: string, to: TransferStatus): void {
   if (!canTransition(from as TransferStatus, to)) {
-    throw new Error(`Transition invalide: ${from} → ${to}`);
+    // Message lisible par l'équipe (affiché tel quel dans l'admin).
+    throw new Error(`Ce transfert est au statut « ${statusLabel(from)} » : passage à « ${statusLabel(to)} » impossible. Rechargez la page.`);
   }
 }
 
@@ -45,11 +47,11 @@ export function statusLabel(status: string): string {
     quoted: "Devis",
     awaiting_payment: "En attente de paiement",
     payment_detected: "Paiement reçu",
-    payout_queued: "Payout en file",
+    payout_queued: "Versement en préparation",
     payout_sent: "Versement en cours",
     delivered: "Livré",
     payment_mismatch: "Paiement non conforme",
-    payout_failed: "Échec payout",
+    payout_failed: "Échec du versement",
     expired: "Expiré",
     cancelled: "Annulé",
   };

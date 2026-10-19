@@ -1,6 +1,8 @@
 import type { Metadata } from "next";
 import { prisma } from "@/lib/prisma";
 import { maskAccount } from "@/lib/bank";
+import { isLiveMode } from "@/lib/mode";
+import { adminPageAccess } from "@/app/admin/_server/session";
 import { HistoryView, type HistoryItem } from "./history-view";
 
 export const dynamic = "force-dynamic";
@@ -12,17 +14,22 @@ export const metadata: Metadata = {
 
 export default async function HistoryPage() {
   let failed = false;
-  const transfers = await prisma.transfer
-    .findMany({
-      include: { beneficiary: true },
-      orderBy: { createdAt: "desc" },
-      take: 100,
-    })
-    .catch((error) => {
-      console.error("History: impossible de charger les transferts", error);
-      failed = true;
-      return [];
-    });
+  // Cette page liste tous les transferts, sans compte client : en mode réel, réservée à l'équipe
+  // (sinon n'importe quel visiteur verrait les envois des autres).
+  const allowed = !isLiveMode() || (await adminPageAccess()).ok;
+  const transfers = !allowed
+    ? []
+    : await prisma.transfer
+        .findMany({
+          include: { beneficiary: true },
+          orderBy: { createdAt: "desc" },
+          take: 100,
+        })
+        .catch((error) => {
+          console.error("History: impossible de charger les transferts", error);
+          failed = true;
+          return [];
+        });
 
   const items: HistoryItem[] = transfers.map((t) => ({
     id: t.id,
