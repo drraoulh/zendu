@@ -138,7 +138,10 @@ export function FeesContent({ destinations }: { destinations: DestinationInfo[] 
                       <h3 id={`from-${g.code}`} className="font-display text-xl font-extrabold text-ink sm:text-2xl">
                         {sourceName}
                       </h3>
-                      <p className="text-sm text-muted">{t("fromSubtitle", { currency: first.sendCurrency })}</p>
+                      <p className="text-sm text-muted">
+                        {/* Seul le Canada encaisse aujourd'hui (virement Interac, src/lib/mode.ts) ; les autres départs ouvrent bientôt. */}
+                        {g.code === "CA" ? t("fromSubtitleInterac") : t("fromSubtitleSoon", { currency: first.sendCurrency })}
+                      </p>
                     </div>
                   </div>
 

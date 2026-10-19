@@ -186,12 +186,12 @@ export function StepsSection() {
 }
 
 const FEES: { n: 1 | 2 | 3; icon: IconName }[] = [
-  { n: 1, icon: "receipt" },
-  { n: 2, icon: "chart" },
-  { n: 3, icon: "transfer" },
+  { n: 1, icon: "check" },
+  { n: 2, icon: "receipt" },
+  { n: 3, icon: "chart" },
 ];
 
-/** Frais transparents : la structure (sans chiffres en dur) + lien vers /frais. */
+/** Frais transparents : la structure (tarifs de src/lib/pricing.ts) + lien vers /frais. */
 export function FeesSection() {
   const t = useT(homeMessages);
   return (

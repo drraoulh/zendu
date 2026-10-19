@@ -33,7 +33,10 @@ export function CountryContent({ country: c, others }: { country: CountryInfo; o
   const currencyName = L.currencyName(c.currency);
   const mainInbound = c.inbound[0];
 
-  const modes = c.networks.map((n) => L.network(n)).join(t("modesJoin"));
+  // Dans la phrase : « … ou compte bancaire » (minuscule), les marques gardent leur casse.
+  const modes = c.networks
+    .map((n) => (n.type === "bank" ? L.network(n).toLowerCase() : L.network(n)))
+    .join(t("modesJoin"));
   const hasBank = c.networks.some((n) => n.type === "bank");
   const modeText = (id: string, label: string) => (MODE_KEY[id] ? t(MODE_KEY[id]) : t("modeMOBILE", { network: label }));
 
@@ -162,7 +165,7 @@ export function CountryContent({ country: c, others }: { country: CountryInfo; o
             <SectionHeading
               eyebrow={t("outboundEyebrow", { from: capitalize(countryPhrase(L.locale, c.code, name).from) })}
               title={t("outboundTitle", { in: inCountry })}
-              subtitle={t("outboundText", { currency: c.outbound[0].sendCurrency })}
+              subtitle={t(c.code === "CA" ? "outboundTextInterac" : "outboundTextSoon", { currency: c.outbound[0].sendCurrency })}
             />
             <ul className="mt-8 grid gap-4 sm:grid-cols-2">
               {c.outbound.map((d) => (
@@ -296,30 +299,32 @@ function FeesCard({ d }: { d: DestinationInfo }) {
         </Link>
       </div>
       {d.quotes.length ? (
-        <table className="w-full text-left text-sm">
+        <div className="overflow-x-auto">
+        <table className="w-full text-left text-[13px] sm:text-sm">
           <caption className="sr-only">{t("fromCountry", { from: capitalize(countryPhrase(L.locale, d.sourceCode, L.country(d.sourceCode, d.sourceName)).from) })}</caption>
           <thead className="bg-surface-soft text-xs font-bold uppercase tracking-wider text-muted">
             <tr>
-              <th scope="col" className="px-4 py-3 sm:px-5">{t("colSend")}</th>
+              <th scope="col" className="px-3 py-3 sm:px-5">{t("colSend")}</th>
               <th scope="col" className="px-2 py-3 sm:px-3">{t("colFee")}</th>
               <th scope="col" className="hidden px-3 py-3 sm:table-cell">{t("colTotal")}</th>
-              <th scope="col" className="px-4 py-3 text-right sm:px-5">{t("colReceive")}</th>
+              <th scope="col" className="px-3 py-3 text-right sm:px-5">{t("colReceive")}</th>
             </tr>
           </thead>
           <tbody className="divide-y divide-line">
             {d.quotes.map((q) => (
               <tr key={q.sendAmount}>
-                <th scope="row" className="px-4 py-4 font-semibold text-ink sm:px-5">{L.money(q.sendAmount, d.sendCurrency)}</th>
+                <th scope="row" className="whitespace-nowrap px-3 py-4 font-semibold text-ink sm:px-5">{L.money(q.sendAmount, d.sendCurrency)}</th>
                 <td className="px-2 py-4 text-ink sm:px-3">
                   {q.fee === 0 ? t("feeFree") : L.money(q.fee, d.sendCurrency)}
-                  <span className="block text-xs text-muted sm:hidden">= {L.money(q.total, d.sendCurrency)}</span>
+                  <span className="block whitespace-nowrap text-xs text-muted sm:hidden">= {L.money(q.total, d.sendCurrency)}</span>
                 </td>
                 <td className="hidden px-3 py-4 text-ink sm:table-cell">{L.money(q.total, d.sendCurrency)}</td>
-                <td className="px-4 py-4 text-right font-display font-bold text-brand-strong sm:px-5">{L.money(q.receiveAmount, d.currency)}</td>
+                <td className="whitespace-nowrap px-3 py-4 text-right font-display font-bold text-brand-strong sm:px-5">{L.money(q.receiveAmount, d.currency)}</td>
               </tr>
             ))}
           </tbody>
         </table>
+        </div>
       ) : (
         <p className="p-6 text-sm text-muted">{t("feesUnavailable")}</p>
       )}

@@ -15,12 +15,13 @@ import {
 } from "@/components/transfer/transfer-calculator";
 import { ButtonLink } from "@/components/ui/button";
 import { Icon, type IconName } from "@/components/ui/icon";
+import { PaymentLogo } from "@/components/ui/payment-logo";
 import { Container, Eyebrow, Section, SectionHeading } from "@/components/ui/layout";
 import { useT } from "@/i18n/define";
 import { marketing, transferPage } from "@/i18n/services";
 import { CORRIDORS, getCountry, getDestinationCountries, type PayoutNetwork } from "@/lib/corridors";
 import { Faq, FeatureGrid, Steps, range } from "./sections";
-import { HomeScreen, PayoutScreen, PhoneShot, TrackingScreen } from "./wst/phone-screens";
+import { HomeScreen, InteracScreen, PhoneShot, ReviewScreen, TrackingScreen } from "./wst/phone-screens";
 
 type K = keyof typeof transferPage.fr;
 
@@ -48,16 +49,17 @@ export function TransferContent() {
       };
     });
 
-    const types: Record<PayoutNetwork["type"], { labels: string[]; countries: number }> = {
-      mobile_money: { labels: [], countries: 0 },
-      bank: { labels: [], countries: 0 },
-      cash: { labels: [], countries: 0 },
+    const types: Record<PayoutNetwork["type"], { labels: string[]; ids: string[]; countries: number }> = {
+      mobile_money: { labels: [], ids: [], countries: 0 },
+      bank: { labels: [], ids: [], countries: 0 },
+      cash: { labels: [], ids: [], countries: 0 },
     };
     for (const c of countries) {
       const seen = new Set<string>();
       for (const n of c.networks) {
         if (n.type === "mobile_money" && !types.mobile_money.labels.includes(n.label)) {
           types.mobile_money.labels.push(n.label);
+          types.mobile_money.ids.push(n.id);
         }
         seen.add(n.type);
       }
@@ -72,21 +74,24 @@ export function TransferContent() {
 
       {/* L'application */}
       <Section id="application" className="scroll-mt-20 overflow-hidden bg-white">
-        <Container>
+        <Container className="xl:max-w-7xl">
           <SectionHeading align="center" eyebrow={t("appEyebrow")} title={t("appTitle")} subtitle={t("appSubtitle")} />
           <div className="relative mt-14">
             <div
               aria-hidden
               className="absolute inset-x-0 top-24 -z-0 mx-auto h-72 max-w-3xl rounded-full bg-gradient-to-r from-brand-soft via-sky/20 to-brand-soft blur-3xl"
             />
-            <div className="relative grid gap-14 md:grid-cols-3 md:gap-6">
+            <div className="relative grid gap-14 sm:grid-cols-2 sm:gap-x-6 xl:grid-cols-4 xl:gap-x-5">
               <PhoneShot title={t("shot1Title")} text={t("shot1Text")}>
                 <HomeScreen />
               </PhoneShot>
-              <PhoneShot title={t("shot2Title")} text={t("shot2Text")} className="md:translate-y-10">
-                <PayoutScreen />
+              <PhoneShot title={t("shot2Title")} text={t("shot2Text")} className="xl:translate-y-10">
+                <ReviewScreen />
               </PhoneShot>
               <PhoneShot title={t("shot3Title")} text={t("shot3Text")}>
+                <InteracScreen />
+              </PhoneShot>
+              <PhoneShot title={t("shot4Title")} text={t("shot4Text")} className="xl:translate-y-10">
                 <TrackingScreen />
               </PhoneShot>
             </div>
@@ -169,13 +174,13 @@ export function TransferContent() {
       <Section id="destinations" className="scroll-mt-20 bg-surface-soft">
         <Container>
           <SectionHeading eyebrow={t("payEyebrow")} title={t("payTitle")} subtitle={t("paySubtitle")} />
-          <ul className="mt-10 grid gap-5 md:grid-cols-3">
+          <ul className="mt-10 grid gap-5 md:grid-cols-2">
             <PayoutCard
               icon="phone"
               title={t("payMobileTitle")}
               text={t("payMobileText")}
               count={t("payCountries", { n: byType.mobile_money.countries })}
-              chips={byType.mobile_money.labels}
+              chips={byType.mobile_money.labels.map((label, i) => ({ label, id: byType.mobile_money.ids[i] }))}
             />
             <PayoutCard
               icon="card"
@@ -270,7 +275,7 @@ function Hero() {
   const t = useT(transferPage);
   const chips: { icon: IconName; label: string }[] = [
     { icon: "receipt", label: t("hl1") },
-    { icon: "phone", label: t("hl2") },
+    { icon: "wallet", label: t("hl2") },
     { icon: "clock", label: t("hl3") },
   ];
   return (
@@ -336,7 +341,7 @@ function PayoutCard({
   title: string;
   text: string;
   count: string;
-  chips?: string[];
+  chips?: { label: string; id: string }[];
 }) {
   return (
     <li className="flex flex-col rounded-3xl border border-line bg-white p-6 shadow-card">
@@ -351,8 +356,12 @@ function PayoutCard({
       {chips && chips.length > 0 && (
         <ul className="mt-4 flex flex-wrap gap-2">
           {chips.map((c) => (
-            <li key={c} className="rounded-full border border-brand/15 bg-brand-soft/60 px-2.5 py-1 text-xs font-semibold text-brand-strong">
-              {c}
+            <li
+              key={c.id}
+              className="inline-flex items-center gap-1.5 rounded-full border border-brand/15 bg-brand-soft/60 py-1 pl-1 pr-2.5 text-xs font-semibold text-brand-strong"
+            >
+              <PaymentLogo id={c.id} size={16} title="" />
+              {c.label}
             </li>
           ))}
         </ul>

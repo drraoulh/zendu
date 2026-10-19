@@ -5,7 +5,7 @@ import { useI18n } from "@/components/i18n-provider";
 import { CountryFlag } from "@/components/country-flag";
 import { WstLogo } from "@/components/brand/wst-logo";
 import { StoreBadges } from "@/components/app/store-badges";
-import { PhonePreview } from "@/components/app/phone-preview";
+import { HomeScreen, PhoneFrame } from "@/components/marketing/wst/phone-screens";
 import { WaitlistForm } from "@/components/app/waitlist-form";
 import { localCountryName, localeTag } from "@/components/app/country-name";
 import { Container, Eyebrow } from "@/components/ui/layout";
@@ -77,10 +77,15 @@ export function ApplicationContent({
           </div>
 
           <div className="animate-rise-1 flex justify-center lg:justify-end">
-            <PhonePreview
-              amountLabel={simulation && amountText ? `${amountText} ${simulation.currency}` : undefined}
-              destLabel={destName ?? undefined}
-            />
+            <div role="img" aria-label={t("mockPreview")} className="relative">
+              <div className="absolute -inset-10 rounded-full bg-brand/30 blur-3xl" aria-hidden />
+              {/* Même maquette que /transfert ; montant simulé repris s'il s'agit d'un envoi Canada → Cameroun. */}
+              <PhoneFrame className="ring-white/15">
+                <HomeScreen
+                  amount={simulation?.corridor === "CA-CM" && simulation.amount >= 10 && simulation.amount <= 5000 ? simulation.amount : undefined}
+                />
+              </PhoneFrame>
+            </div>
           </div>
         </Container>
       </section>

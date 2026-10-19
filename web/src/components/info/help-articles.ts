@@ -79,11 +79,11 @@ export const HELP_ARTICLES: HelpArticle[] = [
     links: ["linkApp", "linkFees"],
     fr: {
       q: "Qu'est-ce que WorldSoft Transfer ?",
-      a: "WorldSoft Transfer est l'application mobile de transfert d'argent de PWFINTECH (« une solution PWFINTECH »). Elle permet d'envoyer de l'argent entre {countries} pays — le Canada, le Cameroun et la Chine — sur un portefeuille mobile money (MTN, Orange), Interac, Alipay, WeChat Pay ou un compte bancaire selon le pays du destinataire.\n\nDans l'application, vous enregistrez vos destinataires, voyez les frais et le taux avant de payer, puis suivez chaque transfert jusqu'à sa livraison.",
+      a: "WorldSoft Transfer est l'application mobile de transfert d'argent de PWFINTECH (« une solution PWFINTECH »). Elle relie {countries} pays — le Canada, le Cameroun et la Chine. Pour l'instant, les envois partent du Canada et se paient par virement Interac ; votre proche reçoit sur MTN MoMo ou Orange Money au Cameroun, sur Alipay ou WeChat Pay en Chine, ou sur un compte bancaire. L'envoi depuis le Cameroun et la Chine arrive bientôt.\n\nDans l'application, vous enregistrez vos destinataires, voyez les frais et le taux avant de payer, puis suivez chaque transfert jusqu'à sa livraison.",
     },
     en: {
       q: "What is WorldSoft Transfer?",
-      a: "WorldSoft Transfer is PWFINTECH's money transfer mobile app (“a PWFINTECH solution”). It lets you send money between {countries} countries — Canada, Cameroon and China — to a mobile money wallet (MTN, Orange), Interac, Alipay, WeChat Pay or a bank account depending on the recipient's country.\n\nIn the app, you save your recipients, see the fees and rate before paying, then track each transfer until it's delivered.",
+      a: "WorldSoft Transfer is PWFINTECH's money transfer mobile app (“a PWFINTECH solution”). It connects {countries} countries — Canada, Cameroon and China. For now, transfers leave from Canada and are paid by Interac e-Transfer; your recipient receives on MTN MoMo or Orange Money in Cameroon, on Alipay or WeChat Pay in China, or in a bank account. Sending from Cameroon and China is coming soon.\n\nIn the app, you save your recipients, see the fees and rate before paying, then track each transfer until it's delivered.",
     },
     es: { q: "¿Qué es WorldSoft Transfer?" },
     zh: { q: "什么是 WorldSoft Transfer？" },
@@ -120,11 +120,11 @@ export const HELP_ARTICLES: HelpArticle[] = [
     links: ["linkCountries", "linkFees"],
     fr: {
       q: "Vers quels pays puis-je envoyer de l'argent ?",
-      a: "WorldSoft Transfer relie actuellement {countries} pays : le Canada, le Cameroun et la Chine. Chacun peut envoyer vers les deux autres et en recevoir.\n\nLa page « Nos pays » présente chaque pays : devise, modes de réception (mobile money, Interac, Alipay, WeChat Pay, compte bancaire), délais et frais. Un autre pays vous intéresse ? Écrivez-nous : vos demandes nous aident à choisir les prochains pays.",
+      a: "WorldSoft Transfer relie actuellement {countries} pays : le Canada, le Cameroun et la Chine. Pour l'instant, les envois partent du Canada, vers le Cameroun et la Chine ; l'envoi depuis le Cameroun et la Chine arrive bientôt.\n\nLa page « Nos pays » présente chaque pays : devise, modes de réception (MTN MoMo, Orange Money, Alipay, WeChat Pay, Interac, compte bancaire), délais et frais. Un autre pays vous intéresse ? Écrivez-nous : vos demandes nous aident à choisir les prochains pays.",
     },
     en: {
       q: "Which countries can I send money to?",
-      a: "WorldSoft Transfer currently connects {countries} countries: Canada, Cameroon and China. Each one can send to and receive from the other two.\n\nThe “Our countries” page details each one: currency, payout methods (mobile money, Interac, Alipay, WeChat Pay, bank account), delivery times and fees. Interested in another country? Write to us: your requests help us choose the next countries.",
+      a: "WorldSoft Transfer currently connects {countries} countries: Canada, Cameroon and China. For now, transfers leave from Canada, to Cameroon and China; sending from Cameroon and China is coming soon.\n\nThe “Our countries” page details each one: currency, payout methods (MTN MoMo, Orange Money, Alipay, WeChat Pay, Interac, bank account), delivery times and fees. Interested in another country? Write to us: your requests help us choose the next countries.",
     },
   },
   {
@@ -146,11 +146,11 @@ export const HELP_ARTICLES: HelpArticle[] = [
     links: ["linkCountries"],
     fr: {
       q: "Comment mon proche reçoit-il l'argent ?",
-      a: "Selon le pays, deux modes sont proposés :\n- Mobile money (MTN MoMo, Orange Money, Wave, M-Pesa, Airtel Money…) : l'argent arrive sur le portefeuille lié au numéro de téléphone du destinataire.\n- Compte bancaire : virement sur le compte du destinataire.\n\nLes modes disponibles pour chaque pays sont indiqués sur sa fiche et dans l'application.",
+      a: "Selon le pays, votre proche reçoit :\n- Au Cameroun : sur son portefeuille MTN MoMo ou Orange Money (lié à son numéro de téléphone), ou sur son compte bancaire.\n- En Chine : sur Alipay, WeChat Pay ou son compte bancaire.\n- Au Canada : par virement Interac ou sur son compte bancaire.\n\nLe retrait en espèces n'est pas proposé. Les modes disponibles pour chaque pays sont indiqués sur sa fiche et dans l'application.",
     },
     en: {
       q: "How does my recipient get the money?",
-      a: "Depending on the country, two methods are offered:\n- Mobile money (MTN MoMo, Orange Money, Wave, M-Pesa, Airtel Money…): the money goes to the wallet linked to the recipient's phone number.\n- Bank account: a transfer to the recipient's account.\n\nThe methods available for each country are shown on its page and in the app.",
+      a: "Depending on the country, your recipient receives:\n- In Cameroon: on their MTN MoMo or Orange Money wallet (linked to their phone number), or in their bank account.\n- In China: on Alipay, WeChat Pay or their bank account.\n- In Canada: by Interac e-Transfer or in their bank account.\n\nCash pickup is not offered. The methods available for each country are shown on its page and in the app.",
     },
   },
   {
@@ -159,11 +159,11 @@ export const HELP_ARTICLES: HelpArticle[] = [
     links: ["linkApp"],
     fr: {
       q: "Comment suivre mon transfert ?",
-      a: "Chaque transfert reçoit une référence unique. Dans l'application WorldSoft Transfer, vous voyez son statut à chaque étape : paiement confirmé, en cours d'envoi, livré, avec un reçu détaillé.\n\nSi un statut ne bouge plus au-delà du délai estimé, contactez-nous en indiquant la référence : c'est le moyen le plus rapide de retrouver votre envoi.",
+      a: "Chaque transfert reçoit une référence unique. Dans l'application WorldSoft Transfer, vous voyez son statut à chaque étape : transfert créé, paiement reçu, versement envoyé, livré, avec un reçu détaillé. Vous êtes aussi prévenu par courriel.\n\nSi un statut ne bouge plus au-delà du délai estimé, contactez-nous en indiquant la référence : c'est le moyen le plus rapide de retrouver votre envoi.",
     },
     en: {
       q: "How do I track my transfer?",
-      a: "Each transfer gets a unique reference. In the WorldSoft Transfer app, you see its status at every step: payment confirmed, being sent, delivered, with a detailed receipt.\n\nIf a status stops moving beyond the estimated delivery time, contact us with the reference: it's the fastest way to find your transfer.",
+      a: "Each transfer gets a unique reference. In the WorldSoft Transfer app, you see its status at every step: transfer created, payment received, payout sent, delivered, with a detailed receipt. You're also notified by email.\n\nIf a status stops moving beyond the estimated delivery time, contact us with the reference: it's the fastest way to find your transfer.",
     },
   },
   {
@@ -215,11 +215,11 @@ export const HELP_ARTICLES: HelpArticle[] = [
     links: ["linkFees", "linkSimulator"],
     fr: {
       q: "Comment sont calculés les frais ?",
-      a: "Les frais d'envoi comprennent une part fixe de {flat} et {percent} % du montant envoyé. Ils s'ajoutent au montant : votre proche reçoit l'intégralité du montant converti.\n\nExemple : pour 100 CAD, les frais sont la part fixe plus {percent} % de 100 CAD. Le détail exact, pour chaque destination, est sur la page « Frais, taux et délais ».",
+      a: "Les frais d'envoi dépendent du trajet :\n- Vers le Cameroun : aucun frais d'envoi.\n- Vers la Chine et le Canada : un petit frais fixe, dans la devise d'envoi (par exemple 1,49 $ du Canada vers la Chine).\n\nIls s'ajoutent au montant : votre proche reçoit l'intégralité du montant converti. Notre rémunération est aussi comprise dans le taux de change affiché. Le détail exact, pour chaque trajet, est sur la page « Frais, taux et délais ».",
     },
     en: {
       q: "How are fees calculated?",
-      a: "Transfer fees are made of a fixed part of {flat} plus {percent}% of the amount sent. They're added on top: your recipient gets the full converted amount.\n\nExample: for 100 CAD, the fee is the fixed part plus {percent}% of 100 CAD. The exact breakdown for each destination is on the “Fees, rates and delivery times” page.",
+      a: "Transfer fees depend on the route:\n- To Cameroon: no transfer fee.\n- To China and Canada: a small flat fee, in the sending currency (for example $1.49 from Canada to China).\n\nFees are added on top: your recipient gets the full converted amount. Our margin is also included in the exchange rate shown. The exact breakdown for each route is on the “Fees, rates and delivery times” page.",
     },
   },
   {
@@ -254,11 +254,11 @@ export const HELP_ARTICLES: HelpArticle[] = [
     links: ["linkFees"],
     fr: {
       q: "Y a-t-il d'autres frais que ceux affichés ?",
-      a: "Du côté de PWFINTECH, non : les frais d'envoi et la marge de change incluse dans le taux sont les seuls coûts, et ils sont affichés avant le paiement.\n\nDes tiers peuvent toutefois appliquer leurs propres frais, que nous ne contrôlons pas, par exemple :\n- votre banque ou l'émetteur de votre carte (certaines cartes de crédit traitent un paiement comme une avance de fonds) ;\n- l'opérateur mobile money du destinataire, s'il retire ensuite l'argent en espèces.",
+      a: "Du côté de PWFINTECH, non : les frais d'envoi (aucun vers le Cameroun) et la marge de change incluse dans le taux sont les seuls coûts, et ils sont affichés avant le paiement.\n\nDes tiers peuvent toutefois appliquer leurs propres frais, que nous ne contrôlons pas, par exemple :\n- votre banque, si votre forfait facture les virements Interac ;\n- l'opérateur mobile money du destinataire, s'il retire ensuite l'argent en espèces chez un agent.",
     },
     en: {
       q: "Are there other fees beyond those shown?",
-      a: "Not from PWFINTECH: the transfer fee and the margin included in the rate are the only costs, and they're shown before payment.\n\nThird parties may however charge their own fees, which we don't control, for example:\n- your bank or card issuer (some credit cards treat a payment as a cash advance);\n- the recipient's mobile money operator, if they then withdraw the money as cash.",
+      a: "Not from PWFINTECH: the transfer fee (none to Cameroon) and the margin included in the rate are the only costs, and they're shown before payment.\n\nThird parties may however charge their own fees, which we don't control, for example:\n- your bank, if your plan charges for Interac e-Transfers;\n- the recipient's mobile money operator, if they then withdraw the money as cash at an agent.",
     },
   },
   {
@@ -267,11 +267,11 @@ export const HELP_ARTICLES: HelpArticle[] = [
     links: ["linkApp"],
     fr: {
       q: "Comment puis-je payer mon transfert ?",
-      a: "Le paiement se fait dans l'application WorldSoft Transfer, au moment de confirmer l'envoi. Il est traité par un prestataire de paiement spécialisé : PWFINTECH ne conserve pas le numéro complet de votre carte.\n\nLes moyens de paiement acceptés sont affichés dans l'application lors du paiement.",
+      a: "Depuis le Canada, vous payez par virement Interac, depuis l'appli de votre banque :\n- dans WorldSoft Transfer, confirmez l'envoi : l'application affiche l'adresse de dépôt PWFINTECH, le montant exact et la référence du transfert ;\n- dans votre banque, envoyez un virement Interac de ce montant exact à cette adresse, avec la référence en message ;\n- dès que notre équipe confirme la réception, l'argent part vers votre proche et vous êtes prévenu.\n\nLe paiement par carte n'est pas encore proposé.",
     },
     en: {
       q: "How can I pay for my transfer?",
-      a: "Payment happens in the WorldSoft Transfer app when you confirm the transfer. It's processed by a specialized payment provider: PWFINTECH doesn't store your full card number.\n\nThe accepted payment methods are shown in the app at checkout.",
+      a: "From Canada, you pay by Interac e-Transfer, from your banking app:\n- in WorldSoft Transfer, confirm the transfer: the app shows the PWFINTECH deposit address, the exact amount and the transfer reference;\n- in your bank, send an Interac e-Transfer of that exact amount to that address, with the reference as the message;\n- as soon as our team confirms receipt, the money goes to your recipient and you're notified.\n\nCard payment isn't offered yet.",
     },
   },
   {
@@ -279,12 +279,12 @@ export const HELP_ARTICLES: HelpArticle[] = [
     category: "payments",
     links: ["linkContact"],
     fr: {
-      q: "Mon paiement a été refusé : que faire ?",
-      a: "Un refus vient le plus souvent de la banque ou de l'émetteur de la carte. Vérifiez :\n- les informations saisies (numéro, date d'expiration, code) ;\n- votre plafond de paiement en ligne ou à l'international ;\n- l'étape de validation demandée par votre banque (notification ou code).\n\nSi le problème persiste, contactez votre banque, puis écrivez-nous si besoin. Aucun transfert n'est envoyé tant que le paiement n'est pas confirmé.",
+      q: "Mon virement Interac n'est pas reconnu : que faire ?",
+      a: "Vérifiez d'abord, dans l'appli de votre banque, que le virement est bien parti :\n- vers l'adresse de dépôt affichée dans WorldSoft Transfer ;\n- pour le montant exact indiqué (un montant différent doit être vérifié par notre équipe) ;\n- avec la référence du transfert en message : c'est elle qui relie votre virement à votre envoi.\n\nUn transfert non payé dans le délai indiqué expire, sans rien débiter. Ne refaites pas de virement : écrivez-nous avec la référence du transfert, nous vérifions et vous répondons.",
     },
     en: {
-      q: "My payment was declined: what should I do?",
-      a: "A decline usually comes from the bank or card issuer. Check:\n- the details entered (number, expiry date, code);\n- your online or international payment limit;\n- the verification step requested by your bank (notification or code).\n\nIf the problem continues, contact your bank, then write to us if needed. No transfer is sent until the payment is confirmed.",
+      q: "My Interac e-Transfer isn't recognised: what should I do?",
+      a: "First check, in your banking app, that the e-Transfer was sent:\n- to the deposit address shown in WorldSoft Transfer;\n- for the exact amount shown (a different amount has to be checked by our team);\n- with the transfer reference as the message: that's what links your e-Transfer to your transfer.\n\nA transfer that isn't paid within the time shown expires, with nothing charged. Don't send a second e-Transfer: write to us with the transfer reference, we'll check and get back to you.",
     },
   },
 

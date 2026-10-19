@@ -66,7 +66,7 @@ export const aboutPage = defineMessages({
     wstEyebrow: "Une solution PWFINTECH",
     wstTitle: "WorldSoft Transfer, notre application de transfert d'argent",
     wstText1:
-      "Le pôle Transfert d'argent de PWFINTECH prend la forme d'une application mobile : WorldSoft Transfer. On y simule, on y envoie et on y suit ses transferts entre le Canada, le Cameroun et la Chine, dans les deux sens.",
+      "Le pôle Transfert d'argent de PWFINTECH prend la forme d'une application mobile : WorldSoft Transfer. On y simule, on y envoie et on y suit ses transferts : aujourd'hui du Canada vers le Cameroun et la Chine, payés par virement Interac ; l'envoi depuis le Cameroun et la Chine arrive bientôt.",
     wstText2:
       "Le site web reste votre point de départ : il présente les frais, les pays desservis et le simulateur, qui utilise le même calcul que l'application.",
     wstPoint1: "Frais et taux affichés avant chaque paiement",
@@ -160,7 +160,7 @@ export const aboutPage = defineMessages({
     wstEyebrow: "A PWFINTECH solution",
     wstTitle: "WorldSoft Transfer, our money transfer app",
     wstText1:
-      "PWFINTECH's Money transfer line takes the form of a mobile app: WorldSoft Transfer. You simulate, send and track your transfers between Canada, Cameroon and China, both ways.",
+      "PWFINTECH's Money transfer line takes the form of a mobile app: WorldSoft Transfer. You simulate, send and track your transfers: today from Canada to Cameroon and China, paid by Interac e-Transfer; sending from Cameroon and China is coming soon.",
     wstText2:
       "The website remains your starting point: it presents fees, destinations and the simulator, which uses the same calculation as the app.",
     wstPoint1: "Fees and rate shown before every payment",

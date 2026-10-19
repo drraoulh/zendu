@@ -5,9 +5,9 @@ export const countriesMessages = defineMessages({
   fr: {
     feeFree: "Gratuit",
     heroEyebrow: "Nos pays",
-    heroTitle: "Canada, Cameroun, Chine : envoyez dans les deux sens",
+    heroTitle: "Canada, Cameroun, Chine : nos trois pays",
     heroSubtitle:
-      "WorldSoft Transfer relie pour le moment trois pays. Chacun peut envoyer vers les deux autres et en recevoir : mobile money au Cameroun, Interac ou compte bancaire au Canada, Alipay, WeChat Pay ou compte bancaire en Chine.",
+      "WorldSoft Transfer relie pour le moment trois pays. Les envois partent aujourd'hui du Canada, payés par virement Interac ; l'envoi depuis le Cameroun et la Chine arrive bientôt. Réception : MTN MoMo, Orange Money ou compte bancaire au Cameroun, Alipay, WeChat Pay ou compte bancaire en Chine, Interac ou compte bancaire au Canada.",
     routesCount: "{n} trajets ouverts",
     currency: "Devise : {c}",
     receiveWith: "Réception",
@@ -25,7 +25,7 @@ export const countriesMessages = defineMessages({
     eyebrow: "Transfert d'argent · {country}",
     title: "Envoyer de l'argent {to}",
     subtitle:
-      "Vos proches reçoivent en {currency} ({currencyName}) par {modes}. Simulez sur le site, envoyez avec l'application WorldSoft Transfer.",
+      "Vos proches reçoivent en {currency}, {currencyName}, par {modes}. Simulez sur le site, envoyez avec l'application WorldSoft Transfer.",
     modesJoin: " ou ",
     simulateTo: "Simuler un envoi {to}",
 
@@ -58,6 +58,8 @@ export const countriesMessages = defineMessages({
     outboundEyebrow: "{from}",
     outboundTitle: "Vous êtes {in} ? Envoyez vers",
     outboundText: "Envoi payé en {currency}, frais et montant reçu affichés avant de payer.",
+    outboundTextInterac: "Envoi payé en {currency} par virement Interac, frais et montant reçu affichés avant de payer.",
+    outboundTextSoon: "Bientôt disponible : envoi payé en {currency}, frais et montant reçu affichés avant de payer.",
 
     banksEyebrow: "Virement bancaire",
     banksTitle: "Banques courantes {in}",
@@ -76,9 +78,9 @@ export const countriesMessages = defineMessages({
     faq1Q: "Combien de temps faut-il pour envoyer de l'argent {to} ?",
     faq1A: "Délai indicatif selon le mode de réception : {modesDelays}. Le délai estimé est toujours indiqué avant l'envoi.",
     faq2Q: "Quels sont les frais pour envoyer {to} ?",
-    faq2A: "Une part fixe plus un pourcentage du montant envoyé, dans la devise du pays d'envoi. Par exemple, {example}. Le taux et le montant reçu sont confirmés avant le paiement.",
+    faq2A: "Aucun frais vers le Cameroun ; vers la Chine et le Canada, un petit frais fixe dans la devise du pays d'envoi. Par exemple, {example}. Notre marge est comprise dans le taux ; le taux et le montant reçu sont confirmés avant le paiement.",
     faq3Q: "En quelle devise le destinataire reçoit-il l'argent ?",
-    faq3A: "En {currency} ({currencyName}). Le montant est converti au taux affiché au moment de votre confirmation.",
+    faq3A: "En {currency}, {currencyName}. Le montant est converti au taux affiché au moment de votre confirmation.",
     faq4Q: "Puis-je envoyer depuis le site web ?",
     faq4A: "Le site permet de simuler l'envoi et de connaître les frais. L'envoi se fait dans l'application WorldSoft Transfer, où vous enregistrez vos destinataires et suivez chaque transfert.",
 
@@ -90,9 +92,9 @@ export const countriesMessages = defineMessages({
   en: {
     feeFree: "Free",
     heroEyebrow: "Our countries",
-    heroTitle: "Canada, Cameroon, China: send both ways",
+    heroTitle: "Canada, Cameroon, China: our three countries",
     heroSubtitle:
-      "WorldSoft Transfer currently connects three countries. Each one can send to and receive from the other two: mobile money in Cameroon, Interac or bank account in Canada, Alipay, WeChat Pay or bank account in China.",
+      "WorldSoft Transfer currently connects three countries. Transfers leave from Canada today, paid by Interac e-Transfer; sending from Cameroon and China is coming soon. Payout: MTN MoMo, Orange Money or bank account in Cameroon, Alipay, WeChat Pay or bank account in China, Interac or bank account in Canada.",
     routesCount: "{n} open routes",
     currency: "Currency: {c}",
     receiveWith: "Payout",
@@ -110,7 +112,7 @@ export const countriesMessages = defineMessages({
     eyebrow: "Money transfer · {country}",
     title: "Send money {to}",
     subtitle:
-      "Your recipients receive {currency} ({currencyName}) via {modes}. Simulate on the website, send with the WorldSoft Transfer app.",
+      "Your recipients receive {currency}, {currencyName}, via {modes}. Simulate on the website, send with the WorldSoft Transfer app.",
     modesJoin: " or ",
     simulateTo: "Simulate a transfer {to}",
 
@@ -143,6 +145,8 @@ export const countriesMessages = defineMessages({
     outboundEyebrow: "{from}",
     outboundTitle: "Are you {in}? Send to",
     outboundText: "Paid in {currency}, with fees and amount received shown before you pay.",
+    outboundTextInterac: "Paid in {currency} by Interac e-Transfer, with fees and amount received shown before you pay.",
+    outboundTextSoon: "Coming soon: paid in {currency}, with fees and amount received shown before you pay.",
 
     banksEyebrow: "Bank transfer",
     banksTitle: "Common banks {in}",
@@ -161,9 +165,9 @@ export const countriesMessages = defineMessages({
     faq1Q: "How long does it take to send money {to}?",
     faq1A: "Indicative delivery by payout method: {modesDelays}. The estimated time is always shown before you send.",
     faq2Q: "What are the fees to send {to}?",
-    faq2A: "A fixed part plus a percentage of the amount sent, in the sending country's currency. For example, {example}. The rate and amount received are confirmed before payment.",
+    faq2A: "No fee to Cameroon; to China and Canada, a small flat fee in the sending country's currency. For example, {example}. Our margin is included in the rate; the rate and amount received are confirmed before payment.",
     faq3Q: "In which currency does the recipient get the money?",
-    faq3A: "In {currency} ({currencyName}). The amount is converted at the rate shown when you confirm.",
+    faq3A: "In {currency}, {currencyName}. The amount is converted at the rate shown when you confirm.",
     faq4Q: "Can I send from the website?",
     faq4A: "The website lets you simulate and see the fees. Sending happens in the WorldSoft Transfer app, where you save recipients and track every transfer.",
 
@@ -174,12 +178,12 @@ export const countriesMessages = defineMessages({
   },
   es: {
     heroEyebrow: "Nuestros países",
-    heroTitle: "Canadá, Camerún, China: envíe en ambos sentidos",
+    heroTitle: "Canadá, Camerún, China: nuestros tres países",
     ctaContact: "Escríbanos",
   },
   zh: {
     heroEyebrow: "服务国家",
-    heroTitle: "加拿大、喀麦隆、中国：双向汇款",
+    heroTitle: "加拿大、喀麦隆、中国：我们的三个国家",
     ctaContact: "联系我们",
   },
 });
