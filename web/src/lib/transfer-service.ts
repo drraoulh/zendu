@@ -1,6 +1,6 @@
 import { prisma } from "@/lib/prisma";
 import { assertTransition } from "@/lib/transfer-machine";
-import { payoutProviderFor } from "@/lib/providers/payout";
+import { momoIsSandbox, payoutProviderFor } from "@/lib/providers/payout";
 import { mockMomo } from "@/lib/providers/mock-momo";
 import { createMomoPayout } from "@/lib/providers/momo";
 import { mockBank } from "@/lib/providers/mock-bank";
@@ -105,7 +105,7 @@ export async function queueAndRunPayout(transferId: string) {
 
   const b = current.beneficiary;
   const bank = isBankNetwork(b.network, b.country);
-  const route = payoutProviderFor(b.network, b.country);
+  const route = payoutProviderFor(b.network, b.country, current.senderEmail);
 
   // Pas d'intégration réelle pour ce réseau (virement bancaire, Orange Money, Alipay, WeChat Pay,
   // Interac…) alors que les versements réels sont actifs : le transfert reste « payout_queued » et un
@@ -139,7 +139,11 @@ export async function queueAndRunPayout(transferId: string) {
   await addEvent(
     transferId,
     "payout_sent",
-    route === "momo" ? "Appel disbursement MTN MoMo" : bank ? "Virement bancaire simulé (mode démo)" : "Versement simulé (mode démo)",
+    route === "momo"
+      ? momoIsSandbox()
+        ? "Versement MTN MoMo de TEST (sandbox) : aucun argent réel n'est versé"
+        : "Appel disbursement MTN MoMo"
+      : bank ? "Virement bancaire simulé (mode démo)" : "Versement simulé (mode démo)",
   );
 
   const provider = route === "momo" ? createMomoPayout() : bank ? mockBank : mockMomo;

@@ -234,7 +234,7 @@ export async function POST(request: Request) {
         totalCad: quoteData.total,
         payInProvider: interac ? INTERAC_PROVIDER : getPayInMode(),
         // MTN MoMo seulement pour MTN au Cameroun ; le reste est simulé en démo, versé par l'équipe sinon.
-        payoutProvider: payoutProviderFor(normalized.data.network, corridor.destination),
+        payoutProvider: payoutProviderFor(normalized.data.network, corridor.destination, senderEmail),
         quoteId: quote.id,
         beneficiaryId: beneficiary.id,
         events: {

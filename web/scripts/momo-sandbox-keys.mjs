@@ -34,7 +34,8 @@ async function main() {
       "Content-Type": "application/json",
     },
     body: JSON.stringify({
-      providerCallbackHost: "localhost",
+      // Domaine des rappels MTN (doit correspondre à MTN_CALLBACK_URL) : 3e argument ou MTN_CALLBACK_HOST.
+      providerCallbackHost: process.argv[3] || process.env.MTN_CALLBACK_HOST || "localhost",
     }),
   });
 
