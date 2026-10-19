@@ -8,7 +8,7 @@ import { safeNext } from "../_server/session";
 
 export type LoginState = { error: "invalid" | "rate_limited" | "locked" | null };
 
-/** Connexion par mot de passe unique (ADMIN_PASSWORD) → cookie de session signé (12 h). */
+/** Connexion par identifiant (ADMIN_USERNAME, facultatif) + mot de passe (ADMIN_PASSWORD) → cookie de session signé (12 h). */
 export async function loginAction(_prev: LoginState, formData: FormData): Promise<LoginState> {
   if (adminMode() !== "configured") return { error: "locked" };
 
@@ -17,7 +17,8 @@ export async function loginAction(_prev: LoginState, formData: FormData): Promis
   if (!rateLimit(`admin-login:${ip}`, 10, 15 * 60 * 1000)) return { error: "rate_limited" };
 
   const password = String(formData.get("password") ?? "");
-  if (!checkAdminPassword(password)) return { error: "invalid" };
+  const username = String(formData.get("username") ?? "");
+  if (!checkAdminPassword(password, username)) return { error: "invalid" };
 
   const token = await createSessionToken();
   if (!token) return { error: "locked" };

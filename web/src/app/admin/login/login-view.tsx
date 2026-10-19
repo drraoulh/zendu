@@ -11,7 +11,17 @@ import { loginAction, type LoginState } from "./actions";
 
 const initial: LoginState = { error: null };
 
-export function LoginView({ mode, next, loggedOut }: { mode: AdminMode; next: string; loggedOut: boolean }) {
+export function LoginView({
+  mode,
+  next,
+  loggedOut,
+  withUsername = false,
+}: {
+  mode: AdminMode;
+  next: string;
+  loggedOut: boolean;
+  withUsername?: boolean;
+}) {
   const { t } = useAdminT();
   const [state, formAction, pending] = useActionState(loginAction, initial);
 
@@ -64,6 +74,23 @@ export function LoginView({ mode, next, loggedOut }: { mode: AdminMode; next: st
               )}
               <form action={formAction} className="mt-5 space-y-4">
                 <input type="hidden" name="next" value={next} />
+                {withUsername && (
+                  <div>
+                    <label htmlFor="admin-username" className="block text-sm font-semibold text-ink">
+                      {t("usernameLabel")}
+                    </label>
+                    <input
+                      id="admin-username"
+                      name="username"
+                      type="text"
+                      required
+                      autoComplete="username"
+                      autoCapitalize="none"
+                      autoFocus
+                      className={`${inputClass} mt-1.5`}
+                    />
+                  </div>
+                )}
                 <div>
                   <label htmlFor="admin-password" className="block text-sm font-semibold text-ink">
                     {t("passwordLabel")}
@@ -74,7 +101,7 @@ export function LoginView({ mode, next, loggedOut }: { mode: AdminMode; next: st
                     type="password"
                     required
                     autoComplete="current-password"
-                    autoFocus
+                    autoFocus={!withUsername}
                     aria-invalid={state.error === "invalid" || undefined}
                     aria-describedby={errorText ? "admin-login-error" : undefined}
                     className={`${inputClass} mt-1.5`}

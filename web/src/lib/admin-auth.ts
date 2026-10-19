@@ -79,9 +79,18 @@ export async function verifySessionToken(token: string | null | undefined, now =
   return safeEqual(parts[2], await sign(`${parts[0]}.${parts[1]}`, secret));
 }
 
-export function checkAdminPassword(input: string): boolean {
+/** Identifiant de connexion facultatif (ADMIN_USERNAME) : s'il est défini, il est exigé avec le mot de passe. */
+export function adminUsernameRequired(): boolean {
+  return Boolean(process.env.ADMIN_USERNAME?.trim());
+}
+
+export function checkAdminPassword(input: string, username = ""): boolean {
   const expected = process.env.ADMIN_PASSWORD;
-  return !!expected && safeEqual(input, expected);
+  const expectedUser = process.env.ADMIN_USERNAME?.trim();
+  // Les deux comparaisons sont toujours faites (temps constant, pas d'indice sur ce qui est faux).
+  const userOk = expectedUser ? safeEqual(username.trim().toLowerCase(), expectedUser.toLowerCase()) : true;
+  const passOk = !!expected && safeEqual(input, expected);
+  return userOk && passOk;
 }
 
 export function sessionCookieOptions() {
