@@ -4,6 +4,7 @@ import { Text, View } from "react-native";
 import { Button, Card, Choice, Divider, H1, Header, Notice, Screen, Small, Steps, SummaryRow } from "@/components/ui";
 import { api, type Quote } from "@/lib/api";
 import { countryName, deliveryEstimate, etaLabel, feeLabel, money, networkLabel, phone, rate } from "@/lib/format";
+import { findCorridor, payMethodsOf, useCorridors } from "@/lib/corridors";
 import { useStore } from "@/lib/store";
 import { colors, fonts } from "@/lib/theme";
 import { PaymentLogo } from "@/components/payment-logo";
@@ -13,11 +14,15 @@ export default function Review() {
   const [quote, setQuote] = useState<Quote | null>(draft.quote);
   const [error, setError] = useState<string | null>(null);
   const recipient = draft.recipient;
-  // Interac n'existe que pour les envois payés en dollars canadiens.
-  const interacOk = quote ? quote.sendCurrency === "CAD" : draft.corridorId.startsWith("CA-");
-  const method = interacOk ? draft.payMethod : "card";
+  // Moyens ouverts par le serveur pour ce trajet (Interac : envois en dollars canadiens ; carte :
+  // seulement en démonstration tant qu'aucun prestataire de carte n'est branché).
+  const methods = payMethodsOf(findCorridor(useCorridors(), draft.corridorId));
+  const interacOk = methods.includes("interac") && (quote ? quote.sendCurrency === "CAD" : draft.corridorId.startsWith("CA-"));
+  const cardOk = methods.includes("card");
+  const method = draft.payMethod === "card" && cardOk ? "card" : interacOk ? "interac" : cardOk ? "card" : null;
 
   function next() {
+    if (!method) return;
     if (method === "interac") {
       setDraft({ payMethod: "interac", cardId: null });
       router.push("/send/processing");
@@ -50,7 +55,7 @@ export default function Review() {
             title={quote ? `${method === "interac" ? "Payer par Interac" : "Payer"} ${money(quote.total, quote.sendCurrency)}` : "Payer"}
             icon="lock"
             onPress={next}
-            disabled={!quote}
+            disabled={!quote || !method}
           />
           <Small style={{ textAlign: "center" }}>Paiement sécurisé · reçu envoyé par courriel</Small>
         </View>
@@ -101,18 +106,23 @@ export default function Review() {
           onPress={() => setDraft({ payMethod: "interac" })}
         />
       ) : null}
-      <Choice
-        leading={
-          <View style={{ flexDirection: "row", gap: 4 }}>
-            <PaymentLogo id="VISA" size={22} />
-            <PaymentLogo id="MASTERCARD" size={22} />
-          </View>
-        }
-        label="Carte de débit"
-        description="Visa Débit, Mastercard Débit · cartes de crédit non acceptées"
-        selected={method === "card"}
-        onPress={() => setDraft({ payMethod: "card" })}
-      />
+      {cardOk ? (
+        <Choice
+          leading={
+            <View style={{ flexDirection: "row", gap: 4 }}>
+              <PaymentLogo id="VISA" size={22} />
+              <PaymentLogo id="MASTERCARD" size={22} />
+            </View>
+          }
+          label="Carte de débit"
+          description="Visa Débit, Mastercard Débit · cartes de crédit non acceptées"
+          selected={method === "card"}
+          onPress={() => setDraft({ payMethod: "card" })}
+        />
+      ) : null}
+      {!method ? (
+        <Notice tone="warn" icon="info" text="Aucun moyen de paiement n'est encore ouvert pour ce trajet. Les envois partent pour l'instant du Canada, par virement Interac." />
+      ) : null}
       {error ? <Notice tone="danger" icon="alert" text={error} /> : null}
     </Screen>
   );

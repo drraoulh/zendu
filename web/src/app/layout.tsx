@@ -5,7 +5,7 @@ import { AuthProvider } from "@/components/auth-provider";
 import { SiteHeader } from "@/components/layout/site-header";
 import { SiteFooter } from "@/components/layout/site-footer";
 import { DemoBanner } from "@/components/layout/demo-banner";
-import { getPayInMode } from "@/lib/providers/payin";
+import { isLiveMode } from "@/lib/mode";
 import { appFullName, appName, logo } from "@/lib/brand";
 import "./globals.css";
 
@@ -53,7 +53,7 @@ export const viewport: Viewport = {
 };
 
 export default function RootLayout({ children }: Readonly<{ children: React.ReactNode }>) {
-  const demo = getPayInMode() === "mock";
+  const demo = !isLiveMode();
   return (
     <html lang="fr" className={`${montserrat.variable} ${inter.variable}`}>
       <body className="flex min-h-screen flex-col">

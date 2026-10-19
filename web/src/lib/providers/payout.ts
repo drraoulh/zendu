@@ -1,3 +1,4 @@
+import { isLiveMode } from "@/lib/mode";
 import { isBankNetwork, MANUAL_BANK_PROVIDER, MANUAL_PAYOUT_PROVIDER, MOCK_BANK_PROVIDER } from "@/lib/bank";
 
 export type PayoutRequest = {
@@ -32,14 +33,22 @@ export function getPayoutMode(): "momo" | "mock_momo" {
 
 /**
  * Qui verse l'argent à ce bénéficiaire ?
- * - Démo (aucune clé MTN) : tout est simulé (mock_momo pour les portefeuilles, mock_bank pour les banques).
- * - Clés MTN présentes : l'API MTN MoMo ne sert QUE pour MTN au Cameroun. Tout le reste (Orange Money,
- *   Alipay, WeChat Pay, Interac, banques) passe en versement manuel par l'équipe, jamais en simulation :
- *   un transfert réel ne doit pas être marqué « livré » sans qu'un versement ait eu lieu.
+ * - Démo, sans clé MTN : tout est simulé (mock_momo pour les portefeuilles, mock_bank pour les banques).
+ * - L'API MTN MoMo ne sert QUE pour MTN au Cameroun, et en mode réel seulement avec des clés de
+ *   production (MTN_TARGET_ENV ≠ "sandbox") : le bac à sable ne verse pas de vrai argent.
+ * - Tout le reste (Orange Money, Alipay, WeChat Pay, Interac, banques, ou MTN sans clés de production
+ *   en mode réel) passe en versement manuel par l'équipe, jamais en simulation : un transfert réel ne
+ *   doit pas être marqué « livré » sans qu'un versement ait eu lieu.
  */
+export function momoLiveReady(): boolean {
+  return getPayoutMode() === "momo" && (process.env.MTN_TARGET_ENV?.trim() || "sandbox") !== "sandbox";
+}
+
 export function payoutProviderFor(network: string, country: string): string {
   const bank = isBankNetwork(network, country);
-  if (getPayoutMode() !== "momo") return bank ? MOCK_BANK_PROVIDER : "mock_momo";
-  if (network === "MTN" && country === "CM") return "momo";
+  const live = isLiveMode();
+  if (!live && getPayoutMode() !== "momo") return bank ? MOCK_BANK_PROVIDER : "mock_momo";
+  const momoUsable = live ? momoLiveReady() : getPayoutMode() === "momo";
+  if (momoUsable && network === "MTN" && country === "CM") return "momo";
   return bank ? MANUAL_BANK_PROVIDER : MANUAL_PAYOUT_PROVIDER;
 }

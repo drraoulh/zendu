@@ -1,4 +1,5 @@
 import { NextResponse } from "next/server";
+import { expireStaleTransfers } from "@/lib/transfer-service";
 import { requireCustomer } from "@/lib/customer-auth";
 import { publicTransfer } from "@/lib/bank";
 import { prisma } from "@/lib/prisma";
@@ -9,6 +10,7 @@ export const dynamic = "force-dynamic";
 export async function GET(request: Request) {
   const authed = await requireCustomer(request);
   if (authed instanceof NextResponse) return authed;
+  await expireStaleTransfers({ customerId: authed.customer.id }).catch(() => 0);
   const transfers = await prisma.transfer.findMany({
     where: { customerId: authed.customer.id },
     include: { beneficiary: true, events: { orderBy: { createdAt: "asc" } } },

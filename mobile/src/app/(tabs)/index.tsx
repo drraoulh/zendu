@@ -1,6 +1,6 @@
 import { router, useFocusEffect } from "expo-router";
 import { useCallback, useEffect, useRef } from "react";
-import { Pressable, ScrollView, StyleSheet, Text, View } from "react-native";
+import { Alert, Pressable, ScrollView, StyleSheet, Text, View } from "react-native";
 import { WstSymbol } from "@/components/brand";
 import { Flag } from "@/components/flag";
 import { Avatar } from "@/components/form";
@@ -8,7 +8,7 @@ import { Icon } from "@/components/icons";
 import { Simulator } from "@/components/simulator";
 import { TransferRow } from "@/components/transfer-row";
 import { Card, Screen, Small } from "@/components/ui";
-import { defaultCorridorFor, SAMPLE_AMOUNT } from "@/lib/corridors";
+import { defaultCorridorFor, findCorridor, payMethodsOf, SAMPLE_AMOUNT, useCorridors } from "@/lib/corridors";
 import { corridorFor } from "@/lib/recipients";
 import { useSession } from "@/lib/session";
 import { useStore, type Recipient } from "@/lib/store";
@@ -25,6 +25,7 @@ export default function Home() {
   const { draft, setDraft, recipients } = useStore();
   const { items, loading, failed, reload } = useMyTransfers(3);
   const { unread } = useNotifications();
+  const corridors = useCorridors();
   const kyc = profile?.kyc ?? "none";
   const todo = kyc === "none" || kyc === "rejected";
   const home = profile?.country ?? "CA";
@@ -52,6 +53,13 @@ export default function Home() {
   function startSend() {
     if (todo) return router.push("/kyc");
     if (kyc === "pending") return;
+    const corridor = findCorridor(corridors, draft.corridorId);
+    if (payMethodsOf(corridor).length === 0) {
+      return Alert.alert(
+        "Bientôt disponible",
+        `L'envoi depuis ${corridor.sourceName} arrive bientôt. Pour l'instant, les envois partent du Canada (paiement par virement Interac).`,
+      );
+    }
     router.push(selected ? "/send/review" : "/send/recipient");
   }
 

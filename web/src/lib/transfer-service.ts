@@ -5,6 +5,8 @@ import { mockMomo } from "@/lib/providers/mock-momo";
 import { createMomoPayout } from "@/lib/providers/momo";
 import { mockBank } from "@/lib/providers/mock-bank";
 import { isBankNetwork, isManualPayoutProvider, maskAccount } from "@/lib/bank";
+import { INTERAC_PAYMENT_HOURS } from "@/lib/providers/interac";
+import { NOTIFY_KINDS, notifyCustomer, type NotifyKind } from "@/lib/transfer-notify";
 
 const WITH_EVENTS = {
   beneficiary: true,
@@ -15,6 +17,30 @@ async function addEvent(transferId: string, type: string, message: string) {
   await prisma.transferEvent.create({
     data: { transferId, type, message },
   });
+  // Courriel au client aux étapes qui le concernent (paiement reçu, livré, échec…).
+  if (NOTIFY_KINDS.includes(type)) await notifyCustomer(transferId, type as NotifyKind);
+}
+
+/**
+ * Transferts jamais payés : passés « expiré » après INTERAC_PAYMENT_HOURS (24 h), comme annoncé au
+ * client. Appelé à la lecture (listes, suivi, admin) et par la tâche planifiée /api/cron/expire.
+ * Un virement reçu en retard peut encore être confirmé par l'équipe (expiré → paiement détecté).
+ */
+export async function expireStaleTransfers(where: { id?: string; customerId?: string } = {}) {
+  const cutoff = new Date(Date.now() - INTERAC_PAYMENT_HOURS * 3600_000);
+  const stale = await prisma.transfer.findMany({
+    where: { ...where, status: "awaiting_payment", createdAt: { lt: cutoff } },
+    select: { id: true },
+    take: 200,
+  });
+  for (const { id } of stale) {
+    const { count } = await prisma.transfer.updateMany({
+      where: { id, status: "awaiting_payment" },
+      data: { status: "expired", failureReason: "Paiement non reçu dans le délai" },
+    });
+    if (count) await addEvent(id, "expired", `Paiement non reçu sous ${INTERAC_PAYMENT_HOURS} h : transfert expiré`);
+  }
+  return stale.length;
 }
 
 export async function markPaymentDetected(transferId: string, payInRef: string) {

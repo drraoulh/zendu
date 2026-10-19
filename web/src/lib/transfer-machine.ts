@@ -24,7 +24,8 @@ const ALLOWED: Record<TransferStatus, TransferStatus[]> = {
   delivered: [],
   payment_mismatch: ["awaiting_payment", "cancelled"],
   payout_failed: ["payout_queued", "cancelled"],
-  expired: [],
+  // Virement Interac arrivé en retard : l'équipe peut encore le confirmer.
+  expired: ["payment_detected"],
   cancelled: [],
 };
 

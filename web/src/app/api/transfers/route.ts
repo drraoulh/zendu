@@ -8,6 +8,7 @@ import { mockPayIn } from "@/lib/providers/mock-payin";
 import { createStripePayIn } from "@/lib/providers/stripe";
 import { INTERAC_PROVIDER, interacInstructions } from "@/lib/providers/interac";
 import { payoutProviderFor } from "@/lib/providers/payout";
+import { payMethodsFor } from "@/lib/mode";
 import { getCorridor, getCountry } from "@/lib/corridors";
 import { publicTransfer } from "@/lib/bank";
 import { beneficiaryInputSchema, normalizeBeneficiary } from "@/lib/beneficiary-input";
@@ -119,6 +120,18 @@ export async function POST(request: Request) {
     });
     if (data.payMethod === "interac" && quoteData.sendCurrency !== "CAD") {
       return NextResponse.json({ error: "Le virement Interac n'est possible que pour les envois depuis le Canada (CAD)." }, { status: 400 });
+    }
+    if (!payMethodsFor(quoteData.sourceCountry).includes(data.payMethod)) {
+      return NextResponse.json(
+        {
+          error:
+            quoteData.sourceCountry === "CA"
+              ? "Le paiement par carte n'est pas encore disponible. Payez par virement Interac."
+              : "L'envoi depuis ce pays n'est pas encore ouvert. Les envois partent pour l'instant du Canada.",
+          code: "pay_method_unavailable",
+        },
+        { status: 400 },
+      );
     }
     const interac = data.payMethod === "interac";
     const reference = createReference();

@@ -2,6 +2,7 @@ import { NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { momoGetTransferStatus } from "@/lib/providers/momo";
 import { assertTransition } from "@/lib/transfer-machine";
+import { notifyCustomer } from "@/lib/transfer-notify";
 
 /**
  * Rappel MTN MoMo Disbursement (X-Callback-Url).
@@ -53,6 +54,7 @@ export async function POST(request: Request) {
       await prisma.transferEvent.create({
         data: { transferId: transfer.id, type: "delivered", message: "Livré (confirmé par MTN MoMo)" },
       });
+      await notifyCustomer(transfer.id, "delivered");
     } else if (status.status === "FAILED") {
       const reason = status.reason?.message ?? status.reason?.code ?? "Échec MTN MoMo";
       assertTransition(transfer.status === "payout_queued" ? "payout_queued" : "payout_sent", "payout_failed");
@@ -63,6 +65,7 @@ export async function POST(request: Request) {
       await prisma.transferEvent.create({
         data: { transferId: transfer.id, type: "payout_failed", message: `Échec MTN MoMo : ${reason}` },
       });
+      await notifyCustomer(transfer.id, "payout_failed");
     }
   } catch {
     // Transition déjà faite (rappel en double) : rien à faire.

@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { api, type CorridorMeta, type Network } from "./api";
+import { api, type CorridorMeta, type Network, type PayMethod } from "./api";
 
 /** Pays ouverts (identiques au site). */
 export const COUNTRIES = {
@@ -69,6 +69,11 @@ export function useCorridors() {
     };
   }, []);
   return corridors;
+}
+
+/** Moyens de paiement d'un trajet (ancien serveur sans l'info : Interac au Canada + carte). */
+export function payMethodsOf(c: CorridorMeta): PayMethod[] {
+  return c.payMethods ?? (c.source === "CA" ? ["interac", "card"] : ["card"]);
 }
 
 export function findCorridor(list: CorridorMeta[], id: string) {

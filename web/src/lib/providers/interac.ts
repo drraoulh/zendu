@@ -1,3 +1,5 @@
+import { isLiveMode } from "@/lib/mode";
+
 /**
  * Encaissement par virement Interac (Canada, CAD) — mode « dépôt automatique » :
  * le client envoie un virement Interac depuis son appli bancaire à l'adresse de dépôt de PWFINTECH
@@ -16,11 +18,11 @@ export function interacDepositEmail(): string | null {
 }
 
 /**
- * Simulation de la réception (démo) : seulement tant qu'aucune vraie adresse de dépôt n'est configurée,
- * pour qu'un transfert réel ne puisse jamais être marqué payé sans contrôle de l'équipe.
+ * Simulation de la réception (démo) : jamais en mode réel (adresse de dépôt configurée ou
+ * APP_MODE="live"), pour qu'un transfert réel ne puisse être marqué payé sans contrôle de l'équipe.
  */
 export function interacSimulationAllowed(): boolean {
-  return interacDepositEmail() === null;
+  return !isLiveMode();
 }
 
 export type InteracInstructions = {

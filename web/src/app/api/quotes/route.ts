@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 import { buildQuote, QuoteLimitError } from "@/lib/quote";
 import { CORRIDORS, getCountry } from "@/lib/corridors";
+import { payMethodsFor } from "@/lib/mode";
 
 function quoteError(error: unknown) {
   if (error instanceof QuoteLimitError) {
@@ -63,6 +64,8 @@ export async function GET(request: Request) {
           sendCurrency: from.currency,
           receiveCurrency: to.currency,
           networks: to.networks,
+          /** Moyens de paiement disponibles maintenant (vide = envoi impossible depuis ce pays). */
+          payMethods: payMethodsFor(c.source),
         };
       }),
     );

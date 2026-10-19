@@ -27,6 +27,8 @@ export type CorridorMeta = {
   sendCurrency: string;
   receiveCurrency: string;
   networks: Network[];
+  /** Moyens de paiement ouverts maintenant (vide = envoi impossible depuis ce pays). Absent sur un ancien serveur. */
+  payMethods?: PayMethod[];
 };
 
 export type Quote = {

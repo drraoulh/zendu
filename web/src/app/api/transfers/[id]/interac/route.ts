@@ -7,6 +7,7 @@ import { getCustomer } from "@/lib/customer-auth";
 import { INTERAC_PROVIDER } from "@/lib/providers/interac";
 import { markPaymentDetected } from "@/lib/transfer-service";
 import { assertTransition } from "@/lib/transfer-machine";
+import { notifyCustomer } from "@/lib/transfer-notify";
 
 type Params = { params: Promise<{ id: string }> };
 
@@ -61,6 +62,7 @@ export async function POST(request: Request, { params }: Params) {
     const reason = body.reason || "Montant ou message du virement Interac incorrect";
     await prisma.transfer.update({ where: { id }, data: { status: "payment_mismatch", failureReason: reason } });
     await prisma.transferEvent.create({ data: { transferId: id, type: "payment_mismatch", message: reason } });
+    await notifyCustomer(id, "payment_mismatch");
     const updated = await prisma.transfer.findUnique({ where: { id }, include: { beneficiary: true } });
     return NextResponse.json(updated ? publicTransfer(updated) : updated);
   } catch (error) {

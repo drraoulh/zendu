@@ -62,6 +62,8 @@ const NUMBER_LOCALE: Record<string, string> = { fr: "fr-CA", en: "en-CA", es: "e
 
 export function AdminDashboard({
   transfers,
+  queue,
+  live = false,
   results,
   filters = {},
   resultsLimit = 100,
@@ -69,6 +71,10 @@ export function AdminDashboard({
   payoutMode,
 }: {
   transfers: AdminTransferRow[] | null;
+  /** Dossiers à traiter (virements Interac attendus, versements manuels), chargés à part. */
+  queue?: AdminTransferRow[] | null;
+  /** Mode réel (aucune simulation possible). */
+  live?: boolean;
   /** Résultats de la recherche (undefined sans recherche, null si la base est indisponible). */
   results?: AdminTransferRow[] | null;
   filters?: TransferFilters;
@@ -95,8 +101,11 @@ export function AdminDashboard({
   const rows = transfers ?? [];
   // Liste affichée : résultats de la recherche, sinon les transferts récents.
   const list = results ?? (filtering ? [] : rows);
-  const interacQueue = rows.filter((r) => r.payInProvider === INTERAC_PROVIDER && r.status === "awaiting_payment");
-  const bankQueue = rows.filter(
+  const work = queue ?? rows;
+  const interacQueue = work.filter(
+    (r) => r.payInProvider === INTERAC_PROVIDER && (r.status === "awaiting_payment" || (r.status === "expired" && r.interacDeclaredAt)),
+  );
+  const bankQueue = work.filter(
     (r) =>
       isManualPayoutProvider(r.payoutProvider) &&
       (r.status === "payout_queued" || r.status === "payout_sent"),
@@ -152,6 +161,12 @@ export function AdminDashboard({
           <p className="mt-1.5 max-w-2xl text-sm leading-relaxed text-muted sm:text-base">{t("subtitle")}</p>
         </div>
         <div className="flex flex-wrap gap-2">
+          <span
+            className={`inline-flex items-center gap-2 rounded-full px-3 py-1.5 text-xs font-bold ${live ? "bg-success/10 text-success" : "bg-warn/15 text-ink"}`}
+          >
+            <span className={`h-2 w-2 rounded-full ${live ? "bg-success" : "bg-warn"}`} aria-hidden />
+            {live ? t("appModeLive") : t("appModeDemo")}
+          </span>
           {modePill(t("payIn"), payInMode)}
           {modePill(t("payout"), payoutMode)}
         </div>
