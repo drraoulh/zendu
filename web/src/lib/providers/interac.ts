@@ -17,6 +17,11 @@ export function interacDepositEmail(): string | null {
   return process.env.INTERAC_DEPOSIT_EMAIL?.trim() || null;
 }
 
+/** Nom du titulaire du compte de dépôt, tel que la banque du client l'affichera (INTERAC_DEPOSIT_NAME). */
+export function interacDepositName(): string | null {
+  return process.env.INTERAC_DEPOSIT_NAME?.trim() || null;
+}
+
 /**
  * Simulation de la réception (démo) : jamais en mode réel (adresse de dépôt configurée ou
  * APP_MODE="live"), pour qu'un transfert réel ne puisse être marqué payé sans contrôle de l'équipe.
@@ -28,6 +33,8 @@ export function interacSimulationAllowed(): boolean {
 export type InteracInstructions = {
   /** Adresse à laquelle envoyer le virement (null tant qu'elle n'est pas configurée). */
   email: string | null;
+  /** Nom affiché par la banque du client pour ce destinataire (null si non configuré). */
+  name: string | null;
   amount: number;
   currency: "CAD";
   /** À recopier dans le message du virement : c'est ce qui permet de rapprocher le paiement. */
@@ -39,6 +46,7 @@ export type InteracInstructions = {
 export function interacInstructions(t: { reference: string; totalCad: number; createdAt: Date }): InteracInstructions {
   return {
     email: interacDepositEmail(),
+    name: interacDepositName(),
     amount: Math.round(t.totalCad * 100) / 100,
     currency: "CAD",
     message: t.reference,

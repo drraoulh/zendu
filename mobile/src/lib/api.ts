@@ -83,6 +83,8 @@ export type Transfer = {
 export type InteracInstructions = {
   /** Adresse de dépôt PWFINTECH (null tant qu'elle n'est pas configurée sur le serveur). */
   email: string | null;
+  /** Nom du titulaire que la banque du client affichera (absent sur un ancien serveur). */
+  name?: string | null;
   amount: number;
   currency: "CAD";
   /** Référence à mettre en message du virement. */

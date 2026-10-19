@@ -227,6 +227,7 @@ export function TransferTracker({
             {awaiting && interac && (
               <ActionCard tone="brand" icon="card" title={tt("interacTitle")} body={tt("interacBody")}>
                 {interac.email ? (
+                  <>
                   <dl className="divide-y divide-line rounded-2xl border border-line bg-white px-4">
                     {(
                       [
@@ -251,6 +252,8 @@ export function TransferTracker({
                       </div>
                     ))}
                   </dl>
+                  {interac.name ? <p className="mt-2 text-xs text-muted">{tt("interacName", { name: interac.name })}</p> : null}
+                  </>
                 ) : (
                   <p className="rounded-xl bg-warn/10 px-3 py-2 text-sm font-medium text-[#8a5d06]">{tt("interacNoAddress")}</p>
                 )}

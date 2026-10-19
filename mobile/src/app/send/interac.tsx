@@ -140,6 +140,7 @@ export default function InteracPayment() {
           title="Destinataire"
           value={info.email ?? (info.simulate ? "Non requise en démonstration" : "Adresse indisponible : contactez le support")}
           muted={!info.email}
+          hint={info.email && info.name ? `Votre banque affichera « ${info.name} » : c'est bien notre compte de réception.` : undefined}
           copied={copied === "email"}
           onCopy={info.email ? () => copy("email", info.email!) : undefined}
         />

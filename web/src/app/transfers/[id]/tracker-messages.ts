@@ -7,6 +7,7 @@ export const trackerMessages = defineMessages({
     interacBody:
       "Depuis votre appli bancaire, envoyez un virement Interac du montant exact à l'adresse ci-dessous, avec la référence comme message. Notre équipe confirme la réception, puis le versement part.",
     interacEmail: "Adresse du virement",
+    interacName: "Votre banque affichera « {name} » : c'est bien notre compte de réception.",
     interacAmount: "Montant exact",
     interacMessage: "Message (référence)",
     interacDeadline: "À envoyer avant le {date}, sinon le transfert expire.",
@@ -27,6 +28,7 @@ export const trackerMessages = defineMessages({
     interacBody:
       "From your banking app, send an Interac e-Transfer of the exact amount to the address below, with the reference as the message. Our team confirms receipt, then the payout starts.",
     interacEmail: "Send to",
+    interacName: "Your bank will show “{name}”: this is our receiving account.",
     interacAmount: "Exact amount",
     interacMessage: "Message (reference)",
     interacDeadline: "Send it before {date}, otherwise the transfer expires.",
