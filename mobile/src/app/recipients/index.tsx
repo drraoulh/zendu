@@ -2,7 +2,7 @@ import { router } from "expo-router";
 import { useState } from "react";
 import { View } from "react-native";
 import { Avatar } from "@/components/form";
-import { Button, Card, Empty, Field, H1, Header, ListItem, Screen, Small } from "@/components/ui";
+import { Button, Card, Empty, Field, Header, ListItem, Screen, Small } from "@/components/ui";
 import { countryName, networkLabel } from "@/lib/format";
 import { recipientDetail } from "@/lib/recipients";
 import { useStore } from "@/lib/store";
@@ -15,7 +15,6 @@ export default function Recipients() {
   return (
     <Screen footer={<Button title="Ajouter un destinataire" icon="plus" onPress={() => router.push("/recipients/new")} />}>
       <Header title="Mes destinataires" />
-      <H1 style={{ marginBottom: 14 }}>Mes destinataires</H1>
       {recipients.length > 3 ? <Field label="Rechercher" placeholder="Rechercher un destinataire" value={q} onChangeText={setQ} /> : null}
       {recipients.length ? (
         <Small style={{ marginBottom: 8 }}>

@@ -15,8 +15,9 @@ export default function Help() {
 
   return (
     <Screen footer={<Button title="Nous contacter" icon="mail" variant="secondary" onPress={() => router.push("/help/contact")} />}>
-      <Header title="Centre d'aide" />
-      <Field label="Rechercher" placeholder="Rechercher dans l'aide" value={q} onChangeText={setQ} />
+      {/* Dans une catégorie, « Retour » revient à la liste des catégories. */}
+      <Header title="Centre d'aide" onBack={cat ? () => setCat(null) : undefined} />
+      <Field label="Rechercher" placeholder="Ex. frais, Interac, colis" value={q} onChangeText={setQ} returnKeyType="search" autoCorrect={false} />
       {!query && !cat ? (
         <>
           <SectionTitle>Catégories</SectionTitle>

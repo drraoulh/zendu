@@ -38,6 +38,8 @@ export default function Forgot() {
         keyboardType="email-address"
         autoCapitalize="none"
         autoComplete="email"
+        returnKeyType="send"
+        onSubmitEditing={send}
         error={error}
       />
       <Notice tone="neutral" icon="clock" text="À la connexion avec le mot de passe temporaire, vous choisirez un nouveau mot de passe. Pensez à vérifier vos courriels indésirables." />

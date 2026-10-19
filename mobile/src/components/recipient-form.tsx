@@ -91,7 +91,7 @@ export function RecipientForm({
         </>
       ) : null}
       <Field
-        label={bank ? "Téléphone (facultatif)" : type === "cash" ? "Téléphone (pour le code de retrait)" : `Numéro ${networkLabel(network)}`}
+        label={bank ? "Téléphone (facultatif)" : network === "INTERAC" ? "Téléphone lié au compte Interac" : `Numéro ${networkLabel(network)}`}
         value={phone}
         onChangeText={setPhone}
         keyboardType="phone-pad"

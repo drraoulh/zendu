@@ -1,6 +1,6 @@
 import { Link, router } from "expo-router";
-import { useState } from "react";
-import { Text, View } from "react-native";
+import { useRef, useState } from "react";
+import { Text, TextInput, View } from "react-native";
 import { WstWordmark } from "@/components/brand";
 import { Button, Field, H1, Notice, P, Screen, Small } from "@/components/ui";
 import { API_URL } from "@/lib/api";
@@ -13,6 +13,7 @@ export default function Login() {
   const [password, setPassword] = useState("");
   const [error, setError] = useState<string | null>(null);
   const [busy, setBusy] = useState(false);
+  const passwordRef = useRef<TextInput>(null);
 
   async function submit() {
     setError(null);
@@ -49,8 +50,21 @@ export default function Login() {
         autoCapitalize="none"
         autoComplete="email"
         textContentType="emailAddress"
+        returnKeyType="next"
+        submitBehavior="submit"
+        onSubmitEditing={() => passwordRef.current?.focus()}
       />
-      <Field label="Mot de passe" value={password} onChangeText={setPassword} secureTextEntry autoComplete="current-password" textContentType="password" onSubmitEditing={submit} />
+      <Field
+        ref={passwordRef}
+        label="Mot de passe"
+        value={password}
+        onChangeText={setPassword}
+        secureTextEntry
+        autoComplete="current-password"
+        textContentType="password"
+        returnKeyType="go"
+        onSubmitEditing={submit}
+      />
       <Link href="/auth/forgot" style={{ color: colors.brand, fontFamily: fonts.semibold, fontSize: 14, marginBottom: 18 }}>
         Mot de passe oublié ?
       </Link>

@@ -2,55 +2,94 @@ import { router } from "expo-router";
 import { useState } from "react";
 import { Text, View } from "react-native";
 import { ConfirmDialog, SectionTitle } from "@/components/form";
-import { Badge, Button, Card, Empty, Header, IconButton, ListItem, Notice, Screen } from "@/components/ui";
+import { Badge, Button, Card, Header, IconButton, ListItem, Notice, Screen } from "@/components/ui";
 import { cardLabel } from "@/lib/cards";
+import { payMethodsOf, useCorridors } from "@/lib/corridors";
 import { useStore, type SavedCard } from "@/lib/store";
 import { colors, fonts } from "@/lib/theme";
 import { cardLogoId, PaymentLogo } from "@/components/payment-logo";
 
+/**
+ * Moyens de paiement : le virement Interac (envois depuis le Canada) passe en premier.
+ * La carte de débit n'existe qu'en démonstration (aucun prestataire réel) : elle n'est proposée
+ * que si le serveur l'ouvre sur au moins un trajet.
+ */
 export default function PaymentMethods() {
   const { cards, removeCard, setDefaultCard } = useStore();
+  const corridors = useCorridors();
   const [toRemove, setToRemove] = useState<SavedCard | null>(null);
   const def = cards.find((c) => c.isDefault);
+  const interacOpen = corridors.some((c) => c.source === "CA" && payMethodsOf(c).includes("interac"));
+  const cardsOpen = corridors.some((c) => payMethodsOf(c).includes("card"));
 
   return (
-    <Screen footer={<Button title="Ajouter une carte" icon="plus" onPress={() => router.push("/account/add-card")} />}>
+    <Screen footer={cardsOpen ? <Button title="Ajouter une carte de débit" icon="plus" variant="secondary" onPress={() => router.push("/account/add-card")} /> : undefined}>
       <Header title="Moyens de paiement" />
-      {def ? (
-        <View style={{ backgroundColor: colors.navy, borderRadius: 22, padding: 20, gap: 14, marginBottom: 8 }}>
-          <View style={{ flexDirection: "row", justifyContent: "space-between" }}>
+
+      <SectionTitle>Envois depuis le Canada</SectionTitle>
+      <Card style={{ paddingVertical: 4 }}>
+        <ListItem
+          leading={<PaymentLogo id="INTERAC" size={28} />}
+          title="Virement Interac"
+          subtitle="Depuis votre banque canadienne, le moins cher. Rien à enregistrer : les instructions s'affichent au moment de payer."
+          subtitleLines={4}
+          // Badge sous le texte : à droite, il écrasait la description sur petit écran (360 px).
+          extra={
+            <View style={{ marginTop: 6 }}>
+              <Badge label={interacOpen ? "Recommandé" : "Bientôt"} tone={interacOpen ? "success" : "neutral"} />
+            </View>
+          }
+          right={<View />}
+        />
+      </Card>
+
+      <SectionTitle>Cartes de débit</SectionTitle>
+      {cardsOpen && def ? (
+        <View style={{ backgroundColor: colors.navy, borderRadius: 22, padding: 20, gap: 14, marginBottom: 10 }}>
+          <View style={{ flexDirection: "row", justifyContent: "space-between", alignItems: "center" }}>
             <PaymentLogo id={cardLogoId(def.brand)} size={28} />
             <Badge label="Par défaut" tone="brand" />
           </View>
-          <Text style={{ color: colors.white, fontFamily: fonts.heading, fontSize: 20, letterSpacing: 1.5 }}>•••• •••• •••• {def.last4}</Text>
-          <View style={{ flexDirection: "row", justifyContent: "space-between" }}>
-            <Text style={{ color: "rgba(255,255,255,0.75)", fontSize: 12 }}>{def.holder.toUpperCase()}</Text>
+          <Text style={{ color: colors.white, fontFamily: fonts.heading, fontSize: 20, letterSpacing: 1.5 }} numberOfLines={1} adjustsFontSizeToFit>
+            •••• •••• •••• {def.last4}
+          </Text>
+          <View style={{ flexDirection: "row", justifyContent: "space-between", gap: 12 }}>
+            <Text style={{ color: "rgba(255,255,255,0.75)", fontSize: 12, flex: 1 }} numberOfLines={1}>
+              {def.holder.toUpperCase()}
+            </Text>
             <Text style={{ color: "rgba(255,255,255,0.75)", fontSize: 12 }}>Exp. {def.exp}</Text>
           </View>
         </View>
       ) : null}
-      <SectionTitle>Cartes enregistrées</SectionTitle>
-      <Card style={{ paddingVertical: 4, marginBottom: 12 }}>
-        {cards.length ? (
-          cards.map((c) => (
+      {cards.length ? (
+        <Card style={{ paddingVertical: 4, marginBottom: 12 }}>
+          {cards.map((c) => (
             <ListItem
               key={c.id}
               leading={<PaymentLogo id={cardLogoId(c.brand)} size={28} />}
               title={cardLabel(c)}
               subtitle={`Expire ${c.exp}${c.isDefault ? " · par défaut" : ""}`}
-              onPress={c.isDefault ? undefined : () => setDefaultCard(c.id)}
+              onPress={c.isDefault || !cardsOpen ? undefined : () => setDefaultCard(c.id)}
               right={<IconButton name="close" label={`Retirer ${cardLabel(c)}`} tone="danger" onPress={() => setToRemove(c)} />}
             />
-          ))
-        ) : (
-          <Empty icon="wallet" title="Aucune carte" text="Ajoutez une carte Visa ou Mastercard pour payer vos transferts." />
-        )}
-        <ListItem leading={<PaymentLogo id="INTERAC" size={28} />} title="Virement Interac" subtitle="Paiement depuis votre banque canadienne" right={<Badge label="Bientôt" />} />
-      </Card>
-      {cards.length > 1 ? <Notice tone="neutral" icon="info" text="Touchez une carte pour en faire la carte par défaut." /> : null}
-      <View style={{ marginTop: 10 }}>
-        <Notice tone="brand" icon="lock" text="Seuls les 4 derniers chiffres sont conservés. WorldSoft Transfer n'affiche ni ne stocke jamais le numéro complet." />
-      </View>
+          ))}
+        </Card>
+      ) : null}
+      {cardsOpen ? (
+        <View style={{ gap: 10 }}>
+          {cards.length > 1 ? <Notice tone="neutral" icon="info" text="Touchez une carte pour en faire la carte par défaut." /> : null}
+          <Notice
+            tone="warn"
+            icon="info"
+            title="Version de démonstration"
+            text="Visa Débit ou Mastercard Débit uniquement (cartes de crédit refusées). Aucune carte n'est débitée en démonstration."
+          />
+          <Notice tone="brand" icon="lock" text="Seuls la marque, les 4 derniers chiffres et la date d'expiration sont conservés, jamais le numéro complet." />
+        </View>
+      ) : (
+        <Notice tone="neutral" icon="info" text="Le paiement par carte n'est pas encore disponible. Payez vos envois par virement Interac." />
+      )}
+
       <ConfirmDialog
         visible={toRemove != null}
         title="Retirer cette carte ?"

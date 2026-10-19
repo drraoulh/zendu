@@ -24,7 +24,7 @@ export const HELP_ARTICLES: HelpArticle[] = [
     slug: "delai-transfert",
     category: "transferts",
     faq: true,
-    title: "Combien de temps prend un transfert ?",
+    title: "Combien de temps prend un transfert\u00a0?",
     intro: "Le délai dépend surtout du mode de réception choisi. Il est toujours affiché avant le paiement.",
     sections: [
       { title: "Mobile Money (Cameroun)", text: "Généralement quelques minutes (MTN Mobile Money, Orange Money)." },
@@ -40,9 +40,11 @@ export const HELP_ARTICLES: HelpArticle[] = [
     slug: "frais",
     category: "transferts",
     faq: true,
-    title: "Quels sont les frais d'envoi ?",
+    title: "Quels sont les frais d'envoi\u00a0?",
     intro: "Les frais et le taux de change sont calculés pour chaque envoi et affichés dans le simulateur, avant tout paiement.",
     sections: [
+      { title: "Vers le Cameroun", text: "Aucun frais d'envoi : notre rémunération est comprise dans le taux de change affiché." },
+      { title: "Vers la Chine et le Canada", text: "Un petit frais fixe s'ajoute, indiqué avant le paiement." },
       { title: "Ce que vous voyez avant de payer", text: "Le montant envoyé, les frais, le taux appliqué, le total à payer et le montant exact reçu par votre proche." },
       { title: "Durée du devis", text: "Un devis est garanti 15 minutes. Passé ce délai, il est recalculé au taux du moment." },
       { title: "Pas de frais cachés", text: "Le total affiché au récapitulatif est le montant débité." },
@@ -55,8 +57,7 @@ export const HELP_ARTICLES: HelpArticle[] = [
     intro: "Les limites dépendent de la devise d'envoi.",
     sections: [
       { title: "Depuis le Canada (CAD)", text: "De 10 $ à 5 000 $ par envoi." },
-      { title: "Depuis le Cameroun (FCFA)", text: "De 5 000 à 3 000 000 FCFA par envoi." },
-      { title: "Depuis la Chine (CNY)", text: "De 50 à 30 000 CNY par envoi." },
+      { title: "Depuis le Cameroun et la Chine", text: "Bientôt disponible. Pour l'instant, les envois partent du Canada." },
     ],
   },
   {
@@ -68,25 +69,25 @@ export const HELP_ARTICLES: HelpArticle[] = [
     sections: [
       { title: "Le statut est « En attente de paiement »", text: "Le paiement n'a pas encore été confirmé. Terminez le paiement depuis l'écran de suivi." },
       { title: "Le statut est « Versement envoyé »", text: "L'argent est en route. Pour un virement bancaire, comptez 1 à 2 jours ouvrables." },
-      { title: "Toujours rien ?", text: "Contactez-nous avec la référence du transfert (PW-…) : notre équipe vérifie auprès de l'opérateur." },
+      { title: "Toujours rien\u00a0?", text: "Contactez-nous avec la référence du transfert (PW-…) : notre équipe vérifie auprès de l'opérateur." },
     ],
   },
   {
     slug: "payer-carte",
     category: "paiements",
-    title: "Comment payer mon transfert ?",
-    intro: "Depuis le Canada, payez par virement Interac (le moins cher) ou par carte de débit. Depuis le Cameroun ou la Chine, par carte.",
+    title: "Comment payer mon transfert\u00a0?",
+    intro: "Les envois partent du Canada et se paient par virement Interac, depuis votre banque canadienne.",
     sections: [
       { title: "Virement Interac", text: "Envoyez le montant exact depuis votre banque en indiquant la référence du transfert (PW-…) en message. Le versement part dès la réception du virement." },
-      { title: "Carte", text: "Le paiement est protégé par 3-D Secure. Seuls les 4 derniers chiffres de votre carte sont conservés." },
-      { title: "Reçu", text: "Un reçu est envoyé par courriel et reste disponible dans l'appli." },
+      { title: "Carte de débit", text: "Proposée seulement dans la version de démonstration (aucune carte n'est débitée). Les cartes de crédit ne sont pas acceptées." },
+      { title: "Reçu", text: "Le reçu reste disponible dans l'appli et vous êtes prévenu par courriel à chaque étape (paiement reçu, argent livré)." },
     ],
   },
   {
     slug: "verifier-identite",
     category: "compte",
     faq: true,
-    title: "Comment vérifier mon identité ?",
+    title: "Comment vérifier mon identité\u00a0?",
     intro: "La réglementation sur les transferts d'argent impose de vérifier l'identité de chaque client avant son premier envoi.",
     sections: [
       { title: "Ce qu'il vous faut", text: "Une pièce d'identité valide (passeport, carte d'identité, permis ou titre de séjour selon votre pays) et quelques secondes pour un selfie." },
@@ -100,7 +101,7 @@ export const HELP_ARTICLES: HelpArticle[] = [
     title: "Sécuriser mon compte",
     intro: "Plusieurs protections sont disponibles dans Profil → Sécurité.",
     sections: [
-      { title: "Vérification en deux étapes", text: "Un code est demandé à chaque connexion." },
+      { title: "Vérification en deux étapes", text: "Un code envoyé par courriel est demandé à chaque connexion." },
       { title: "Face ID / empreinte et code PIN", text: "Verrouillez l'ouverture de l'appli sur votre téléphone." },
       { title: "Mot de passe", text: "Utilisez un mot de passe unique, que vous n'utilisez sur aucun autre site." },
     ],
@@ -109,7 +110,7 @@ export const HELP_ARTICLES: HelpArticle[] = [
     slug: "suivi-colis",
     category: "shipping",
     faq: true,
-    title: "Comment suivre mon colis ?",
+    title: "Comment suivre mon colis\u00a0?",
     intro: "Ouvrez l'onglet Colis et saisissez le numéro de suivi (PWS-…) indiqué sur votre reçu d'expédition.",
     sections: [
       { title: "Étapes du suivi", text: "Colis reçu, en transit, dédouanement, en livraison, puis livré. Chaque étape affiche sa date et son lieu." },

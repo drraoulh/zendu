@@ -2,7 +2,7 @@ import { useEffect, useRef, useState } from "react";
 import { ActivityIndicator, Modal, Platform, Pressable, StyleSheet, Text, TextInput, View, useWindowDimensions } from "react-native";
 import { api, type CorridorMeta, type Quote } from "@/lib/api";
 import { COUNTRIES, SAMPLE_AMOUNT, findCorridor, useCorridors, type CountryCode } from "@/lib/corridors";
-import { countryName, etaLabel, money, parseAmount, rate } from "@/lib/format";
+import { countryName, etaLabel, money, parseAmount, rateLine, unit } from "@/lib/format";
 import { colors, fonts, radius } from "@/lib/theme";
 import { Flag } from "./flag";
 import { Icon } from "./icons";
@@ -26,7 +26,7 @@ export function Simulator({
 }) {
   const corridors = useCorridors();
   const corridor = findCorridor(corridors, corridorId);
-  const [text, setText] = useState(String(amount));
+  const [text, setText] = useState(groupDigits(String(amount)));
   const [quoted, setQuoted] = useState<{ key: string; quote: Quote } | null>(null);
   const [remoteError, setRemoteError] = useState<{ key: string; message: string } | null>(null);
   const [picker, setPicker] = useState<"source" | "destination" | null>(null);
@@ -89,22 +89,22 @@ export function Simulator({
     }
     const next = findCorridor(corridors, `${source}-${destination}`);
     const amount = next.sendCurrency !== corridor.sendCurrency ? (SAMPLE_AMOUNT[next.sendCurrency] ?? 100) : value;
-    setText(String(amount));
+    setText(groupDigits(String(amount)));
     onChange({ corridorId: next.id, sendAmount: amount, quote: null });
   }
 
   function swap() {
     const next = findCorridor(corridors, `${corridor.destination}-${corridor.source}`);
     const amount = SAMPLE_AMOUNT[next.sendCurrency] ?? 100;
-    setText(String(amount));
+    setText(groupDigits(String(amount)));
     onChange({ corridorId: next.id, sendAmount: amount, quote: null });
   }
 
   // Petits écrans (iPhone SE) : chiffres plus petits pour que « 80 770 » tienne à côté de la pastille.
   const compact = useWindowDimensions().width < 360;
   const amountSize = compact ? { fontSize: 24 } : null;
-  const sendUnit = corridor.sendCurrency === "XAF" ? "FCFA" : corridor.sendCurrency;
-  const receiveUnit = corridor.receiveCurrency === "XAF" ? "FCFA" : corridor.receiveCurrency;
+  const sendUnit = unit(corridor.sendCurrency);
+  const receiveUnit = unit(corridor.receiveCurrency);
 
   return (
     <View style={s.card}>
@@ -113,12 +113,12 @@ export function Simulator({
           <Text style={s.fieldLabel}>Vous envoyez</Text>
           <TextInput
             value={text}
-            onChangeText={(t) => setText(t.replace(/[^\d.,]/g, ""))}
+            onChangeText={(t) => setText(groupDigits(t))}
             keyboardType="decimal-pad"
             inputMode="decimal"
             accessibilityLabel="Montant envoyé"
             style={[s.amountInput, amountSize]}
-            maxLength={10}
+            maxLength={13}
           />
         </View>
         <CountryPill compact={compact} code={corridor.source} unit={sendUnit} label="Pays d'envoi" onPress={() => setPicker("source")} />
@@ -134,7 +134,7 @@ export function Simulator({
           ) : current ? (
             <>
               <Text style={s.rateText}>
-                1 {current.sendCurrency} = {rate(current.rate)} {current.receiveCurrency}
+                {rateLine(current.rate, current.sendCurrency, current.receiveCurrency)}
               </Text>
               <Text style={s.hint}>
                 {current.fee > 0 ? `Frais ${money(current.fee, current.sendCurrency)}` : "Sans frais"} · {etaLabel(current.deliveryEstimate)}
@@ -178,6 +178,14 @@ export function Simulator({
       />
     </View>
   );
+}
+
+/** Saisie « 100000 » → « 100 000 » (milliers séparés comme sur les montants affichés). */
+function groupDigits(raw: string) {
+  const clean = raw.replace(/[^\d.,]/g, "");
+  const m = /^(\d*)([.,]\d*)?$/.exec(clean);
+  if (!m) return clean;
+  return m[1].replace(/\B(?=(\d{3})+(?!\d))/g, " ") + (m[2] ?? "");
 }
 
 /** Pastille pays + devise, comme sur les convertisseurs des applis de transfert. */

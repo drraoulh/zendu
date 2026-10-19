@@ -1,9 +1,9 @@
-import { Redirect, router } from "expo-router";
-import { useEffect, useState } from "react";
+import { Redirect, router, useFocusEffect } from "expo-router";
+import { useCallback, useEffect, useRef, useState } from "react";
 import { Text, View } from "react-native";
 import { Button, Card, Choice, Divider, H1, Header, Notice, Screen, Small, Steps, SummaryRow } from "@/components/ui";
 import { api, type Quote } from "@/lib/api";
-import { countryName, deliveryEstimate, etaLabel, feeLabel, money, networkLabel, phone, rate } from "@/lib/format";
+import { countryName, deliveryEstimate, etaLabel, feeLabel, money, networkLabel, phone, rateLine } from "@/lib/format";
 import { findCorridor, payMethodsOf, useCorridors } from "@/lib/corridors";
 import { useStore } from "@/lib/store";
 import { colors, fonts } from "@/lib/theme";
@@ -21,8 +21,17 @@ export default function Review() {
   const cardOk = methods.includes("card");
   const method = draft.payMethod === "card" && cardOk ? "card" : interacOk ? "interac" : cardOk ? "card" : null;
 
+  // Double appui sur « Payer » : un seul écran de traitement (donc un seul transfert créé).
+  const going = useRef(false);
+  useFocusEffect(
+    useCallback(() => {
+      going.current = false;
+    }, []),
+  );
+
   function next() {
-    if (!method) return;
+    if (!method || going.current) return;
+    going.current = true;
     if (method === "interac") {
       setDraft({ payMethod: "interac", cardId: null });
       router.push("/send/processing");
@@ -82,7 +91,7 @@ export default function Review() {
         {quote ? (
           <>
             <SummaryRow label="Vous envoyez" value={money(quote.sendAmount, quote.sendCurrency)} />
-            <SummaryRow label="Taux de change" value={`1 ${quote.sendCurrency} = ${rate(quote.rate)} ${quote.receiveCurrency}`} />
+            <SummaryRow label="Taux de change" value={rateLine(quote.rate, quote.sendCurrency, quote.receiveCurrency)} />
             <SummaryRow label="Frais" value={feeLabel(quote.fee, quote.sendCurrency)} />
             <Divider />
             <SummaryRow label="Total à payer" value={money(quote.total, quote.sendCurrency)} strong />

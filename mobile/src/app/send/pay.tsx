@@ -1,5 +1,5 @@
-import { Redirect, router } from "expo-router";
-import { useState } from "react";
+import { Redirect, router, useFocusEffect } from "expo-router";
+import { useCallback, useRef, useState } from "react";
 import { Text, View } from "react-native";
 import { CardForm } from "@/components/card-form";
 import { Button, Card, Choice, H2, Header, Notice, Screen, Small } from "@/components/ui";
@@ -16,10 +16,19 @@ export default function Pay() {
   const [selected, setSelected] = useState<string | null>(draft.cardId ?? cards.find((c) => c.isDefault)?.id ?? cards[0]?.id ?? null);
   const [adding, setAdding] = useState(cards.length === 0);
   const quote = draft.quote;
+  // Double appui : un seul écran de traitement (donc un seul transfert créé).
+  const going = useRef(false);
+  useFocusEffect(
+    useCallback(() => {
+      going.current = false;
+    }, []),
+  );
 
   if (!draft.recipient || !quote) return <Redirect href="/(tabs)" />;
 
   function pay(cardId: string) {
+    if (going.current) return;
+    going.current = true;
     setDraft({ cardId });
     router.push("/send/processing");
   }
@@ -36,15 +45,16 @@ export default function Pay() {
       }
     >
       <Header title="Paiement par carte" />
-      <Card style={{ marginBottom: 16, flexDirection: "row", flexWrap: "wrap", justifyContent: "space-between", alignItems: "center", gap: 10 }}>
-        <View style={{ flexGrow: 1, flexShrink: 1, minWidth: 140 }}>
-          <Small>TOTAL À PAYER</Small>
-          <Text style={{ fontFamily: fonts.display, fontSize: 26, color: colors.navy }} numberOfLines={1} adjustsFontSizeToFit minimumFontScale={0.7}>
-            {money(quote.total, quote.sendCurrency)}
-          </Text>
-        </View>
-        <View style={{ flexShrink: 1, alignItems: "flex-end", maxWidth: "100%" }}>
-          <Small numberOfLines={1}>{draft.recipient.fullName} reçoit</Small>
+      <Card style={{ marginBottom: 16 }}>
+        <Small>TOTAL À PAYER</Small>
+        <Text style={{ fontFamily: fonts.display, fontSize: 26, color: colors.navy }} numberOfLines={1} adjustsFontSizeToFit minimumFontScale={0.7}>
+          {money(quote.total, quote.sendCurrency)}
+        </Text>
+        {/* Bénéficiaire sur sa propre ligne : à côté du total, le bloc passait en dessous, mal aligné (360 px). */}
+        <View style={{ flexDirection: "row", alignItems: "center", gap: 10, marginTop: 10, paddingTop: 10, borderTopWidth: 1, borderTopColor: colors.line }}>
+          <Small numberOfLines={1} style={{ flex: 1 }}>
+            {draft.recipient.fullName} reçoit
+          </Small>
           <Text style={{ fontFamily: fonts.heading, color: colors.brand }} numberOfLines={1}>
             {money(quote.receiveAmount, quote.receiveCurrency)}
           </Text>

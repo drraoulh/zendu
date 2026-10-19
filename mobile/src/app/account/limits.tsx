@@ -3,7 +3,7 @@ import { View } from "react-native";
 import { Flag } from "@/components/flag";
 import { SectionTitle } from "@/components/form";
 import { Button, Card, Header, Notice, Screen, Small, SummaryRow } from "@/components/ui";
-import { COUNTRY_CODES, useCorridors } from "@/lib/corridors";
+import { COUNTRY_CODES, payMethodsOf, useCorridors } from "@/lib/corridors";
 import { countryName, money } from "@/lib/format";
 import { useSession } from "@/lib/session";
 
@@ -16,7 +16,9 @@ export default function Limits() {
   const corridors = useCorridors();
   const kyc = profile?.kyc ?? "none";
   const home = profile?.country;
-  const sources = [...COUNTRY_CODES].sort((a, b) => (a === home ? -1 : b === home ? 1 : 0));
+  // Pays de départ ouverts d'abord (Canada en mode réel), puis ceux qui arrivent bientôt.
+  const isOpen = (source: string) => corridors.some((c) => c.source === source && payMethodsOf(c).length > 0);
+  const sources = [...COUNTRY_CODES].sort((a, b) => Number(isOpen(b)) - Number(isOpen(a)) || (a === home ? -1 : b === home ? 1 : 0));
 
   return (
     <Screen>
@@ -44,7 +46,9 @@ export default function Limits() {
                 <Flag code={source} size={18} />
                 <Small>Vers {list.map((x) => withArticle(x.destination)).join(" ou ")}</Small>
               </View>
-              {list.every((x) => x.minSend === c.minSend && x.maxSend === c.maxSend) ? (
+              {!isOpen(source) ? (
+                <Small style={{ marginTop: 4 }}>Bientôt disponible. Pour l&apos;instant, les envois partent du Canada (virement Interac).</Small>
+              ) : list.every((x) => x.minSend === c.minSend && x.maxSend === c.maxSend) ? (
                 <>
                   <SummaryRow label="Minimum par envoi" value={money(c.minSend, c.sendCurrency)} />
                   <SummaryRow label="Maximum par envoi" value={money(c.maxSend, c.sendCurrency)} strong />

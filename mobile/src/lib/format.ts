@@ -10,6 +10,21 @@ export function money(amount: number, currency: string) {
   return `${grouped}${dec ? `,${dec}` : ""} ${label}`;
 }
 
+/** Unité affichée d'une devise (« FCFA » pour le franc CFA, comme sur les montants). */
+export function unit(currency: string) {
+  return currency === "XAF" ? "FCFA" : currency;
+}
+
+/** « 1 CAD = 403,85 FCFA » : même unité que les montants affichés à côté. */
+export function rateLine(value: number, from: string, to: string) {
+  return `1 ${unit(from)} = ${rate(value)} ${unit(to)}`;
+}
+
+/** Date et heure en toutes lettres pour une phrase : « 20/10/2026 à 12:06 ». */
+export function dateAt(iso: string) {
+  return dateTime(iso).replace(" · ", " à ");
+}
+
 export function rate(value: number) {
   if (!Number.isFinite(value)) return "—";
   if (value >= 100) return value.toFixed(2).replace(".", ",");

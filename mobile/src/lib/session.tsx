@@ -60,7 +60,7 @@ type SessionValue = {
   /** Étape 2 : code vérifié par le serveur → session active. restart = défi expiré, revenir à la connexion. */
   completeSignIn: (code: string) => Promise<({ ok: true; mustChangePassword: boolean } | { ok: false; error: string; restart?: boolean })>;
   /** Nouveau code, éventuellement sur l'autre canal (SMS / courriel). */
-  resendCode: (channel?: "sms" | "email") => Promise<Result & { demoCode?: string }>;
+  resendCode: (channel?: "sms" | "email") => Promise<Result & { demoCode?: string; channel?: "sms" | "email"; resendAfter?: number }>;
   cancelSignIn: () => void;
   signOut: () => Promise<void>;
   deleteAccount: (password: string) => Promise<Result>;
@@ -229,7 +229,7 @@ export function SessionProvider({ children }: { children: ReactNode }) {
         try {
           const challenge = await api.resend2fa(pending.challenge.challengeId, channel);
           setPending({ ...pending, challenge });
-          return { ok: true, demoCode: challenge.demoCode };
+          return { ok: true, demoCode: challenge.demoCode, channel: challenge.channel, resendAfter: challenge.resendAfter };
         } catch (e) {
           return { ok: false, error: message(e) };
         }

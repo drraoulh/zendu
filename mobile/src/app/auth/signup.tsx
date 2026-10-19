@@ -1,8 +1,8 @@
 import { Link, router } from "expo-router";
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { Text, View } from "react-native";
 import { Flag } from "@/components/flag";
-import { Checkbox, OtpInput, PasswordChecklist, SelectField } from "@/components/form";
+import { Checkbox, PasswordChecklist, SelectField } from "@/components/form";
 import { Button, Field, H1, Header, Notice, P, Screen, Small, Steps } from "@/components/ui";
 import { COUNTRIES, COUNTRY_CODES, type CountryCode } from "@/lib/corridors";
 import { ageFrom, maskDate, OCCUPATIONS, parseBirthDate, POSTAL_LABEL, REGION_LABEL, REGIONS } from "@/lib/geo";
@@ -11,7 +11,11 @@ import { passwordScore, useSession } from "@/lib/session";
 import { colors, fonts } from "@/lib/theme";
 
 const EMAIL = /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/;
-const TITLES = ["Coordonnées", "Vérification du téléphone", "Informations personnelles", "Adresse", "Sécurité"];
+// Pas d'étape « code par SMS » : aucun envoi réel de SMS à l'inscription (la connexion, elle, est
+// protégée par un code envoyé par courriel). Étapes 5 à 7 : vérification d'identité (écran /kyc).
+const TITLES = ["Coordonnées", "Informations personnelles", "Adresse", "Sécurité"];
+const LAST = TITLES.length;
+const SIGNUP_TOTAL_STEPS = LAST + 3;
 
 export default function SignUp() {
   const { signUp } = useSession();
@@ -20,8 +24,6 @@ export default function SignUp() {
   const [region, setRegion] = useState("");
   const [email, setEmail] = useState("");
   const [phone, setPhone] = useState("");
-  const [code, setCode] = useState("");
-  const [countdown, setCountdown] = useState(45);
   const [firstName, setFirstName] = useState("");
   const [lastName, setLastName] = useState("");
   const [birth, setBirth] = useState("");
@@ -38,12 +40,6 @@ export default function SignUp() {
   const [busy, setBusy] = useState(false);
   const c = COUNTRIES[country];
 
-  useEffect(() => {
-    if (step !== 2 || countdown <= 0) return;
-    const t = setTimeout(() => setCountdown((n) => n - 1), 1000);
-    return () => clearTimeout(t);
-  }, [step, countdown]);
-
   function validate(): Record<string, string> {
     const e: Record<string, string> = {};
     if (step === 1) {
@@ -51,8 +47,7 @@ export default function SignUp() {
       if (!EMAIL.test(email.trim())) e.email = "Adresse courriel invalide";
       if (phone.replace(/\D/g, "").length < 8) e.phone = "Numéro de téléphone invalide";
     }
-    if (step === 2 && code.length < 4) e.code = "Saisissez les 4 chiffres reçus";
-    if (step === 3) {
+    if (step === 2) {
       if (firstName.trim().length < 2) e.firstName = "Prénom requis";
       if (lastName.trim().length < 2) e.lastName = "Nom requis";
       const d = parseBirthDate(birth);
@@ -61,13 +56,13 @@ export default function SignUp() {
       else if (ageFrom(d) > 120) e.birth = "Date invalide";
       if (!occupation) e.occupation = "Choisissez une occupation";
     }
-    if (step === 4) {
+    if (step === 3) {
       if (line1.trim().length < 4) e.line1 = "Adresse requise";
       if (city.trim().length < 2) e.city = "Ville requise";
       if (country === "CA" && !/^[A-Za-z]\d[A-Za-z]\s?\d[A-Za-z]\d$/.test(postal.trim())) e.postal = "Code postal invalide (A1A 1A1)";
       if (country === "CN" && postal && !/^\d{6}$/.test(postal.trim())) e.postal = "Code postal à 6 chiffres";
     }
-    if (step === 5) {
+    if (step === 4) {
       if (passwordScore(password) < 4) e.password = "Le mot de passe ne respecte pas toutes les règles";
       if (!accepted) e.accepted = "Vous devez accepter les conditions";
     }
@@ -78,19 +73,13 @@ export default function SignUp() {
     const e = validate();
     setErrors(e);
     if (Object.keys(e).length) return;
-    if (step < 5) {
-      if (step === 1) {
-        setCode("");
-        setCountdown(45);
-      }
-      return setStep(step + 1);
-    }
+    if (step < LAST) return setStep(step + 1);
     setBusy(true);
     const r = await signUp(
       {
         firstName: firstName.trim(),
         lastName: lastName.trim(),
-        email,
+        email: email.trim().toLowerCase(),
         phone: `+${c.dialCode} ${phone.trim()}`,
         country,
         region,
@@ -113,12 +102,14 @@ export default function SignUp() {
     else router.replace("/welcome");
   }
 
-  const cta = step === 2 ? "Vérifier" : step === 5 ? "Créer mon compte" : "Continuer";
+  const cta = step === LAST ? "Créer mon compte" : "Continuer";
 
   return (
     <Screen
       footer={
         <View style={{ gap: 10 }}>
+          {/* Erreur du serveur (ex. courriel déjà utilisé) au-dessus du bouton : visible sans défiler. */}
+          {errors.submit ? <Notice tone="danger" icon="alert" text={errors.submit} /> : null}
           <Button title={cta} onPress={next} loading={busy} />
           {step === 1 ? (
             <Text style={{ textAlign: "center", color: colors.muted, fontSize: 14 }}>
@@ -132,7 +123,7 @@ export default function SignUp() {
       }
     >
       <Header title="Créer un compte" onBack={back} />
-      <Steps current={step} total={8} label={TITLES[step - 1]} />
+      <Steps current={step} total={SIGNUP_TOTAL_STEPS} label={TITLES[step - 1]} />
 
       {step === 1 ? (
         <>
@@ -173,7 +164,7 @@ export default function SignUp() {
             autoComplete="tel"
             placeholder={c.phonePlaceholder}
             error={errors.phone}
-            hint="Nous vous enverrons un code par texto pour confirmer ce numéro."
+            hint="Pour vous joindre au sujet de vos transferts."
             left={
               <View style={{ flexDirection: "row", alignItems: "center", gap: 6 }}>
                 <Flag code={country} size={20} />
@@ -185,30 +176,6 @@ export default function SignUp() {
       ) : null}
 
       {step === 2 ? (
-        <>
-          <H1>Entrez le code reçu</H1>
-          <P style={{ marginTop: 6 }}>
-            Code envoyé au +{c.dialCode} •••• {phone.replace(/\D/g, "").slice(-2)}. Il expire dans 10 minutes.
-          </P>
-          <OtpInput length={4} value={code} onChange={setCode} />
-          {errors.code ? <Text style={{ color: colors.danger, textAlign: "center", marginBottom: 8 }}>{errors.code}</Text> : null}
-          <View style={{ alignItems: "center", gap: 10, marginBottom: 16 }}>
-            {countdown > 0 ? (
-              <Small>Renvoyer le code dans 0:{String(countdown).padStart(2, "0")}</Small>
-            ) : (
-              <Button title="Renvoyer le code" variant="ghost" size="sm" onPress={() => setCountdown(45)} />
-            )}
-            <Button title="Modifier le numéro" variant="ghost" size="sm" onPress={() => setStep(1)} />
-          </View>
-          <Notice
-            tone="neutral"
-            icon="info"
-            text="Version de démonstration : aucun SMS n'est envoyé, saisissez 4 chiffres au choix. Vous ne recevez rien en production ? Vérifiez que le numéro peut recevoir des textos."
-          />
-        </>
-      ) : null}
-
-      {step === 3 ? (
         <>
           <H1>Qui êtes-vous ?</H1>
           <P style={{ marginTop: 6, marginBottom: 18 }}>Indiquez vos nom et prénom tels qu&apos;ils figurent sur votre pièce d&apos;identité.</P>
@@ -234,7 +201,7 @@ export default function SignUp() {
         </>
       ) : null}
 
-      {step === 4 ? (
+      {step === 3 ? (
         <>
           <H1>Où habitez-vous ?</H1>
           <P style={{ marginTop: 6, marginBottom: 18 }}>Votre adresse résidentielle actuelle (pas de case postale).</P>
@@ -260,7 +227,7 @@ export default function SignUp() {
         </>
       ) : null}
 
-      {step === 5 ? (
+      {step === 4 ? (
         <>
           <H1>Choisissez un mot de passe</H1>
           <P style={{ marginTop: 6, marginBottom: 18 }}>Il protège votre argent : évitez de réutiliser celui d&apos;un autre service.</P>
@@ -291,7 +258,6 @@ export default function SignUp() {
           <Checkbox checked={marketing} onChange={setMarketing}>
             <Small style={{ color: colors.ink }}>Recevoir les offres et nouveautés par courriel (facultatif)</Small>
           </Checkbox>
-          {errors.submit ? <Notice tone="danger" icon="alert" text={errors.submit} /> : null}
         </>
       ) : null}
     </Screen>

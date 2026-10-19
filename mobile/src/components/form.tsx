@@ -114,31 +114,40 @@ export function Chips<T extends string>({
   value,
   onChange,
   multiple = false,
+  scroll = false,
+  inset = 0,
 }: {
   options: { value: T; label: string; icon?: IconName }[];
   value: T | T[];
   onChange: (v: T) => void;
   multiple?: boolean;
+  /** Une seule ligne qui défile horizontalement (filtres) au lieu de passer à la ligne. */
+  scroll?: boolean;
+  /** Avec scroll : marge latérale de l'écran, pour que la ligne défile jusqu'au bord sans être coupée net. */
+  inset?: number;
 }) {
   const selected = (v: T) => (Array.isArray(value) ? value.includes(v) : value === v);
-  return (
-    <View style={{ flexDirection: "row", flexWrap: "wrap", gap: 8, marginBottom: 14 }}>
-      {options.map((o) => {
-        const on = selected(o.value);
-        return (
-          <Pressable
-            key={o.value}
-            accessibilityRole={multiple ? "checkbox" : "radio"}
-            accessibilityState={multiple ? { checked: on } : { selected: on }}
-            onPress={() => onChange(o.value)}
-            style={[f.chip, on && { backgroundColor: colors.brand, borderColor: colors.brand }]}
-          >
-            {o.icon ? <Icon name={o.icon} size={16} color={on ? colors.white : colors.muted} /> : null}
-            <Text style={[f.chipText, on && { color: colors.white }]}>{o.label}</Text>
-          </Pressable>
-        );
-      })}
-    </View>
+  const items = options.map((o) => {
+    const on = selected(o.value);
+    return (
+      <Pressable
+        key={o.value}
+        accessibilityRole={multiple ? "checkbox" : "radio"}
+        accessibilityState={multiple ? { checked: on } : { selected: on }}
+        onPress={() => onChange(o.value)}
+        style={[f.chip, on && { backgroundColor: colors.brand, borderColor: colors.brand }]}
+      >
+        {o.icon ? <Icon name={o.icon} size={16} color={on ? colors.white : colors.muted} /> : null}
+        <Text style={[f.chipText, on && { color: colors.white }]}>{o.label}</Text>
+      </Pressable>
+    );
+  });
+  return scroll ? (
+    <ScrollView horizontal showsHorizontalScrollIndicator={false} style={{ marginBottom: 14, flexGrow: 0, marginHorizontal: -inset }} contentContainerStyle={{ gap: 8, paddingHorizontal: inset }}>
+      {items}
+    </ScrollView>
+  ) : (
+    <View style={{ flexDirection: "row", flexWrap: "wrap", gap: 8, marginBottom: 14 }}>{items}</View>
   );
 }
 

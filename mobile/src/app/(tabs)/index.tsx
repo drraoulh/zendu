@@ -7,8 +7,9 @@ import { Avatar } from "@/components/form";
 import { Icon } from "@/components/icons";
 import { Simulator } from "@/components/simulator";
 import { TransferRow } from "@/components/transfer-row";
-import { Card, Screen, Small } from "@/components/ui";
+import { Card, Notice, Screen, Small } from "@/components/ui";
 import { defaultCorridorFor, findCorridor, payMethodsOf, SAMPLE_AMOUNT, useCorridors } from "@/lib/corridors";
+import { countryName } from "@/lib/format";
 import { corridorFor } from "@/lib/recipients";
 import { useSession } from "@/lib/session";
 import { useStore, type Recipient } from "@/lib/store";
@@ -50,16 +51,16 @@ export default function Home() {
     }, [draft.recipient, draft.recipientFromHome, setDraft]),
   );
 
+  // Pays d'envoi sans moyen de paiement ouvert (mode réel : seul le Canada, par Interac).
+  const corridor = findCorridor(corridors, draft.corridorId);
+  const closed = payMethodsOf(corridor).length === 0;
+  // Nom du pays en français (le serveur renvoie « Cameroon », « China »).
+  const closedText = `L'envoi depuis ${countryName(corridor.source)} arrive bientôt. Pour l'instant, les envois partent du Canada, par virement Interac.`;
+
   function startSend() {
     if (todo) return router.push("/kyc");
     if (kyc === "pending") return;
-    const corridor = findCorridor(corridors, draft.corridorId);
-    if (payMethodsOf(corridor).length === 0) {
-      return Alert.alert(
-        "Bientôt disponible",
-        `L'envoi depuis ${corridor.sourceName} arrive bientôt. Pour l'instant, les envois partent du Canada (paiement par virement Interac).`,
-      );
-    }
+    if (closed) return Alert.alert("Bientôt disponible", closedText);
     router.push(selected ? "/send/review" : "/send/recipient");
   }
 
@@ -111,8 +112,14 @@ export default function Home() {
         amount={draft.sendAmount}
         onChange={(n) => setDraft(selected && !n.corridorId.endsWith(`-${selected.country}`) ? { ...n, recipient: null } : n)}
         onContinue={kyc === "pending" ? undefined : startSend}
-        ctaLabel={todo ? "Vérifier mon identité" : selected ? `Envoyer à ${selected.fullName.split(" ")[0]}` : "Envoyer"}
+        ctaLabel={todo ? "Vérifier mon identité" : closed ? "Bientôt disponible" : selected ? `Envoyer à ${selected.fullName.split(" ")[0]}` : "Envoyer"}
       />
+      {/* Alert.alert ne s'affiche pas sur le web : le message reste visible sous le simulateur. */}
+      {closed && !todo ? (
+        <View style={{ marginTop: 12 }}>
+          <Notice tone="warn" icon="clock" title="Bientôt disponible" text={closedText} />
+        </View>
+      ) : null}
 
       <Text style={st.section}>Envoyer à nouveau</Text>
       <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={st.people}>

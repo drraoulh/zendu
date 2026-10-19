@@ -34,15 +34,25 @@ export default function Parcels() {
     void storage.get<string[]>(KEY_RECENT).then((l) => setRecent(l ?? []));
   }, []);
 
+  // Lien direct avec un numéro (…/parcels?number=PWS-…) : suivi lancé tout de suite.
+  const linked = params.number;
+  useEffect(() => {
+    if (linked) void search(linked);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [linked]);
+
   async function search(value = number) {
     setError(null);
-    if (!value.trim()) return setError("Saisissez votre numéro de suivi (PWS-…)");
-    setNumber(value);
+    const clean = value.trim().toUpperCase();
+    if (!clean) return setError("Saisissez votre numéro de suivi (PWS-…)");
+    setNumber(clean);
     setBusy(true);
     try {
-      const found = (await api.trackShipment(value.trim())).shipment;
+      const found = (await api.trackShipment(clean)).shipment;
       setShipment(found);
-      const next = [found.number, ...recent.filter((n) => n !== found.number)].slice(0, 5);
+      // Liste relue sur l'appareil : la recherche peut partir avant le chargement des numéros récents.
+      const saved = (await storage.get<string[]>(KEY_RECENT)) ?? [];
+      const next = [found.number, ...saved.filter((n) => n !== found.number)].slice(0, 5);
       setRecent(next);
       void storage.set(KEY_RECENT, next);
     } catch (e) {
@@ -60,7 +70,16 @@ export default function Parcels() {
     <Screen edges={["top"]}>
       <H1 style={{ marginTop: 8 }}>Suivi de colis</H1>
       <P style={{ marginTop: 6, marginBottom: 18 }}>Saisissez le numéro de suivi indiqué sur votre reçu d&apos;expédition PWFINTECH.</P>
-      <Field label="Numéro de suivi" value={number} onChangeText={setNumber} placeholder="PWS-12345" autoCapitalize="characters" onSubmitEditing={() => search()} />
+      <Field
+        label="Numéro de suivi"
+        value={number}
+        onChangeText={setNumber}
+        placeholder="PWS-12345"
+        autoCapitalize="characters"
+        autoCorrect={false}
+        returnKeyType="search"
+        onSubmitEditing={() => search()}
+      />
       <Button title="Suivre" icon="ship" onPress={() => search()} loading={busy} />
       {error ? (
         <View style={{ marginTop: 12 }}>
@@ -91,17 +110,19 @@ export default function Parcels() {
       {shipment && st ? (
         <>
           <Card style={{ marginTop: 16, marginBottom: 12 }}>
-            <View style={{ flexDirection: "row", justifyContent: "space-between", alignItems: "center" }}>
-              <View>
+            <View style={{ flexDirection: "row", justifyContent: "space-between", alignItems: "center", gap: 10 }}>
+              <View style={{ flexShrink: 1 }}>
                 <Small>N° DE SUIVI</Small>
-                <Text style={{ fontFamily: fonts.display, fontSize: 20, color: colors.navy }}>{shipment.number}</Text>
+                <Text style={{ fontFamily: fonts.display, fontSize: 20, color: colors.navy }} numberOfLines={1} adjustsFontSizeToFit>
+                  {shipment.number}
+                </Text>
               </View>
               <Badge label={st.label} tone={st.tone} />
             </View>
             <View style={{ flexDirection: "row", alignItems: "center", gap: 10, marginTop: 14 }}>
-              <Text style={{ fontFamily: fonts.heading, color: colors.ink, flex: 1 }} numberOfLines={1}>{shipment.origin}</Text>
+              <Text style={{ fontFamily: fonts.heading, color: colors.ink, flex: 1 }} numberOfLines={2}>{shipment.origin}</Text>
               <Icon name={shipment.mode === "sea" ? "ship" : "send"} color={colors.brand} />
-              <Text style={{ fontFamily: fonts.heading, color: colors.ink, flex: 1, textAlign: "right" }} numberOfLines={1}>{shipment.destination}</Text>
+              <Text style={{ fontFamily: fonts.heading, color: colors.ink, flex: 1, textAlign: "right" }} numberOfLines={2}>{shipment.destination}</Text>
             </View>
             <Small style={{ marginTop: 6 }}>
               {shipment.mode === "sea" ? "Maritime" : "Aérien"}

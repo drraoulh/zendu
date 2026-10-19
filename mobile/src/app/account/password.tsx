@@ -11,20 +11,24 @@ export default function ChangePassword() {
   const [confirm, setConfirm] = useState("");
   const [error, setError] = useState<string | null>(null);
   const [done, setDone] = useState(false);
+  const [busy, setBusy] = useState(false);
 
   async function save() {
     setError(null);
+    if (!current) return setError("Saisissez votre mot de passe actuel.");
     if (passwordScore(next) < 4) return setError("Le nouveau mot de passe ne respecte pas toutes les règles.");
     if (next !== confirm) return setError("La confirmation ne correspond pas.");
     if (next === current) return setError("Choisissez un mot de passe différent de l'actuel.");
+    setBusy(true);
     const r = await changePassword(current, next);
+    setBusy(false);
     if (!r.ok) return setError(r.error);
     setDone(true);
     setTimeout(() => router.back(), 1200);
   }
 
   return (
-    <Screen footer={<Button title="Mettre à jour le mot de passe" onPress={save} disabled={done} />}>
+    <Screen footer={<Button title="Mettre à jour le mot de passe" onPress={save} loading={busy} disabled={done} />}>
       <Header title="Changer le mot de passe" />
       <P style={{ marginBottom: 18 }}>Choisissez un mot de passe que vous n&apos;utilisez sur aucun autre site.</P>
       <Field label="Mot de passe actuel" value={current} onChangeText={setCurrent} secureTextEntry autoComplete="current-password" />

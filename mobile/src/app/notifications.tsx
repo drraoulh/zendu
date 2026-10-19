@@ -1,15 +1,15 @@
 import { router, type Href } from "expo-router";
-import { Text, View } from "react-native";
+import { ActivityIndicator, Text, View } from "react-native";
 import { SectionTitle } from "@/components/form";
 import { Icon } from "@/components/icons";
-import { Button, Card, Empty, Header, ListItem, Screen, Small } from "@/components/ui";
+import { Button, Card, Empty, Header, ListItem, Notice, Screen, Small } from "@/components/ui";
 import { dateTime } from "@/lib/format";
 import { dayGroup } from "@/lib/notifications";
 import { colors, fonts } from "@/lib/theme";
 import { useNotifications } from "@/lib/use-notifications";
 
 export default function Notifications() {
-  const { list, unread, isRead, markAllRead, markRead } = useNotifications();
+  const { list, unread, isRead, markAllRead, markRead, loading, failed, reload } = useNotifications();
   const groups = list.reduce<Record<string, typeof list>>((acc, n) => {
     const g = dayGroup(n.at);
     (acc[g] ??= []).push(n);
@@ -26,7 +26,16 @@ export default function Notifications() {
         </Text>
         {unread.length ? <Button title="Tout marquer comme lu" variant="ghost" size="sm" onPress={markAllRead} /> : null}
       </View>
-      {list.length ? (
+      {failed ? (
+        <View style={{ marginVertical: 10, gap: 8 }}>
+          <Notice tone="warn" icon="alert" text="Impossible de charger vos transferts pour le moment. Vérifiez votre connexion." />
+          <Button title="Réessayer" variant="secondary" size="sm" onPress={() => void reload()} />
+        </View>
+      ) : null}
+      {/* Premier chargement : pas de « Aucune notification » trompeur pendant la requête. */}
+      {loading && !list.length ? (
+        <ActivityIndicator color={colors.brand} style={{ marginTop: 30 }} />
+      ) : list.length ? (
         Object.entries(groups).map(([g, items]) => (
           <View key={g}>
             <SectionTitle>{g}</SectionTitle>
@@ -49,10 +58,10 @@ export default function Notifications() {
             </Card>
           </View>
         ))
-      ) : (
+      ) : failed ? null : (
         <Empty icon="bell" title="Aucune notification" text="Vous serez prévenu ici à chaque étape de vos transferts." />
       )}
-      <Small style={{ textAlign: "center", marginTop: 16 }}>Les notifications push seront activées avec la version publiée sur les stores.</Small>
+      <Small style={{ textAlign: "center", marginTop: 16 }}>Les notifications push arriveront avec la version publiée sur les stores. En attendant, vous êtes prévenu par courriel.</Small>
     </Screen>
   );
 }

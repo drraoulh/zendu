@@ -74,7 +74,8 @@ export default function History() {
   return (
     <SafeAreaView edges={["top"]} style={{ flex: 1, backgroundColor: colors.bg }}>
       <ScrollView
-        contentContainerStyle={{ padding: 20, paddingTop: 16 }}
+        // Tablette : colonne centrée de 640 px, comme les autres écrans (voir Screen).
+        contentContainerStyle={{ padding: 20, paddingTop: 16, width: "100%", maxWidth: 640, alignSelf: "center" }}
         keyboardShouldPersistTaps="handled"
         refreshControl={<RefreshControl refreshing={loading && count > 0} onRefresh={reload} tintColor={colors.brand} />}
       >
@@ -85,7 +86,7 @@ export default function History() {
         {items.length ? (
           <>
             <Field label="Rechercher" placeholder="Nom ou référence" value={q} onChangeText={setQ} autoCapitalize="none" />
-            <Chips options={FILTERS} value={filter} onChange={setFilter} />
+            <Chips options={FILTERS} value={filter} onChange={setFilter} scroll inset={20} />
           </>
         ) : null}
         {failed ? (

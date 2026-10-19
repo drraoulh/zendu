@@ -1,3 +1,4 @@
+import Constants from "expo-constants";
 import { router, type Href } from "expo-router";
 import { useState } from "react";
 import { Text, View } from "react-native";
@@ -5,6 +6,7 @@ import { PoweredBy } from "@/components/brand";
 import { Avatar, ConfirmDialog, SectionTitle } from "@/components/form";
 import { Icon } from "@/components/icons";
 import { Badge, Card, ListItem, Screen, Small } from "@/components/ui";
+import { payMethodsOf, useCorridors } from "@/lib/corridors";
 import { referralCode, useSession } from "@/lib/session";
 import { useStore } from "@/lib/store";
 import { dateTime } from "@/lib/format";
@@ -16,6 +18,7 @@ export default function Profile() {
   const { profile, settings, signOut } = useSession();
   const { cards, recipients } = useStore();
   const [confirm, setConfirm] = useState(false);
+  const cardsOpen = useCorridors().some((c) => payMethodsOf(c).includes("card"));
   if (!profile) return null;
   const kyc = profile.kyc;
   const card = cards.find((c) => c.isDefault) ?? cards[0];
@@ -52,7 +55,7 @@ export default function Profile() {
       <SectionTitle>Compte</SectionTitle>
       <Card style={{ paddingVertical: 4 }}>
         <ListItem icon="id" tone="neutral" title="Informations personnelles" onPress={go("/account/info")} />
-        <ListItem icon="wallet" tone="neutral" title="Moyens de paiement" subtitle={card ? `•••• ${card.last4}` : "Aucune carte"} onPress={go("/account/payment-methods")} />
+        <ListItem icon="wallet" tone="neutral" title="Moyens de paiement" subtitle={`Virement Interac${cardsOpen && card ? ` · carte •••• ${card.last4}` : ""}`} onPress={go("/account/payment-methods")} />
         <ListItem icon="ship" tone="neutral" title="Suivre un colis" onPress={go("/(tabs)/parcels")} />
         <ListItem icon="user" tone="neutral" title="Mes destinataires" subtitle={`${recipients.length} enregistré${recipients.length > 1 ? "s" : ""}`} onPress={go("/recipients")} />
         <ListItem
@@ -89,7 +92,7 @@ export default function Profile() {
       </Card>
 
       <View style={{ alignItems: "center", marginTop: 20, gap: 4 }}>
-        <Small>WorldSoft Transfer 1.0.0</Small>
+        <Small>WorldSoft Transfer {Constants.expoConfig?.version ?? "1.0.0"}</Small>
         <PoweredBy />
       </View>
 

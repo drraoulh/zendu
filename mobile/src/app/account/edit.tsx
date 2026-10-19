@@ -59,7 +59,7 @@ export default function EditInfo() {
       }
     >
       <Header title="Modifier mes informations" />
-      <Field label="Courriel" value={email} onChangeText={setEmail} keyboardType="email-address" autoCapitalize="none" error={errors.email} />
+      <Field label="Courriel" value={email} onChangeText={setEmail} keyboardType="email-address" autoCapitalize="none" autoComplete="email" hint="Vos codes de connexion sont envoyés à cette adresse." error={errors.email} />
       <Field label="Téléphone" value={phone} onChangeText={setPhone} keyboardType="phone-pad" error={errors.phone} />
       <Field label="Adresse" value={line1} onChangeText={setLine1} error={errors.line1} />
       <Field label="Appartement, bureau (facultatif)" value={line2} onChangeText={setLine2} />

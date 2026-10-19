@@ -68,7 +68,6 @@ export default function Success() {
             <Button title="Voir le reçu" variant="secondary" size="sm" style={{ flex: 1 }} onPress={() => router.push({ pathname: "/receipt/[id]", params: { id: t.id, card: card ?? "" } })} />
             <Button
               title={`Prévenir ${first}`}
-              icon="send"
               variant="secondary"
               size="sm"
               style={{ flex: 1 }}

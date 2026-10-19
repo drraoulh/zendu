@@ -44,7 +44,12 @@ export default function Devices() {
         </View>
       ) : null}
       {!list ? (
-        <ActivityIndicator color={colors.brand} style={{ marginTop: 30 }} />
+        // Échec du premier chargement : bouton « Réessayer » au lieu d'un chargement sans fin.
+        error ? (
+          <Button title="Réessayer" variant="secondary" onPress={load} />
+        ) : (
+          <ActivityIndicator color={colors.brand} style={{ marginTop: 30 }} />
+        )
       ) : (
         <Card style={{ paddingVertical: 4, marginBottom: 14 }}>
           {list.map((s) => (

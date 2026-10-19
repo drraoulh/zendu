@@ -52,22 +52,37 @@ export default function Security() {
   // La vérification en deux étapes est imposée par le serveur à chaque connexion : seul le verrouillage
   // de l'appli (PIN ou biométrie) reste au choix de l'utilisateur.
   const strong = settings.biometric || settings.pin;
+  // Sur le web, l'appli ne se verrouille pas (ni PIN ni biométrie) : on ne propose pas un réglage sans effet.
+  const web = Platform.OS === "web";
 
   return (
     <Screen>
       <Header title="Sécurité" />
       <Notice
-        tone={strong ? "success" : "warn"}
+        tone={strong || web ? "success" : "warn"}
         icon="shield"
-        title={strong ? "Votre compte est bien protégé" : "Renforcez la protection de votre compte"}
-        text={strong ? "Vérification en deux étapes et verrouillage de l'appli activés." : "La vérification en deux étapes est active. Ajoutez un verrouillage de l'appli (PIN ou biométrie)."}
+        title={strong || web ? "Votre compte est bien protégé" : "Renforcez la protection de votre compte"}
+        text={
+          strong
+            ? "Vérification en deux étapes et verrouillage de l'appli activés."
+            : web
+              ? "La vérification en deux étapes est active : un code vous est demandé à chaque connexion."
+              : "La vérification en deux étapes est active. Ajoutez un verrouillage de l'appli (PIN ou biométrie)."
+        }
       />
 
       <SectionTitle>Connexion</SectionTitle>
       <Card style={{ paddingVertical: 4 }}>
         <ListItem icon="lock" tone="neutral" title="Changer le mot de passe" subtitle={since(profile?.passwordChangedAt ?? profile?.createdAt)} onPress={() => router.push("/account/password")} />
-        <ListItem icon="shield" tone="success" title="Vérification en deux étapes" subtitle="Toujours active : un code à chaque connexion" />
-        <ToggleRow icon="face" label="Face ID / empreinte" sub="Pour ouvrir l'appli et vous connecter" value={settings.biometric} onChange={toggleBiometric} />
+        <ListItem icon="shield" tone="success" title="Vérification en deux étapes" subtitle="Toujours active : un code par courriel à chaque connexion" />
+        <ToggleRow
+          icon="face"
+          label="Face ID / empreinte"
+          sub={web ? "Disponible dans l'appli sur téléphone" : "Pour déverrouiller l'appli à l'ouverture"}
+          value={settings.biometric && !web}
+          onChange={toggleBiometric}
+          disabled={web}
+        />
       </Card>
       {message ? <Small style={{ marginTop: 8 }}>{message}</Small> : null}
 
@@ -77,8 +92,9 @@ export default function Security() {
         <ToggleRow
           icon="lock"
           label="Code PIN de l'appli"
-          sub={settings.pin ? "Activé · 6 chiffres" : "Désactivé"}
-          value={settings.pin}
+          sub={web ? "Disponible dans l'appli sur téléphone" : settings.pin ? "Activé · 6 chiffres" : "Désactivé"}
+          value={settings.pin && !web}
+          disabled={web}
           onChange={(v) => (v ? router.push("/account/pin") : void setPin(null))}
         />
       </Card>
@@ -87,20 +103,26 @@ export default function Security() {
       {confirmDelete ? (
         <Card>
           <Small style={{ marginBottom: 12, color: colors.ink }}>
-            Vos informations, cartes et destinataires seront effacés. Cette action est définitive. Confirmez avec votre mot de passe.
+            Votre compte, vos informations, cartes et destinataires seront effacés. Cette action est définitive. Confirmez avec votre mot de passe.
           </Small>
           <Field label="Mot de passe" value={password} onChangeText={setPassword} secureTextEntry autoComplete="current-password" error={deleteError} />
           <View style={{ gap: 8 }}>
             <Button title="Supprimer définitivement" variant="danger" onPress={remove} loading={deleting} disabled={!password} />
-            <Button title="Annuler" variant="secondary" onPress={() => setConfirmDelete(false)} />
+            <Button
+              title="Annuler"
+              variant="secondary"
+              onPress={() => {
+                setConfirmDelete(false);
+                setPassword("");
+                setDeleteError(null);
+              }}
+            />
           </View>
         </Card>
       ) : (
         <Button title="Supprimer mon compte" variant="danger" onPress={() => setConfirmDelete(true)} />
       )}
-      <Small style={{ marginTop: 8 }}>La suppression est définitive. Vos reçus restent disponibles par courriel.</Small>
-
-
+      <Small style={{ marginTop: 8 }}>La suppression est définitive. Les transferts déjà effectués restent archivés par PWFINTECH, sans lien avec votre compte.</Small>
     </Screen>
   );
 }

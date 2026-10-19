@@ -1,14 +1,14 @@
 import * as Clipboard from "expo-clipboard";
 import { router, useLocalSearchParams } from "expo-router";
 import { useCallback, useEffect, useRef, useState } from "react";
-import { ActivityIndicator, Pressable, StyleSheet, Text, View } from "react-native";
+import { ActivityIndicator, Pressable, StyleSheet, Text, View, useWindowDimensions } from "react-native";
 import { WstWordmark } from "@/components/brand";
 import { Flag } from "@/components/flag";
 import { Icon } from "@/components/icons";
 import { Badge, Button, Card, Divider, Header, IconButton, Notice, Screen, Small, SummaryRow } from "@/components/ui";
 import { api, type Transfer } from "@/lib/api";
 import { findCorridor, useCorridors } from "@/lib/corridors";
-import { countryName, dateTime, deliveryEstimate, etaLabel, eventTitle, feeLabel, money, networkLabel, phone, rate, statusInfo, TERMINAL_STATUSES } from "@/lib/format";
+import { countryName, dateAt, dateTime, deliveryEstimate, etaLabel, eventTitle, feeLabel, money, networkLabel, phone, rateLine, statusInfo, TERMINAL_STATUSES } from "@/lib/format";
 import { colors, fonts } from "@/lib/theme";
 import { useResend } from "@/lib/use-resend";
 import { PaymentLogo } from "@/components/payment-logo";
@@ -83,6 +83,7 @@ export default function TransferScreen() {
   const corridors = useCorridors();
   const { resend, canResend } = useResend();
   const statusRef = useRef<string | null>(null);
+  const narrow = useWindowDimensions().width < 400;
 
   const load = useCallback(async () => {
     try {
@@ -162,10 +163,14 @@ export default function TransferScreen() {
   const stopped = failed ? info.step : terminal && transfer.status !== "delivered" ? Math.min(reached + 1, STEPS.length - 1) : -1;
   const doneUpTo = stopped >= 0 ? stopped - 1 : info.step;
   const pending = terminal ? -1 : info.step + 1;
+  // Le client a touché « J'ai envoyé le virement » : on attend la confirmation de réception.
+  const declared = events.some((e) => e.type === "interac_declared");
   const pendingHint = (i: number) =>
     i === 1
       ? transfer.interac
-        ? "En attente de votre virement Interac"
+        ? declared
+          ? "Virement signalé · réception en cours de vérification"
+          : "En attente de votre virement Interac"
         : "En attente de votre paiement"
       : i === 2
         ? "Préparation du versement…"
@@ -247,7 +252,8 @@ export default function TransferScreen() {
           {failed ? <Button title="Contacter le support" icon="mail" onPress={help} /> : null}
           {canResend ? (
             <Button
-              title={`Renvoyer ${money(transfer.sendAmountCad, transfer.sendCurrency)} à ${first}`}
+              // Petit écran : sans le montant, le libellé passait sur deux lignes.
+              title={narrow ? `Renvoyer à ${first}` : `Renvoyer ${money(transfer.sendAmountCad, transfer.sendCurrency)} à ${first}`}
               icon="refresh"
               variant={failed ? "secondary" : "primary"}
               onPress={() => resend(transfer)}
@@ -268,15 +274,25 @@ export default function TransferScreen() {
         <View style={{ gap: 10, marginBottom: 14 }}>
           {transfer.interac ? (
             <>
-              <Notice
-                tone="warn"
-                icon="clock"
-                text={`En attente de votre virement Interac de ${money(transfer.interac.amount, transfer.interac.currency)}, à envoyer avant le ${dateTime(transfer.interac.expiresAt)}. Le versement part dès sa réception ; cet écran se met à jour automatiquement.`}
-              />
+              {declared ? (
+                <Notice
+                  tone="brand"
+                  icon="clock"
+                  title="Virement signalé"
+                  text={`Merci ! Nous vérifions la réception de votre virement Interac de ${money(transfer.interac.amount, transfer.interac.currency)}. Le versement part dès qu'elle est confirmée ; cet écran se met à jour automatiquement.`}
+                />
+              ) : (
+                <Notice
+                  tone="warn"
+                  icon="clock"
+                  text={`En attente de votre virement Interac de ${money(transfer.interac.amount, transfer.interac.currency)}, à envoyer avant le ${dateAt(transfer.interac.expiresAt)}. Le versement part dès sa réception ; cet écran se met à jour automatiquement.`}
+                />
+              )}
               <Button
-                title="Voir les instructions du virement"
+                title="Instructions du virement"
                 icon="bank"
-                onPress={() => router.push({ pathname: "/send/interac", params: { id: transfer.id } })}
+                variant={declared ? "secondary" : "primary"}
+                onPress={() => router.push({ pathname: "/send/interac", params: { id: transfer.id, from: "transfer" } })}
               />
             </>
           ) : mock ? (
@@ -303,7 +319,7 @@ export default function TransferScreen() {
         <SummaryRow label="Envoyé" value={money(transfer.sendAmountCad, transfer.sendCurrency)} />
         <SummaryRow label="Frais" value={feeLabel(transfer.feeCad, transfer.sendCurrency)} />
         <SummaryRow label="Total payé" value={money(transfer.totalCad, transfer.sendCurrency)} strong />
-        <SummaryRow label="Taux" value={`1 ${transfer.sendCurrency} = ${rate(transfer.rate)} ${transfer.receiveCurrency}`} />
+        <SummaryRow label="Taux" value={rateLine(transfer.rate, transfer.sendCurrency, transfer.receiveCurrency)} />
         <SummaryRow label="Reçu" value={money(transfer.receiveAmountXaf, transfer.receiveCurrency)} highlight />
         <Divider />
         <SummaryRow label="Bénéficiaire" value={transfer.beneficiary.fullName} />

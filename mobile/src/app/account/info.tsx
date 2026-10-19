@@ -18,7 +18,7 @@ export default function Info() {
         title={verified ? "Identité vérifiée" : profile.kyc === "pending" ? "Vérification en cours" : profile.kyc === "rejected" ? "Vérification refusée" : "Identité à vérifier"}
         text={
           verified
-            ? `Vérification KYC complétée${profile.kycDocument ? ` · ${profile.kycDocument.toLowerCase()}` : ""}`
+            ? profile.kycDocument ? `Pièce vérifiée : ${profile.kycDocument.toLowerCase()}` : "Votre pièce d'identité a été vérifiée."
             : profile.kyc === "pending"
               ? "Nous vérifions vos documents, généralement en quelques minutes."
               : "Nécessaire avant votre premier transfert."
@@ -31,7 +31,7 @@ export default function Info() {
         <SummaryRow label="Téléphone" value={phone(profile.phone) || profile.phone} />
         <SummaryRow
           label="Adresse"
-          value={a ? [a.line1, a.line2, `${a.city} (${a.region})`, a.postalCode, countryName(profile.country)].filter(Boolean).join(", ") : countryName(profile.country)}
+          value={a ? [a.line1, a.line2, a.region ? `${a.city} (${a.region})` : a.city, a.postalCode, countryName(profile.country)].filter(Boolean).join(", ") : countryName(profile.country)}
         />
         <SummaryRow label="Profession" value={[profile.occupation, profile.jobTitle].filter(Boolean).join(" · ") || "—"} />
       </Card>

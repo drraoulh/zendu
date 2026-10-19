@@ -12,13 +12,14 @@ import { colors, fonts } from "@/lib/theme";
 const SLIDES: { icon: IconName; title: string; text: string }[] = [
   {
     icon: "send",
-    title: "Envoyez de l'argent entre le Canada, le Cameroun et la Chine",
-    text: "Six trajets ouverts, dans les deux sens : Mobile Money (MTN, Orange), virement bancaire, Interac, Alipay ou WeChat Pay.",
+    // Mode réel : les envois partent du Canada (virement Interac) ; ne pas annoncer d'autres départs.
+    title: "Envoyez de l'argent du Canada vers le Cameroun et la Chine",
+    text: "Payez par virement Interac. Votre proche reçoit sur Mobile Money (MTN, Orange), Alipay, WeChat Pay ou son compte bancaire.",
   },
   {
     icon: "eye",
     title: "Des frais clairs, un suivi en temps réel",
-    text: "Vous voyez le taux, les frais et le total avant de payer, puis chaque étape jusqu'à la livraison.",
+    text: "Aucun frais vers le Cameroun, un petit frais fixe vers la Chine. Le taux et le montant reçu sont affichés avant de payer, puis chaque étape jusqu'à la réception.",
   },
   {
     icon: "ship",
@@ -71,30 +72,33 @@ export default function Welcome() {
       </View>
 
       <View style={st.sheet}>
-        {short ? null : (
-          <View style={st.iconWrap}>
-            <Icon name={slide.icon} color={colors.brand} size={24} />
-          </View>
-        )}
-        <Text style={[st.title, compact && { fontSize: 21, lineHeight: 26 }]} accessibilityRole="header">{slide.title}</Text>
-        <Text style={st.text}>{slide.text}</Text>
+        {/* Tablette : contenu centré sur 640 px au lieu de boutons étirés sur toute la largeur. */}
+        <View style={st.sheetInner}>
+          {short ? null : (
+            <View style={st.iconWrap}>
+              <Icon name={slide.icon} color={colors.brand} size={24} />
+            </View>
+          )}
+          <Text style={[st.title, compact && { fontSize: 21, lineHeight: 26 }]} accessibilityRole="header">{slide.title}</Text>
+          <Text style={st.text}>{slide.text}</Text>
 
-        <View style={[st.dots, compact && { marginVertical: 14 }]} accessibilityLabel={`Écran ${index + 1} sur ${SLIDES.length}`}>
-          {SLIDES.map((_, i) => (
-            <View key={i} style={[st.dot, i === index && st.dotOn]} />
-          ))}
-        </View>
-
-        {last ? (
-          <View style={{ gap: 10 }}>
-            <Button title="Créer un compte" onPress={() => go("/auth/signup")} />
-            <Button title="J'ai déjà un compte" variant="secondary" onPress={() => go("/auth/login")} />
+          <View style={[st.dots, compact && { marginVertical: 14 }]} accessibilityLabel={`Écran ${index + 1} sur ${SLIDES.length}`}>
+            {SLIDES.map((_, i) => (
+              <View key={i} style={[st.dot, i === index && st.dotOn]} />
+            ))}
           </View>
-        ) : (
-          <Button title="Suivant" onPress={() => setIndex(index + 1)} />
-        )}
-        <View style={{ alignItems: "center", marginTop: compact ? 10 : 16 }}>
-          <PoweredBy />
+
+          {last ? (
+            <View style={{ gap: 10 }}>
+              <Button title="Créer un compte" onPress={() => go("/auth/signup")} />
+              <Button title="J'ai déjà un compte" variant="secondary" onPress={() => go("/auth/login")} />
+            </View>
+          ) : (
+            <Button title="Suivant" onPress={() => setIndex(index + 1)} />
+          )}
+          <View style={{ alignItems: "center", marginTop: compact ? 10 : 16 }}>
+            <PoweredBy />
+          </View>
         </View>
       </View>
     </SafeAreaView>
@@ -109,6 +113,7 @@ const st = StyleSheet.create({
   flags: { flexDirection: "row", gap: 10 },
   flagPill: { padding: 6, borderRadius: 12, backgroundColor: "rgba(255,255,255,0.1)" },
   sheet: { backgroundColor: colors.white, borderTopLeftRadius: 32, borderTopRightRadius: 32, padding: 24, paddingBottom: 20 },
+  sheetInner: { width: "100%", maxWidth: 640, alignSelf: "center" },
   iconWrap: { width: 48, height: 48, borderRadius: 16, backgroundColor: colors.brandSoft, alignItems: "center", justifyContent: "center", marginBottom: 14 },
   title: { fontFamily: fonts.display, fontSize: 24, lineHeight: 30, color: colors.navy, letterSpacing: -0.4 },
   text: { fontSize: 15, lineHeight: 22, color: colors.muted, marginTop: 8 },

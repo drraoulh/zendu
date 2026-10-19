@@ -37,7 +37,7 @@ export default function Reset() {
           router.replace("/auth/login");
         }}
       />
-      <H1>Nouveau mot de passe</H1>
+      <H1>Choisissez un nouveau mot de passe</H1>
       <P style={{ marginTop: 6, marginBottom: 18 }}>
         Vous vous êtes connecté avec un mot de passe temporaire. Choisissez un mot de passe que vous n&apos;utilisez pas ailleurs.
       </P>

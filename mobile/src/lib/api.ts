@@ -234,8 +234,9 @@ async function request<T>(path: string, init?: RequestInit & { token?: string | 
 
 export const api = {
   signup: (input: SignupInput) => request<{ token: string; customer: Customer }>("/api/auth/signup", { method: "POST", body: JSON.stringify(input) }),
+  // Code de connexion par courriel d'abord (Brevo) ; le SMS reste au choix sur l'écran de vérification.
   login: (email: string, password: string, device?: string) =>
-    request<LoginChallenge>("/api/auth/login", { method: "POST", body: JSON.stringify({ email, password, device }), token: null }),
+    request<LoginChallenge>("/api/auth/login", { method: "POST", body: JSON.stringify({ email, password, device, channel: "email" }), token: null }),
   verify2fa: (challengeId: string, code: string) =>
     request<{ token: string; customer: Customer }>("/api/auth/verify-2fa", { method: "POST", body: JSON.stringify({ challengeId, code }), token: null }),
   resend2fa: (challengeId: string, channel?: "sms" | "email") =>

@@ -10,7 +10,7 @@ import { useSession } from "@/lib/session";
 import { colors, fonts, radius } from "@/lib/theme";
 
 /**
- * Vérification d'identité (étapes 6 à 8 de l'inscription) puis « Compte créé ».
+ * Vérification d'identité (étapes 5 à 7 de l'inscription, qui en compte 7) puis « Compte créé ».
  * Démo : la capture est simulée. En production, brancher le SDK du prestataire KYC à cet endroit.
  */
 export default function Kyc() {
@@ -58,7 +58,7 @@ export default function Kyc() {
         }
       >
         <Header title="Vérification d'identité" back={false} />
-        <Steps current={6} total={8} label="Pièce d'identité" />
+        <Steps current={5} total={7} label="Pièce d'identité" />
         <H1>Vérifions votre identité</H1>
         <P style={{ marginTop: 6, marginBottom: 18 }}>Exigée par la réglementation sur les transferts d&apos;argent. Cela prend environ 2 minutes.</P>
         {profile?.kyc === "rejected" ? (
@@ -90,7 +90,7 @@ export default function Kyc() {
     return (
       <Screen footer={<Button title="Continuer" onPress={() => setStep(8)} disabled={!ready} />}>
         <Header title="Photo de la pièce" onBack={() => setStep(6)} />
-        <Steps current={7} total={8} label="Photo de la pièce" />
+        <Steps current={6} total={7} label="Photo de la pièce" />
         <H1>{doc.label}</H1>
         <P style={{ marginTop: 6, marginBottom: 18 }}>Placez la pièce dans le cadre, posée sur une surface sombre.</P>
         <Capture label={doc.twoSided ? "Recto" : "Page photo"} done={front} onPress={() => setFront(true)} />
@@ -109,7 +109,7 @@ export default function Kyc() {
     return (
       <Screen footer={<Button title="Envoyer pour vérification" onPress={submit} disabled={!selfie} loading={busy} />}>
         <Header title="Vérification du visage" onBack={() => setStep(7)} />
-        <Steps current={8} total={8} label="Selfie" />
+        <Steps current={7} total={7} label="Selfie" />
         <H1>Prenez un selfie</H1>
         <P style={{ marginTop: 6 }}>Nous comparons votre visage à la photo de votre pièce d&apos;identité.</P>
         <View style={st.selfie}>
@@ -154,15 +154,15 @@ export default function Kyc() {
           tone={verified ? "success" : "warn"}
           icon={verified ? "shield" : "clock"}
           title={verified ? "Identité vérifiée" : "Identité en cours de vérification"}
-          text={verified ? "Vous pouvez envoyer de l'argent dès maintenant." : "Généralement quelques minutes. Nous vous avertirons par notification et courriel."}
+          text={verified ? "Vous pouvez envoyer de l'argent dès maintenant." : "Généralement quelques minutes. Vous serez prévenu dans l'appli dès qu'elle sera terminée."}
         />
       </View>
       <Small style={{ fontFamily: fonts.heading, letterSpacing: 0.8, marginTop: 20, marginBottom: 8 }}>ENSUITE, VOUS POURREZ</Small>
       <Card style={{ paddingVertical: 6 }}>
-        <ListItem icon="send" title="Envoyer de l'argent" subtitle="Mobile Money, virement bancaire, retrait" />
+        <ListItem icon="send" title="Envoyer de l'argent" subtitle="Mobile Money, virement bancaire, Interac, Alipay, WeChat Pay" />
         <ListItem icon="user" title="Enregistrer vos destinataires" subtitle="Vos proches, en un geste" />
         <ListItem icon="history" title="Suivre chaque transfert" subtitle="Étapes en temps réel et reçus" />
-        <ListItem icon="ship" title="Suivre vos colis" subtitle="Avec votre numéro de suivi PWS-…" />
+        <ListItem icon="ship" title="Suivre vos colis" subtitle="Avec le numéro indiqué sur votre reçu d'expédition" />
       </Card>
       {bioMessage ? (
         <View style={{ marginTop: 12 }}>
@@ -186,7 +186,7 @@ function Capture({ label, done, onPress, disabled = false }: { label: string; do
   return (
     <View style={[st.capture, done && { borderColor: colors.success, backgroundColor: colors.successSoft, borderStyle: "solid" }, disabled && { opacity: 0.5 }]}>
       <Icon name={done ? "check" : "id"} color={done ? colors.success : colors.brand} size={30} />
-      <Text style={st.captureLabel}>{done ? `${label} · capturé` : label}</Text>
+      <Text style={st.captureLabel}>{done ? `${label} · photo prise` : label}</Text>
       <Button title={done ? "Reprendre" : "Prendre la photo"} icon="camera" size="sm" variant={done ? "secondary" : "primary"} onPress={onPress} disabled={disabled} />
     </View>
   );

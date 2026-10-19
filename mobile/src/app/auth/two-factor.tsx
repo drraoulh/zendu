@@ -18,6 +18,8 @@ export default function TwoFactor() {
   const [error, setError] = useState<string | null>(null);
   const [busy, setBusy] = useState(false);
   const [restart, setRestart] = useState(false);
+  const [info, setInfo] = useState<string | null>(null);
+  const [sending, setSending] = useState(false);
   const done = useRef(false);
 
   const demoCode = pending?.demoCode;
@@ -49,14 +51,20 @@ export default function TwoFactor() {
     router.replace(r.mustChangePassword ? "/auth/reset" : "/");
   }
 
-  async function resend(channel?: "sms" | "email") {
+  async function resend(wanted?: "sms" | "email") {
     setError(null);
+    setInfo(null);
     setCode("");
-    const r = await resendCode(channel);
+    setSending(true);
+    const r = await resendCode(wanted);
+    setSending(false);
     if (!r.ok) return setError(r.error);
     // Mode démo : le nouveau code est prérempli aussi.
     if (r.demoCode) setCode(r.demoCode);
-    setCountdown(pending?.resendAfter ?? 30);
+    // Le serveur bascule sur le courriel si le SMS n'est pas disponible : on le dit au lieu de laisser croire à un SMS.
+    if (wanted && r.channel && r.channel !== wanted) setInfo(wanted === "sms" ? "L'envoi par SMS n'est pas disponible : un nouveau code vous a été envoyé par courriel." : "Un nouveau code vous a été envoyé par SMS.");
+    else setInfo("Nouveau code envoyé.");
+    setCountdown(r.resendAfter ?? 30);
   }
 
   function backToLogin() {
@@ -64,7 +72,7 @@ export default function TwoFactor() {
     router.replace("/auth/login");
   }
 
-  const channel = pending?.channel ?? "sms";
+  const channel = pending?.channel ?? "email";
 
   return (
     <Screen
@@ -83,7 +91,7 @@ export default function TwoFactor() {
         <Text style={{ color: colors.ink }}>{pending?.destination ?? ""}</Text>.
       </P>
       <OtpInput value={code} onChange={setCode} />
-      {error ? <Text style={{ color: colors.danger, textAlign: "center", marginBottom: 8 }}>{error}</Text> : null}
+      {error ? <Text style={{ color: colors.danger, textAlign: "center", marginBottom: 8 }}>{error}</Text> : info ? <Small style={{ color: colors.success, textAlign: "center", marginBottom: 8 }}>{info}</Small> : null}
       {!restart ? (
         <>
           <Small style={{ textAlign: "center", marginBottom: 8 }}>Le code expire dans 10 minutes · 5 essais au maximum.</Small>
@@ -91,13 +99,13 @@ export default function TwoFactor() {
             {countdown > 0 ? (
               <Small>Renvoyer le code dans 0:{String(countdown).padStart(2, "0")}</Small>
             ) : (
-              <Button title="Renvoyer le code" variant="ghost" size="sm" onPress={() => void resend()} />
+              <Button title="Renvoyer le code" variant="ghost" size="sm" loading={sending} onPress={() => void resend()} />
             )}
             <Button
               title={channel === "sms" ? "Recevoir par courriel" : "Recevoir par SMS"}
               variant="ghost"
               size="sm"
-              disabled={countdown > 0}
+              disabled={countdown > 0 || sending}
               onPress={() => void resend(channel === "sms" ? "email" : "sms")}
             />
           </View>

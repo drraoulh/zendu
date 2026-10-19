@@ -6,7 +6,7 @@ import { Icon } from "@/components/icons";
 import { RecipientNotice, recipientMessage } from "@/components/recipient-notice";
 import { Button, Header, Notice, Screen, Small } from "@/components/ui";
 import { api, type Transfer } from "@/lib/api";
-import { countryName, dateTime, feeLabel, money, networkLabel, phone, rate, statusInfo } from "@/lib/format";
+import { countryName, dateTime, feeLabel, money, networkLabel, phone, rateLine, statusInfo } from "@/lib/format";
 import { openSite } from "@/lib/links";
 import { shareViewAsImage } from "@/lib/share-image";
 import { colors, fonts, radius } from "@/lib/theme";
@@ -53,8 +53,9 @@ export default function Receipt() {
   const first = ben.fullName.split(" ")[0];
   const deliveredAt = t.events?.find((e) => e.type === "delivered")?.createdAt;
   // Moyen de paiement : celui choisi pendant l'envoi (carte précise) ou, à défaut, celui du transfert.
-  const paidWith = params.card ?? ({ interac_manual: "Virement Interac", interac: "Virement Interac", stripe: "Carte de débit" } as Record<string, string>)[t.payInProvider];
-  const benLine = [networkLabel(ben.network), ben.accountMasked ?? (ben.phone ? phone(ben.phone) : null)].filter(Boolean).join(" · ");
+  const paidWith = params.card || ({ interac_manual: "Virement Interac", interac: "Virement Interac", stripe: "Carte de débit" } as Record<string, string>)[t.payInProvider];
+  // Espaces insécables : le numéro ne se coupe pas en fin de ligne (« +237 670 000 / 000 »).
+  const benLine = [networkLabel(ben.network), ben.accountMasked ?? (ben.phone ? phone(ben.phone).replace(/ /g, "\u00a0") : null)].filter(Boolean).join(" · ");
 
   function receiptText() {
     if (!t) return "";
@@ -68,7 +69,7 @@ export default function Receipt() {
       `Montant envoyé : ${money(t.sendAmountCad, t.sendCurrency)}`,
       `Frais : ${feeLabel(t.feeCad, t.sendCurrency)}`,
       `Total payé : ${money(t.totalCad, t.sendCurrency)}`,
-      `Taux : 1 ${t.sendCurrency} = ${rate(t.rate)} ${t.receiveCurrency}`,
+      `Taux : ${rateLine(t.rate, t.sendCurrency, t.receiveCurrency)}`,
       `Montant reçu : ${money(t.receiveAmountXaf, t.receiveCurrency)}`,
       ...(paidWith ? [`Payé avec : ${paidWith}`] : []),
       ...(deliveredAt ? [`Livré le : ${dateTime(deliveredAt)}`] : []),
@@ -151,7 +152,7 @@ export default function Receipt() {
             <View style={r.sep} />
             <Line label="Montant envoyé" value={money(t.sendAmountCad, t.sendCurrency)} />
             <Line label="Frais" value={feeLabel(t.feeCad, t.sendCurrency)} />
-            <Line label="Taux de change" value={`1 ${t.sendCurrency} = ${rate(t.rate)} ${t.receiveCurrency}`} />
+            <Line label="Taux de change" value={rateLine(t.rate, t.sendCurrency, t.receiveCurrency)} />
             <Line label="Total payé" value={money(t.totalCad, t.sendCurrency)} strong />
             <View style={r.sep} />
             <Line label="Référence" value={t.reference} strong />

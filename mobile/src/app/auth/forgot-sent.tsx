@@ -22,7 +22,7 @@ export default function ForgotSent() {
         </View>
         <H1 style={{ textAlign: "center" }}>Vérifiez votre boîte de réception</H1>
         <P style={{ textAlign: "center" }}>
-          Si un compte existe pour <Text style={{ color: colors.ink }}>{email}</Text>, notre équipe vous envoie un mot de passe temporaire par courriel.
+          Si un compte existe {email ? <>pour <Text style={{ color: colors.ink }}>{email}</Text></> : "pour cette adresse"}, notre équipe vous envoie un mot de passe temporaire par courriel.
         </P>
       </View>
       <View style={{ marginTop: 16 }}>

@@ -6,7 +6,7 @@ import { Icon } from "@/components/icons";
 import { PaymentLogo } from "@/components/payment-logo";
 import { Button, Card, Header, Notice, Screen, Small } from "@/components/ui";
 import { api, type Transfer } from "@/lib/api";
-import { dateTime, money } from "@/lib/format";
+import { dateAt, money } from "@/lib/format";
 import { colors, fonts, radius } from "@/lib/theme";
 
 const POLL_MS = 6000;
@@ -17,7 +17,8 @@ const POLL_MS = 6000;
  * passe à la confirmation dès que l'équipe a validé la réception.
  */
 export default function InteracPayment() {
-  const { id } = useLocalSearchParams<{ id: string }>();
+  // from=transfer : ouvert depuis le suivi, le retour y revient.
+  const { id, from } = useLocalSearchParams<{ id: string; from?: string }>();
   const [transfer, setTransfer] = useState<Transfer | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [copied, setCopied] = useState<string | null>(null);
@@ -88,7 +89,7 @@ export default function InteracPayment() {
     }
   }
 
-  const leave = () => router.dismissTo("/(tabs)");
+  const leave = () => (from === "transfer" && router.canGoBack() ? router.back() : router.dismissTo("/(tabs)"));
   const info = transfer?.interac;
 
   if (!transfer || !info) {
@@ -104,12 +105,14 @@ export default function InteracPayment() {
   }
 
   const amount = money(info.amount, info.currency);
+  // Déjà signalé (retour depuis le suivi) : le bouton ramène au suivi sans redemander.
+  const declared = transfer.events?.some((e) => e.type === "interac_declared") ?? false;
 
   return (
     <Screen
       footer={
         <View style={{ gap: 8 }}>
-          <Button title="J'ai envoyé le virement" icon="check" onPress={declare} loading={busy === "declare"} disabled={busy !== null} />
+          <Button title={declared ? "Voir le suivi" : "J'ai envoyé le virement"} icon="check" onPress={declared && from === "transfer" ? leave : declare} loading={busy === "declare"} disabled={busy !== null} />
           {info.simulate ? (
             <Button title="Simuler la réception (démo)" variant="ghost" size="sm" onPress={simulate} loading={busy === "simulate"} disabled={busy !== null} />
           ) : null}
@@ -131,11 +134,11 @@ export default function InteracPayment() {
 
       <Text style={s.section}>Dans l&apos;appli de votre banque</Text>
       <Card style={{ paddingVertical: 4, marginBottom: 14 }}>
-        <Step n={1} title="Ouvrez « Virement Interac » (Interac e-Transfer)" />
+        <Step n={1} title={"Ouvrez «\u00a0Virement Interac\u00a0»"} hint={"Appelé «\u00a0Interac e-Transfer\u00a0» dans les applis en anglais."} />
         <Step
           n={2}
           title="Destinataire"
-          value={info.email ?? "Adresse de dépôt PWFINTECH à compléter"}
+          value={info.email ?? (info.simulate ? "Non requise en démonstration" : "Adresse indisponible : contactez le support")}
           muted={!info.email}
           copied={copied === "email"}
           onCopy={info.email ? () => copy("email", info.email!) : undefined}
@@ -155,11 +158,11 @@ export default function InteracPayment() {
       <Notice
         tone="neutral"
         icon="clock"
-        text={`À envoyer avant le ${dateTime(info.expiresAt)}. Dès que votre virement est reçu, l'argent part vers ${transfer.beneficiary.fullName.split(" ")[0]} et vous êtes notifié.`}
+        text={`À envoyer avant le ${dateAt(info.expiresAt)}. Dès que votre virement est reçu, l'argent part vers ${transfer.beneficiary.fullName.split(" ")[0]} et vous êtes notifié.`}
       />
       {info.simulate ? (
         <View style={{ marginTop: 10 }}>
-          <Notice tone="warn" icon="info" text="Mode démonstration : aucun virement réel n'est attendu. Utilisez « Simuler la réception »." />
+          <Notice tone="warn" icon="info" text={"Mode démonstration : aucun virement réel n'est attendu. Touchez «\u00a0Simuler la réception\u00a0»."} />
         </View>
       ) : null}
       {error ? (
@@ -198,7 +201,7 @@ function Step({
       <View style={{ flex: 1, minWidth: 0 }}>
         <Text style={s.stepTitle}>{title}</Text>
         {value ? (
-          <Text style={[s.value, muted && { color: colors.muted, fontFamily: fonts.semibold }]} selectable>
+          <Text style={[s.value, muted && { color: colors.muted, fontFamily: fonts.semibold, fontSize: 14 }]} selectable>
             {value}
           </Text>
         ) : null}
