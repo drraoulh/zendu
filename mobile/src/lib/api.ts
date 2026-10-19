@@ -136,6 +136,8 @@ export type Customer = {
   marketing?: boolean;
   kyc: "none" | "pending" | "verified" | "rejected";
   kycDocument?: string | null;
+  /** "didit" quand l'identité est vérifiée par Didit. */
+  kycProvider?: string | null;
   kycNote?: string | null;
   kycVerifiedAt?: string | null;
   mustChangePassword: boolean;
@@ -248,6 +250,10 @@ export const api = {
   deleteMe: (password: string) => request<{ ok: true }>("/api/me", { method: "DELETE", body: JSON.stringify({ password }) }),
   changePassword: (current: string, next: string, token?: string) =>
     request<{ customer: Customer }>("/api/me/password", { method: "POST", body: JSON.stringify({ current, next }), ...(token ? { token } : {}) }),
+  /** Vérification Didit : ouvre une session (pièce + selfie) et renvoie la page à ouvrir. */
+  startDidit: () => request<{ url: string; customer: Customer }>("/api/me/kyc/didit", { method: "POST" }),
+  /** Relit la décision Didit ; `available` = Didit branché sur le serveur. */
+  kycStatus: () => request<{ customer: Customer; available?: boolean }>("/api/me/kyc/didit"),
   submitKyc: (document: string) => request<{ customer: Customer }>("/api/me/kyc", { method: "POST", body: JSON.stringify({ document }) }),
   myTransfers: () => request<Transfer[]>("/api/me/transfers"),
   sessions: () => request<DeviceSession[]>("/api/me/sessions"),

@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 import { publicCustomer, requireCustomer } from "@/lib/customer-auth";
 import { prisma } from "@/lib/prisma";
+import { diditConfigured } from "@/lib/didit";
 
 export const dynamic = "force-dynamic";
 
@@ -13,6 +14,10 @@ export async function POST(request: Request) {
   const authed = await requireCustomer(request);
   if (authed instanceof NextResponse) return authed;
   if (authed.customer.kycStatus === "verified") return NextResponse.json({ customer: publicCustomer(authed.customer) });
+  // Didit branché : la déclaration sans photo n'est plus acceptée (POST /api/me/kyc/didit).
+  if (diditConfigured()) {
+    return NextResponse.json({ ok: false, code: "use_didit", error: "Faites la vérification en ligne (pièce d'identité + selfie)." }, { status: 409 });
+  }
   const body = (await request.json().catch(() => ({}))) as { document?: unknown };
   const document = typeof body.document === "string" ? body.document.trim().slice(0, 80) : "";
   if (!document) return NextResponse.json({ ok: false, error: "Type de pièce requis" }, { status: 400 });

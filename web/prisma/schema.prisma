@@ -192,6 +192,9 @@ model Customer {
   kycReviewedAt      DateTime?
   /// Motif de refus ou note KYC visible par le client.
   kycNote            String?
+  /// Prestataire de vérification ("didit") et identifiant de la dernière session chez lui.
+  kycProvider        String?
+  kycSessionId       String?
   status             String            @default("active")
   marketing          Boolean           @default(false)
   /// Note interne de l'équipe (jamais exposée au client).
@@ -204,6 +207,7 @@ model Customer {
   updatedAt          DateTime          @updatedAt
 
   @@index([kycStatus])
+  @@index([kycSessionId])
   @@index([status])
   @@index([createdAt])
 }

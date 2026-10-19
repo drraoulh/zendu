@@ -67,6 +67,10 @@ type SessionValue = {
   refresh: () => Promise<void>;
   update: (patch: Partial<Profile>) => Promise<Result>;
   submitKyc: (document: string) => Promise<Result>;
+  /** Vérification Didit : URL de la page à ouvrir, ou erreur (code "didit_unavailable" si non branché). */
+  startDidit: () => Promise<{ ok: true; url: string } | { ok: false; error: string; code?: string }>;
+  /** Relit le statut d'identité ; `available` = vérification Didit branchée. */
+  refreshKyc: () => Promise<{ available: boolean }>;
   updateSettings: (patch: Partial<Settings>) => Promise<void>;
   changePassword: (current: string, next: string) => Promise<Result>;
   /** Mot de passe temporaire donné par l'équipe : à remplacer juste après la connexion. */
@@ -260,6 +264,24 @@ export function SessionProvider({ children }: { children: ReactNode }) {
           return { ok: true };
         } catch (e) {
           return { ok: false, error: message(e) };
+        }
+      },
+      startDidit: async () => {
+        try {
+          const r = await api.startDidit();
+          await saveProfile(r.customer);
+          return { ok: true, url: r.url };
+        } catch (e) {
+          return { ok: false, error: message(e), code: e instanceof ApiError ? e.code : undefined };
+        }
+      },
+      refreshKyc: async () => {
+        try {
+          const r = await api.kycStatus();
+          await saveProfile(r.customer);
+          return { available: r.available === true };
+        } catch {
+          return { available: false };
         }
       },
       submitKyc: async (document) => {

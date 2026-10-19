@@ -1,4 +1,5 @@
 import { NextResponse } from "next/server";
+import { diditConfigured, syncDiditDecision } from "@/lib/didit";
 import { z } from "zod";
 import { publicCustomer, requireCustomer, verifyPassword } from "@/lib/customer-auth";
 import { profileErrorMessage, profilePatchSchema } from "@/lib/customer-input";
@@ -11,7 +12,12 @@ export const dynamic = "force-dynamic";
 export async function GET(request: Request) {
   const authed = await requireCustomer(request);
   if (authed instanceof NextResponse) return authed;
-  return NextResponse.json({ customer: publicCustomer(authed.customer) });
+  let customer = authed.customer;
+  // Vérification Didit en cours : l'appli interroge /api/me toutes les 15 s, on relit la décision.
+  if (customer.kycStatus === "pending" && customer.kycProvider === "didit" && diditConfigured()) {
+    customer = await syncDiditDecision(customer).catch(() => customer);
+  }
+  return NextResponse.json({ customer: publicCustomer(customer) });
 }
 
 /** PATCH /api/me — coordonnées, adresse, occupation. Nom légal et naissance : figés une fois l'identité vérifiée. */

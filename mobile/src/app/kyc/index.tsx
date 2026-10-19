@@ -1,5 +1,6 @@
 import { router } from "expo-router";
-import { useState } from "react";
+import * as WebBrowser from "expo-web-browser";
+import { useEffect, useState } from "react";
 import { Platform, StyleSheet, Text, View } from "react-native";
 import { Icon, type IconName } from "@/components/icons";
 import { Button, Card, Choice, H1, Header, ListItem, Notice, P, Screen, Small, Steps } from "@/components/ui";
@@ -11,10 +12,13 @@ import { colors, fonts, radius } from "@/lib/theme";
 
 /**
  * Vérification d'identité (étapes 5 à 7 de l'inscription, qui en compte 7) puis « Compte créé ».
- * Démo : la capture est simulée. En production, brancher le SDK du prestataire KYC à cet endroit.
+ * Didit branché sur le serveur : pièce d'identité + selfie sur la page sécurisée de Didit, décision
+ * automatique (l'appli relit le statut au retour puis toutes les 15 s). Sinon (démo) : capture simulée.
  */
 export default function Kyc() {
-  const { profile, submitKyc, updateSettings } = useSession();
+  const { profile, submitKyc, updateSettings, startDidit, refreshKyc } = useSession();
+  // null = on ne sait pas encore si la vérification Didit est branchée.
+  const [didit, setDidit] = useState<boolean | null>(null);
   const country = (profile?.country ?? "CA") as CountryCode;
   const docs = KYC_DOCUMENTS[country] ?? KYC_DOCUMENTS.CA;
   const [step, setStep] = useState(profile?.kyc === "none" || profile?.kyc === "rejected" ? 6 : 9);
@@ -26,6 +30,34 @@ export default function Kyc() {
   const [selfie, setSelfie] = useState(false);
   const [bioMessage, setBioMessage] = useState<string | null>(null);
   const doc = docs.find((d) => d.id === docId) ?? docs[0];
+
+  useEffect(() => {
+    let alive = true;
+    void refreshKyc().then((r) => alive && setDidit(r.available));
+    return () => {
+      alive = false;
+    };
+  }, [refreshKyc]);
+
+  async function verifyWithDidit() {
+    setBusy(true);
+    setError(null);
+    const r = await startDidit();
+    if (!r.ok) {
+      setBusy(false);
+      // Didit pas (ou plus) branché : parcours de démonstration.
+      if (r.code === "didit_unavailable") {
+        setDidit(false);
+        return setStep(7);
+      }
+      return setError(r.error);
+    }
+    // Page Didit (pièce + selfie) ; à la fermeture, on relit la décision.
+    await WebBrowser.openBrowserAsync(r.url).catch(() => undefined);
+    await refreshKyc();
+    setBusy(false);
+    setStep(9);
+  }
 
   async function submit() {
     setBusy(true);
@@ -46,6 +78,50 @@ export default function Kyc() {
   }
 
   const exit = () => router.dismissTo("/(tabs)");
+
+  if (step === 6 && didit) {
+    return (
+      <Screen
+        footer={
+          <View style={{ gap: 6 }}>
+            <Button title="Commencer la vérification" icon="camera" onPress={verifyWithDidit} loading={busy} />
+            <Button title="Plus tard" variant="ghost" onPress={exit} disabled={busy} />
+          </View>
+        }
+      >
+        <Header title="Vérification d'identité" back={false} />
+        <Steps current={5} total={7} label="Pièce d'identité" />
+        <H1>Vérifions votre identité</H1>
+        <P style={{ marginTop: 6, marginBottom: 18 }}>Exigée par la réglementation sur les transferts d&apos;argent. Cela prend environ 2 minutes.</P>
+        {profile?.kyc === "rejected" ? (
+          <View style={{ marginBottom: 14 }}>
+            <Notice
+              tone="danger"
+              icon="alert"
+              title="Votre précédente vérification a été refusée"
+              text={profile.kycNote ? `${profile.kycNote}` : "Recommencez avec un document valide et lisible."}
+            />
+          </View>
+        ) : null}
+        <Card style={{ paddingVertical: 6, marginBottom: 14 }}>
+          <Tip icon="id" text="Photographiez votre pièce : passeport, carte d'identité ou permis de conduire" />
+          <Tip icon="face" text="Prenez un selfie : il est comparé à la photo de la pièce" />
+          <Tip icon="check" text="Réponse en général en quelques minutes" />
+        </Card>
+        <Notice
+          tone="brand"
+          icon="lock"
+          title="Vérification sécurisée par Didit"
+          text="La vérification se fait sur la page sécurisée de notre prestataire. Revenez ensuite dans l'appli : votre statut se met à jour tout seul."
+        />
+        {error ? (
+          <View style={{ marginTop: 12 }}>
+            <Notice tone="danger" icon="alert" text={error} />
+          </View>
+        ) : null}
+      </Screen>
+    );
+  }
 
   if (step === 6) {
     return (
@@ -138,6 +214,9 @@ export default function Kyc() {
       footer={
         <View style={{ gap: 8 }}>
           <Button title="Découvrir l'application" onPress={exit} />
+          {didit && !verified ? (
+            <Button title="Reprendre la vérification" variant="ghost" onPress={verifyWithDidit} loading={busy} />
+          ) : null}
           {Platform.OS === "web" ? null : <Button title="Activer Face ID / empreinte" icon="face" variant="secondary" onPress={enableBiometric} />}
         </View>
       }
@@ -156,6 +235,11 @@ export default function Kyc() {
           title={verified ? "Identité vérifiée" : "Identité en cours de vérification"}
           text={verified ? "Vous pouvez envoyer de l'argent dès maintenant." : "Généralement quelques minutes. Vous serez prévenu dans l'appli dès qu'elle sera terminée."}
         />
+        {error ? (
+          <View style={{ marginTop: 12 }}>
+            <Notice tone="danger" icon="alert" text={error} />
+          </View>
+        ) : null}
       </View>
       <Small style={{ fontFamily: fonts.heading, letterSpacing: 0.8, marginTop: 20, marginBottom: 8 }}>ENSUITE, VOUS POURREZ</Small>
       <Card style={{ paddingVertical: 6 }}>
