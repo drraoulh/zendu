@@ -22,7 +22,8 @@ export type PayMethod = "interac" | "card";
 export function payMethodsFor(sourceCountry: string): PayMethod[] {
   const live = isLiveMode();
   const methods: PayMethod[] = [];
-  if (sourceCountry === "CA") methods.push("interac");
+  // En réel, Interac exige une adresse de dépôt (sinon le client ne saurait pas où payer).
+  if (sourceCountry === "CA" && (!live || process.env.INTERAC_DEPOSIT_EMAIL?.trim())) methods.push("interac");
   if (!live) methods.push("card");
   return methods;
 }

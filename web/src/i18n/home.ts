@@ -91,7 +91,7 @@ export const homeMessages = defineMessages({
 
     destEyebrow: "Nos trajets",
     destTitle: "Canada, Cameroun, Chine : nos trajets",
-    destSubtitle: "{n} trajets ouverts entre nos trois pays. Choisissez-en un pour le simuler.",
+    destSubtitle: "{n} trajets entre nos trois pays : les envois partent pour l'instant du Canada. Choisissez-en un pour le simuler.",
     routeFast: "quelques minutes",
     routeDay: "moins de 24 h",
     routeSimulate: "Simuler →",
@@ -232,7 +232,7 @@ export const homeMessages = defineMessages({
 
     destEyebrow: "Our routes",
     destTitle: "Canada, Cameroon, China: our routes",
-    destSubtitle: "{n} open routes between our three countries. Pick one to simulate it.",
+    destSubtitle: "{n} routes between our three countries: transfers currently leave from Canada. Pick one to simulate it.",
     routeFast: "a few minutes",
     routeDay: "under 24h",
     routeSimulate: "Simulate →",

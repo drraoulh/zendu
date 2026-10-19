@@ -8,7 +8,7 @@ export const countriesMessages = defineMessages({
     heroTitle: "Canada, Cameroun, Chine : nos trois pays",
     heroSubtitle:
       "WorldSoft Transfer relie pour le moment trois pays. Les envois partent aujourd'hui du Canada, payés par virement Interac ; l'envoi depuis le Cameroun et la Chine arrive bientôt. Réception : MTN MoMo, Orange Money ou compte bancaire au Cameroun, Alipay, WeChat Pay ou compte bancaire en Chine, Interac ou compte bancaire au Canada.",
-    routesCount: "{n} trajets ouverts",
+    routesCount: "{n} trajets",
     currency: "Devise : {c}",
     receiveWith: "Réception",
     sendTo: "Envoyer vers",
@@ -95,7 +95,7 @@ export const countriesMessages = defineMessages({
     heroTitle: "Canada, Cameroon, China: our three countries",
     heroSubtitle:
       "WorldSoft Transfer currently connects three countries. Transfers leave from Canada today, paid by Interac e-Transfer; sending from Cameroon and China is coming soon. Payout: MTN MoMo, Orange Money or bank account in Cameroon, Alipay, WeChat Pay or bank account in China, Interac or bank account in Canada.",
-    routesCount: "{n} open routes",
+    routesCount: "{n} routes",
     currency: "Currency: {c}",
     receiveWith: "Payout",
     sendTo: "Send to",

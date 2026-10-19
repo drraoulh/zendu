@@ -118,7 +118,7 @@ export const transferPage = defineMessages({
 
     destEyebrow: "Destinations",
     destTitle: "Où pouvez-vous envoyer ?",
-    destSubtitle: "{n} trajets ouverts entre le Canada, le Cameroun et la Chine. Choisissez-en un pour le simuler.",
+    destSubtitle: "{n} trajets entre le Canada, le Cameroun et la Chine : les envois partent pour l'instant du Canada. Choisissez-en un pour le simuler.",
     destModes: "{n} modes de réception",
     destMode: "1 mode de réception",
     destSimulate: "Simuler",
@@ -232,7 +232,7 @@ export const transferPage = defineMessages({
 
     destEyebrow: "Destinations",
     destTitle: "Where can you send?",
-    destSubtitle: "{n} open routes between Canada, Cameroon and China. Pick one to simulate it.",
+    destSubtitle: "{n} routes between Canada, Cameroon and China: transfers currently leave from Canada. Pick one to simulate it.",
     destModes: "{n} delivery methods",
     destMode: "1 delivery method",
     destSimulate: "Simulate",

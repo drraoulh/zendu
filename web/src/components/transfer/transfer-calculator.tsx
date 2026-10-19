@@ -93,6 +93,13 @@ function parseAmount(text: string): number {
   return Number(cleaned);
 }
 
+/** Montant calculé affiché avec séparateur de milliers (« 40 385 ») ; parseAmount ignore les espaces. */
+function groupAmount(n: number): string {
+  const [int, dec] = String(n).split(".");
+  const grouped = int.replace(/\B(?=(\d{3})+(?!\d))/g, "\u00a0");
+  return dec ? `${grouped}.${dec}` : grouped;
+}
+
 function sanitizeInput(text: string): string {
   // Chiffres + un seul séparateur décimal.
   const s = text.replace(/[^\d.,]/g, "").replace(",", ".");
@@ -323,8 +330,8 @@ export function TransferCalculator({
             setQuote(q);
             setQuoteError(null);
             setNow(Date.now());
-            if (mode === "send") setReceiveText(String(q.receiveAmount));
-            else setSendText(String(q.sendAmount));
+            if (mode === "send") setReceiveText(groupAmount(q.receiveAmount));
+            else setSendText(groupAmount(q.sendAmount));
           }
           setLoading(false);
         } catch (err) {
