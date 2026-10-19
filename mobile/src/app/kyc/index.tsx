@@ -1,10 +1,10 @@
 import { router } from "expo-router";
-import * as WebBrowser from "expo-web-browser";
 import { useEffect, useState } from "react";
 import { Platform, StyleSheet, Text, View } from "react-native";
 import { Icon, type IconName } from "@/components/icons";
 import { Button, Card, Choice, H1, Header, ListItem, Notice, P, Screen, Small, Steps } from "@/components/ui";
 import { authenticate, biometricKind, biometricLabel } from "@/lib/biometrics";
+import { runDiditVerification } from "@/lib/didit";
 import type { CountryCode } from "@/lib/corridors";
 import { KYC_DOCUMENTS } from "@/lib/geo";
 import { useSession } from "@/lib/session";
@@ -52,10 +52,12 @@ export default function Kyc() {
       }
       return setError(r.error);
     }
-    // Page Didit (pièce + selfie) ; à la fermeture, on relit la décision.
-    await WebBrowser.openBrowserAsync(r.url).catch(() => undefined);
+    // Didit (SDK natif sur téléphone, page sécurisée sur le web) ; ensuite, on relit la décision.
+    const outcome = await runDiditVerification(r);
     await refreshKyc();
     setBusy(false);
+    if (outcome.kind === "failed") return setError(outcome.message);
+    if (outcome.kind === "cancelled") return setError("Vérification interrompue. Vous pouvez la reprendre quand vous voulez.");
     setStep(9);
   }
 

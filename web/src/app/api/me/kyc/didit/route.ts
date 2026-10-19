@@ -6,7 +6,7 @@ import { prisma } from "@/lib/prisma";
 export const dynamic = "force-dynamic";
 
 /**
- * POST /api/me/kyc/didit → { url, customer } : ouvre une session Didit (pièce + selfie) pour le client.
+ * POST /api/me/kyc/didit → { url, sessionToken, customer } : ouvre une session Didit (pièce + selfie).
  * GET  /api/me/kyc/didit → { customer, available } : relit la décision chez Didit (au retour dans l'appli) ;
  *   `available` dit à l'appli si la vérification Didit est branchée.
  * Sans DIDIT_API_KEY / DIDIT_WORKFLOW_ID : 503 { code: "didit_unavailable" } (l'appli garde l'ancien parcours).
@@ -19,7 +19,7 @@ export async function POST(request: Request) {
   }
   if (authed.customer.kycStatus === "verified") return NextResponse.json({ customer: publicCustomer(authed.customer) });
   try {
-    const { sessionId, url } = await createDiditSession(authed.customer);
+    const { sessionId, url, sessionToken } = await createDiditSession(authed.customer);
     const customer = await prisma.customer.update({
       where: { id: authed.customer.id },
       data: {
@@ -32,7 +32,8 @@ export async function POST(request: Request) {
         kycNote: null,
       },
     });
-    return NextResponse.json({ url, customer: publicCustomer(customer) });
+    // sessionToken : pour le SDK natif Didit de l'appli (jamais la clé API).
+    return NextResponse.json({ url, sessionToken, customer: publicCustomer(customer) });
   } catch (error) {
     const message = error instanceof DiditError ? error.message : "La vérification n'a pas pu démarrer.";
     return NextResponse.json({ ok: false, code: "didit_error", error: message }, { status: 502 });

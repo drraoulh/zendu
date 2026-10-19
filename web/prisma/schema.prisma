@@ -250,3 +250,21 @@ model OtpChallenge {
   @@index([customerId])
   @@index([expiresAt])
 }
+
+/// Webhooks Didit reçus : une ligne par event_id (clé primaire = anti-doublon atomique et durable).
+/// Aucune donnée d'identité n'est stockée ici (la décision complète reste chez Didit).
+model DiditWebhookEvent {
+  eventId     String    @id
+  webhookType String
+  sessionId   String?
+  status      String?
+  /// Méthode de signature acceptée : "raw" | "v2" | "simple" | "none" (aucun secret configuré).
+  signature   String
+  receivedAt  DateTime  @default(now())
+  processedAt DateTime?
+  /// Résultat du traitement ou erreur (court, sans donnée personnelle).
+  outcome     String?
+
+  @@index([sessionId])
+  @@index([receivedAt])
+}

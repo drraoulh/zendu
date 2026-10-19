@@ -12,7 +12,11 @@
       "bundleIdentifier": "com.pwfintech.worldsoft",
       "supportsTablet": false,
       "infoPlist": {
-        "ITSAppUsesNonExemptEncryption": false
+        "ITSAppUsesNonExemptEncryption": false,
+        "NSCameraUsageDescription": "WorldSoft Transfer utilise l'appareil photo pour scanner votre carte et vérifier votre identité (pièce d'identité et selfie).",
+        "NSMicrophoneUsageDescription": "Le micro peut être utilisé pendant la vérification d'identité (contrôle de vivacité).",
+        "NSPhotoLibraryUsageDescription": "Vous pouvez choisir une photo de votre pièce d'identité dans vos photos.",
+        "NSLocationWhenInUseUsageDescription": "Votre position aide à prévenir la fraude pendant la vérification d'identité."
       }
     },
     "android": {
@@ -62,6 +66,13 @@
           "backgroundColor": "#ffffff",
           "image": "./assets/brand/splash-symbol.png",
           "imageWidth": 120
+        }
+      ],
+      [
+        "@didit-protocol/sdk-react-native",
+        {
+          "iosNfcEnabled": false,
+          "androidNfcEnabled": false
         }
       ]
     ],

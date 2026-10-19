@@ -3,6 +3,7 @@
   "main": "expo-router/entry",
   "version": "1.0.0",
   "dependencies": {
+    "@didit-protocol/sdk-react-native": "^4.9.1",
     "@expo/ui": "~57.0.21",
     "expo": "~57.0.26",
     "expo-camera": "~57.0.6",

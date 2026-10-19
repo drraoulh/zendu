@@ -68,7 +68,7 @@ type SessionValue = {
   update: (patch: Partial<Profile>) => Promise<Result>;
   submitKyc: (document: string) => Promise<Result>;
   /** Vérification Didit : URL de la page à ouvrir, ou erreur (code "didit_unavailable" si non branché). */
-  startDidit: () => Promise<{ ok: true; url: string } | { ok: false; error: string; code?: string }>;
+  startDidit: () => Promise<{ ok: true; url: string; sessionToken: string | null } | { ok: false; error: string; code?: string }>;
   /** Relit le statut d'identité ; `available` = vérification Didit branchée. */
   refreshKyc: () => Promise<{ available: boolean }>;
   updateSettings: (patch: Partial<Settings>) => Promise<void>;
@@ -270,7 +270,7 @@ export function SessionProvider({ children }: { children: ReactNode }) {
         try {
           const r = await api.startDidit();
           await saveProfile(r.customer);
-          return { ok: true, url: r.url };
+          return { ok: true, url: r.url, sessionToken: r.sessionToken ?? null };
         } catch (e) {
           return { ok: false, error: message(e), code: e instanceof ApiError ? e.code : undefined };
         }
