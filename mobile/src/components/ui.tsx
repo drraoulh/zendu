@@ -215,7 +215,7 @@ export function Button({
       ) : (
         <>
           {icon ? <Icon name={icon} color={v.fg} size={size === "sm" ? 18 : 20} /> : null}
-          <Text style={[styles.btnText, size === "sm" && { fontSize: 14 }, { color: v.fg }]} numberOfLines={2}>{tr(title)}</Text>
+          <Text style={[styles.btnText, size === "sm" && { fontFamily: fonts.regular, fontSize: 14 }, { color: v.fg }]} numberOfLines={2}>{tr(title)}</Text>
         </>
       )}
     </Pressable>
@@ -412,7 +412,7 @@ export function Choice({
     >
       {leading ?? (icon ? <Icon name={icon} color={selected ? colors.brand : colors.muted} size={20} /> : null)}
       <View style={{ flex: 1 }}>
-        <Text style={[styles.listTitle, { fontSize: 15 }]}>{tr(label)}</Text>
+        <Text style={[styles.listTitle, { fontFamily: fonts.regular, fontSize: 15 }]}>{tr(label)}</Text>
         {description ? <Small>{tr(description)}</Small> : null}
       </View>
       <View style={[styles.radio, selected && { borderColor: colors.brand }]}>
@@ -428,7 +428,7 @@ export function Empty({ icon, title, text, action }: { icon: IconName; title: st
       <View style={[styles.listIcon, { width: 56, height: 56, borderRadius: 18, backgroundColor: colors.brandSoft }]}>
         <Icon name={icon} color={colors.brand} size={26} />
       </View>
-      <Text style={[styles.h2, { fontSize: 18, textAlign: "center" }]}>{tr(title)}</Text>
+      <Text style={[styles.h2, { fontFamily: fonts.regular, fontSize: 18, textAlign: "center" }]}>{tr(title)}</Text>
       <P style={{ textAlign: "center" }}>{tr(text)}</P>
       {action ? <View style={{ marginTop: 8, alignSelf: "stretch" }}>{action}</View> : null}
     </View>
@@ -445,8 +445,8 @@ export const styles = StyleSheet.create({
   iconBtn: { width: 44, height: 44, borderRadius: 14, alignItems: "center", justifyContent: "center", backgroundColor: colors.white, borderWidth: 1, borderColor: colors.line },
   h1: { fontFamily: fonts.display, fontSize: 28, lineHeight: 34, color: colors.navy, letterSpacing: -0.5 },
   h2: { fontFamily: fonts.heading, fontSize: 20, lineHeight: 26, color: colors.ink },
-  p: { fontSize: 15, lineHeight: 22, color: colors.muted },
-  small: { fontSize: 13, lineHeight: 18, color: colors.muted },
+  p: { fontFamily: fonts.regular, fontSize: 15, lineHeight: 22, color: colors.muted },
+  small: { fontFamily: fonts.regular, fontSize: 13, lineHeight: 18, color: colors.muted },
   label: { fontFamily: fonts.semibold, fontSize: 13, color: colors.ink, marginBottom: 6 },
   btn: { minHeight: 54, borderRadius: radius.md, borderWidth: 1, flexDirection: "row", alignItems: "center", justifyContent: "center", gap: 8, paddingHorizontal: 18 },
   btnSm: { minHeight: 44, borderRadius: radius.sm, paddingHorizontal: 14 },
@@ -459,15 +459,15 @@ export const styles = StyleSheet.create({
   noticeTitle: { fontFamily: fonts.heading, fontSize: 14, marginBottom: 2 },
   row: { flexDirection: "row", justifyContent: "space-between", alignItems: "center", paddingVertical: 7, gap: 12 },
   // Libellé court (« Délai estimé ») sur une ligne : c'est la valeur qui passe à la ligne si besoin (320 px).
-  rowLabel: { fontSize: 14, color: colors.muted, flexShrink: 0, maxWidth: "50%" },
+  rowLabel: { fontFamily: fonts.regular, fontSize: 14, color: colors.muted, flexShrink: 0, maxWidth: "50%" },
   rowValue: { fontFamily: fonts.semibold, fontSize: 14, color: colors.ink, textAlign: "right", flexShrink: 1 },
   listItem: { flexDirection: "row", alignItems: "center", gap: 12, paddingVertical: 12, paddingHorizontal: 4, borderRadius: radius.sm },
   listIcon: { width: 42, height: 42, borderRadius: 14, alignItems: "center", justifyContent: "center" },
   listTitle: { fontFamily: fonts.semibold, fontSize: 15, color: colors.ink },
   input: { flexDirection: "row", alignItems: "center", gap: 8, minHeight: 52, borderRadius: radius.sm, borderWidth: 1, borderColor: colors.line, backgroundColor: colors.white, paddingHorizontal: 14 },
   // minWidth 0 : sinon, sur le web, la largeur par défaut d'un <input> déborde de la ligne.
-  inputText: { flex: 1, minWidth: 0, fontSize: 16, color: colors.ink, paddingVertical: 12, ...(Platform.OS === "web" ? { outlineStyle: "none" as never } : null) },
-  error: { color: colors.danger, fontSize: 13, marginTop: 4 },
+  inputText: { flex: 1, minWidth: 0, fontFamily: fonts.regular, fontSize: 16, color: colors.ink, paddingVertical: 12, ...(Platform.OS === "web" ? { outlineStyle: "none" as never } : null) },
+  error: { fontFamily: fonts.regular, color: colors.danger, fontSize: 13, marginTop: 4 },
   choice: { flexDirection: "row", alignItems: "center", gap: 12, padding: 14, borderRadius: radius.md, borderWidth: 1.5, borderColor: colors.line, backgroundColor: colors.white, marginBottom: 10 },
   radio: { width: 22, height: 22, borderRadius: 11, borderWidth: 2, borderColor: colors.line, alignItems: "center", justifyContent: "center" },
   radioDot: { width: 10, height: 10, borderRadius: 5, backgroundColor: colors.brand },

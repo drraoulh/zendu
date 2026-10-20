@@ -4,7 +4,7 @@ import { Text, View } from "react-native";
 import { PinPad } from "@/components/pin-pad";
 import { H1, Header, P, Screen } from "@/components/ui";
 import { useSession } from "@/lib/session";
-import { colors } from "@/lib/theme";
+import { colors, fonts } from "@/lib/theme";
 import { tr } from "@/lib/i18n";
 
 export default function PinSetup() {
@@ -38,7 +38,7 @@ export default function PinSetup() {
     <Screen scroll={false}>
       <Header title={tr("Code PIN de l'appli")} />
       <View style={{ alignItems: "center", gap: 8, marginTop: 12, marginBottom: 24 }}>
-        <H1 style={{ textAlign: "center", fontSize: 22 }}>{first ? tr("Confirmez votre code") : tr("Choisissez un code à 6 chiffres")}</H1>
+        <H1 style={{ fontFamily: fonts.regular, textAlign: "center", fontSize: 22 }}>{first ? tr("Confirmez votre code") : tr("Choisissez un code à 6 chiffres")}</H1>
         <P style={{ textAlign: "center" }}>{tr("Il sera demandé à chaque ouverture de l'appli.")}</P>
         {error ? <Text style={{ color: colors.danger }}>{error}</Text> : null}
       </View>

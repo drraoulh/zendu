@@ -133,7 +133,7 @@ export function Simulator({
 
   // Petits écrans (iPhone SE) : chiffres plus petits pour que « 80 770 » tienne à côté de la pastille.
   const compact = useWindowDimensions().width < 360;
-  const amountSize = compact ? { fontSize: 24 } : null;
+  const amountSize = compact ? { fontFamily: fonts.regular, fontSize: 24 } : null;
   const sendUnit = unit(corridor.sendCurrency);
   const receiveUnit = unit(corridor.receiveCurrency);
 
@@ -174,7 +174,7 @@ export function Simulator({
                 {current.fee > 0 ? tr("Frais {0}", money(current.fee, current.sendCurrency)) : tr("Sans frais")} · {etaLabel(current.deliveryEstimate)}
               </Text>
               {rateAge != null ? (
-                <Text style={[s.hint, { fontSize: 12 }]}>
+                <Text style={[s.hint, { fontFamily: fonts.regular, fontSize: 12 }]}>
                   {tr("Taux mis à jour {0} · bloqué à la création du transfert", rateAge < 1 ? tr("à l'instant") : tr("il y a {0} min", rateAge))}
                 </Text>
               ) : null}
@@ -248,7 +248,7 @@ function CountryPill({ code, unit, label, onPress, compact = false }: { code: st
       style={({ pressed }) => [s.pill, compact && { paddingHorizontal: 8, gap: 4 }, pressed && { opacity: 0.8 }]}
     >
       <Flag code={code} size={compact ? 18 : 22} />
-      <Text style={[s.pillText, compact && { fontSize: 13 }]}>{unit}</Text>
+      <Text style={[s.pillText, compact && { fontFamily: fonts.regular, fontSize: 13 }]}>{unit}</Text>
       <Icon name="chevDown" size={14} color={colors.muted} />
     </Pressable>
   );
@@ -312,8 +312,8 @@ const s = StyleSheet.create({
   total: { flexDirection: "row", justifyContent: "space-between", alignItems: "center", paddingHorizontal: 6, paddingTop: 12 },
   totalValue: { fontFamily: fonts.heading, fontSize: 16, color: colors.ink },
   countryName: { fontFamily: fonts.semibold, fontSize: 14, color: colors.ink, flexShrink: 1 },
-  error: { color: colors.danger, fontSize: 14 },
-  hint: { color: colors.muted, fontSize: 13 },
+  error: { fontFamily: fonts.regular, color: colors.danger, fontSize: 14 },
+  hint: { fontFamily: fonts.regular, color: colors.muted, fontSize: 13 },
   backdrop: { flex: 1, backgroundColor: "rgba(4,15,51,0.45)", justifyContent: "flex-end" },
   sheet: { backgroundColor: colors.white, borderTopLeftRadius: 28, borderTopRightRadius: 28, padding: 20, paddingBottom: 36, gap: 6 },
   sheetTitle: { fontFamily: fonts.heading, fontSize: 18, color: colors.ink, marginBottom: 8 },

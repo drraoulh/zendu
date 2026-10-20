@@ -80,7 +80,7 @@ export default function Welcome() {
               <Icon name={slide.icon} color={colors.brand} size={24} />
             </View>
           )}
-          <Text style={[st.title, compact && { fontSize: 21, lineHeight: 26 }]} accessibilityRole="header">{tr(slide.title)}</Text>
+          <Text style={[st.title, compact && { fontFamily: fonts.regular, fontSize: 21, lineHeight: 26 }]} accessibilityRole="header">{tr(slide.title)}</Text>
           <Text style={st.text}>{tr(slide.text)}</Text>
 
           <View style={[st.dots, compact && { marginVertical: 14 }]} accessibilityLabel={tr("Écran {0} sur {1}", index + 1, tr(SLIDES.length))}>
@@ -117,7 +117,7 @@ const st = StyleSheet.create({
   sheetInner: { width: "100%", maxWidth: 640, alignSelf: "center" },
   iconWrap: { width: 48, height: 48, borderRadius: 16, backgroundColor: colors.brandSoft, alignItems: "center", justifyContent: "center", marginBottom: 14 },
   title: { fontFamily: fonts.display, fontSize: 24, lineHeight: 30, color: colors.navy, letterSpacing: -0.4 },
-  text: { fontSize: 15, lineHeight: 22, color: colors.muted, marginTop: 8 },
+  text: { fontFamily: fonts.regular, fontSize: 15, lineHeight: 22, color: colors.muted, marginTop: 8 },
   dots: { flexDirection: "row", gap: 6, marginVertical: 20 },
   dot: { width: 8, height: 8, borderRadius: 4, backgroundColor: colors.line },
   dotOn: { width: 24, backgroundColor: colors.brand },

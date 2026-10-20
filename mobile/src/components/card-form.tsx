@@ -162,7 +162,7 @@ export function CardForm({ defaultHolder, submitLabel, onSubmit }: { defaultHold
               )}
             </View>
             <View style={c.chip} />
-            <Text style={[c.number, { fontSize: numberSize, letterSpacing: numberSize * 0.075 }]} numberOfLines={1}>
+            <Text style={[c.number, { fontFamily: fonts.regular, fontSize: numberSize, letterSpacing: numberSize * 0.075 }]} numberOfLines={1}>
               {shown}
             </Text>
             <View style={{ flexDirection: "row", justifyContent: "space-between", gap: 12 }}>
@@ -290,7 +290,7 @@ const c = StyleSheet.create({
   top: { flexDirection: "row", justifyContent: "space-between", alignItems: "center" },
   chip: { width: 40, height: 30, borderRadius: 6, backgroundColor: "#d9b866" },
   number: { color: colors.white, fontFamily: fonts.heading, fontSize: 20, letterSpacing: 1.5 },
-  caption: { color: "rgba(255,255,255,0.55)", fontSize: 9, letterSpacing: 1 },
+  caption: { fontFamily: fonts.regular, color: "rgba(255,255,255,0.55)", fontSize: 9, letterSpacing: 1 },
   meta: { color: "rgba(255,255,255,0.85)", fontFamily: fonts.semibold, fontSize: 12, letterSpacing: 0.6 },
   compact: { flexDirection: "row", alignItems: "center", gap: 12, backgroundColor: colors.navy, borderRadius: radius.md, paddingHorizontal: 14, paddingVertical: 12, marginBottom: 14 },
   compactNumber: { flex: 1, color: colors.white, fontFamily: fonts.heading, fontSize: 15, letterSpacing: 1 },

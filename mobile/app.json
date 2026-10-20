@@ -67,9 +67,11 @@
         "expo-font",
         {
           "fonts": [
-            "./assets/fonts/Montserrat-600.ttf",
-            "./assets/fonts/Montserrat-800.ttf",
-            "./assets/fonts/Montserrat-900.ttf"
+            "./assets/fonts/DMSans-400.ttf",
+            "./assets/fonts/DMSans-500.ttf",
+            "./assets/fonts/DMSans-600.ttf",
+            "./assets/fonts/DMSans-700.ttf",
+            "./assets/fonts/DMSans-800.ttf"
           ]
         }
       ],

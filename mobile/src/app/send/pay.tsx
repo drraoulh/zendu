@@ -64,7 +64,7 @@ export default function Pay() {
 
       {!adding ? (
         <>
-          <H2 style={{ fontSize: 17, marginBottom: 10 }}>{tr("Carte enregistrée")}</H2>
+          <H2 style={{ fontFamily: fonts.regular, fontSize: 17, marginBottom: 10 }}>{tr("Carte enregistrée")}</H2>
           {cards.map((c) => (
             <Choice key={c.id} leading={<PaymentLogo id={cardLogoId(c.brand)} size={24} />} label={cardLabel(c)} description={tr("Expire {0} · {1}", c.exp, c.holder)} selected={selected === c.id} onPress={() => setSelected(c.id)} />
           ))}
@@ -72,7 +72,7 @@ export default function Pay() {
         </>
       ) : (
         <>
-          <H2 style={{ fontSize: 17, marginBottom: 4 }}>{tr("Nouvelle carte de débit")}</H2>
+          <H2 style={{ fontFamily: fonts.regular, fontSize: 17, marginBottom: 4 }}>{tr("Nouvelle carte de débit")}</H2>
           <Small style={{ marginBottom: 12 }}>{tr("Visa Débit ou Mastercard Débit. Les cartes de crédit ne sont pas acceptées.")}</Small>
           <CardForm
             defaultHolder={profile ? `${profile.firstName} ${profile.lastName}` : ""}

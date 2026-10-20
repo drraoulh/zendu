@@ -30,7 +30,7 @@ export default function Login() {
   return (
     <Screen
       footer={
-        <Text style={{ textAlign: "center", color: colors.muted, fontSize: 14, paddingBottom: 4 }}>
+        <Text style={{ fontFamily: fonts.regular, textAlign: "center", color: colors.muted, fontSize: 14, paddingBottom: 4 }}>
           {tr("Pas encore de compte ?")}{" "}
           <Link href="/auth/signup" replace style={{ color: colors.brand, fontFamily: fonts.semibold }}>
             {tr("Créer un compte")}

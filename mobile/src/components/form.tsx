@@ -340,14 +340,14 @@ export function NumberedSteps({ steps }: { steps: { title: string; text: string 
 
 const f = StyleSheet.create({
   select: { flexDirection: "row", alignItems: "center", minHeight: 52, borderRadius: radius.sm, borderWidth: 1, borderColor: colors.line, backgroundColor: colors.white, paddingHorizontal: 14, gap: 8 },
-  selectText: { flex: 1, fontSize: 16, color: colors.ink },
-  error: { color: colors.danger, fontSize: 13, marginTop: 4 },
+  selectText: { fontFamily: fonts.regular, flex: 1, fontSize: 16, color: colors.ink },
+  error: { fontFamily: fonts.regular, color: colors.danger, fontSize: 13, marginTop: 4 },
   backdrop: { flex: 1, backgroundColor: "rgba(4,15,51,0.45)", justifyContent: "flex-end" },
   sheet: { backgroundColor: colors.white, borderTopLeftRadius: 28, borderTopRightRadius: 28, padding: 20, paddingBottom: 34 },
   grabber: { alignSelf: "center", width: 40, height: 4, borderRadius: 2, backgroundColor: colors.line, marginBottom: 12 },
   sheetTitle: { fontFamily: fonts.heading, fontSize: 18, color: colors.ink, marginBottom: 10 },
   option: { flexDirection: "row", alignItems: "center", justifyContent: "space-between", padding: 14, minHeight: 48, borderRadius: radius.sm },
-  optionText: { fontSize: 16, color: colors.ink },
+  optionText: { fontFamily: fonts.regular, fontSize: 16, color: colors.ink },
   dialog: { backgroundColor: colors.white, borderRadius: radius.xl, padding: 22 },
   chip: { flexDirection: "row", alignItems: "center", gap: 6, paddingHorizontal: 14, paddingVertical: 9, minHeight: 44, borderRadius: radius.pill, borderWidth: 1, borderColor: colors.line, backgroundColor: colors.white },
   chipText: { fontFamily: fonts.semibold, fontSize: 14, color: colors.ink },

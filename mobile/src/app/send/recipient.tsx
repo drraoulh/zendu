@@ -1,4 +1,5 @@
 import { router } from "expo-router";
+import { fonts } from "@/lib/theme";
 import { useState } from "react";
 import { PaymentLogo } from "@/components/payment-logo";
 import { RecipientForm } from "@/components/recipient-form";
@@ -46,7 +47,7 @@ export default function ChooseRecipient() {
         </>
       ) : (
         <>
-          {saved.length ? <H2 style={{ fontSize: 17, marginBottom: 12 }}>{tr("Nouveau bénéficiaire")}</H2> : null}
+          {saved.length ? <H2 style={{ fontFamily: fonts.regular, fontSize: 17, marginBottom: 12 }}>{tr("Nouveau bénéficiaire")}</H2> : null}
           <RecipientForm
             country={country}
             networks={corridor.networks}

@@ -113,7 +113,7 @@ export default function SignUp() {
           {errors.submit ? <Notice tone="danger" icon="alert" text={errors.submit} /> : null}
           <Button title={tr(cta)} onPress={next} loading={busy} />
           {step === 1 ? (
-            <Text style={{ textAlign: "center", color: colors.muted, fontSize: 14 }}>
+            <Text style={{ fontFamily: fonts.regular, textAlign: "center", color: colors.muted, fontSize: 14 }}>
               {tr("Déjà un compte ?")}{" "}
               <Link href="/auth/login" replace style={{ color: colors.brand, fontFamily: fonts.semibold }}>
                 {tr("Se connecter")}
@@ -253,7 +253,7 @@ export default function SignUp() {
               </Text>{" "}{tr("de PWFINTECH.")}
             </Small>
           </Checkbox>
-          {errors.accepted ? <Text style={{ color: colors.danger, fontSize: 13, marginTop: -6, marginBottom: 10 }}>{errors.accepted}</Text> : null}
+          {errors.accepted ? <Text style={{ fontFamily: fonts.regular, color: colors.danger, fontSize: 13, marginTop: -6, marginBottom: 10 }}>{errors.accepted}</Text> : null}
           <Checkbox checked={marketing} onChange={setMarketing}>
             <Small style={{ color: colors.ink }}>{tr("Recevoir les offres et nouveautés par courriel (facultatif)")}</Small>
           </Checkbox>

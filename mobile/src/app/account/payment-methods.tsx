@@ -55,10 +55,10 @@ export default function PaymentMethods() {
             •••• •••• •••• {def.last4}
           </Text>
           <View style={{ flexDirection: "row", justifyContent: "space-between", gap: 12 }}>
-            <Text style={{ color: "rgba(255,255,255,0.75)", fontSize: 12, flex: 1 }} numberOfLines={1}>
+            <Text style={{ fontFamily: fonts.regular, color: "rgba(255,255,255,0.75)", fontSize: 12, flex: 1 }} numberOfLines={1}>
               {def.holder.toUpperCase()}
             </Text>
-            <Text style={{ color: "rgba(255,255,255,0.75)", fontSize: 12 }}>{tr("Exp. {0}", def.exp)}</Text>
+            <Text style={{ fontFamily: fonts.regular, color: "rgba(255,255,255,0.75)", fontSize: 12 }}>{tr("Exp. {0}", def.exp)}</Text>
           </View>
         </View>
       ) : null}

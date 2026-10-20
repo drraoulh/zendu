@@ -135,10 +135,10 @@ const s = StyleSheet.create({
   bl: { bottom: 0, left: 0, borderBottomWidth: 4, borderLeftWidth: 4, borderBottomLeftRadius: radius.lg },
   br: { bottom: 0, right: 0, borderBottomWidth: 4, borderRightWidth: 4, borderBottomRightRadius: radius.lg },
   help: { color: colors.white, fontFamily: fonts.semibold, fontSize: 15, textAlign: "center", textShadowColor: "rgba(0,0,0,0.6)", textShadowRadius: 6 },
-  slow: { color: "#ffd479", fontSize: 13, textAlign: "center" },
+  slow: { fontFamily: fonts.regular, color: "#ffd479", fontSize: 13, textAlign: "center" },
   denied: { alignItems: "center", gap: 16, paddingHorizontal: 12 },
   deniedText: { color: colors.white, fontFamily: fonts.semibold, fontSize: 15, textAlign: "center" },
   bottom: { gap: 12, paddingBottom: 12 },
   privacy: { flexDirection: "row", alignItems: "center", justifyContent: "center", gap: 6 },
-  privacyText: { color: "rgba(255,255,255,0.75)", fontSize: 12, textAlign: "center", flexShrink: 1 },
+  privacyText: { fontFamily: fonts.regular, color: "rgba(255,255,255,0.75)", fontSize: 12, textAlign: "center", flexShrink: 1 },
 });

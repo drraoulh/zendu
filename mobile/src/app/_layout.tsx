@@ -15,9 +15,12 @@ configurePush();
 
 export default function RootLayout() {
   const [fontsLoaded, fontError] = useFonts({
-    "Montserrat-600": require("@/assets/fonts/Montserrat-600.ttf"),
-    "Montserrat-800": require("@/assets/fonts/Montserrat-800.ttf"),
-    "Montserrat-900": require("@/assets/fonts/Montserrat-900.ttf"),
+    // DM Sans, la typographie du site (une seule famille pour les titres et le texte).
+    "DMSans-400": require("@/assets/fonts/DMSans-400.ttf"),
+    "DMSans-500": require("@/assets/fonts/DMSans-500.ttf"),
+    "DMSans-600": require("@/assets/fonts/DMSans-600.ttf"),
+    "DMSans-700": require("@/assets/fonts/DMSans-700.ttf"),
+    "DMSans-800": require("@/assets/fonts/DMSans-800.ttf"),
   });
 
   return (

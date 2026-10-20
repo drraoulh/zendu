@@ -45,7 +45,7 @@ export function WstWordmark({ size = 30, negative = false }: { size?: number; ne
 /** « une solution PWFINTECH ». */
 export function PoweredBy({ dark = false }: { dark?: boolean }) {
   return (
-    <Text style={{ fontSize: 12, color: dark ? "rgba(255,255,255,0.7)" : colors.muted }}>
+    <Text style={{ fontFamily: fonts.regular, fontSize: 12, color: dark ? "rgba(255,255,255,0.7)" : colors.muted }}>
       {tr("une solution")}{" "}<Text style={{ fontFamily: fonts.heading, color: dark ? colors.white : colors.navy }}>PWFINTECH</Text>
     </Text>
   );

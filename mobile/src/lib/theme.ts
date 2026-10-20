@@ -22,9 +22,12 @@ export const colors = {
 };
 
 export const fonts = {
-  display: "Montserrat-900",
-  heading: "Montserrat-800",
-  semibold: "Montserrat-600",
+  // DM Sans, comme le site : titres francs (800), sous-titres (700), libellés (600), texte (400).
+  display: "DMSans-800",
+  heading: "DMSans-700",
+  semibold: "DMSans-600",
+  medium: "DMSans-500",
+  regular: "DMSans-400",
 };
 
 export const radius = { sm: 12, md: 16, lg: 22, xl: 28, pill: 999 };
