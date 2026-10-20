@@ -1,7 +1,8 @@
 "use client";
 
+import Image from "next/image";
 import { CountryFlag } from "@/components/country-flag";
-import { CheckGrid } from "@/components/journeys/service-blocks";
+import { Icon } from "@/components/ui/icon";
 import { Container, Section, SectionHeading } from "@/components/ui/layout";
 import { useT } from "@/i18n/define";
 import { marketing } from "@/i18n/services";
@@ -11,6 +12,8 @@ import { CtaBand, Faq, Notice, ServiceHero, Steps, range } from "./sections";
 type K = keyof typeof aviPage.fr;
 
 const COUNTRIES = ["fr", "be", "de", "it"] as const;
+/** Une photo par pièce, dans l'ordre des textes doc1 à doc6. */
+const DOC_IMAGES = ["passport", "admission", "dates", "guarantor", "contact", "funds"];
 const REQUEST = "/contact?sujet=avi";
 
 export function AviContent() {
@@ -56,14 +59,25 @@ export function AviContent() {
 
       <Section>
         <Container>
-          <div className="grid gap-10 lg:grid-cols-[0.9fr_1.3fr] lg:gap-14">
-            <div>
-              <SectionHeading eyebrow={t("docsEyebrow")} title={t("docsTitle")} subtitle={t("docsSubtitle")} />
-              <div className="mt-8">
-                <Notice title={t("noticeTitle")}>{t("noticeText")}</Notice>
-              </div>
-            </div>
-            <CheckGrid items={range(6).map((i) => k(`doc${i}`))} />
+          <SectionHeading eyebrow={t("docsEyebrow")} title={t("docsTitle")} subtitle={t("docsSubtitle")} />
+          <ul className="mt-12 grid gap-x-6 gap-y-10 sm:grid-cols-2 lg:grid-cols-3">
+            {DOC_IMAGES.map((img, idx) => (
+              <li key={img} className="group">
+                <div className="relative aspect-[4/3] overflow-hidden rounded-3xl bg-surface-soft">
+                  <Image src={`/images/avi/${img}.jpg`} alt="" fill sizes="(min-width: 1024px) 400px, (min-width: 640px) 50vw, 100vw" className="zoom-on-hover object-cover" />
+                  <span className="absolute left-4 top-4 grid h-9 w-9 place-items-center rounded-full bg-white font-display text-sm font-bold text-ink">
+                    {idx + 1}
+                  </span>
+                </div>
+                <p className="mt-4 flex items-start gap-2.5 font-display text-lg font-bold text-ink">
+                  <Icon name="check" className="mt-1 h-5 w-5 shrink-0 text-brand" strokeWidth={2.4} />
+                  {k(`doc${idx + 1}`)}
+                </p>
+              </li>
+            ))}
+          </ul>
+          <div className="mt-12 max-w-3xl">
+            <Notice title={t("noticeTitle")}>{t("noticeText")}</Notice>
           </div>
         </Container>
       </Section>
