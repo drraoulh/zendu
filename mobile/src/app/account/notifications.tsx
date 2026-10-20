@@ -1,18 +1,34 @@
 import { router } from "expo-router";
-import { useState } from "react";
-import { View } from "react-native";
+import { useEffect, useState } from "react";
+
+import { Linking, View } from "react-native";
 import { SectionTitle, ToggleRow } from "@/components/form";
-import { Badge, Card, Header, ListItem, Notice, Screen } from "@/components/ui";
+import { Badge, Button, Card, Header, ListItem, Notice, Screen } from "@/components/ui";
+import { registerPush, unregisterPush, type PushStatus } from "@/lib/push";
 import { useSession } from "@/lib/session";
 
 /**
  * Réglages des notifications : seulement ce qui existe vraiment.
  * - Courriels de suivi des transferts : toujours envoyés par le serveur (Brevo).
  * - Offres et nouveautés : consentement enregistré sur le compte (champ « marketing »).
- * - Push : pas encore disponibles (version publiée sur les stores).
+ * - Push : paiement reçu, argent livré, incident, identité vérifiée (service push d'Expo).
  */
 export default function NotificationSettings() {
-  const { profile, update } = useSession();
+  const { profile, update, settings, updateSettings } = useSession();
+  const pushWanted = settings.notifications.push;
+  const [push, setPush] = useState<PushStatus | null>(null);
+  useEffect(() => {
+    if (pushWanted) void registerPush(settings.language, false).then(setPush);
+  }, [pushWanted, settings.language]);
+
+  async function togglePush(v: boolean) {
+    await updateSettings({ notifications: { ...settings.notifications, push: v } });
+    if (v) setPush(await registerPush(settings.language, true));
+    else {
+      await unregisterPush();
+      setPush(null);
+    }
+  }
   const [marketing, setMarketing] = useState(Boolean(profile?.marketing));
   const [error, setError] = useState<string | null>(null);
   const [saving, setSaving] = useState(false);
@@ -56,18 +72,24 @@ export default function NotificationSettings() {
       <SectionTitle>Dans l&apos;appli</SectionTitle>
       <Card style={{ paddingVertical: 4 }}>
         <ListItem icon="bell" title="Centre de notifications" subtitle="Transferts, vérification d'identité et demandes" onPress={() => router.push("/notifications")} />
-        <ListItem
+        <ToggleRow
           icon="phone"
-          tone="neutral"
-          title="Notifications push"
-          subtitle="Avec la version publiée sur les stores"
-          extra={
-            <View style={{ marginTop: 6 }}>
-              <Badge label="Bientôt" />
-            </View>
-          }
+          label="Notifications push"
+          sub="Paiement reçu, argent livré, incident, identité vérifiée"
+          value={pushWanted && push !== "denied"}
+          onChange={(v) => void togglePush(v)}
         />
       </Card>
+      {pushWanted && push === "denied" ? (
+        <View style={{ marginTop: 10, gap: 8 }}>
+          <Notice tone="warn" icon="bell" text="Les notifications sont bloquées dans les réglages du téléphone." />
+          <Button title="Ouvrir les réglages" size="sm" variant="secondary" onPress={() => void Linking.openSettings()} />
+        </View>
+      ) : pushWanted && push === "unavailable" ? (
+        <View style={{ marginTop: 10 }}>
+          <Notice tone="neutral" icon="info" text="Notifications push indisponibles sur cet appareil pour le moment. Vous recevez toujours les courriels de suivi." />
+        </View>
+      ) : null}
     </Screen>
   );
 }

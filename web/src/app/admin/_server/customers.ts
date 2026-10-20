@@ -1,4 +1,5 @@
 import type { Customer, Prisma } from "@prisma/client";
+import { pushKyc } from "@/lib/push";
 import { z } from "zod";
 import { hashPassword, passwordProblem, temporaryPassword } from "@/lib/customer-auth";
 import { addressSchema, emailSchema, profileFields } from "@/lib/customer-input";
@@ -237,7 +238,12 @@ export async function patchCustomer(id: string, patch: z.infer<typeof customerPa
   const data: Prisma.CustomerUpdateInput = { ...patch };
   if (patch.kycStatus) data.kycReviewedAt = patch.kycStatus === "verified" || patch.kycStatus === "rejected" ? new Date() : null;
   try {
+    const before = patch.kycStatus ? await prisma.customer.findUnique({ where: { id }, select: { kycStatus: true } }) : null;
     const c = await prisma.customer.update({ where: { id }, data, include: { _count: { select: { transfers: true } } } });
+    // Décision d'identité prise par l'équipe : le client est prévenu sur son téléphone.
+    if (before && before.kycStatus !== c.kycStatus && (c.kycStatus === "verified" || c.kycStatus === "rejected")) {
+      await pushKyc(id, c.kycStatus);
+    }
     // Compte suspendu : toutes ses sessions sont coupées immédiatement.
     if (patch.status === "suspended") {
       await prisma.customerSession.updateMany({ where: { customerId: id, revokedAt: null }, data: { revokedAt: new Date() } });

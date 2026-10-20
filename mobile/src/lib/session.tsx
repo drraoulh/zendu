@@ -3,6 +3,7 @@ import * as Device from "expo-device";
 import { createContext, useCallback, useContext, useEffect, useMemo, useRef, useState, type ReactNode } from "react";
 import { Platform } from "react-native";
 import { api, ApiError, setAuthToken, setUnauthorizedHandler, type Customer, type LoginChallenge, type SignupInput } from "./api";
+import { registerPush, unregisterPush } from "./push";
 import { storage } from "./storage";
 
 /**
@@ -163,6 +164,13 @@ export function SessionProvider({ children }: { children: ReactNode }) {
     return () => setUnauthorizedHandler(null);
   }, [clearSession]);
 
+  // Notifications push : appareil enregistré sur le compte connecté (langue de l'appli comprise).
+  const pushOn = Boolean(token && profile?.id) && settings.notifications.push;
+  const pushLang = settings.language;
+  useEffect(() => {
+    if (pushOn) void registerPush(pushLang);
+  }, [pushOn, pushLang]);
+
   // Identité en cours de vérification : on interroge le serveur régulièrement.
   const kycPending = profile?.kyc === "pending";
   useEffect(() => {
@@ -240,6 +248,8 @@ export function SessionProvider({ children }: { children: ReactNode }) {
       },
       cancelSignIn: () => setPending(null),
       signOut: async () => {
+        // L'appareil cesse de recevoir les notifications de ce compte avant la fin de la session.
+        await unregisterPush(token);
         if (token) await api.logout(token).catch(() => undefined);
         await clearSession();
       },

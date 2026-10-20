@@ -1,6 +1,7 @@
 import { createHmac, timingSafeEqual } from "node:crypto";
 import type { Customer, Prisma } from "@prisma/client";
 import { prisma } from "@/lib/prisma";
+import { pushKyc } from "@/lib/push";
 
 /**
  * Vérification d'identité par Didit (https://didit.me) : pièce d'identité + selfie sur la page
@@ -112,7 +113,13 @@ export async function syncDiditDecision(customer: Customer): Promise<Customer> {
   }
   // "Not Started", "Awaiting User" : rien ne change.
   if (!data || (data.kycStatus === customer.kycStatus && data.kycNote === customer.kycNote)) return customer;
-  return prisma.customer.update({ where: { id: customer.id }, data });
+  const updated = await prisma.customer.update({ where: { id: customer.id }, data });
+  // Décision finale nouvelle : le client est prévenu sur son téléphone.
+  const next = updated.kycStatus;
+  if (next !== customer.kycStatus && (next === "verified" || next === "rejected")) {
+    await pushKyc(customer.id, next);
+  }
+  return updated;
 }
 
 /** Normalisation de Didit : un flottant entier est écrit comme un entier (100.0 → 100). */

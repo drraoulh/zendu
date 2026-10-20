@@ -256,6 +256,11 @@ export const api = {
   resend2fa: (challengeId: string, channel?: "sms" | "email") =>
     request<LoginChallenge>("/api/auth/resend-2fa", { method: "POST", body: JSON.stringify({ challengeId, channel }), token: null }),
   logout: (token: string) => request<{ ok: true }>("/api/auth/logout", { method: "POST", token }),
+  /** Cet appareil reçoit les notifications push du compte. */
+  registerPush: (pushToken: string, platform: "ios" | "android", lang: string) =>
+    request<{ ok: true }>("/api/me/push-token", { method: "POST", body: JSON.stringify({ token: pushToken, platform, lang }) }),
+  unregisterPush: (pushToken: string, token?: string) =>
+    request<{ ok: true }>("/api/me/push-token", { method: "DELETE", body: JSON.stringify({ token: pushToken }), ...(token ? { token } : {}) }),
   passwordReset: (email: string) => request<{ ok: true }>("/api/auth/password-reset", { method: "POST", body: JSON.stringify({ email }) }),
   me: (token?: string) => request<{ customer: Customer }>("/api/me", token ? { token } : undefined),
   updateMe: (patch: Partial<Customer>) => request<{ customer: Customer }>("/api/me", { method: "PATCH", body: JSON.stringify(patch) }),

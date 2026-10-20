@@ -1,10 +1,12 @@
 import { prisma } from "@/lib/prisma";
 import { formatMoney } from "@/lib/money";
 import { momoIsSandbox } from "@/lib/providers/payout";
+import { pushTransfer } from "@/lib/push";
 
 /**
  * Courriels envoyés au client quand son transfert avance (Brevo, mêmes variables que les codes de
  * connexion : BREVO_API_KEY, BREVO_SENDER_EMAIL, BREVO_SENDER_NAME). Sans Brevo : rien n'est envoyé.
+ * Les mêmes étapes partent aussi en notification push sur l'appli (voir lib/push.ts).
  * Un échec d'envoi n'empêche jamais le transfert d'avancer (seulement journalisé, sans donnée perso).
  */
 export type NotifyKind = "payment_detected" | "delivered" | "payout_failed" | "payment_mismatch" | "expired" | "cancelled";
@@ -38,15 +40,18 @@ function content(kind: NotifyKind, t: { sandbox?: boolean; reference: string; re
   }
 }
 
+/** Prévient le client : notification push sur ses appareils (appli) et courriel (Brevo). */
 export async function notifyCustomer(transferId: string, kind: NotifyKind): Promise<void> {
   const key = process.env.BREVO_API_KEY?.trim();
   const senderEmail = process.env.BREVO_SENDER_EMAIL?.trim();
-  if (!key || !senderEmail) return;
   try {
     const t = await prisma.transfer.findUnique({ where: { id: transferId }, include: { beneficiary: true } });
-    if (!t?.senderEmail) return;
+    if (!t) return;
+    const sandbox = t.payoutProvider === "momo" && momoIsSandbox();
+    await pushTransfer(t, kind, sandbox);
+    if (!key || !senderEmail || !t.senderEmail) return;
     const who = t.beneficiary.fullName.split(" ")[0] || t.beneficiary.fullName;
-    const c = content(kind, { ...t, sandbox: t.payoutProvider === "momo" && momoIsSandbox() }, who);
+    const c = content(kind, { ...t, sandbox }, who);
     const name = t.senderName.split(" ")[0] || t.senderName;
     const html = `<!doctype html><html lang="fr"><body style="margin:0;background:#f5f8ff;font-family:Arial,Helvetica,sans-serif;color:#0a1838">
 <table role="presentation" width="100%" cellpadding="0" cellspacing="0"><tr><td align="center" style="padding:32px 16px">

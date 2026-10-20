@@ -45,6 +45,13 @@
         }
       ],
       [
+        "expo-notifications",
+        {
+          "color": "#0b4dff",
+          "defaultChannel": "transfers"
+        }
+      ],
+      [
         "expo-contacts",
         {
           "contactsPermission": "WorldSoft Transfer lit uniquement le contact que vous choisissez pour remplir le nom et le numéro de votre destinataire."

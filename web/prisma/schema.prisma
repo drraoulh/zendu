@@ -201,6 +201,7 @@ model Customer {
   adminNote          String?
   lastLoginAt        DateTime?
   sessions           CustomerSession[]
+  pushTokens         PushToken[]
   otpChallenges      OtpChallenge[]
   transfers          Transfer[]
   createdAt          DateTime          @default(now())
@@ -267,4 +268,21 @@ model DiditWebhookEvent {
 
   @@index([sessionId])
   @@index([receivedAt])
+}
+
+/// Appareils du client qui reçoivent les notifications push (jeton Expo « ExponentPushToken[…] »).
+model PushToken {
+  token      String    @id
+  customerId String
+  customer   Customer  @relation(fields: [customerId], references: [id], onDelete: Cascade)
+  /// "ios" | "android"
+  platform   String
+  /// Langue des notifications : "fr" | "en" | "es" | "zh" (celle de l'appli sur cet appareil).
+  lang       String    @default("fr")
+  createdAt  DateTime  @default(now())
+  updatedAt  DateTime  @updatedAt
+  /// Renseigné quand Expo signale l'appareil comme désinscrit (application supprimée…).
+  disabledAt DateTime?
+
+  @@index([customerId])
 }

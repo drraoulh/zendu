@@ -5,11 +5,13 @@ import { StatusBar } from "expo-status-bar";
 import { useEffect } from "react";
 import { KeyboardProvider } from "react-native-keyboard-controller";
 import { SafeAreaProvider } from "react-native-safe-area-context";
+import { configurePush } from "@/lib/push";
 import { SessionProvider, useSession } from "@/lib/session";
 import { StoreProvider } from "@/lib/store";
 import { colors } from "@/lib/theme";
 
 void SplashScreen.preventAutoHideAsync();
+configurePush();
 
 export default function RootLayout() {
   const [fontsLoaded, fontError] = useFonts({
