@@ -1,5 +1,6 @@
 import { prisma } from "@/lib/prisma";
 import { formatMoney } from "@/lib/money";
+import { momoIsSandbox } from "@/lib/providers/payout";
 
 /**
  * Courriels envoyés au client quand son transfert avance (Brevo, mêmes variables que les codes de
@@ -12,13 +13,19 @@ export const NOTIFY_KINDS: readonly string[] = ["payment_detected", "delivered",
 
 const esc = (s: string) => s.replace(/[<>&"]/g, "");
 
-function content(kind: NotifyKind, t: { reference: string; receiveAmountXaf: number; receiveCurrency: string; totalCad: number; sendCurrency: string; failureReason: string | null }, who: string) {
+function content(kind: NotifyKind, t: { sandbox?: boolean; reference: string; receiveAmountXaf: number; receiveCurrency: string; totalCad: number; sendCurrency: string; failureReason: string | null }, who: string) {
   const received = formatMoney(t.receiveAmountXaf, t.receiveCurrency, "fr-CA");
   const paid = formatMoney(t.totalCad, t.sendCurrency, "fr-CA");
   switch (kind) {
     case "payment_detected":
       return { subject: `Paiement reçu — transfert ${t.reference}`, text: `Nous avons bien reçu votre paiement de ${paid}. L'envoi de ${received} à ${who} est en cours.` };
     case "delivered":
+      if (t.sandbox) {
+        return {
+          subject: `Versement de TEST — transfert ${t.reference}`,
+          text: `Phase de test : le versement de ${received} à ${who} a été simulé chez MTN (sandbox). AUCUN argent réel n'a été versé. Si vous avez payé, contactez-nous avec la référence ${t.reference} pour être remboursé.`,
+        };
+      }
       return { subject: `Argent livré — transfert ${t.reference}`, text: `Bonne nouvelle : ${who} a reçu ${received}.` };
     case "payout_failed":
       return { subject: `Problème de versement — transfert ${t.reference}`, text: `Le versement à ${who} n'a pas abouti${t.failureReason ? ` (${t.failureReason})` : ""}. Notre équipe vous contacte pour le relancer ou vous rembourser.` };
@@ -39,7 +46,7 @@ export async function notifyCustomer(transferId: string, kind: NotifyKind): Prom
     const t = await prisma.transfer.findUnique({ where: { id: transferId }, include: { beneficiary: true } });
     if (!t?.senderEmail) return;
     const who = t.beneficiary.fullName.split(" ")[0] || t.beneficiary.fullName;
-    const c = content(kind, t, who);
+    const c = content(kind, { ...t, sandbox: t.payoutProvider === "momo" && momoIsSandbox() }, who);
     const name = t.senderName.split(" ")[0] || t.senderName;
     const html = `<!doctype html><html lang="fr"><body style="margin:0;background:#f5f8ff;font-family:Arial,Helvetica,sans-serif;color:#0a1838">
 <table role="presentation" width="100%" cellpadding="0" cellspacing="0"><tr><td align="center" style="padding:32px 16px">

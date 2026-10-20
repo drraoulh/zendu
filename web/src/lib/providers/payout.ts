@@ -60,7 +60,8 @@ export function isSandboxTester(senderEmail?: string | null): boolean {
     .split(",")
     .map((e) => e.trim().toLowerCase())
     .filter(Boolean);
-  return list.includes(senderEmail.trim().toLowerCase());
+  // « * » : tous les comptes (phase de test). Les clients sont alors prévenus que le versement est fictif.
+  return list.includes("*") || list.includes(senderEmail.trim().toLowerCase());
 }
 
 export function payoutProviderFor(network: string, country: string, senderEmail?: string | null): string {
