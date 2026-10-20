@@ -9,6 +9,7 @@ import { cardLogoId, PaymentLogo } from "./payment-logo";
 import { Checkbox } from "./form";
 import { Icon } from "./icons";
 import { Button, Field, Small } from "./ui";
+import { tr } from "@/lib/i18n";
 
 
 /**
@@ -85,8 +86,8 @@ export function CardForm({ defaultHolder, submitLabel, onSubmit }: { defaultHold
   function startScan() {
     if (cardScanAvailable) return setScanning(true);
     Alert.alert(
-      "Scan indisponible ici",
-      "Le scan de carte fonctionne dans l'application installée (APK Android ou version iPhone). Dans Expo Go, saisissez la carte ou utilisez le remplissage automatique du clavier.",
+      tr("Scan indisponible ici"),
+      tr("Le scan de carte fonctionne dans l'application installée (APK Android ou version iPhone). Dans Expo Go, saisissez la carte ou utilisez le remplissage automatique du clavier."),
     );
   }
 
@@ -106,13 +107,13 @@ export function CardForm({ defaultHolder, submitLabel, onSubmit }: { defaultHold
 
   function submit() {
     const e: Record<string, string> = {};
-    if (!numberOk) e.number = "Numéro de carte invalide";
+    if (!numberOk) e.number = tr("Numéro de carte invalide");
     // Débit uniquement (comme les services de transfert les moins chers) : Amex n'émet que des cartes
     // de crédit. Les autres cartes de crédit sont refusées par le prestataire de paiement.
-    else if (brand === "Amex") e.number = "American Express n'est pas une carte de débit";
-    if (!expiryValid(exp)) e.exp = "Date invalide ou dépassée";
-    if (!/^\d{3,4}$/.test(cvc)) e.cvc = brand === "Amex" ? "4 chiffres" : "3 chiffres";
-    if (holder.trim().length < 2) e.holder = "Nom requis";
+    else if (brand === "Amex") e.number = tr("American Express n'est pas une carte de débit");
+    if (!expiryValid(exp)) e.exp = tr("Date invalide ou dépassée");
+    if (!/^\d{3,4}$/.test(cvc)) e.cvc = brand === "Amex" ? tr("4 chiffres") : tr("3 chiffres");
+    if (holder.trim().length < 2) e.holder = tr("Nom requis");
     setErrors(e);
     if (Object.keys(e).length) return;
     onSubmit({ brand, last4: digits.slice(-4), exp, holder: holder.trim(), isDefault });
@@ -145,7 +146,7 @@ export function CardForm({ defaultHolder, submitLabel, onSubmit }: { defaultHold
                 <Text style={c.cvcText}>{cvc ? "•".repeat(cvc.length) : "CVC"}</Text>
               </View>
             </View>
-            <Text style={c.meta}>Les 3 chiffres au dos de la carte (4 sur le devant pour Amex)</Text>
+            <Text style={c.meta}>{tr("Les 3 chiffres au dos de la carte (4 sur le devant pour Amex)")}</Text>
           </>
         ) : (
           <>
@@ -167,7 +168,7 @@ export function CardForm({ defaultHolder, submitLabel, onSubmit }: { defaultHold
             <View style={{ flexDirection: "row", justifyContent: "space-between", gap: 12 }}>
               <View style={{ flex: 1 }}>
                 <Text style={c.caption}>TITULAIRE</Text>
-                <Text style={c.meta} numberOfLines={1}>{(holder || "NOM SUR LA CARTE").toUpperCase()}</Text>
+                <Text style={c.meta} numberOfLines={1}>{(holder || tr("NOM SUR LA CARTE")).toUpperCase()}</Text>
               </View>
               <View>
                 <Text style={c.caption}>EXPIRE</Text>
@@ -179,13 +180,13 @@ export function CardForm({ defaultHolder, submitLabel, onSubmit }: { defaultHold
       </View>
 
       {Platform.OS !== "web" && !typing ? (
-        <Pressable accessibilityRole="button" accessibilityLabel="Scanner ma carte avec l'appareil photo" onPress={startScan} style={({ pressed }) => [c.scan, pressed && { opacity: 0.85 }]}>
+        <Pressable accessibilityRole="button" accessibilityLabel={tr("Scanner ma carte avec l'appareil photo")} onPress={startScan} style={({ pressed }) => [c.scan, pressed && { opacity: 0.85 }]}>
           <View style={c.scanIcon}>
             <Icon name="camera" color={colors.white} size={22} />
           </View>
           <View style={{ flex: 1 }}>
-            <Text style={c.scanTitle}>Scanner ma carte</Text>
-            <Small>Numéro, date et nom remplis avec l&apos;appareil photo</Small>
+            <Text style={c.scanTitle}>{tr("Scanner ma carte")}</Text>
+            <Small>{tr("Numéro, date et nom remplis avec l'appareil photo")}</Small>
           </View>
           <Icon name="chev" color={colors.brand} size={18} />
         </Pressable>
@@ -194,7 +195,7 @@ export function CardForm({ defaultHolder, submitLabel, onSubmit }: { defaultHold
         <View style={c.filled} accessibilityRole="alert">
           <Icon name="check" color={colors.success} size={16} strokeWidth={2.6} />
           <Small style={{ color: colors.success, flex: 1 }}>
-            {autofilled === "scan" ? "Carte scannée : vérifiez les informations puis ajoutez le CVC." : "Numéro et date remplis automatiquement. Ajoutez le CVC."}
+            {autofilled === "scan" ? tr("Carte scannée : vérifiez les informations puis ajoutez le CVC.") : tr("Numéro et date remplis automatiquement. Ajoutez le CVC.")}
           </Small>
         </View>
       ) : null}
@@ -202,7 +203,7 @@ export function CardForm({ defaultHolder, submitLabel, onSubmit }: { defaultHold
 
       <Field
         ref={numberRef}
-        label="Numéro de carte"
+        label={tr("Numéro de carte")}
         value={number}
         onChangeText={onNumber}
         placeholder="1234 5678 9012 3456"
@@ -220,7 +221,7 @@ export function CardForm({ defaultHolder, submitLabel, onSubmit }: { defaultHold
         <View style={{ flex: 1 }}>
           <Field
             ref={expRef}
-            label="Expiration"
+            label={tr("Expiration")}
             value={exp}
             onChangeText={onExp}
             placeholder="MM/AA"
@@ -238,7 +239,7 @@ export function CardForm({ defaultHolder, submitLabel, onSubmit }: { defaultHold
             label="CVC"
             value={cvc}
             onChangeText={onCvc}
-            placeholder={brand === "Amex" ? "4 chiffres" : "3 chiffres"}
+            placeholder={brand === "Amex" ? tr("4 chiffres") : tr("3 chiffres")}
             keyboardType="number-pad"
             secureTextEntry
             autoComplete="cc-csc"
@@ -257,7 +258,7 @@ export function CardForm({ defaultHolder, submitLabel, onSubmit }: { defaultHold
       </View>
       <Field
         ref={holderRef}
-        label="Nom sur la carte"
+        label={tr("Nom sur la carte")}
         value={holder}
         onChangeText={(v) => {
           clear("holder");
@@ -273,12 +274,12 @@ export function CardForm({ defaultHolder, submitLabel, onSubmit }: { defaultHold
         error={errors.holder}
       />
       <Checkbox checked={isDefault} onChange={setIsDefault}>
-        <Small style={{ color: colors.ink }}>Définir comme moyen de paiement par défaut</Small>
+        <Small style={{ color: colors.ink }}>{tr("Définir comme moyen de paiement par défaut")}</Small>
       </Checkbox>
-      <Button title={submitLabel} icon="lock" onPress={submit} />
+      <Button title={tr(submitLabel)} icon="lock" onPress={submit} />
       <View style={c.secure}>
         <Icon name="shield" color={colors.muted} size={14} />
-        <Small>Connexion chiffrée · aucun débit à l&apos;enregistrement · numéro complet jamais conservé</Small>
+        <Small>{tr("Connexion chiffrée · aucun débit à l'enregistrement · numéro complet jamais conservé")}</Small>
       </View>
     </View>
   );

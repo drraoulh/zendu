@@ -5,6 +5,7 @@ import { Badge, Button, Card, Header, ListItem, Notice, P, Screen } from "@/comp
 import { api, type DeviceSession } from "@/lib/api";
 import { dateTime } from "@/lib/format";
 import { colors } from "@/lib/theme";
+import { tr } from "@/lib/i18n";
 
 export default function Devices() {
   const [list, setList] = useState<DeviceSession[] | null>(null);
@@ -28,7 +29,7 @@ export default function Devices() {
       else await api.revokeOtherSessions();
       load();
     } catch (e) {
-      setError(e instanceof Error ? e.message : "Action impossible");
+      setError(e instanceof Error ? e.message : tr("Action impossible"));
     }
   }
 
@@ -36,8 +37,8 @@ export default function Devices() {
 
   return (
     <Screen>
-      <Header title="Appareils connectés" />
-      <P style={{ marginBottom: 16 }}>Ces appareils ont accès à votre compte. Déconnectez ceux que vous ne reconnaissez pas.</P>
+      <Header title={tr("Appareils connectés")} />
+      <P style={{ marginBottom: 16 }}>{tr("Ces appareils ont accès à votre compte. Déconnectez ceux que vous ne reconnaissez pas.")}</P>
       {error ? (
         <View style={{ marginBottom: 12 }}>
           <Notice tone="danger" icon="alert" text={error} />
@@ -46,7 +47,7 @@ export default function Devices() {
       {!list ? (
         // Échec du premier chargement : bouton « Réessayer » au lieu d'un chargement sans fin.
         error ? (
-          <Button title="Réessayer" variant="secondary" onPress={load} />
+          <Button title={tr("Réessayer")} variant="secondary" onPress={load} />
         ) : (
           <ActivityIndicator color={colors.brand} style={{ marginTop: 30 }} />
         )
@@ -56,12 +57,12 @@ export default function Devices() {
             <ListItem
               key={s.id}
               icon={/navigateur|windows|mac/i.test(s.device ?? "") ? "tech" : "phone"}
-              title={s.device ?? "Appareil inconnu"}
-              subtitle={s.current ? "Actif maintenant" : `Actif le ${dateTime(s.lastUsedAt)}`}
+              title={s.device ?? tr("Appareil inconnu")}
+              subtitle={s.current ? tr("Actif maintenant") : tr("Actif le {0}", dateTime(s.lastUsedAt))}
               // Badge / bouton sous le texte : à droite, ils écrasaient le nom de l'appareil sur petit écran.
               extra={
                 <View style={{ marginTop: 6, alignItems: "flex-start" }}>
-                  {s.current ? <Badge label="Cet appareil" tone="success" /> : <Button title="Déconnecter" size="sm" variant="secondary" onPress={() => revoke(s.id)} />}
+                  {s.current ? <Badge label={tr("Cet appareil")} tone="success" /> : <Button title={tr("Déconnecter")} size="sm" variant="secondary" onPress={() => revoke(s.id)} />}
                 </View>
               }
               right={<View />}
@@ -69,9 +70,9 @@ export default function Devices() {
           ))}
         </Card>
       )}
-      {others.length > 1 ? <Button title="Déconnecter tous les autres appareils" variant="danger" onPress={() => revoke()} /> : null}
+      {others.length > 1 ? <Button title={tr("Déconnecter tous les autres appareils")} variant="danger" onPress={() => revoke()} /> : null}
       <View style={{ marginTop: 12 }}>
-        <Notice tone="neutral" icon="info" text="Un appareil inconnu ? Déconnectez-le, puis changez votre mot de passe." />
+        <Notice tone="neutral" icon="info" text={tr("Un appareil inconnu ? Déconnectez-le, puis changez votre mot de passe.")} />
       </View>
     </Screen>
   );

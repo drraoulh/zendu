@@ -5,6 +5,7 @@ import { Icon } from "@/components/icons";
 import { Button, Card, Empty, H1, Header, P, Screen, Small } from "@/components/ui";
 import { findArticle, HELP_CATEGORIES } from "@/lib/help";
 import { colors, fonts } from "@/lib/theme";
+import { tr } from "@/lib/i18n";
 
 export default function Article() {
   const { slug } = useLocalSearchParams<{ slug: string }>();
@@ -14,29 +15,29 @@ export default function Article() {
   if (!a) {
     return (
       <Screen>
-        <Header title="Article d'aide" />
-        <Empty icon="help" title="Article introuvable" text="Revenez au centre d'aide." />
+        <Header title={tr("Article d'aide")} />
+        <Empty icon="help" title={tr("Article introuvable")} text={tr("Revenez au centre d'aide.")} />
       </Screen>
     );
   }
 
   return (
     <Screen>
-      <Header title="Article d'aide" />
-      <Small style={{ color: colors.brand, fontFamily: fonts.semibold }}>Aide · {HELP_CATEGORIES.find((c) => c.id === a.category)?.label}</Small>
-      <H1 style={{ marginTop: 6 }}>{a.title}</H1>
-      <P style={{ marginTop: 8, marginBottom: 16 }}>{a.intro}</P>
+      <Header title={tr("Article d'aide")} />
+      <Small style={{ color: colors.brand, fontFamily: fonts.semibold }}>{tr("Aide ·")}{" "}{HELP_CATEGORIES.find((c) => c.id === a.category)?.label}</Small>
+      <H1 style={{ marginTop: 6 }}>{tr(a.title)}</H1>
+      <P style={{ marginTop: 8, marginBottom: 16 }}>{tr(a.intro)}</P>
       <Card style={{ gap: 14, marginBottom: 14 }}>
         {a.sections.map((s) => (
           <View key={s.title}>
-            <Text style={{ fontFamily: fonts.heading, color: colors.ink, fontSize: 15 }}>{s.title}</Text>
-            <Small style={{ marginTop: 2 }}>{s.text}</Small>
+            <Text style={{ fontFamily: fonts.heading, color: colors.ink, fontSize: 15 }}>{tr(s.title)}</Text>
+            <Small style={{ marginTop: 2 }}>{tr(s.text)}</Small>
           </View>
         ))}
       </Card>
       {a.bullets ? (
         <Card style={{ marginBottom: 14 }}>
-          <Text style={{ fontFamily: fonts.heading, color: colors.ink, fontSize: 15, marginBottom: 8 }}>{a.bullets.title}</Text>
+          <Text style={{ fontFamily: fonts.heading, color: colors.ink, fontSize: 15, marginBottom: 8 }}>{tr(a.bullets.title)}</Text>
           {a.bullets.items.map((i) => (
             <View key={i} style={{ flexDirection: "row", gap: 8, paddingVertical: 3 }}>
               <Icon name="chev" size={14} color={colors.brand} />
@@ -46,16 +47,16 @@ export default function Article() {
         </Card>
       ) : null}
       <Card style={{ alignItems: "center", gap: 10 }}>
-        <Text style={{ fontFamily: fonts.semibold, color: colors.ink }}>{vote ? "Merci pour votre retour !" : "Cet article vous a-t-il aidé ?"}</Text>
+        <Text style={{ fontFamily: fonts.semibold, color: colors.ink }}>{vote ? tr("Merci pour votre retour !") : tr("Cet article vous a-t-il aidé ?")}</Text>
         {!vote ? (
           <View style={{ flexDirection: "row", gap: 8 }}>
-            <Button title="Oui" size="sm" variant="secondary" onPress={() => setVote("yes")} />
-            <Button title="Non" size="sm" variant="secondary" onPress={() => setVote("no")} />
+            <Button title={tr("Oui")} size="sm" variant="secondary" onPress={() => setVote("yes")} />
+            <Button title={tr("Non")} size="sm" variant="secondary" onPress={() => setVote("no")} />
           </View>
         ) : null}
-        {vote === "no" ? <Small>Toujours bloqué ? Notre équipe peut vous aider.</Small> : null}
+        {vote === "no" ? <Small>{tr("Toujours bloqué ? Notre équipe peut vous aider.")}</Small> : null}
       </Card>
-      <Button title="Nous contacter" icon="mail" variant="ghost" onPress={() => router.push({ pathname: "/help/contact", params: { subject: a.title } })} style={{ marginTop: 10 }} />
+      <Button title={tr("Nous contacter")} icon="mail" variant="ghost" onPress={() => router.push({ pathname: "/help/contact", params: { subject: a.title } })} style={{ marginTop: 10 }} />
     </Screen>
   );
 }

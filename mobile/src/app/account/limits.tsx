@@ -6,6 +6,7 @@ import { Button, Card, Header, Notice, Screen, Small, SummaryRow } from "@/compo
 import { COUNTRY_CODES, payMethodsOf, useCorridors } from "@/lib/corridors";
 import { countryName, money } from "@/lib/format";
 import { useSession } from "@/lib/session";
+import { tr } from "@/lib/i18n";
 
 /** « le Canada », « le Cameroun », « la Chine ». */
 const withArticle = (code: string) => `${code === "CN" ? "la" : "le"} ${countryName(code)}`;
@@ -22,45 +23,45 @@ export default function Limits() {
 
   return (
     <Screen>
-      <Header title="Limites d'envoi" />
+      <Header title={tr("Limites d'envoi")} />
       {kyc !== "verified" ? (
         <View style={{ marginBottom: 14 }}>
           <Notice
             tone="warn"
             icon="shield"
-            title={kyc === "pending" ? "Vérification en cours" : "Identité à vérifier"}
-            text={kyc === "pending" ? "Vous pourrez envoyer dès que votre identité sera confirmée." : "La vérification d'identité est obligatoire avant votre premier envoi."}
+            title={kyc === "pending" ? tr("Vérification en cours") : tr("Identité à vérifier")}
+            text={kyc === "pending" ? tr("Vous pourrez envoyer dès que votre identité sera confirmée.") : tr("La vérification d'identité est obligatoire avant votre premier envoi.")}
           />
         </View>
       ) : null}
-      <Small>Montant minimum et maximum par envoi, selon le pays et la devise de départ. Les frais et le taux sont toujours affichés avant le paiement.</Small>
+      <Small>{tr("Montant minimum et maximum par envoi, selon le pays et la devise de départ. Les frais et le taux sont toujours affichés avant le paiement.")}</Small>
       {sources.map((source) => {
         const list = corridors.filter((c) => c.source === source);
         if (!list.length) return null;
         const c = list[0];
         return (
           <View key={source}>
-            <SectionTitle>{`Depuis ${withArticle(source)}${source === home ? " (vous)" : ""}`}</SectionTitle>
+            <SectionTitle>{tr("Depuis {0}{1}", withArticle(source), source === home ? " (vous)" : "")}</SectionTitle>
             <Card>
               <View style={{ flexDirection: "row", alignItems: "center", gap: 8, marginBottom: 6 }}>
                 <Flag code={source} size={18} />
-                <Small>Vers {list.map((x) => withArticle(x.destination)).join(" ou ")}</Small>
+                <Small>{tr("Vers")}{" "}{list.map((x) => withArticle(x.destination)).join(" ou ")}</Small>
               </View>
               {!isOpen(source) ? (
-                <Small style={{ marginTop: 4 }}>Bientôt disponible. Pour l&apos;instant, les envois partent du Canada (virement Interac).</Small>
+                <Small style={{ marginTop: 4 }}>{tr("Bientôt disponible. Pour l'instant, les envois partent du Canada (virement Interac).")}</Small>
               ) : list.every((x) => x.minSend === c.minSend && x.maxSend === c.maxSend) ? (
                 <>
-                  <SummaryRow label="Minimum par envoi" value={money(c.minSend, c.sendCurrency)} />
-                  <SummaryRow label="Maximum par envoi" value={money(c.maxSend, c.sendCurrency)} strong />
+                  <SummaryRow label={tr("Minimum par envoi")} value={money(c.minSend, c.sendCurrency)} />
+                  <SummaryRow label={tr("Maximum par envoi")} value={money(c.maxSend, c.sendCurrency)} strong />
                 </>
               ) : (
-                list.map((x) => <SummaryRow key={x.id} label={`Vers ${withArticle(x.destination)}`} value={`${money(x.minSend, x.sendCurrency)} à ${money(x.maxSend, x.sendCurrency)}`} />)
+                list.map((x) => <SummaryRow key={x.id} label={tr("Vers {0}", withArticle(x.destination))} value={tr("{0} à {1}", money(x.minSend, x.sendCurrency), money(x.maxSend, x.sendCurrency))} />)
               )}
             </Card>
           </View>
         );
       })}
-      <Button title="Une question sur les limites ?" variant="ghost" icon="help" style={{ marginTop: 12 }} onPress={() => router.push({ pathname: "/help/[slug]", params: { slug: "limites" } })} />
+      <Button title={tr("Une question sur les limites ?")} variant="ghost" icon="help" style={{ marginTop: 12 }} onPress={() => router.push({ pathname: "/help/[slug]", params: { slug: "limites" } })} />
     </Screen>
   );
 }

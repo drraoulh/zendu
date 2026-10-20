@@ -8,11 +8,12 @@ import { api } from "@/lib/api";
 import { company, PLACEHOLDER } from "@/lib/company";
 import { useSession } from "@/lib/session";
 import { useStore } from "@/lib/store";
+import { tr } from "@/lib/i18n";
 
 const SUBJECTS = [
-  { value: "transfert", label: "Transfert" },
-  { value: "shipping", label: "Colis" },
-  { value: "autre", label: "Autre" },
+  { value: "transfert", label: tr("Transfert") },
+  { value: "shipping", label: tr("Colis") },
+  { value: "autre", label: tr("Autre") },
 ] as const;
 
 type Subject = (typeof SUBJECTS)[number]["value"];
@@ -32,7 +33,7 @@ export default function Contact() {
   async function send() {
     if (!profile) return;
     setError(null);
-    if (message.trim().length < 5) return setError("Décrivez votre demande (5 caractères minimum).");
+    if (message.trim().length < 5) return setError(tr("Décrivez votre demande (5 caractères minimum)."));
     setBusy(true);
     try {
       const body = title.trim() ? `${title.trim()}\n\n${message.trim()}` : message.trim();
@@ -47,7 +48,7 @@ export default function Contact() {
       setSent(res.reference);
       setMessage("");
     } catch (e) {
-      setError(e instanceof Error ? e.message : "Envoi impossible");
+      setError(e instanceof Error ? e.message : tr("Envoi impossible"));
     } finally {
       setBusy(false);
     }
@@ -55,11 +56,11 @@ export default function Contact() {
 
   return (
     <Screen>
-      <Header title="Nous contacter" />
+      <Header title={tr("Nous contacter")} />
       <Card style={{ paddingVertical: 4, marginBottom: 16 }}>
         <ListItem
           icon="mail"
-          title="Courriel"
+          title={tr("Courriel")}
           subtitle={company.email ?? PLACEHOLDER}
           onPress={company.email ? () => Linking.openURL(`mailto:${company.email}`) : undefined}
         />
@@ -71,31 +72,31 @@ export default function Contact() {
         />
         <ListItem
           icon="phone"
-          title="Téléphone"
+          title={tr("Téléphone")}
           subtitle={company.phone ?? PLACEHOLDER}
           onPress={company.phone ? () => Linking.openURL(`tel:${company.phone?.replace(/\s/g, "")}`) : undefined}
         />
       </Card>
 
-      <H2 style={{ fontSize: 18, marginBottom: 6 }}>Écrire à l&apos;équipe</H2>
-      <Small style={{ marginBottom: 14 }}>Bonjour {profile?.firstName} ! Comment pouvons-nous vous aider aujourd&apos;hui ?</Small>
+      <H2 style={{ fontSize: 18, marginBottom: 6 }}>{tr("Écrire à l'équipe")}</H2>
+      <Small style={{ marginBottom: 14 }}>{tr("Bonjour {0} ! Comment pouvons-nous vous aider aujourd'hui ?", profile?.firstName)}</Small>
       {sent ? (
         <View style={{ gap: 10 }}>
-          <Notice tone="success" icon="check" title="Message envoyé" text={`Référence ${sent}. Nous vous répondons par courriel à ${profile?.email}.`} />
-          <Button title="Écrire un autre message" variant="secondary" onPress={() => setSent(null)} />
+          <Notice tone="success" icon="check" title={tr("Message envoyé")} text={tr("Référence {0}. Nous vous répondons par courriel à {1}.", sent, profile?.email)} />
+          <Button title={tr("Écrire un autre message")} variant="secondary" onPress={() => setSent(null)} />
         </View>
       ) : (
         <>
-          <Label>Sujet</Label>
+          <Label>{tr("Sujet")}</Label>
           <Chips options={[...SUBJECTS]} value={subject} onChange={setSubject} />
-          <Field label="Objet" value={title} onChangeText={setTitle} placeholder="Ex. Transfert PW-XXXXXX" />
-          <Field label="Message" value={message} onChangeText={setMessage} placeholder="Décrivez votre demande" multiline numberOfLines={5} style={{ minHeight: 110, textAlignVertical: "top" }} />
+          <Field label={tr("Objet")} value={title} onChangeText={setTitle} placeholder={tr("Ex. Transfert PW-XXXXXX")} />
+          <Field label={tr("Message")} value={message} onChangeText={setMessage} placeholder={tr("Décrivez votre demande")} multiline numberOfLines={5} style={{ minHeight: 110, textAlignVertical: "top" }} />
           {error ? (
             <View style={{ marginBottom: 10 }}>
               <Notice tone="danger" icon="alert" text={error} />
             </View>
           ) : null}
-          <Button title="Envoyer le message" icon="send" onPress={send} loading={busy} />
+          <Button title={tr("Envoyer le message")} icon="send" onPress={send} loading={busy} />
         </>
       )}
     </Screen>

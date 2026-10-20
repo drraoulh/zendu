@@ -6,6 +6,7 @@ import { H1, Header, Label, Screen } from "@/components/ui";
 import { COUNTRIES, COUNTRY_CODES, FALLBACK_CORRIDORS, type CountryCode } from "@/lib/corridors";
 import { useSession } from "@/lib/session";
 import { useStore } from "@/lib/store";
+import { tr } from "@/lib/i18n";
 
 /** Ajout (ou modification avec ?id=) d'un destinataire. */
 export default function NewRecipient() {
@@ -19,11 +20,11 @@ export default function NewRecipient() {
 
   return (
     <Screen>
-      <Header title={existing ? "Modifier le destinataire" : "Ajouter un destinataire"} />
-      <H1 style={{ marginBottom: 16 }}>{existing ? existing.fullName : "Nouveau destinataire"}</H1>
+      <Header title={existing ? tr("Modifier le destinataire") : tr("Ajouter un destinataire")} />
+      <H1 style={{ marginBottom: 16 }}>{existing ? existing.fullName : tr("Nouveau destinataire")}</H1>
       {!existing ? (
         <>
-          <Label>Pays de destination</Label>
+          <Label>{tr("Pays de destination")}</Label>
           <Chips options={COUNTRY_CODES.map((c) => ({ value: c, label: COUNTRIES[c].name }))} value={country} onChange={setCountry} />
         </>
       ) : null}
@@ -33,7 +34,7 @@ export default function NewRecipient() {
         networks={networks}
         initial={existing}
         withRelation
-        submitLabel="Enregistrer"
+        submitLabel={tr("Enregistrer")}
         onSubmit={(r) => {
           saveRecipient({ ...r, id: existing?.id });
           router.back();

@@ -3,6 +3,7 @@ import * as Device from "expo-device";
 import { createContext, useCallback, useContext, useEffect, useMemo, useRef, useState, type ReactNode } from "react";
 import { Platform } from "react-native";
 import { api, ApiError, setAuthToken, setUnauthorizedHandler, type Customer, type LoginChallenge, type SignupInput } from "./api";
+import { getLang, setLang, tr } from "./i18n";
 import { registerPush, unregisterPush } from "./push";
 import { storage } from "./storage";
 
@@ -37,7 +38,8 @@ export const DEFAULT_SETTINGS: Settings = {
   twoFactor: true,
   biometric: false,
   pin: false,
-  language: "fr",
+  // Langue du téléphone (ou réglage déjà enregistré), lue au démarrage par lib/i18n.
+  language: getLang(),
   notifications: { transfers: true, rates: true, shipping: true, finance: true, offers: false, push: true, email: true, sms: false },
 };
 
@@ -97,12 +99,12 @@ function hash(value: string) {
 }
 
 export function deviceName() {
-  const model = Device.modelName ?? (Platform.OS === "web" ? "Navigateur web" : "Téléphone");
+  const model = Device.modelName ?? (Platform.OS === "web" ? tr("Navigateur web") : tr("Téléphone"));
   return [model, Device.osName, Device.osVersion].filter(Boolean).join(" · ");
 }
 
 function message(e: unknown) {
-  return e instanceof Error ? e.message : "Une erreur est survenue.";
+  return e instanceof Error ? e.message : tr("Une erreur est survenue.");
 }
 
 export function SessionProvider({ children }: { children: ReactNode }) {
@@ -139,7 +141,11 @@ export function SessionProvider({ children }: { children: ReactNode }) {
         storage.get<boolean>(KEY_ONBOARDED),
         storage.get<string>(KEY_PIN),
       ]);
-      if (st) setSettings({ ...DEFAULT_SETTINGS, ...st, notifications: { ...DEFAULT_SETTINGS.notifications, ...st.notifications } });
+      if (st) {
+        const merged = { ...DEFAULT_SETTINGS, ...st, notifications: { ...DEFAULT_SETTINGS.notifications, ...st.notifications } };
+        setLang(merged.language);
+        setSettings(merged);
+      }
       setOnboarded(Boolean(o));
       setPinHash(pin);
       if (t && p) {
@@ -223,7 +229,7 @@ export function SessionProvider({ children }: { children: ReactNode }) {
         }
       },
       completeSignIn: async (code) => {
-        if (!pending) return { ok: false, error: "Connexion expirée. Reconnectez-vous.", restart: true };
+        if (!pending) return { ok: false, error: tr("Connexion expirée. Reconnectez-vous."), restart: true };
         try {
           const r = await api.verify2fa(pending.challenge.challengeId, code);
           tempPassword.current = r.customer.mustChangePassword ? pending.password : null;
@@ -237,7 +243,7 @@ export function SessionProvider({ children }: { children: ReactNode }) {
         }
       },
       resendCode: async (channel) => {
-        if (!pending) return { ok: false, error: "Connexion expirée. Reconnectez-vous." };
+        if (!pending) return { ok: false, error: tr("Connexion expirée. Reconnectez-vous.") };
         try {
           const challenge = await api.resend2fa(pending.challenge.challengeId, channel);
           setPending({ ...pending, challenge });
@@ -305,6 +311,7 @@ export function SessionProvider({ children }: { children: ReactNode }) {
       },
       updateSettings: async (patch) => {
         const next = { ...settings, ...patch, notifications: { ...settings.notifications, ...patch.notifications } };
+        if (patch.language) setLang(patch.language);
         setSettings(next);
         await storage.set(KEY_SETTINGS, next);
       },
@@ -319,7 +326,7 @@ export function SessionProvider({ children }: { children: ReactNode }) {
       },
       replaceTemporaryPassword: async (next, current) => {
         const temp = current ?? tempPassword.current;
-        if (!temp) return { ok: false, error: "Saisissez le mot de passe temporaire reçu par courriel." };
+        if (!temp) return { ok: false, error: tr("Saisissez le mot de passe temporaire reçu par courriel.") };
         try {
           const r = await api.changePassword(temp, next);
           tempPassword.current = null;
@@ -360,10 +367,10 @@ export function useSession() {
 
 /** Règles de mot de passe communes (identiques au serveur). */
 export const PASSWORD_RULES: { label: string; test: (v: string) => boolean }[] = [
-  { label: "Au moins 8 caractères", test: (v) => v.length >= 8 },
-  { label: "Une majuscule et une minuscule", test: (v) => /[a-z]/.test(v) && /[A-Z]/.test(v) },
-  { label: "Au moins un chiffre", test: (v) => /\d/.test(v) },
-  { label: "Un caractère spécial (! ? @ # …)", test: (v) => /[^A-Za-z0-9]/.test(v) },
+  { label: tr("Au moins 8 caractères"), test: (v) => v.length >= 8 },
+  { label: tr("Une majuscule et une minuscule"), test: (v) => /[a-z]/.test(v) && /[A-Z]/.test(v) },
+  { label: tr("Au moins un chiffre"), test: (v) => /\d/.test(v) },
+  { label: tr("Un caractère spécial (! ? @ # …)"), test: (v) => /[^A-Za-z0-9]/.test(v) },
 ];
 
 export function passwordScore(v: string) {

@@ -1,3 +1,4 @@
+import { tr } from "@/lib/i18n";
 /**
  * Coordonnées PWFINTECH affichées dans l'appli (variables EXPO_PUBLIC_COMPANY_*).
  * Valeur absente → « À compléter » : aucune information n'est inventée.
@@ -11,7 +12,7 @@ export const company = {
   email: v(process.env.EXPO_PUBLIC_COMPANY_EMAIL),
   phone: v(process.env.EXPO_PUBLIC_COMPANY_PHONE),
   whatsapp: v(process.env.EXPO_PUBLIC_COMPANY_WHATSAPP),
-  legalName: v(process.env.EXPO_PUBLIC_COMPANY_LEGAL_NAME) ?? "Paul World Finances and Technologies",
+  legalName: v(process.env.EXPO_PUBLIC_COMPANY_LEGAL_NAME) ?? tr("Paul World Finances and Technologies"),
 };
 
-export const PLACEHOLDER = "À compléter";
+export const PLACEHOLDER = tr("À compléter");

@@ -5,12 +5,13 @@ import { Tabs } from "expo-router/js-tabs";
 import { Icon, type IconName } from "@/components/icons";
 import { useSession } from "@/lib/session";
 import { colors, fonts } from "@/lib/theme";
+import { tr } from "@/lib/i18n";
 
 const TABS: { name: string; title: string; icon: IconName }[] = [
-  { name: "index", title: "Accueil", icon: "home" },
-  { name: "history", title: "Historique", icon: "history" },
-  { name: "parcels", title: "Colis", icon: "ship" },
-  { name: "profile", title: "Profil", icon: "user" },
+  { name: "index", title: tr("Accueil"), icon: "home" },
+  { name: "history", title: tr("Historique"), icon: "history" },
+  { name: "parcels", title: tr("Colis"), icon: "ship" },
+  { name: "profile", title: tr("Profil"), icon: "user" },
 ];
 
 export default function TabsLayout() {

@@ -8,23 +8,24 @@ import { Icon, type IconName } from "@/components/icons";
 import { Button } from "@/components/ui";
 import { useSession } from "@/lib/session";
 import { colors, fonts } from "@/lib/theme";
+import { tr } from "@/lib/i18n";
 
 const SLIDES: { icon: IconName; title: string; text: string }[] = [
   {
     icon: "send",
     // Mode réel : les envois partent du Canada (virement Interac) ; ne pas annoncer d'autres départs.
-    title: "Envoyez de l'argent du Canada vers le Cameroun et la Chine",
-    text: "Payez par virement Interac. Votre proche reçoit sur Mobile Money (MTN, Orange), Alipay, WeChat Pay ou son compte bancaire.",
+    title: tr("Envoyez de l'argent du Canada vers le Cameroun et la Chine"),
+    text: tr("Payez par virement Interac. Votre proche reçoit sur Mobile Money (MTN, Orange), Alipay, WeChat Pay ou son compte bancaire."),
   },
   {
     icon: "eye",
-    title: "Des frais clairs, un suivi en temps réel",
-    text: "Aucun frais vers le Cameroun, un petit frais fixe vers la Chine. Le taux et le montant reçu sont affichés avant de payer, puis chaque étape jusqu'à la réception.",
+    title: tr("Des frais clairs, un suivi en temps réel"),
+    text: tr("Aucun frais vers le Cameroun, un petit frais fixe vers la Chine. Le taux et le montant reçu sont affichés avant de payer, puis chaque étape jusqu'à la réception."),
   },
   {
     icon: "ship",
-    title: "Suivez aussi vos colis",
-    text: "Vous expédiez avec PWFINTECH ? Suivez votre colis étape par étape avec son numéro de suivi, directement dans l'appli.",
+    title: tr("Suivez aussi vos colis"),
+    text: tr("Vous expédiez avec PWFINTECH ? Suivez votre colis étape par étape avec son numéro de suivi, directement dans l'appli."),
   },
 ];
 
@@ -51,7 +52,7 @@ export default function Welcome() {
         <WstWordmark size={28} negative />
         {!last ? (
           <Pressable accessibilityRole="button" onPress={() => setIndex(SLIDES.length - 1)} hitSlop={10}>
-            <Text style={st.skip}>Passer</Text>
+            <Text style={st.skip}>{tr("Passer")}</Text>
           </Pressable>
         ) : null}
       </View>
@@ -79,10 +80,10 @@ export default function Welcome() {
               <Icon name={slide.icon} color={colors.brand} size={24} />
             </View>
           )}
-          <Text style={[st.title, compact && { fontSize: 21, lineHeight: 26 }]} accessibilityRole="header">{slide.title}</Text>
-          <Text style={st.text}>{slide.text}</Text>
+          <Text style={[st.title, compact && { fontSize: 21, lineHeight: 26 }]} accessibilityRole="header">{tr(slide.title)}</Text>
+          <Text style={st.text}>{tr(slide.text)}</Text>
 
-          <View style={[st.dots, compact && { marginVertical: 14 }]} accessibilityLabel={`Écran ${index + 1} sur ${SLIDES.length}`}>
+          <View style={[st.dots, compact && { marginVertical: 14 }]} accessibilityLabel={tr("Écran {0} sur {1}", index + 1, tr(SLIDES.length))}>
             {SLIDES.map((_, i) => (
               <View key={i} style={[st.dot, i === index && st.dotOn]} />
             ))}
@@ -90,11 +91,11 @@ export default function Welcome() {
 
           {last ? (
             <View style={{ gap: 10 }}>
-              <Button title="Créer un compte" onPress={() => go("/auth/signup")} />
-              <Button title="J'ai déjà un compte" variant="secondary" onPress={() => go("/auth/login")} />
+              <Button title={tr("Créer un compte")} onPress={() => go("/auth/signup")} />
+              <Button title={tr("J'ai déjà un compte")} variant="secondary" onPress={() => go("/auth/login")} />
             </View>
           ) : (
-            <Button title="Suivant" onPress={() => setIndex(index + 1)} />
+            <Button title={tr("Suivant")} onPress={() => setIndex(index + 1)} />
           )}
           <View style={{ alignItems: "center", marginTop: compact ? 10 : 16 }}>
             <PoweredBy />

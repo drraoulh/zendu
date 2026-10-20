@@ -7,14 +7,15 @@ import { api, type Shipment } from "@/lib/api";
 import { dateTime } from "@/lib/format";
 import { storage } from "@/lib/storage";
 import { colors, fonts } from "@/lib/theme";
+import { tr } from "@/lib/i18n";
 
 const STATUS: Record<string, { label: string; tone: "brand" | "success" | "warn" | "danger" }> = {
-  received: { label: "Colis reçu", tone: "brand" },
-  in_transit: { label: "En transit", tone: "brand" },
-  customs: { label: "Dédouanement", tone: "warn" },
-  out_for_delivery: { label: "En livraison", tone: "brand" },
-  delivered: { label: "Livré", tone: "success" },
-  exception: { label: "Incident", tone: "danger" },
+  received: { label: tr("Colis reçu"), tone: "brand" },
+  in_transit: { label: tr("En transit"), tone: "brand" },
+  customs: { label: tr("Dédouanement"), tone: "warn" },
+  out_for_delivery: { label: tr("En livraison"), tone: "brand" },
+  delivered: { label: tr("Livré"), tone: "success" },
+  exception: { label: tr("Incident"), tone: "danger" },
 };
 
 const ORDER = ["received", "in_transit", "customs", "out_for_delivery", "delivered"];
@@ -44,7 +45,7 @@ export default function Parcels() {
   async function search(value = number) {
     setError(null);
     const clean = value.trim().toUpperCase();
-    if (!clean) return setError("Saisissez votre numéro de suivi (PWS-…)");
+    if (!clean) return setError(tr("Saisissez votre numéro de suivi (PWS-…)"));
     setNumber(clean);
     setBusy(true);
     try {
@@ -57,7 +58,7 @@ export default function Parcels() {
       void storage.set(KEY_RECENT, next);
     } catch (e) {
       setShipment(null);
-      setError(e instanceof Error ? e.message : "Colis introuvable");
+      setError(e instanceof Error ? e.message : tr("Colis introuvable"));
     } finally {
       setBusy(false);
     }
@@ -68,10 +69,10 @@ export default function Parcels() {
 
   return (
     <Screen edges={["top"]}>
-      <H1 style={{ marginTop: 8 }}>Suivi de colis</H1>
-      <P style={{ marginTop: 6, marginBottom: 18 }}>Saisissez le numéro de suivi indiqué sur votre reçu d&apos;expédition PWFINTECH.</P>
+      <H1 style={{ marginTop: 8 }}>{tr("Suivi de colis")}</H1>
+      <P style={{ marginTop: 6, marginBottom: 18 }}>{tr("Saisissez le numéro de suivi indiqué sur votre reçu d'expédition PWFINTECH.")}</P>
       <Field
-        label="Numéro de suivi"
+        label={tr("Numéro de suivi")}
         value={number}
         onChangeText={setNumber}
         placeholder="PWS-12345"
@@ -80,7 +81,7 @@ export default function Parcels() {
         returnKeyType="search"
         onSubmitEditing={() => search()}
       />
-      <Button title="Suivre" icon="ship" onPress={() => search()} loading={busy} />
+      <Button title={tr("Suivre")} icon="ship" onPress={() => search()} loading={busy} />
       {error ? (
         <View style={{ marginTop: 12 }}>
           <Notice tone="danger" icon="alert" text={error} />
@@ -89,7 +90,7 @@ export default function Parcels() {
 
       {!shipment && recent.length ? (
         <Card style={{ paddingVertical: 4, marginTop: 16 }}>
-          <Small style={{ paddingHorizontal: 4, paddingTop: 8 }}>RECHERCHES RÉCENTES</Small>
+          <Small style={{ paddingHorizontal: 4, paddingTop: 8 }}>{tr("RECHERCHES RÉCENTES")}</Small>
           {recent.map((n) => (
             <ListItem key={n} icon="ship" title={n} onPress={() => search(n)} />
           ))}
@@ -100,8 +101,8 @@ export default function Parcels() {
         <Card style={{ marginTop: 16, flexDirection: "row", gap: 12, alignItems: "center" }} onPress={() => router.push({ pathname: "/help/[slug]", params: { slug: "suivi-colis" } })}>
           <Icon name="help" color={colors.brand} size={20} />
           <View style={{ flex: 1 }}>
-            <Text style={{ fontFamily: fonts.heading, color: colors.ink }}>Où trouver mon numéro ?</Text>
-            <Small>Il commence par PWS- et figure sur votre reçu d&apos;expédition. Il peut apparaître quelques heures après le dépôt.</Small>
+            <Text style={{ fontFamily: fonts.heading, color: colors.ink }}>{tr("Où trouver mon numéro ?")}</Text>
+            <Small>{tr("Il commence par PWS- et figure sur votre reçu d'expédition. Il peut apparaître quelques heures après le dépôt.")}</Small>
           </View>
           <Icon name="chev" color={colors.muted} size={18} />
         </Card>
@@ -112,12 +113,12 @@ export default function Parcels() {
           <Card style={{ marginTop: 16, marginBottom: 12 }}>
             <View style={{ flexDirection: "row", justifyContent: "space-between", alignItems: "center", gap: 10 }}>
               <View style={{ flexShrink: 1 }}>
-                <Small>N° DE SUIVI</Small>
+                <Small>{tr("N° DE SUIVI")}</Small>
                 <Text style={{ fontFamily: fonts.display, fontSize: 20, color: colors.navy }} numberOfLines={1} adjustsFontSizeToFit>
                   {shipment.number}
                 </Text>
               </View>
-              <Badge label={st.label} tone={st.tone} />
+              <Badge label={tr(st.label)} tone={st.tone} />
             </View>
             <View style={{ flexDirection: "row", alignItems: "center", gap: 10, marginTop: 14 }}>
               <Text style={{ fontFamily: fonts.heading, color: colors.ink, flex: 1 }} numberOfLines={2}>{shipment.origin}</Text>
@@ -125,8 +126,8 @@ export default function Parcels() {
               <Text style={{ fontFamily: fonts.heading, color: colors.ink, flex: 1, textAlign: "right" }} numberOfLines={2}>{shipment.destination}</Text>
             </View>
             <Small style={{ marginTop: 6 }}>
-              {shipment.mode === "sea" ? "Maritime" : "Aérien"}
-              {shipment.estimatedDelivery ? ` · livraison estimée le ${shipment.estimatedDelivery.split("-").reverse().join("/")}` : ""}
+              {shipment.mode === "sea" ? tr("Maritime") : tr("Aérien")}
+              {shipment.estimatedDelivery ? tr(" · livraison estimée le {0}", shipment.estimatedDelivery.split("-").reverse().join("/")) : ""}
             </Small>
           </Card>
           <Card style={{ marginBottom: 12 }}>
@@ -135,7 +136,7 @@ export default function Parcels() {
                   <View key={`${e.at}${i}`} style={{ flexDirection: "row", gap: 12, paddingVertical: 8 }}>
                     <View style={{ width: 12, height: 12, borderRadius: 6, marginTop: 4, backgroundColor: i === 0 ? colors.brand : colors.silver }} />
                     <View style={{ flex: 1 }}>
-                      <Text style={{ fontFamily: fonts.semibold, color: colors.ink }}>{e.label}</Text>
+                      <Text style={{ fontFamily: fonts.semibold, color: colors.ink }}>{tr(e.label)}</Text>
                       <Small>
                         {dateTime(e.at)}
                         {e.location ? ` · ${e.location}` : ""}
@@ -146,19 +147,19 @@ export default function Parcels() {
               : ORDER.map((s, i) => (
                   <View key={s} style={{ flexDirection: "row", gap: 12, paddingVertical: 8 }}>
                     <View style={{ width: 12, height: 12, borderRadius: 6, marginTop: 4, backgroundColor: i <= reached ? colors.brand : colors.line }} />
-                    <Text style={{ fontFamily: fonts.semibold, color: i <= reached ? colors.ink : colors.muted }}>{STATUS[s].label}</Text>
+                    <Text style={{ fontFamily: fonts.semibold, color: i <= reached ? colors.ink : colors.muted }}>{tr(STATUS[s].label)}</Text>
                   </View>
                 ))}
           </Card>
           {shipment.status === "exception" ? (
             <View style={{ gap: 10, marginBottom: 12 }}>
-              <Notice tone="danger" icon="alert" text="Un incident bloque ce colis. Notre équipe logistique vous contacte ; vous pouvez aussi nous écrire avec le numéro de suivi." />
-              <Button title="Contacter le support" icon="mail" variant="secondary" onPress={() => router.push({ pathname: "/help/contact", params: { subject: `Colis ${shipment.number}` } })} />
+              <Notice tone="danger" icon="alert" text={tr("Un incident bloque ce colis. Notre équipe logistique vous contacte ; vous pouvez aussi nous écrire avec le numéro de suivi.")} />
+              <Button title={tr("Contacter le support")} icon="mail" variant="secondary" onPress={() => router.push({ pathname: "/help/contact", params: { subject: tr("Colis {0}", shipment.number) } })} />
             </View>
           ) : null}
           {shipment.weightKg ? (
             <Card>
-              <SummaryRow label="Poids" value={`${shipment.weightKg} kg`} />
+              <SummaryRow label={tr("Poids")} value={`${shipment.weightKg} kg`} />
             </Card>
           ) : null}
         </>

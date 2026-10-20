@@ -7,13 +7,14 @@ import { authenticate, biometricKind, biometricLabel, type BiometricKind } from 
 import { useSession } from "@/lib/session";
 import { useStore } from "@/lib/store";
 import { colors } from "@/lib/theme";
+import { tr } from "@/lib/i18n";
 
 function since(iso?: string) {
-  if (!iso) return "Jamais modifié";
+  if (!iso) return tr("Jamais modifié");
   const days = Math.floor((Date.now() - new Date(iso).getTime()) / 86400000);
-  if (days < 1) return "Modifié aujourd'hui";
-  if (days < 31) return `Modifié il y a ${days} jour${days > 1 ? "s" : ""}`;
-  return `Modifié il y a ${Math.floor(days / 30)} mois`;
+  if (days < 1) return tr("Modifié aujourd'hui");
+  if (days < 31) return tr("Modifié il y a {0} jour{1}", days, days > 1 ? "s" : "");
+  return tr("Modifié il y a {0} mois", Math.floor(days / 30));
 }
 
 export default function Security() {
@@ -43,8 +44,8 @@ export default function Security() {
   async function toggleBiometric(v: boolean) {
     setMessage(null);
     if (!v) return updateSettings({ biometric: false });
-    if (bio === "none") return setMessage(Platform.OS === "web" ? "La biométrie n'est disponible que sur téléphone." : "Aucune biométrie configurée sur cet appareil.");
-    const res = await authenticate(`Activer ${biometricLabel(bio)}`);
+    if (bio === "none") return setMessage(Platform.OS === "web" ? tr("La biométrie n'est disponible que sur téléphone.") : tr("Aucune biométrie configurée sur cet appareil."));
+    const res = await authenticate(tr("Activer {0}", biometricLabel(bio)));
     if (res.ok) await updateSettings({ biometric: true });
     else setMessage(res.error);
   }
@@ -57,59 +58,59 @@ export default function Security() {
 
   return (
     <Screen>
-      <Header title="Sécurité" />
+      <Header title={tr("Sécurité")} />
       <Notice
         tone={strong || web ? "success" : "warn"}
         icon="shield"
-        title={strong || web ? "Votre compte est bien protégé" : "Renforcez la protection de votre compte"}
+        title={strong || web ? tr("Votre compte est bien protégé") : tr("Renforcez la protection de votre compte")}
         text={
           strong
-            ? "Vérification en deux étapes et verrouillage de l'appli activés."
+            ? tr("Vérification en deux étapes et verrouillage de l'appli activés.")
             : web
-              ? "La vérification en deux étapes est active : un code vous est demandé à chaque connexion."
-              : "La vérification en deux étapes est active. Ajoutez un verrouillage de l'appli (PIN ou biométrie)."
+              ? tr("La vérification en deux étapes est active : un code vous est demandé à chaque connexion.")
+              : tr("La vérification en deux étapes est active. Ajoutez un verrouillage de l'appli (PIN ou biométrie).")
         }
       />
 
-      <SectionTitle>Connexion</SectionTitle>
+      <SectionTitle>{tr("Connexion")}</SectionTitle>
       <Card style={{ paddingVertical: 4 }}>
-        <ListItem icon="lock" tone="neutral" title="Changer le mot de passe" subtitle={since(profile?.passwordChangedAt ?? profile?.createdAt)} onPress={() => router.push("/account/password")} />
-        <ListItem icon="shield" tone="success" title="Vérification en deux étapes" subtitle="Toujours active : un code par courriel à chaque connexion" />
+        <ListItem icon="lock" tone="neutral" title={tr("Changer le mot de passe")} subtitle={since(profile?.passwordChangedAt ?? profile?.createdAt)} onPress={() => router.push("/account/password")} />
+        <ListItem icon="shield" tone="success" title={tr("Vérification en deux étapes")} subtitle={tr("Toujours active : un code par courriel à chaque connexion")} />
         <ToggleRow
           icon="face"
-          label="Face ID / empreinte"
-          sub={web ? "Disponible dans l'appli sur téléphone" : "Pour déverrouiller l'appli à l'ouverture"}
+          label={tr("Face ID / empreinte")}
+          sub={web ? tr("Disponible dans l'appli sur téléphone") : tr("Pour déverrouiller l'appli à l'ouverture")}
           value={settings.biometric && !web}
           onChange={toggleBiometric}
           disabled={web}
         />
       </Card>
-      {message ? <Small style={{ marginTop: 8 }}>{message}</Small> : null}
+      {message ? <Small style={{ marginTop: 8 }}>{tr(message)}</Small> : null}
 
-      <SectionTitle>Appareils et appli</SectionTitle>
+      <SectionTitle>{tr("Appareils et appli")}</SectionTitle>
       <Card style={{ paddingVertical: 4 }}>
-        <ListItem icon="phone" tone="neutral" title="Appareils connectés" subtitle="Gérer les sessions" onPress={() => router.push("/account/devices")} />
+        <ListItem icon="phone" tone="neutral" title={tr("Appareils connectés")} subtitle={tr("Gérer les sessions")} onPress={() => router.push("/account/devices")} />
         <ToggleRow
           icon="lock"
-          label="Code PIN de l'appli"
-          sub={web ? "Disponible dans l'appli sur téléphone" : settings.pin ? "Activé · 6 chiffres" : "Désactivé"}
+          label={tr("Code PIN de l'appli")}
+          sub={web ? tr("Disponible dans l'appli sur téléphone") : settings.pin ? tr("Activé · 6 chiffres") : tr("Désactivé")}
           value={settings.pin && !web}
           disabled={web}
           onChange={(v) => (v ? router.push("/account/pin") : void setPin(null))}
         />
       </Card>
 
-      <SectionTitle>Zone sensible</SectionTitle>
+      <SectionTitle>{tr("Zone sensible")}</SectionTitle>
       {confirmDelete ? (
         <Card>
           <Small style={{ marginBottom: 12, color: colors.ink }}>
-            Votre compte, vos informations, cartes et destinataires seront effacés. Cette action est définitive. Confirmez avec votre mot de passe.
+            {tr("Votre compte, vos informations, cartes et destinataires seront effacés. Cette action est définitive. Confirmez avec votre mot de passe.")}
           </Small>
-          <Field label="Mot de passe" value={password} onChangeText={setPassword} secureTextEntry autoComplete="current-password" error={deleteError} />
+          <Field label={tr("Mot de passe")} value={password} onChangeText={setPassword} secureTextEntry autoComplete="current-password" error={deleteError} />
           <View style={{ gap: 8 }}>
-            <Button title="Supprimer définitivement" variant="danger" onPress={remove} loading={deleting} disabled={!password} />
+            <Button title={tr("Supprimer définitivement")} variant="danger" onPress={remove} loading={deleting} disabled={!password} />
             <Button
-              title="Annuler"
+              title={tr("Annuler")}
               variant="secondary"
               onPress={() => {
                 setConfirmDelete(false);
@@ -120,9 +121,9 @@ export default function Security() {
           </View>
         </Card>
       ) : (
-        <Button title="Supprimer mon compte" variant="danger" onPress={() => setConfirmDelete(true)} />
+        <Button title={tr("Supprimer mon compte")} variant="danger" onPress={() => setConfirmDelete(true)} />
       )}
-      <Small style={{ marginTop: 8 }}>La suppression est définitive. Les transferts déjà effectués restent archivés par PWFINTECH, sans lien avec votre compte.</Small>
+      <Small style={{ marginTop: 8 }}>{tr("La suppression est définitive. Les transferts déjà effectués restent archivés par PWFINTECH, sans lien avec votre compte.")}</Small>
     </Screen>
   );
 }

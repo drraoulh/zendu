@@ -10,14 +10,15 @@ import { countryName, dateTime, money, networkLabel, statusInfo } from "@/lib/fo
 import { useShare } from "@/lib/share";
 import { colors } from "@/lib/theme";
 import { useMyTransfers } from "@/lib/use-transfers";
+import { tr } from "@/lib/i18n";
 
 type Filter = "all" | "progress" | "delivered" | "issue";
 
 const FILTERS: { value: Filter; label: string }[] = [
-  { value: "all", label: "Tous" },
-  { value: "progress", label: "En cours" },
-  { value: "delivered", label: "Livrés" },
-  { value: "issue", label: "Incidents" },
+  { value: "all", label: tr("Tous") },
+  { value: "progress", label: tr("En cours") },
+  { value: "delivered", label: tr("Livrés") },
+  { value: "issue", label: tr("Incidents") },
 ];
 
 function group(t: Transfer): Filter {
@@ -26,7 +27,7 @@ function group(t: Transfer): Filter {
   return "progress";
 }
 
-const MONTH_NAMES = ["janvier", "février", "mars", "avril", "mai", "juin", "juillet", "août", "septembre", "octobre", "novembre", "décembre"];
+const MONTH_NAMES = ["janvier", tr("février"), "mars", "avril", "mai", "juin", "juillet", tr("août"), "septembre", "octobre", "novembre", tr("décembre")];
 
 /** Transferts regroupés par mois (« Octobre 2026 »), dans l'ordre de la liste. */
 function byMonth(list: Transfer[]) {
@@ -43,7 +44,7 @@ function byMonth(list: Transfer[]) {
 }
 
 function csv(list: Transfer[]) {
-  const head = "Date;Référence;Destinataire;Pays;Mode;Envoyé;Frais;Total;Reçu;Statut";
+  const head = tr("Date;Référence;Destinataire;Pays;Mode;Envoyé;Frais;Total;Reçu;Statut");
   const rows = list.map((t) =>
     [
       dateTime(t.createdAt),
@@ -65,7 +66,7 @@ export default function History() {
   const { items, loading, failed, reload, count } = useMyTransfers();
   const [q, setQ] = useState("");
   const [filter, setFilter] = useState<Filter>("all");
-  const exporter = useShare("Exporter");
+  const exporter = useShare(tr("Exporter"));
   const query = q.trim().toLowerCase();
   const list = items.filter(
     (t) => (filter === "all" || group(t) === filter) && (!query || t.beneficiary.fullName.toLowerCase().includes(query) || t.reference.toLowerCase().includes(query)),
@@ -80,12 +81,12 @@ export default function History() {
         refreshControl={<RefreshControl refreshing={loading && count > 0} onRefresh={reload} tintColor={colors.brand} />}
       >
         <View style={{ flexDirection: "row", justifyContent: "space-between", alignItems: "center", marginBottom: 14 }}>
-          <H1>Mes transferts</H1>
-          {items.length ? <Button title={exporter.label} size="sm" variant="secondary" onPress={() => exporter.share(csv(list), "Historique WorldSoft Transfer")} /> : null}
+          <H1>{tr("Mes transferts")}</H1>
+          {items.length ? <Button title={tr(exporter.label)} size="sm" variant="secondary" onPress={() => exporter.share(csv(list), tr("Historique WorldSoft Transfer"))} /> : null}
         </View>
         {items.length ? (
           <>
-            <Field label="Rechercher" placeholder="Nom ou référence" value={q} onChangeText={setQ} autoCapitalize="none" />
+            <Field label={tr("Rechercher")} placeholder={tr("Nom ou référence")} value={q} onChangeText={setQ} autoCapitalize="none" />
             <Chips options={FILTERS} value={filter} onChange={setFilter} scroll inset={20} />
           </>
         ) : null}
@@ -94,15 +95,15 @@ export default function History() {
             <Notice
               tone="danger"
               icon="alert"
-              text={items.length ? "Impossible d'actualiser vos transferts. La liste affichée peut ne pas être à jour." : "Impossible de charger vos transferts. Vérifiez votre connexion."}
+              text={items.length ? tr("Impossible d'actualiser vos transferts. La liste affichée peut ne pas être à jour.") : tr("Impossible de charger vos transferts. Vérifiez votre connexion.")}
             />
-            <Button title="Réessayer" icon="refresh" size="sm" variant="secondary" onPress={reload} loading={loading} />
+            <Button title={tr("Réessayer")} icon="refresh" size="sm" variant="secondary" onPress={reload} loading={loading} />
           </View>
         ) : null}
         {list.length ? (
           byMonth(list).map((g) => (
             <View key={g.label}>
-              <SectionTitle>{g.label}</SectionTitle>
+              <SectionTitle>{tr(g.label)}</SectionTitle>
               <Card style={{ paddingVertical: 6 }}>
                 {g.items.map((t) => (
                   <TransferRow key={t.id} transfer={t} />
@@ -114,16 +115,16 @@ export default function History() {
           <Card style={{ paddingVertical: 6 }}>
             {loading && !items.length ? (
               <View style={{ padding: 24, alignItems: "center" }}>
-                <ActivityIndicator color={colors.brand} accessibilityLabel="Chargement" />
+                <ActivityIndicator color={colors.brand} accessibilityLabel={tr("Chargement")} />
               </View>
             ) : items.length ? (
-              <Empty icon="history" title="Aucun résultat" text="Essayez un autre nom, une autre référence ou un autre filtre." />
+              <Empty icon="history" title={tr("Aucun résultat")} text={tr("Essayez un autre nom, une autre référence ou un autre filtre.")} />
             ) : (
               <Empty
                 icon="history"
-                title="Aucun transfert"
-                text="Vos transferts apparaîtront ici, avec leur suivi en temps réel."
-                action={<Button title="Envoyer de l'argent" size="sm" onPress={() => router.push("/(tabs)")} />}
+                title={tr("Aucun transfert")}
+                text={tr("Vos transferts apparaîtront ici, avec leur suivi en temps réel.")}
+                action={<Button title={tr("Envoyer de l'argent")} size="sm" onPress={() => router.push("/(tabs)")} />}
               />
             )}
           </Card>

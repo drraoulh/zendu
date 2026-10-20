@@ -1,5 +1,6 @@
 import { Platform, TurboModuleRegistry } from "react-native";
 import * as WebBrowser from "expo-web-browser";
+import { tr } from "@/lib/i18n";
 
 export type DiditOutcome = { kind: "done" } | { kind: "cancelled" } | { kind: "failed"; message: string };
 
@@ -34,7 +35,7 @@ export async function runDiditVerification(session: { url: string; sessionToken:
       try {
         const result = await sdk.startVerification(session.sessionToken, { languageCode: "fr", showExitConfirmation: true });
         if (result.type === "cancelled") return { kind: "cancelled" };
-        if (result.type === "failed") return { kind: "failed", message: result.error?.message || "La vérification n'a pas pu aboutir." };
+        if (result.type === "failed") return { kind: "failed", message: result.error?.message || tr("La vérification n'a pas pu aboutir.") };
         return { kind: "done" };
       } catch {
         // Module natif indisponible : on bascule sur la page web ci-dessous.

@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
 import { api, type CorridorMeta, type Network, type PayMethod } from "./api";
+import { tr } from "@/lib/i18n";
 
 /** Pays ouverts (identiques au site). */
 export const COUNTRIES = {
@@ -13,18 +14,18 @@ export const COUNTRY_CODES = Object.keys(COUNTRIES) as CountryCode[];
 
 const NETWORKS: Record<CountryCode, Network[]> = {
   CA: [
-    { id: "INTERAC", label: "Interac e-Transfer", type: "mobile_money" },
-    { id: "BANK", label: "Bank account", type: "bank" },
+    { id: "INTERAC", label: tr("Interac e-Transfer"), type: "mobile_money" },
+    { id: "BANK", label: tr("Bank account"), type: "bank" },
   ],
   CM: [
-    { id: "MTN", label: "MTN MoMo", type: "mobile_money" },
-    { id: "ORANGE", label: "Orange Money", type: "mobile_money" },
-    { id: "BANK", label: "Bank account", type: "bank" },
+    { id: "MTN", label: tr("MTN MoMo"), type: "mobile_money" },
+    { id: "ORANGE", label: tr("Orange Money"), type: "mobile_money" },
+    { id: "BANK", label: tr("Bank account"), type: "bank" },
   ],
   CN: [
-    { id: "ALIPAY", label: "Alipay", type: "mobile_money" },
-    { id: "WECHAT", label: "WeChat Pay", type: "mobile_money" },
-    { id: "BANK", label: "Bank account", type: "bank" },
+    { id: "ALIPAY", label: tr("Alipay"), type: "mobile_money" },
+    { id: "WECHAT", label: tr("WeChat Pay"), type: "mobile_money" },
+    { id: "BANK", label: tr("Bank account"), type: "bank" },
   ],
 };
 

@@ -11,6 +11,7 @@ import { shareReceiptPdf } from "@/lib/receipt-pdf";
 import { shareViewAsImage } from "@/lib/share-image";
 import { colors, fonts, radius } from "@/lib/theme";
 import { cardLogoId, PaymentLogo } from "@/components/payment-logo";
+import { tr } from "@/lib/i18n";
 
 type Mode = "mine" | "recipient";
 
@@ -37,11 +38,11 @@ export default function Receipt() {
   if (!t) {
     return (
       <Screen>
-        <Header title="Reçu" />
+        <Header title={tr("Reçu")} />
         {error ? (
           <View style={{ gap: 12 }}>
             <Notice tone="danger" icon="alert" text={error} />
-            <Button title="Réessayer" icon="refresh" size="sm" variant="secondary" onPress={load} />
+            <Button title={tr("Réessayer")} icon="refresh" size="sm" variant="secondary" onPress={load} />
           </View>
         ) : (
           <ActivityIndicator color={colors.brand} style={{ marginTop: 80 }} />
@@ -55,26 +56,26 @@ export default function Receipt() {
   const first = ben.fullName.split(" ")[0];
   const deliveredAt = t.events?.find((e) => e.type === "delivered")?.createdAt;
   // Moyen de paiement : celui choisi pendant l'envoi (carte précise) ou, à défaut, celui du transfert.
-  const paidWith = params.card || ({ interac_manual: "Virement Interac", interac: "Virement Interac", stripe: "Carte de débit" } as Record<string, string>)[t.payInProvider];
+  const paidWith = params.card || ({ interac_manual: tr("Virement Interac"), interac: tr("Virement Interac"), stripe: tr("Carte de débit") } as Record<string, string>)[t.payInProvider];
   // Espaces insécables : le numéro ne se coupe pas en fin de ligne (« +237 670 000 / 000 »).
   const benLine = [networkLabel(ben.network), ben.accountMasked ?? (ben.phone ? phone(ben.phone).replace(/ /g, "\u00a0") : null)].filter(Boolean).join(" · ");
 
   function receiptText() {
     if (!t) return "";
     return [
-      "Reçu WorldSoft Transfer — une solution PWFINTECH",
-      `Référence : ${t.reference}`,
-      `Date : ${dateTime(t.createdAt)}`,
-      `Statut : ${info.label}`,
-      `Expéditeur : ${t.senderName} — ${countryName(t.sourceCountry)}`,
-      `Destinataire : ${ben.fullName} — ${benLine} — ${countryName(t.destCountry)}`,
-      `Montant envoyé : ${money(t.sendAmountCad, t.sendCurrency)}`,
-      `Frais : ${feeLabel(t.feeCad, t.sendCurrency)}`,
-      `Total payé : ${money(t.totalCad, t.sendCurrency)}`,
-      `Taux : ${rateLine(t.rate, t.sendCurrency, t.receiveCurrency)}`,
-      `Montant reçu : ${money(t.receiveAmountXaf, t.receiveCurrency)}`,
-      ...(paidWith ? [`Payé avec : ${paidWith}`] : []),
-      ...(deliveredAt ? [`Livré le : ${dateTime(deliveredAt)}`] : []),
+      tr("Reçu WorldSoft Transfer — une solution PWFINTECH"),
+      tr("Référence : {0}", t.reference),
+      tr("Date : {0}", dateTime(t.createdAt)),
+      tr("Statut : {0}", tr(info.label)),
+      tr("Expéditeur : {0} — {1}", t.senderName, countryName(t.sourceCountry)),
+      tr("Destinataire : {0} — {1} — {2}", ben.fullName, benLine, countryName(t.destCountry)),
+      tr("Montant envoyé : {0}", money(t.sendAmountCad, t.sendCurrency)),
+      tr("Frais : {0}", feeLabel(t.feeCad, t.sendCurrency)),
+      tr("Total payé : {0}", money(t.totalCad, t.sendCurrency)),
+      tr("Taux : {0}", rateLine(t.rate, t.sendCurrency, t.receiveCurrency)),
+      tr("Montant reçu : {0}", money(t.receiveAmountXaf, t.receiveCurrency)),
+      ...(paidWith ? [tr("Payé avec : {0}", paidWith)] : []),
+      ...(deliveredAt ? [tr("Livré le : {0}", dateTime(deliveredAt))] : []),
     ].join("\n");
   }
 
@@ -85,7 +86,7 @@ export default function Receipt() {
     try {
       await shareReceiptPdf(t.id, t.reference);
     } catch (e) {
-      setPdfError(e instanceof Error ? e.message : "Reçu indisponible pour le moment.");
+      setPdfError(e instanceof Error ? e.message : tr("Reçu indisponible pour le moment."));
     } finally {
       setPdfBusy(false);
     }
@@ -95,8 +96,8 @@ export default function Receipt() {
     if (!t) return;
     const r =
       mode === "recipient"
-        ? await shareViewAsImage(noticeRef, recipientMessage(t), `Prévenir ${first}`)
-        : await shareViewAsImage(mineRef, receiptText(), "Reçu WorldSoft Transfer");
+        ? await shareViewAsImage(noticeRef, recipientMessage(t), tr("Prévenir {0}", first))
+        : await shareViewAsImage(mineRef, receiptText(), tr("Reçu WorldSoft Transfer"));
     if (r === "copied") {
       setCopied(true);
       setTimeout(() => setCopied(false), 2000);
@@ -108,26 +109,26 @@ export default function Receipt() {
       footer={
         mode === "recipient" ? (
           <View style={{ gap: 6 }}>
-            <Button title={copied ? "Message copié" : `Envoyer à ${first}`} icon={copied ? "check" : "send"} onPress={share} />
-            <Small style={{ textAlign: "center" }}>Par WhatsApp, SMS ou courriel · sans frais ni données de paiement</Small>
+            <Button title={copied ? tr("Message copié") : tr("Envoyer à {0}", first)} icon={copied ? "check" : "send"} onPress={share} />
+            <Small style={{ textAlign: "center" }}>{tr("Par WhatsApp, SMS ou courriel · sans frais ni données de paiement")}</Small>
           </View>
         ) : (
           <View style={{ gap: 8 }}>
             {pdfError ? <Notice tone="danger" icon="alert" text={pdfError} /> : null}
             <View style={{ flexDirection: "row", gap: 8 }}>
-              <Button title="Reçu PDF" icon="download" variant="secondary" loading={pdfBusy} style={{ flex: 1 }} onPress={sharePdf} />
-              <Button title={copied ? "Copié" : "Image"} icon={copied ? "check" : "send"} style={{ flex: 1 }} onPress={share} />
+              <Button title={tr("Reçu PDF")} icon="download" variant="secondary" loading={pdfBusy} style={{ flex: 1 }} onPress={sharePdf} />
+              <Button title={copied ? tr("Copié") : tr("Image")} icon={copied ? "check" : "send"} style={{ flex: 1 }} onPress={share} />
             </View>
           </View>
         )
       }
     >
-      <Header title="Reçu" />
+      <Header title={tr("Reçu")} />
       <View style={r.tabs} accessibilityRole="tablist">
         {(
           [
-            ["mine", "Mon reçu"],
-            ["recipient", `Pour ${first}`],
+            ["mine", tr("Mon reçu")],
+            ["recipient", tr("Pour {0}", first)],
           ] as const
         ).map(([m, label]) => (
           <Pressable
@@ -137,7 +138,7 @@ export default function Receipt() {
             onPress={() => setMode(m)}
             style={[r.tab, mode === m && r.tabOn]}
           >
-            <Text style={[r.tabText, mode === m && { color: colors.white }]} numberOfLines={1}>{label}</Text>
+            <Text style={[r.tabText, mode === m && { color: colors.white }]} numberOfLines={1}>{tr(label)}</Text>
           </Pressable>
         ))}
       </View>
@@ -145,7 +146,7 @@ export default function Receipt() {
       {mode === "recipient" ? (
         <>
           <Small style={{ marginBottom: 12 }}>
-            Envoyez cet avis à {first} pour l&apos;informer de votre envoi. Il ne contient ni vos frais ni votre moyen de paiement.
+            {tr("Envoyez cet avis à {0} pour l'informer de votre envoi. Il ne contient ni vos frais ni votre moyen de paiement.", first)}
           </Small>
           <View ref={noticeRef} collapsable={false}>
             <RecipientNotice transfer={t} />
@@ -157,27 +158,27 @@ export default function Receipt() {
             <View style={r.headTop}>
               <WstWordmark size={22} negative />
               <View style={[r.badge, { backgroundColor: info.tone === "success" ? colors.success : info.tone === "danger" ? colors.danger : "rgba(255,255,255,0.16)" }]}>
-                <Text style={r.badgeText}>{info.label}</Text>
+                <Text style={r.badgeText}>{tr(info.label)}</Text>
               </View>
             </View>
-            <Text style={r.headLabel}>{ben.fullName} reçoit</Text>
+            <Text style={r.headLabel}>{tr("{0} reçoit", ben.fullName)}</Text>
             <Text style={r.amount}>{money(t.receiveAmountXaf, t.receiveCurrency)}</Text>
             <Text style={r.headMeta}>{dateTime(t.createdAt)}</Text>
           </View>
           <View style={r.body}>
-            <Party label="Expéditeur" name={t.senderName} line={`${t.senderEmail} · ${countryName(t.sourceCountry)}`} />
-            <Party label="Destinataire" name={ben.fullName} line={`${benLine} · ${countryName(t.destCountry)}`} logo={ben.network} />
+            <Party label={tr("Expéditeur")} name={t.senderName} line={`${t.senderEmail} · ${countryName(t.sourceCountry)}`} />
+            <Party label={tr("Destinataire")} name={ben.fullName} line={`${benLine} · ${countryName(t.destCountry)}`} logo={ben.network} />
             <View style={r.sep} />
-            <Line label="Montant envoyé" value={money(t.sendAmountCad, t.sendCurrency)} />
-            <Line label="Frais" value={feeLabel(t.feeCad, t.sendCurrency)} />
-            <Line label="Taux de change" value={rateLine(t.rate, t.sendCurrency, t.receiveCurrency)} />
-            <Line label="Total payé" value={money(t.totalCad, t.sendCurrency)} strong />
+            <Line label={tr("Montant envoyé")} value={money(t.sendAmountCad, t.sendCurrency)} />
+            <Line label={tr("Frais")} value={feeLabel(t.feeCad, t.sendCurrency)} />
+            <Line label={tr("Taux de change")} value={rateLine(t.rate, t.sendCurrency, t.receiveCurrency)} />
+            <Line label={tr("Total payé")} value={money(t.totalCad, t.sendCurrency)} strong />
             <View style={r.sep} />
-            <Line label="Référence" value={t.reference} strong />
+            <Line label={tr("Référence")} value={t.reference} strong />
             {paidWith ? (
-              <Line label="Payé avec" value={paidWith} logo={paidWith.startsWith("Virement Interac") ? "INTERAC" : cardLogoId((params.card ?? "").split(" ")[0])} />
+              <Line label={tr("Payé avec")} value={paidWith} logo={paidWith.startsWith("Virement Interac") ? "INTERAC" : cardLogoId((params.card ?? "").split(" ")[0])} />
             ) : null}
-            {deliveredAt ? <Line label="Livré le" value={dateTime(deliveredAt)} /> : null}
+            {deliveredAt ? <Line label={tr("Livré le")} value={dateTime(deliveredAt)} /> : null}
           </View>
           <View style={r.foot}>
             <Icon name="shield" color={colors.muted} size={14} />
@@ -205,7 +206,7 @@ function Party({ label, name, line, logo }: { label: string; name: string; line:
 function Line({ label, value, strong = false, logo }: { label: string; value: string; strong?: boolean; logo?: string }) {
   return (
     <View style={r.line}>
-      <Text style={r.lineLabel}>{label}</Text>
+      <Text style={r.lineLabel}>{tr(label)}</Text>
       <View style={{ flexDirection: "row", alignItems: "center", gap: 8, flexShrink: 1 }}>
         {logo ? <PaymentLogo id={logo} size={18} /> : null}
         <Text style={[r.lineValue, strong && { fontFamily: fonts.heading }]}>{value}</Text>

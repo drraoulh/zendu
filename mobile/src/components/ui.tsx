@@ -17,6 +17,7 @@ import { KeyboardAvoidingView, KeyboardAwareScrollView, KeyboardStickyView } fro
 import { SafeAreaView, useSafeAreaInsets, type Edge } from "react-native-safe-area-context";
 import { colors, fonts, radius } from "@/lib/theme";
 import { Icon, type IconName } from "./icons";
+import { tr } from "@/lib/i18n";
 
 type Tone = "brand" | "success" | "warn" | "danger" | "neutral";
 
@@ -98,7 +99,7 @@ export function Header({
       {back ? (
         <Pressable
           accessibilityRole="button"
-          accessibilityLabel="Retour"
+          accessibilityLabel={tr("Retour")}
           hitSlop={10}
           onPress={onBack ?? (() => (router.canGoBack() ? router.back() : router.replace("/")))}
           style={styles.iconBtn}
@@ -109,8 +110,8 @@ export function Header({
         <View style={styles.headerSide} />
       )}
       <View style={{ flex: 1, alignItems: "center", paddingHorizontal: 8 }}>
-        {title ? <Text style={styles.headerTitle} numberOfLines={2}>{title}</Text> : null}
-        {subtitle ? <Text style={styles.small} numberOfLines={1}>{subtitle}</Text> : null}
+        {title ? <Text style={styles.headerTitle} numberOfLines={2}>{tr(title)}</Text> : null}
+        {subtitle ? <Text style={styles.small} numberOfLines={1}>{tr(subtitle)}</Text> : null}
       </View>
       <View style={[styles.headerSide, { alignItems: "flex-end" }]}>{right}</View>
     </View>
@@ -118,11 +119,11 @@ export function Header({
 }
 
 /** Étapes de l'envoi d'argent. */
-export const SEND_STEPS = ["Montant", "Destinataire", "Paiement"];
+export const SEND_STEPS = [tr("Montant"), tr("Destinataire"), tr("Paiement")];
 
 export function Steps({ current, total, label, names }: { current: number; total: number; label?: string; names?: string[] }) {
   return (
-    <View style={{ marginBottom: 18 }} accessibilityLabel={`Étape ${current} sur ${total}${label ? ` : ${label}` : ""}`}>
+    <View style={{ marginBottom: 18 }} accessibilityLabel={tr("Étape {0} sur {1}{2}", current, total, label ? ` : ${label}` : "")}>
       <View style={{ flexDirection: "row", gap: 6 }}>
         {Array.from({ length: total }, (_, i) => (
           <View key={i} style={{ flex: 1, height: 4, borderRadius: 2, backgroundColor: i < current ? colors.brand : colors.line }} />
@@ -143,7 +144,7 @@ export function Steps({ current, total, label, names }: { current: number; total
         </View>
       ) : label ? (
         <Text style={[styles.small, { marginTop: 8, fontFamily: fonts.semibold, color: colors.brand }]}>
-          Étape {current} sur {total} · {label}
+          {tr("Étape {0} sur {1} · {2}", current, total, tr(label))}
         </Text>
       ) : null}
     </View>
@@ -214,7 +215,7 @@ export function Button({
       ) : (
         <>
           {icon ? <Icon name={icon} color={v.fg} size={size === "sm" ? 18 : 20} /> : null}
-          <Text style={[styles.btnText, size === "sm" && { fontSize: 14 }, { color: v.fg }]} numberOfLines={2}>{title}</Text>
+          <Text style={[styles.btnText, size === "sm" && { fontSize: 14 }, { color: v.fg }]} numberOfLines={2}>{tr(title)}</Text>
         </>
       )}
     </Pressable>
@@ -223,7 +224,7 @@ export function Button({
 
 export function IconButton({ name, onPress, label, tone = "neutral" }: { name: IconName; onPress?: () => void; label: string; tone?: Tone }) {
   return (
-    <Pressable accessibilityRole="button" accessibilityLabel={label} onPress={onPress} hitSlop={8} style={[styles.iconBtn, { backgroundColor: TONE_COLORS[tone].bg }]}>
+    <Pressable accessibilityRole="button" accessibilityLabel={tr(label)} onPress={onPress} hitSlop={8} style={[styles.iconBtn, { backgroundColor: TONE_COLORS[tone].bg }]}>
       <Icon name={name} color={TONE_COLORS[tone].fg} size={20} />
     </Pressable>
   );
@@ -246,7 +247,7 @@ export function Badge({ label, tone = "neutral" }: { label: string; tone?: Tone 
   return (
     <View style={[styles.badge, { backgroundColor: TONE_COLORS[tone].bg }]}>
       <View style={[styles.dot, { backgroundColor: TONE_COLORS[tone].fg }]} />
-      <Text style={[styles.badgeText, { color: TONE_COLORS[tone].fg }]}>{label}</Text>
+      <Text style={[styles.badgeText, { color: TONE_COLORS[tone].fg }]}>{tr(label)}</Text>
     </View>
   );
 }
@@ -256,8 +257,8 @@ export function Notice({ text, tone = "brand", icon = "info", title }: { text: s
     <View style={[styles.notice, { backgroundColor: TONE_COLORS[tone].bg }]} accessibilityRole="alert">
       <Icon name={icon} color={TONE_COLORS[tone].fg} size={20} />
       <View style={{ flex: 1 }}>
-        {title ? <Text style={[styles.noticeTitle, { color: TONE_COLORS[tone].fg }]}>{title}</Text> : null}
-        <Text style={[styles.small, { color: colors.ink }]}>{text}</Text>
+        {title ? <Text style={[styles.noticeTitle, { color: TONE_COLORS[tone].fg }]}>{tr(title)}</Text> : null}
+        <Text style={[styles.small, { color: colors.ink }]}>{tr(text)}</Text>
       </View>
     </View>
   );
@@ -280,11 +281,11 @@ export function SummaryRow({
   const text = <Text style={[styles.rowValue, strong && { fontFamily: fonts.heading }, highlight && { color: colors.brand, fontFamily: fonts.heading }]}>{value}</Text>;
   return (
     <View style={styles.row}>
-      <Text style={styles.rowLabel}>{label}</Text>
+      <Text style={styles.rowLabel}>{tr(label)}</Text>
       {valueIcon ? (
         <View style={{ flexDirection: "row", alignItems: "center", gap: 8, flexShrink: 1, justifyContent: "flex-end" }}>
           {valueIcon}
-          {text}
+          {tr(text)}
         </View>
       ) : (
         text
@@ -328,8 +329,8 @@ export function ListItem({
           </View>
         ) : null)}
       <View style={{ flex: 1 }}>
-        <Text style={styles.listTitle} numberOfLines={2}>{title}</Text>
-        {subtitle ? <Text style={styles.small} numberOfLines={subtitleLines}>{subtitle}</Text> : null}
+        <Text style={styles.listTitle} numberOfLines={2}>{tr(title)}</Text>
+        {subtitle ? <Text style={styles.small} numberOfLines={subtitleLines}>{tr(subtitle)}</Text> : null}
         {extra}
       </View>
       {right ?? (onPress ? <Icon name="chev" color={colors.muted} size={18} /> : null)}
@@ -361,13 +362,13 @@ export function Field({
   const [focused, setFocused] = useState(false);
   return (
     <View style={{ marginBottom: 14 }}>
-      <Label>{label}</Label>
+      <Label>{tr(label)}</Label>
       <View style={[styles.input, focused && { borderColor: colors.brand }, error ? { borderColor: colors.danger } : null]}>
         {left}
         <TextInput
           ref={ref}
           placeholderTextColor="#8a94ad"
-          accessibilityLabel={label}
+          accessibilityLabel={tr(label)}
           style={[styles.inputText, style]}
           onFocus={(e) => {
             setFocused(true);
@@ -381,7 +382,7 @@ export function Field({
         />
         {right}
       </View>
-      {error ? <Text style={styles.error}>{error}</Text> : hint ? <Small style={{ marginTop: 4 }}>{hint}</Small> : null}
+      {error ? <Text style={styles.error}>{error}</Text> : hint ? <Small style={{ marginTop: 4 }}>{tr(hint)}</Small> : null}
     </View>
   );
 }
@@ -411,8 +412,8 @@ export function Choice({
     >
       {leading ?? (icon ? <Icon name={icon} color={selected ? colors.brand : colors.muted} size={20} /> : null)}
       <View style={{ flex: 1 }}>
-        <Text style={[styles.listTitle, { fontSize: 15 }]}>{label}</Text>
-        {description ? <Small>{description}</Small> : null}
+        <Text style={[styles.listTitle, { fontSize: 15 }]}>{tr(label)}</Text>
+        {description ? <Small>{tr(description)}</Small> : null}
       </View>
       <View style={[styles.radio, selected && { borderColor: colors.brand }]}>
         {selected ? <View style={styles.radioDot} /> : null}
@@ -427,8 +428,8 @@ export function Empty({ icon, title, text, action }: { icon: IconName; title: st
       <View style={[styles.listIcon, { width: 56, height: 56, borderRadius: 18, backgroundColor: colors.brandSoft }]}>
         <Icon name={icon} color={colors.brand} size={26} />
       </View>
-      <Text style={[styles.h2, { fontSize: 18, textAlign: "center" }]}>{title}</Text>
-      <P style={{ textAlign: "center" }}>{text}</P>
+      <Text style={[styles.h2, { fontSize: 18, textAlign: "center" }]}>{tr(title)}</Text>
+      <P style={{ textAlign: "center" }}>{tr(text)}</P>
       {action ? <View style={{ marginTop: 8, alignSelf: "stretch" }}>{action}</View> : null}
     </View>
   );

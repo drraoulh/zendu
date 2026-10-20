@@ -1,3 +1,5 @@
+import { getLang, tr } from "./i18n";
+
 const ZERO_DECIMAL = new Set(["XAF", "XOF", "JPY", "KRW"]);
 
 export function money(amount: number, currency: string) {
@@ -5,9 +7,11 @@ export function money(amount: number, currency: string) {
   const n = Number.isFinite(amount) ? amount : 0;
   const fixed = n.toFixed(digits);
   const [int, dec] = fixed.split(".");
-  const grouped = int.replace(/\B(?=(\d{3})+(?!\d))/g, " ");
+  // Anglais et chinois : « 1,234.56 » ; français et espagnol : « 1 234,56 ».
+  const dot = getLang() === "en" || getLang() === "zh";
+  const grouped = int.replace(/\B(?=(\d{3})+(?!\d))/g, dot ? "," : " ");
   const label = currency === "XAF" ? "FCFA" : currency;
-  return `${grouped}${dec ? `,${dec}` : ""} ${label}`;
+  return `${grouped}${dec ? `${dot ? "." : ","}${dec}` : ""} ${label}`;
 }
 
 /** Unité affichée d'une devise (« FCFA » pour le franc CFA, comme sur les montants). */
@@ -22,13 +26,15 @@ export function rateLine(value: number, from: string, to: string) {
 
 /** Date et heure en toutes lettres pour une phrase : « 20/10/2026 à 12:06 ». */
 export function dateAt(iso: string) {
-  return dateTime(iso).replace(" · ", " à ");
+  const [d, h] = dateTime(iso).split(" · ");
+  return h ? tr("{0} à {1}", d, h) : d;
 }
 
 export function rate(value: number) {
   if (!Number.isFinite(value)) return "—";
-  if (value >= 100) return value.toFixed(2).replace(".", ",");
-  return value.toPrecision(4).replace(".", ",");
+  const sep = getLang() === "en" || getLang() === "zh" ? "." : ",";
+  if (value >= 100) return value.toFixed(2).replace(".", sep);
+  return value.toPrecision(4).replace(".", sep);
 }
 
 export function parseAmount(text: string) {
@@ -46,7 +52,7 @@ export function dateTime(iso: string) {
 export const COUNTRY_NAMES: Record<string, string> = { CA: "Canada", CM: "Cameroun", CN: "Chine" };
 
 export function countryName(code: string) {
-  return COUNTRY_NAMES[code] ?? code;
+  return COUNTRY_NAMES[code] ? tr(COUNTRY_NAMES[code]) : code;
 }
 
 export const NETWORK_LABELS: Record<string, string> = {
@@ -60,7 +66,7 @@ export const NETWORK_LABELS: Record<string, string> = {
 };
 
 export function networkLabel(id: string) {
-  return NETWORK_LABELS[id] ?? id;
+  return NETWORK_LABELS[id] ? tr(NETWORK_LABELS[id]) : id;
 }
 
 export function etaLabel(estimate: string) {
@@ -69,7 +75,7 @@ export function etaLabel(estimate: string) {
     "Under 24h": "En moins de 24 h",
     "1-2 business days": "1 à 2 jours ouvrables",
   };
-  return map[estimate] ?? estimate;
+  return map[estimate] ? tr(map[estimate]) : estimate;
 }
 
 /** Délai annoncé pour un trajet ; un virement bancaire prend toujours 1 à 2 jours ouvrables. */
@@ -80,6 +86,11 @@ export function deliveryEstimate(corridorEstimate: string, network?: string | nu
 export type StatusInfo = { label: string; tone: "brand" | "success" | "warn" | "danger" | "neutral"; step: number };
 
 export function statusInfo(status: string): StatusInfo {
+  const info = statusRaw(status);
+  return { ...info, label: tr(info.label) };
+}
+
+function statusRaw(status: string): StatusInfo {
   switch (status) {
     case "awaiting_payment":
       return { label: "En attente de paiement", tone: "warn", step: 0 };
@@ -118,7 +129,7 @@ const EVENT_TITLES: Record<string, string> = {
 };
 
 export function eventTitle(type: string) {
-  return EVENT_TITLES[type] ?? "Mise à jour";
+  return tr(EVENT_TITLES[type] ?? "Mise à jour");
 }
 
 /**
@@ -138,5 +149,5 @@ export function phone(digits: string) {
 
 /** Frais d'un envoi : « Gratuit » quand il n'y en a pas (cas général : la marge est dans le taux). */
 export function feeLabel(fee: number, currency: string) {
-  return fee > 0 ? money(fee, currency) : "Gratuit";
+  return fee > 0 ? money(fee, currency) : tr("Gratuit");
 }

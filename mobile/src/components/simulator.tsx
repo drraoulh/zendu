@@ -7,6 +7,7 @@ import { colors, fonts, radius } from "@/lib/theme";
 import { Flag } from "./flag";
 import { Icon } from "./icons";
 import { Button } from "./ui";
+import { tr } from "@/lib/i18n";
 
 /**
  * Simulateur de transfert : choix du trajet, montant, devis en direct (API /api/quotes).
@@ -19,7 +20,7 @@ export function Simulator({
   receiveAmount = null,
   onChange,
   onContinue,
-  ctaLabel = "Continuer",
+  ctaLabel = tr("Continuer"),
 }: {
   corridorId: string;
   amount: number;
@@ -52,16 +53,16 @@ export function Simulator({
   const key = `${corridor.id}:${mode}:${value}`;
   const localError =
     !Number.isFinite(value) || value <= 0
-      ? "Saisissez un montant."
+      ? tr("Saisissez un montant.")
       : mode === "send" && (value < corridor.minSend || value > corridor.maxSend)
-        ? `Le montant doit être compris entre ${money(corridor.minSend, corridor.sendCurrency)} et ${money(corridor.maxSend, corridor.sendCurrency)}.`
+        ? tr("Le montant doit être compris entre {0} et {1}.", money(corridor.minSend, corridor.sendCurrency), money(corridor.maxSend, corridor.sendCurrency))
         : null;
   // Le devis affiché doit correspondre exactement au trajet et au montant saisis.
   const current = !localError && quoted?.key === key ? quoted.quote : null;
   // Montant reçu demandé : le montant envoyé calculé doit rester dans les limites du trajet.
   const rangeError =
     current && mode === "receive" && (current.sendAmount < corridor.minSend || current.sendAmount > corridor.maxSend)
-      ? `Le montant envoyé doit être compris entre ${money(corridor.minSend, corridor.sendCurrency)} et ${money(corridor.maxSend, corridor.sendCurrency)}.`
+      ? tr("Le montant envoyé doit être compris entre {0} et {1}.", money(corridor.minSend, corridor.sendCurrency), money(corridor.maxSend, corridor.sendCurrency))
       : null;
   const error = localError ?? rangeError ?? (remoteError?.key === key ? remoteError.message : null);
   const loading = !error && !current;
@@ -140,7 +141,7 @@ export function Simulator({
     <View style={s.card}>
       <View style={s.row}>
         <View style={s.amountCol}>
-          <Text style={s.fieldLabel}>Vous envoyez</Text>
+          <Text style={s.fieldLabel}>{tr("Vous envoyez")}</Text>
           <TextInput
             value={text}
             onChangeText={(t) => {
@@ -149,16 +150,16 @@ export function Simulator({
             }}
             keyboardType="decimal-pad"
             inputMode="decimal"
-            accessibilityLabel="Montant envoyé"
+            accessibilityLabel={tr("Montant envoyé")}
             style={[s.amountInput, amountSize]}
             maxLength={13}
           />
         </View>
-        <CountryPill compact={compact} code={corridor.source} unit={sendUnit} label="Pays d'envoi" onPress={() => setPicker("source")} />
+        <CountryPill compact={compact} code={corridor.source} unit={sendUnit} label={tr("Pays d'envoi")} onPress={() => setPicker("source")} />
       </View>
 
       <View style={s.middle}>
-        <Pressable accessibilityRole="button" accessibilityLabel="Inverser le trajet" onPress={swap} style={s.swap} hitSlop={6}>
+        <Pressable accessibilityRole="button" accessibilityLabel={tr("Inverser le trajet")} onPress={swap} style={s.swap} hitSlop={6}>
           <Icon name="swap" color={colors.brand} size={18} />
         </Pressable>
         <View style={{ flex: 1, gap: 2 }}>
@@ -170,23 +171,23 @@ export function Simulator({
                 {rateLine(current.rate, current.sendCurrency, current.receiveCurrency)}
               </Text>
               <Text style={s.hint}>
-                {current.fee > 0 ? `Frais ${money(current.fee, current.sendCurrency)}` : "Sans frais"} · {etaLabel(current.deliveryEstimate)}
+                {current.fee > 0 ? tr("Frais {0}", money(current.fee, current.sendCurrency)) : tr("Sans frais")} · {etaLabel(current.deliveryEstimate)}
               </Text>
               {rateAge != null ? (
                 <Text style={[s.hint, { fontSize: 12 }]}>
-                  Taux mis à jour {rateAge < 1 ? "à l'instant" : `il y a ${rateAge} min`} · bloqué à la création du transfert
+                  {tr("Taux mis à jour {0} · bloqué à la création du transfert", rateAge < 1 ? tr("à l'instant") : tr("il y a {0} min", rateAge))}
                 </Text>
               ) : null}
             </>
           ) : (
-            <Text style={s.hint}>Calcul du taux…</Text>
+            <Text style={s.hint}>{tr("Calcul du taux…")}</Text>
           )}
         </View>
       </View>
 
       <View style={[s.row, s.rowReceive]}>
         <View style={s.amountCol}>
-          <Text style={s.fieldLabel}>Ils reçoivent</Text>
+          <Text style={s.fieldLabel}>{tr("Ils reçoivent")}</Text>
           <View style={{ flexDirection: "row", alignItems: "center", gap: 8 }}>
             <TextInput
               value={receiveText}
@@ -198,28 +199,28 @@ export function Simulator({
               placeholderTextColor={colors.muted}
               keyboardType="decimal-pad"
               inputMode="decimal"
-              accessibilityLabel="Montant reçu par le destinataire"
+              accessibilityLabel={tr("Montant reçu par le destinataire")}
               style={[s.amountInput, amountSize, { color: colors.brand, flex: 1 }]}
               maxLength={13}
             />
             {loading && mode === "send" ? <ActivityIndicator color={colors.brand} /> : null}
           </View>
         </View>
-        <CountryPill compact={compact} code={corridor.destination} unit={receiveUnit} label="Pays de réception" onPress={() => setPicker("destination")} />
+        <CountryPill compact={compact} code={corridor.destination} unit={receiveUnit} label={tr("Pays de réception")} onPress={() => setPicker("destination")} />
       </View>
 
       {current ? (
         <View style={s.total}>
-          <Text style={s.hint}>Total à payer</Text>
+          <Text style={s.hint}>{tr("Total à payer")}</Text>
           <Text style={s.totalValue}>{money(current.total, current.sendCurrency)}</Text>
         </View>
       ) : null}
 
-      {onContinue ? <Button title={ctaLabel} icon="send" onPress={onContinue} disabled={!current} style={{ marginTop: 14 }} /> : null}
+      {onContinue ? <Button title={tr(ctaLabel)} icon="send" onPress={onContinue} disabled={!current} style={{ marginTop: 14 }} /> : null}
 
       <CountryPicker
         visible={picker != null}
-        title={picker === "source" ? "Envoyer depuis" : "Envoyer vers"}
+        title={picker === "source" ? tr("Envoyer depuis") : tr("Envoyer vers")}
         selected={picker === "source" ? corridor.source : corridor.destination}
         onPick={pick}
         onClose={() => setPicker(null)}
@@ -241,7 +242,7 @@ function CountryPill({ code, unit, label, onPress, compact = false }: { code: st
   return (
     <Pressable
       accessibilityRole="button"
-      accessibilityLabel={`${label} : ${countryName(code)}, ${unit}. Modifier`}
+      accessibilityLabel={tr("{0} : {1}, {2}. Modifier", tr(label), countryName(code), unit)}
       onPress={onPress}
       hitSlop={4}
       style={({ pressed }) => [s.pill, compact && { paddingHorizontal: 8, gap: 4 }, pressed && { opacity: 0.8 }]}
@@ -268,9 +269,9 @@ function CountryPicker({
 }) {
   return (
     <Modal visible={visible} transparent animationType="fade" onRequestClose={onClose}>
-      <Pressable style={s.backdrop} onPress={onClose} accessibilityLabel="Fermer">
+      <Pressable style={s.backdrop} onPress={onClose} accessibilityLabel={tr("Fermer")}>
         <Pressable style={s.sheet} onPress={() => undefined}>
-          <Text style={s.sheetTitle}>{title}</Text>
+          <Text style={s.sheetTitle}>{tr(title)}</Text>
           {(Object.keys(COUNTRIES) as CountryCode[]).map((code) => (
             <Pressable
               key={code}
@@ -282,7 +283,7 @@ function CountryPicker({
               <Flag code={code} size={30} />
               <View style={{ flex: 1 }}>
                 <Text style={s.countryName}>{COUNTRIES[code].name}</Text>
-                <Text style={s.hint}>{COUNTRIES[code].currency === "XAF" ? "Franc CFA (XAF)" : COUNTRIES[code].currency}</Text>
+                <Text style={s.hint}>{COUNTRIES[code].currency === "XAF" ? tr("Franc CFA (XAF)") : COUNTRIES[code].currency}</Text>
               </View>
               {code === selected ? <Icon name="check" color={colors.brand} /> : null}
             </Pressable>

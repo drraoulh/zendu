@@ -9,11 +9,12 @@ import { ageFrom, maskDate, OCCUPATIONS, parseBirthDate, POSTAL_LABEL, REGION_LA
 import { openSite } from "@/lib/links";
 import { passwordScore, useSession } from "@/lib/session";
 import { colors, fonts } from "@/lib/theme";
+import { tr } from "@/lib/i18n";
 
 const EMAIL = /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/;
 // Pas d'étape « code par SMS » : aucun envoi réel de SMS à l'inscription (la connexion, elle, est
 // protégée par un code envoyé par courriel). Étapes 5 à 7 : vérification d'identité (écran /kyc).
-const TITLES = ["Coordonnées", "Informations personnelles", "Adresse", "Sécurité"];
+const TITLES = [tr("Coordonnées"), tr("Informations personnelles"), tr("Adresse"), tr("Sécurité")];
 const LAST = TITLES.length;
 const SIGNUP_TOTAL_STEPS = LAST + 3;
 
@@ -44,27 +45,27 @@ export default function SignUp() {
     const e: Record<string, string> = {};
     if (step === 1) {
       if (!region) e.region = `${REGION_LABEL[country]} requis(e)`;
-      if (!EMAIL.test(email.trim())) e.email = "Adresse courriel invalide";
-      if (phone.replace(/\D/g, "").length < 8) e.phone = "Numéro de téléphone invalide";
+      if (!EMAIL.test(email.trim())) e.email = tr("Adresse courriel invalide");
+      if (phone.replace(/\D/g, "").length < 8) e.phone = tr("Numéro de téléphone invalide");
     }
     if (step === 2) {
-      if (firstName.trim().length < 2) e.firstName = "Prénom requis";
-      if (lastName.trim().length < 2) e.lastName = "Nom requis";
+      if (firstName.trim().length < 2) e.firstName = tr("Prénom requis");
+      if (lastName.trim().length < 2) e.lastName = tr("Nom requis");
       const d = parseBirthDate(birth);
-      if (!d) e.birth = "Date invalide (JJ/MM/AAAA)";
-      else if (ageFrom(d) < 18) e.birth = "Vous devez avoir au moins 18 ans";
-      else if (ageFrom(d) > 120) e.birth = "Date invalide";
-      if (!occupation) e.occupation = "Choisissez une occupation";
+      if (!d) e.birth = tr("Date invalide (JJ/MM/AAAA)");
+      else if (ageFrom(d) < 18) e.birth = tr("Vous devez avoir au moins 18 ans");
+      else if (ageFrom(d) > 120) e.birth = tr("Date invalide");
+      if (!occupation) e.occupation = tr("Choisissez une occupation");
     }
     if (step === 3) {
-      if (line1.trim().length < 4) e.line1 = "Adresse requise";
-      if (city.trim().length < 2) e.city = "Ville requise";
-      if (country === "CA" && !/^[A-Za-z]\d[A-Za-z]\s?\d[A-Za-z]\d$/.test(postal.trim())) e.postal = "Code postal invalide (A1A 1A1)";
-      if (country === "CN" && postal && !/^\d{6}$/.test(postal.trim())) e.postal = "Code postal à 6 chiffres";
+      if (line1.trim().length < 4) e.line1 = tr("Adresse requise");
+      if (city.trim().length < 2) e.city = tr("Ville requise");
+      if (country === "CA" && !/^[A-Za-z]\d[A-Za-z]\s?\d[A-Za-z]\d$/.test(postal.trim())) e.postal = tr("Code postal invalide (A1A 1A1)");
+      if (country === "CN" && postal && !/^\d{6}$/.test(postal.trim())) e.postal = tr("Code postal à 6 chiffres");
     }
     if (step === 4) {
-      if (passwordScore(password) < 4) e.password = "Le mot de passe ne respecte pas toutes les règles";
-      if (!accepted) e.accepted = "Vous devez accepter les conditions";
+      if (passwordScore(password) < 4) e.password = tr("Le mot de passe ne respecte pas toutes les règles");
+      if (!accepted) e.accepted = tr("Vous devez accepter les conditions");
     }
     return e;
   }
@@ -102,7 +103,7 @@ export default function SignUp() {
     else router.replace("/welcome");
   }
 
-  const cta = step === LAST ? "Créer mon compte" : "Continuer";
+  const cta = step === LAST ? tr("Créer mon compte") : tr("Continuer");
 
   return (
     <Screen
@@ -110,27 +111,27 @@ export default function SignUp() {
         <View style={{ gap: 10 }}>
           {/* Erreur du serveur (ex. courriel déjà utilisé) au-dessus du bouton : visible sans défiler. */}
           {errors.submit ? <Notice tone="danger" icon="alert" text={errors.submit} /> : null}
-          <Button title={cta} onPress={next} loading={busy} />
+          <Button title={tr(cta)} onPress={next} loading={busy} />
           {step === 1 ? (
             <Text style={{ textAlign: "center", color: colors.muted, fontSize: 14 }}>
-              Déjà un compte ?{" "}
+              {tr("Déjà un compte ?")}{" "}
               <Link href="/auth/login" replace style={{ color: colors.brand, fontFamily: fonts.semibold }}>
-                Se connecter
+                {tr("Se connecter")}
               </Link>
             </Text>
           ) : null}
         </View>
       }
     >
-      <Header title="Créer un compte" onBack={back} />
-      <Steps current={step} total={SIGNUP_TOTAL_STEPS} label={TITLES[step - 1]} />
+      <Header title={tr("Créer un compte")} onBack={back} />
+      <Steps current={step} total={SIGNUP_TOTAL_STEPS} label={tr(TITLES[step - 1])} />
 
       {step === 1 ? (
         <>
-          <H1>Commençons par vous</H1>
-          <P style={{ marginTop: 6, marginBottom: 18 }}>Ces coordonnées servent à vous joindre et à sécuriser vos transferts.</P>
+          <H1>{tr("Commençons par vous")}</H1>
+          <P style={{ marginTop: 6, marginBottom: 18 }}>{tr("Ces coordonnées servent à vous joindre et à sécuriser vos transferts.")}</P>
           <SelectField
-            label="Pays de résidence"
+            label={tr("Pays de résidence")}
             value={country}
             options={COUNTRY_CODES.map((code) => ({ value: code, label: COUNTRIES[code].name }))}
             onChange={(v) => {
@@ -139,14 +140,14 @@ export default function SignUp() {
             }}
           />
           <SelectField
-            label={REGION_LABEL[country]}
+            label={tr(REGION_LABEL[country])}
             value={region}
-            options={REGIONS[country].map((r) => ({ value: r, label: r }))}
+            options={REGIONS[country].map((r) => ({ value: r, label: tr(r) }))}
             onChange={setRegion}
             error={errors.region}
           />
           <Field
-            label="Courriel"
+            label={tr("Courriel")}
             value={email}
             onChangeText={setEmail}
             placeholder="nom@exemple.com"
@@ -157,14 +158,14 @@ export default function SignUp() {
             error={errors.email}
           />
           <Field
-            label="Numéro de téléphone"
+            label={tr("Numéro de téléphone")}
             value={phone}
             onChangeText={setPhone}
             keyboardType="phone-pad"
             autoComplete="tel"
             placeholder={c.phonePlaceholder}
             error={errors.phone}
-            hint="Pour vous joindre au sujet de vos transferts."
+            hint={tr("Pour vous joindre au sujet de vos transferts.")}
             left={
               <View style={{ flexDirection: "row", alignItems: "center", gap: 6 }}>
                 <Flag code={country} size={20} />
@@ -177,12 +178,12 @@ export default function SignUp() {
 
       {step === 2 ? (
         <>
-          <H1>Qui êtes-vous ?</H1>
-          <P style={{ marginTop: 6, marginBottom: 18 }}>Indiquez vos nom et prénom tels qu&apos;ils figurent sur votre pièce d&apos;identité.</P>
-          <Field label="Prénom" value={firstName} onChangeText={setFirstName} autoComplete="given-name" textContentType="givenName" error={errors.firstName} />
-          <Field label="Nom" value={lastName} onChangeText={setLastName} placeholder="Nom de famille" autoComplete="family-name" textContentType="familyName" error={errors.lastName} />
+          <H1>{tr("Qui êtes-vous ?")}</H1>
+          <P style={{ marginTop: 6, marginBottom: 18 }}>{tr("Indiquez vos nom et prénom tels qu'ils figurent sur votre pièce d'identité.")}</P>
+          <Field label={tr("Prénom")} value={firstName} onChangeText={setFirstName} autoComplete="given-name" textContentType="givenName" error={errors.firstName} />
+          <Field label={tr("Nom")} value={lastName} onChangeText={setLastName} placeholder={tr("Nom de famille")} autoComplete="family-name" textContentType="familyName" error={errors.lastName} />
           <Field
-            label="Date de naissance"
+            label={tr("Date de naissance")}
             value={birth}
             onChangeText={(v) => setBirth(maskDate(v))}
             placeholder="JJ/MM/AAAA"
@@ -190,28 +191,28 @@ export default function SignUp() {
             maxLength={10}
             error={errors.birth}
           />
-          <SelectField label="Profession ou occupation" value={occupation} options={OCCUPATIONS.map((o) => ({ value: o, label: o }))} onChange={setOccupation} error={errors.occupation} />
-          <Field label="Poste ou domaine (facultatif)" value={jobTitle} onChangeText={setJobTitle} placeholder="Ex. infirmier, comptable…" />
+          <SelectField label={tr("Profession ou occupation")} value={occupation} options={OCCUPATIONS.map((o) => ({ value: o, label: tr(o) }))} onChange={setOccupation} error={errors.occupation} />
+          <Field label={tr("Poste ou domaine (facultatif)")} value={jobTitle} onChangeText={setJobTitle} placeholder={tr("Ex. infirmier, comptable…")} />
           <Notice
             tone="brand"
             icon="info"
-            title="Pourquoi ces informations ?"
-            text="La réglementation sur les transferts d'argent nous oblige à vérifier l'identité de nos clients et à connaître leur occupation. Ces données restent confidentielles."
+            title={tr("Pourquoi ces informations ?")}
+            text={tr("La réglementation sur les transferts d'argent nous oblige à vérifier l'identité de nos clients et à connaître leur occupation. Ces données restent confidentielles.")}
           />
         </>
       ) : null}
 
       {step === 3 ? (
         <>
-          <H1>Où habitez-vous ?</H1>
-          <P style={{ marginTop: 6, marginBottom: 18 }}>Votre adresse résidentielle actuelle (pas de case postale).</P>
-          <Field label="Adresse" value={line1} onChangeText={setLine1} autoComplete="street-address" error={errors.line1} />
-          <Field label="Appartement, bureau (facultatif)" value={line2} onChangeText={setLine2} placeholder="Ex. app. 804" />
-          <Field label="Ville" value={city} onChangeText={setCity} autoComplete="postal-address-locality" error={errors.city} />
-          <SelectField label={REGION_LABEL[country]} value={region} options={REGIONS[country].map((r) => ({ value: r, label: r }))} onChange={setRegion} />
+          <H1>{tr("Où habitez-vous ?")}</H1>
+          <P style={{ marginTop: 6, marginBottom: 18 }}>{tr("Votre adresse résidentielle actuelle (pas de case postale).")}</P>
+          <Field label={tr("Adresse")} value={line1} onChangeText={setLine1} autoComplete="street-address" error={errors.line1} />
+          <Field label={tr("Appartement, bureau (facultatif)")} value={line2} onChangeText={setLine2} placeholder={tr("Ex. app. 804")} />
+          <Field label={tr("Ville")} value={city} onChangeText={setCity} autoComplete="postal-address-locality" error={errors.city} />
+          <SelectField label={tr(REGION_LABEL[country])} value={region} options={REGIONS[country].map((r) => ({ value: r, label: tr(r) }))} onChange={setRegion} />
           {POSTAL_LABEL[country] ? (
             <Field
-              label={country === "CN" ? "Code postal (facultatif)" : "Code postal"}
+              label={country === "CN" ? tr("Code postal (facultatif)") : tr("Code postal")}
               value={postal}
               onChangeText={setPostal}
               placeholder={country === "CA" ? "A1A 1A1" : "100000"}
@@ -222,17 +223,17 @@ export default function SignUp() {
           ) : null}
           <View style={{ flexDirection: "row", alignItems: "center", gap: 10 }}>
             <Flag code={country} size={22} />
-            <Small>Pays de résidence : {c.name}</Small>
+            <Small>{tr("Pays de résidence : {0}", c.name)}</Small>
           </View>
         </>
       ) : null}
 
       {step === 4 ? (
         <>
-          <H1>Choisissez un mot de passe</H1>
-          <P style={{ marginTop: 6, marginBottom: 18 }}>Il protège votre argent : évitez de réutiliser celui d&apos;un autre service.</P>
+          <H1>{tr("Choisissez un mot de passe")}</H1>
+          <P style={{ marginTop: 6, marginBottom: 18 }}>{tr("Il protège votre argent : évitez de réutiliser celui d'un autre service.")}</P>
           <Field
-            label="Mot de passe"
+            label={tr("Mot de passe")}
             value={password}
             onChangeText={setPassword}
             secureTextEntry
@@ -243,20 +244,18 @@ export default function SignUp() {
           <PasswordChecklist value={password} />
           <Checkbox checked={accepted} onChange={setAccepted}>
             <Small style={{ color: colors.ink }}>
-              J&apos;accepte les{" "}
+              {tr("J'accepte les")}{" "}
               <Text style={{ color: colors.brand }} onPress={() => openSite("/conditions")}>
-                conditions d&apos;utilisation
-              </Text>{" "}
-              et la{" "}
+                {tr("conditions d'utilisation")}
+              </Text>{" "}{tr("et la")}{" "}
               <Text style={{ color: colors.brand }} onPress={() => openSite("/confidentialite")}>
-                politique de confidentialité
-              </Text>{" "}
-              de PWFINTECH.
+                {tr("politique de confidentialité")}
+              </Text>{" "}{tr("de PWFINTECH.")}
             </Small>
           </Checkbox>
           {errors.accepted ? <Text style={{ color: colors.danger, fontSize: 13, marginTop: -6, marginBottom: 10 }}>{errors.accepted}</Text> : null}
           <Checkbox checked={marketing} onChange={setMarketing}>
-            <Small style={{ color: colors.ink }}>Recevoir les offres et nouveautés par courriel (facultatif)</Small>
+            <Small style={{ color: colors.ink }}>{tr("Recevoir les offres et nouveautés par courriel (facultatif)")}</Small>
           </Checkbox>
         </>
       ) : null}

@@ -1,6 +1,7 @@
 import * as Clipboard from "expo-clipboard";
 import { useEffect, useRef, useState } from "react";
 import { Share } from "react-native";
+import { tr } from "@/lib/i18n";
 
 /**
  * Partage un texte. Si la feuille de partage n'existe pas (navigateur sans Web Share, ex. Chrome
@@ -24,7 +25,7 @@ export async function shareText(message: string, title?: string): Promise<"share
 }
 
 /** Bouton « Partager » : affiche « Copié » quelques secondes quand le texte a été copié faute de partage natif. */
-export function useShare(label = "Partager") {
+export function useShare(label = tr("Partager")) {
   const [state, setState] = useState<"idle" | "copied" | "failed">("idle");
   const timer = useRef<ReturnType<typeof setTimeout> | null>(null);
   useEffect(() => () => {
@@ -37,5 +38,5 @@ export function useShare(label = "Partager") {
     if (timer.current) clearTimeout(timer.current);
     timer.current = setTimeout(() => setState("idle"), 2000);
   }
-  return { share, label: state === "copied" ? "Copié" : state === "failed" ? "Partage indisponible" : label, copied: state === "copied" };
+  return { share, label: state === "copied" ? tr("Copié") : state === "failed" ? tr("Partage indisponible") : label, copied: state === "copied" };
 }

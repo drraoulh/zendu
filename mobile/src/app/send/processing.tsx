@@ -10,6 +10,7 @@ import { money, networkLabel } from "@/lib/format";
 import { useSession } from "@/lib/session";
 import { useStore } from "@/lib/store";
 import { colors, fonts } from "@/lib/theme";
+import { tr } from "@/lib/i18n";
 
 type Phase = 0 | 1 | 2 | 3;
 
@@ -73,7 +74,7 @@ export default function Processing() {
         router.dismissAll();
         router.replace({ pathname: "/send/success", params: { id: transfer.id, card: card ? cardLabel(card) : "" } });
       } catch (e) {
-        setError(e instanceof Error ? e.message : "Paiement impossible");
+        setError(e instanceof Error ? e.message : tr("Paiement impossible"));
       }
     })();
   }, [recipient, profile, quote, interac, draft.corridorId, draft.sendAmount, draft.receiveAmount, draft.saveRecipient, addTransfer, saveRecipient, card]);
@@ -82,22 +83,22 @@ export default function Processing() {
 
   const steps = interac
     ? [
-        { title: "Vérification du montant", sub: money(quote.total, quote.sendCurrency) },
-        { title: "Création du transfert", sub: phase > 1 ? "Créé" : phase === 1 ? "En cours…" : "À venir" },
-        { title: "Instructions du virement Interac", sub: phase > 1 ? "Prêtes" : "À venir" },
+        { title: tr("Vérification du montant"), sub: money(quote.total, quote.sendCurrency) },
+        { title: tr("Création du transfert"), sub: phase > 1 ? tr("Créé") : phase === 1 ? tr("En cours…") : tr("À venir") },
+        { title: tr("Instructions du virement Interac"), sub: phase > 1 ? tr("Prêtes") : tr("À venir") },
       ]
     : [
-        { title: "Autorisation de la carte", sub: `${card ? cardLabel(card) : "Carte"} · ${money(quote.total, quote.sendCurrency)}` },
-        { title: "Création du transfert", sub: phase > 1 ? "Créé" : phase === 1 ? "En cours…" : "À venir" },
-        { title: `Envoi vers ${networkLabel(recipient.network)}`, sub: phase > 2 ? "Lancé" : phase === 2 ? "En cours…" : "À venir" },
+        { title: tr("Autorisation de la carte"), sub: `${card ? cardLabel(card) : tr("Carte")} · ${money(quote.total, quote.sendCurrency)}` },
+        { title: tr("Création du transfert"), sub: phase > 1 ? tr("Créé") : phase === 1 ? tr("En cours…") : tr("À venir") },
+        { title: tr("Envoi vers {0}", networkLabel(recipient.network)), sub: phase > 2 ? tr("Lancé") : phase === 2 ? tr("En cours…") : tr("À venir") },
       ];
 
   return (
     <Screen>
       <View style={{ alignItems: "center", paddingTop: 50, gap: 10 }}>
         {error ? <Icon name="alert" size={48} color={colors.danger} /> : <ActivityIndicator size="large" color={colors.brand} />}
-        <H1 style={{ textAlign: "center" }}>{error ? "Paiement interrompu" : interac ? "Préparation du virement" : "Traitement du paiement"}</H1>
-        <P style={{ textAlign: "center" }}>{error ? "Aucun montant n'a été débité." : "Ne fermez pas l'application. Cela prend généralement quelques secondes."}</P>
+        <H1 style={{ textAlign: "center" }}>{error ? tr("Paiement interrompu") : interac ? tr("Préparation du virement") : tr("Traitement du paiement")}</H1>
+        <P style={{ textAlign: "center" }}>{error ? tr("Aucun montant n'a été débité.") : tr("Ne fermez pas l'application. Cela prend généralement quelques secondes.")}</P>
       </View>
       <Card style={{ marginTop: 24 }}>
         {steps.map((s, i) => {
@@ -118,18 +119,18 @@ export default function Processing() {
                 {done ? <Icon name="check" color={colors.white} size={14} strokeWidth={3} /> : current ? <ActivityIndicator size="small" color={colors.brand} /> : null}
               </View>
               <View style={{ flex: 1 }}>
-                <Text style={{ fontFamily: fonts.semibold, color: colors.ink, fontSize: 15 }}>{s.title}</Text>
-                <Small>{s.sub}</Small>
+                <Text style={{ fontFamily: fonts.semibold, color: colors.ink, fontSize: 15 }}>{tr(s.title)}</Text>
+                <Small>{tr(s.sub)}</Small>
               </View>
             </View>
           );
         })}
       </Card>
-      {reference ? <Small style={{ textAlign: "center", marginTop: 12 }}>Réf. {reference}</Small> : null}
+      {reference ? <Small style={{ textAlign: "center", marginTop: 12 }}>{tr("Réf. {0}", reference)}</Small> : null}
       {error ? (
         <View style={{ marginTop: 16, gap: 10 }}>
           <Notice tone="danger" icon="alert" text={error} />
-          <Button title="Revenir au récapitulatif" onPress={() => router.back()} />
+          <Button title={tr("Revenir au récapitulatif")} onPress={() => router.back()} />
         </View>
       ) : null}
     </Screen>

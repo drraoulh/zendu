@@ -7,6 +7,7 @@ import { PoweredBy, WstWordmark } from "./brand";
 import { Flag } from "./flag";
 import { Icon } from "./icons";
 import { PaymentLogo } from "./payment-logo";
+import { tr } from "@/lib/i18n";
 
 export function etaFor(t: Transfer) {
   if (t.beneficiary.network === "BANK") return "1-2 business days";
@@ -17,14 +18,14 @@ export function etaFor(t: Transfer) {
 export function recipientMessage(t: Transfer) {
   const first = t.beneficiary.fullName.split(" ")[0];
   const ben = t.beneficiary;
-  const where = ben.network === "BANK" ? `sur votre compte ${ben.bankName ?? "bancaire"}${ben.accountMasked ? ` (${ben.accountMasked})` : ""}` : ben.network === "CASH" ? "en retrait d'espèces" : `sur ${networkLabel(ben.network)}${ben.phone ? ` (${phone(ben.phone)})` : ""}`;
+  const where = ben.network === "BANK" ? tr("sur votre compte {0}{1}", ben.bankName ?? "bancaire", ben.accountMasked ? ` (${ben.accountMasked})` : "") : ben.network === "CASH" ? tr("en retrait d'espèces") : `sur ${networkLabel(ben.network)}${ben.phone ? ` (${phone(ben.phone)})` : ""}`;
   const delivered = t.status === "delivered";
   return [
-    `Bonjour ${first},`,
-    `${t.senderName} vous a envoyé ${money(t.receiveAmountXaf, t.receiveCurrency)} avec WorldSoft Transfer.`,
-    delivered ? `L'argent est disponible ${where}.` : `Vous le recevrez ${where} — délai estimé : ${etaLabel(etaFor(t)).toLowerCase()}.`,
-    `Référence : ${t.reference}`,
-    "WorldSoft Transfer — une solution PWFINTECH",
+    tr("Bonjour {0},", first),
+    tr("{0} vous a envoyé {1} avec WorldSoft Transfer.", t.senderName, money(t.receiveAmountXaf, t.receiveCurrency)),
+    delivered ? tr("L'argent est disponible {0}.", where) : tr("Vous le recevrez {0} — délai estimé : {1}.", where, etaLabel(etaFor(t)).toLowerCase()),
+    tr("Référence : {0}", t.reference),
+    tr("WorldSoft Transfer — une solution PWFINTECH"),
   ].join("\n");
 }
 
@@ -38,7 +39,7 @@ export function RecipientNotice({ transfer: t }: { transfer: Transfer }) {
   const delivered = t.status === "delivered";
   const where =
     ben.network === "BANK"
-      ? [ben.bankName, ben.accountMasked].filter(Boolean).join(" · ") || "Compte bancaire"
+      ? [ben.bankName, ben.accountMasked].filter(Boolean).join(" · ") || tr("Compte bancaire")
       : [networkLabel(ben.network), ben.phone ? phone(ben.phone) : null].filter(Boolean).join(" · ");
 
   return (
@@ -49,11 +50,11 @@ export function RecipientNotice({ transfer: t }: { transfer: Transfer }) {
       <View style={s.body}>
         <View style={[s.state, { backgroundColor: delivered ? colors.successSoft : colors.brandSoft }]}>
           <Icon name={delivered ? "check" : "clock"} color={delivered ? colors.success : colors.brand} size={14} strokeWidth={2.6} />
-          <Text style={[s.stateText, { color: delivered ? colors.success : colors.brand }]}>{delivered ? "Argent disponible" : info.label}</Text>
+          <Text style={[s.stateText, { color: delivered ? colors.success : colors.brand }]}>{delivered ? tr("Argent disponible") : info.label}</Text>
         </View>
-        <Text style={s.hello}>Bonjour {ben.fullName.split(" ")[0]},</Text>
+        <Text style={s.hello}>{tr("Bonjour {0},", ben.fullName.split(" ")[0])}</Text>
         <Text style={s.lead}>
-          <Text style={s.strong}>{t.senderName}</Text> vous a envoyé
+          <Text style={s.strong}>{t.senderName}</Text>{" "}{tr("vous a envoyé")}
         </Text>
         <Text style={s.amount}>{money(t.receiveAmountXaf, t.receiveCurrency)}</Text>
 
@@ -66,9 +67,9 @@ export function RecipientNotice({ transfer: t }: { transfer: Transfer }) {
         </View>
 
         <View style={s.rows}>
-          <Row label="Réception" value={where} icon={<PaymentLogo id={ben.network} size={20} />} />
-          <Row label={delivered ? "Statut" : "Délai estimé"} value={delivered ? "Livré" : etaLabel(etaFor(t))} />
-          <Row label="Référence" value={t.reference} strong />
+          <Row label={tr("Réception")} value={where} icon={<PaymentLogo id={ben.network} size={20} />} />
+          <Row label={delivered ? tr("Statut") : tr("Délai estimé")} value={delivered ? tr("Livré") : etaLabel(etaFor(t))} />
+          <Row label={tr("Référence")} value={t.reference} strong />
         </View>
       </View>
       <View style={s.foot}>
@@ -81,7 +82,7 @@ export function RecipientNotice({ transfer: t }: { transfer: Transfer }) {
 function Row({ label, value, strong = false, icon }: { label: string; value: string; strong?: boolean; icon?: ReactNode }) {
   return (
     <View style={s.row}>
-      <Text style={s.rowLabel}>{label}</Text>
+      <Text style={s.rowLabel}>{tr(label)}</Text>
       {icon}
       <Text style={[s.rowValue, strong && { fontFamily: fonts.heading }]} numberOfLines={2}>
         {value}

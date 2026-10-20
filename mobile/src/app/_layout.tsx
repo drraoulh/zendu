@@ -35,7 +35,7 @@ export default function RootLayout() {
 }
 
 function Navigator({ fontsReady }: { fontsReady: boolean }) {
-  const { ready } = useSession();
+  const { ready, settings } = useSession();
   const show = fontsReady && ready;
 
   useEffect(() => {
@@ -45,7 +45,8 @@ function Navigator({ fontsReady }: { fontsReady: boolean }) {
   if (!show) return null;
 
   return (
-    <Stack screenOptions={{ headerShown: false, contentStyle: { backgroundColor: colors.bg } }}>
+    // Clé = langue : un changement de langue redessine tous les écrans avec les nouveaux textes.
+    <Stack key={settings.language} screenOptions={{ headerShown: false, contentStyle: { backgroundColor: colors.bg } }}>
       <Stack.Screen name="index" />
       <Stack.Screen name="welcome" />
       <Stack.Screen name="(tabs)" />

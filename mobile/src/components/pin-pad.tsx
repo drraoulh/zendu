@@ -1,6 +1,7 @@
 import { Pressable, StyleSheet, Text, View, useWindowDimensions } from "react-native";
 import { colors, fonts } from "@/lib/theme";
 import { Icon } from "./icons";
+import { tr } from "@/lib/i18n";
 
 /** Pavé numérique pour le code PIN de l'appli. */
 export function PinPad({ value, length = 6, onChange, extra }: { value: string; length?: number; onChange: (v: string) => void; extra?: { label: string; onPress: () => void } }) {
@@ -12,7 +13,7 @@ export function PinPad({ value, length = 6, onChange, extra }: { value: string; 
   const keyStyle = { width: size, height: size, borderRadius: size / 2 };
   return (
     <View style={{ alignItems: "center" }}>
-      <View style={{ flexDirection: "row", gap: 14, marginBottom: short ? 20 : 32 }} accessibilityLabel={`${value.length} chiffres saisis sur ${length}`}>
+      <View style={{ flexDirection: "row", gap: 14, marginBottom: short ? 20 : 32 }} accessibilityLabel={tr("{0} chiffres saisis sur {1}", value.length, length)}>
         {Array.from({ length }, (_, i) => (
           <View key={i} style={[p.dot, i < value.length && { backgroundColor: colors.brand, borderColor: colors.brand }]} />
         ))}
@@ -21,7 +22,7 @@ export function PinPad({ value, length = 6, onChange, extra }: { value: string; 
         {keys.map((k) => {
           if (k === "extra") {
             return extra ? (
-              <Pressable key={k} accessibilityRole="button" accessibilityLabel={extra.label} onPress={extra.onPress} style={[p.key, keyStyle]}>
+              <Pressable key={k} accessibilityRole="button" accessibilityLabel={tr(extra.label)} onPress={extra.onPress} style={[p.key, keyStyle]}>
                 <Icon name="face" color={colors.brand} size={28} />
               </Pressable>
             ) : (
@@ -30,7 +31,7 @@ export function PinPad({ value, length = 6, onChange, extra }: { value: string; 
           }
           if (k === "del") {
             return (
-              <Pressable key={k} accessibilityRole="button" accessibilityLabel="Effacer" onPress={() => onChange(value.slice(0, -1))} style={[p.key, keyStyle]}>
+              <Pressable key={k} accessibilityRole="button" accessibilityLabel={tr("Effacer")} onPress={() => onChange(value.slice(0, -1))} style={[p.key, keyStyle]}>
                 <Icon name="back" color={colors.ink} size={26} />
               </Pressable>
             );

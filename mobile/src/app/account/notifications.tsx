@@ -6,6 +6,7 @@ import { SectionTitle, ToggleRow } from "@/components/form";
 import { Badge, Button, Card, Header, ListItem, Notice, Screen } from "@/components/ui";
 import { registerPush, unregisterPush, type PushStatus } from "@/lib/push";
 import { useSession } from "@/lib/session";
+import { tr } from "@/lib/i18n";
 
 /**
  * Réglages des notifications : seulement ce qui existe vraiment.
@@ -47,21 +48,21 @@ export default function NotificationSettings() {
 
   return (
     <Screen>
-      <Header title="Notifications" />
-      <SectionTitle>Par courriel</SectionTitle>
+      <Header title={tr("Notifications")} />
+      <SectionTitle>{tr("Par courriel")}</SectionTitle>
       <Card style={{ paddingVertical: 4 }}>
         <ListItem
           icon="send"
-          title="Suivi de vos transferts"
-          subtitle={`Paiement reçu, argent livré, incident${profile?.email ? ` · ${profile.email}` : ""}`}
+          title={tr("Suivi de vos transferts")}
+          subtitle={tr("Paiement reçu, argent livré, incident{0}", profile?.email ? ` · ${profile.email}` : "")}
           subtitleLines={3}
           extra={
             <View style={{ marginTop: 6 }}>
-              <Badge label="Toujours actif" tone="success" />
+              <Badge label={tr("Toujours actif")} tone="success" />
             </View>
           }
         />
-        <ToggleRow icon="bell" label="Offres et nouveautés" sub="Promotions et nouveaux services PWFINTECH" value={marketing} onChange={toggleMarketing} disabled={saving} />
+        <ToggleRow icon="bell" label={tr("Offres et nouveautés")} sub={tr("Promotions et nouveaux services PWFINTECH")} value={marketing} onChange={toggleMarketing} disabled={saving} />
       </Card>
       {error ? (
         <View style={{ marginTop: 10 }}>
@@ -69,25 +70,25 @@ export default function NotificationSettings() {
         </View>
       ) : null}
 
-      <SectionTitle>Dans l&apos;appli</SectionTitle>
+      <SectionTitle>{tr("Dans l'appli")}</SectionTitle>
       <Card style={{ paddingVertical: 4 }}>
-        <ListItem icon="bell" title="Centre de notifications" subtitle="Transferts, vérification d'identité et demandes" onPress={() => router.push("/notifications")} />
+        <ListItem icon="bell" title={tr("Centre de notifications")} subtitle={tr("Transferts, vérification d'identité et demandes")} onPress={() => router.push("/notifications")} />
         <ToggleRow
           icon="phone"
-          label="Notifications push"
-          sub="Paiement reçu, argent livré, incident, identité vérifiée"
+          label={tr("Notifications push")}
+          sub={tr("Paiement reçu, argent livré, incident, identité vérifiée")}
           value={pushWanted && push !== "denied"}
           onChange={(v) => void togglePush(v)}
         />
       </Card>
       {pushWanted && push === "denied" ? (
         <View style={{ marginTop: 10, gap: 8 }}>
-          <Notice tone="warn" icon="bell" text="Les notifications sont bloquées dans les réglages du téléphone." />
-          <Button title="Ouvrir les réglages" size="sm" variant="secondary" onPress={() => void Linking.openSettings()} />
+          <Notice tone="warn" icon="bell" text={tr("Les notifications sont bloquées dans les réglages du téléphone.")} />
+          <Button title={tr("Ouvrir les réglages")} size="sm" variant="secondary" onPress={() => void Linking.openSettings()} />
         </View>
       ) : pushWanted && push === "unavailable" ? (
         <View style={{ marginTop: 10 }}>
-          <Notice tone="neutral" icon="info" text="Notifications push indisponibles sur cet appareil pour le moment. Vous recevez toujours les courriels de suivi." />
+          <Notice tone="neutral" icon="info" text={tr("Notifications push indisponibles sur cet appareil pour le moment. Vous recevez toujours les courriels de suivi.")} />
         </View>
       ) : null}
     </Screen>

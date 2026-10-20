@@ -9,6 +9,7 @@ import { Button, H1, P, Small } from "@/components/ui";
 import { authenticate, biometricLabel, biometricKind, type BiometricKind } from "@/lib/biometrics";
 import { useSession } from "@/lib/session";
 import { colors } from "@/lib/theme";
+import { tr } from "@/lib/i18n";
 
 /** Ouverture de l'appli : code PIN et/ou Face ID / empreinte (écran « Connexion biométrique »). */
 export default function Lock() {
@@ -28,7 +29,7 @@ export default function Lock() {
   }, [unlock]);
 
   const bio = useCallback(async () => {
-    const res = await authenticate("Déverrouiller WorldSoft Transfer");
+    const res = await authenticate(tr("Déverrouiller WorldSoft Transfer"));
     if (res.ok) {
       setRecognized(true);
       setTimeout(done, 400);
@@ -53,7 +54,7 @@ export default function Lock() {
     setPin("");
     if (failures.current >= 5) return withPassword();
     const left = 5 - failures.current;
-    setError(`Code incorrect · ${left} essai${left > 1 ? "s" : ""} restant${left > 1 ? "s" : ""}`);
+    setError(tr("Code incorrect · {0} essai{1} restant{2}", left, left > 1 ? "s" : "", left > 1 ? "s" : ""));
   }
 
   async function withPassword() {
@@ -67,12 +68,12 @@ export default function Lock() {
   return (
     <SafeAreaView style={{ flex: 1, backgroundColor: colors.bg, alignItems: "center", justifyContent: "center", gap: 16, padding: 20 }}>
       <WstSymbol size={52} />
-      <H1 style={{ textAlign: "center", fontSize: 24 }}>{profile?.firstName ? `Bonjour ${profile.firstName}` : "Bonjour"}</H1>
+      <H1 style={{ textAlign: "center", fontSize: 24 }}>{profile?.firstName ? tr("Bonjour {0}", profile.firstName) : tr("Bonjour")}</H1>
       {usePin ? (
         <>
-          <Small>Saisissez votre code PIN</Small>
+          <Small>{tr("Saisissez votre code PIN")}</Small>
           {error ? <Text style={{ color: colors.danger, textAlign: "center" }}>{error}</Text> : <View style={{ height: 18 }} />}
-          <PinPad value={pin} onChange={onPin} extra={settings.biometric && kind && kind !== "none" ? { label: `Utiliser ${label}`, onPress: bio } : undefined} />
+          <PinPad value={pin} onChange={onPin} extra={settings.biometric && kind && kind !== "none" ? { label: tr("Utiliser {0}", tr(label)), onPress: bio } : undefined} />
         </>
       ) : (
         <>
@@ -88,17 +89,17 @@ export default function Lock() {
           >
             <Icon name={recognized ? "check" : "face"} size={60} color={recognized ? colors.success : colors.brand} strokeWidth={1.6} />
           </View>
-          <H1 style={{ textAlign: "center", fontSize: 22 }}>{recognized ? "Identité reconnue" : kind === "fingerprint" ? "Posez votre doigt sur le capteur" : "Regardez votre téléphone"}</H1>
+          <H1 style={{ textAlign: "center", fontSize: 22 }}>{recognized ? tr("Identité reconnue") : kind === "fingerprint" ? tr("Posez votre doigt sur le capteur") : tr("Regardez votre téléphone")}</H1>
           <P style={{ textAlign: "center" }}>
             {kind === "none"
-              ? "Aucune biométrie n'est disponible sur cet appareil. Connectez-vous avec votre mot de passe."
-              : `${label.charAt(0).toUpperCase()}${label.slice(1)} vérifie votre identité pour ouvrir l'appli.`}
+              ? tr("Aucune biométrie n'est disponible sur cet appareil. Connectez-vous avec votre mot de passe.")
+              : tr("{0}{1} vérifie votre identité pour ouvrir l'appli.", label.charAt(0).toUpperCase(), label.slice(1))}
           </P>
           {error ? <Text style={{ color: colors.danger, textAlign: "center" }}>{error}</Text> : null}
-          {kind && kind !== "none" ? <Button title="Réessayer" icon="face" onPress={bio} style={{ alignSelf: "stretch" }} /> : null}
+          {kind && kind !== "none" ? <Button title={tr("Réessayer")} icon="face" onPress={bio} style={{ alignSelf: "stretch" }} /> : null}
         </>
       )}
-      <Button title="Se connecter avec le mot de passe" variant="ghost" size="sm" onPress={withPassword} />
+      <Button title={tr("Se connecter avec le mot de passe")} variant="ghost" size="sm" onPress={withPassword} />
     </SafeAreaView>
   );
 }

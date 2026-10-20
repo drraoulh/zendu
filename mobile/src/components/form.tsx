@@ -4,6 +4,7 @@ import { PASSWORD_RULES } from "@/lib/session";
 import { colors, fonts, radius } from "@/lib/theme";
 import { Icon, type IconName } from "./icons";
 import { Button, Label, Small } from "./ui";
+import { tr } from "@/lib/i18n";
 
 /* ---------- Liste déroulante (feuille modale) ---------- */
 
@@ -12,7 +13,7 @@ export function SelectField({
   value,
   options,
   onChange,
-  placeholder = "Choisir…",
+  placeholder = tr("Choisir…"),
   error,
 }: {
   label: string;
@@ -26,7 +27,7 @@ export function SelectField({
   const current = options.find((o) => o.value === value);
   return (
     <View style={{ marginBottom: 14 }}>
-      <Label>{label}</Label>
+      <Label>{tr(label)}</Label>
       <Pressable
         accessibilityRole="button"
         accessibilityLabel={`${label} : ${current?.label ?? placeholder}`}
@@ -37,7 +38,7 @@ export function SelectField({
         <Icon name="chevDown" size={18} color={colors.muted} />
       </Pressable>
       {error ? <Text style={f.error}>{error}</Text> : null}
-      <Sheet visible={open} title={label} onClose={() => setOpen(false)}>
+      <Sheet visible={open} title={tr(label)} onClose={() => setOpen(false)}>
         {options.map((o) => (
           <Pressable
             key={o.value}
@@ -49,7 +50,7 @@ export function SelectField({
             }}
             style={[f.option, o.value === value && { backgroundColor: colors.brandSoft }]}
           >
-            <Text style={f.optionText}>{o.label}</Text>
+            <Text style={f.optionText}>{tr(o.label)}</Text>
             {o.value === value ? <Icon name="check" color={colors.brand} size={18} /> : null}
           </Pressable>
         ))}
@@ -61,10 +62,10 @@ export function SelectField({
 export function Sheet({ visible, title, onClose, children }: { visible: boolean; title: string; onClose: () => void; children: ReactNode }) {
   return (
     <Modal visible={visible} transparent animationType="fade" onRequestClose={onClose}>
-      <Pressable style={f.backdrop} onPress={onClose} accessibilityLabel="Fermer">
+      <Pressable style={f.backdrop} onPress={onClose} accessibilityLabel={tr("Fermer")}>
         <Pressable style={f.sheet} onPress={() => undefined}>
           <View style={f.grabber} />
-          <Text style={f.sheetTitle}>{title}</Text>
+          <Text style={f.sheetTitle}>{tr(title)}</Text>
           <ScrollView style={{ maxHeight: 420 }}>{children}</ScrollView>
         </Pressable>
       </Pressable>
@@ -95,11 +96,11 @@ export function ConfirmDialog({
     <Modal visible={visible} transparent animationType="fade" onRequestClose={onCancel}>
       <View style={[f.backdrop, { justifyContent: "center", padding: 24 }]}>
         <View style={f.dialog} accessibilityRole="alert">
-          <Text style={f.sheetTitle}>{title}</Text>
-          <Small style={{ marginBottom: 18 }}>{message}</Small>
+          <Text style={f.sheetTitle}>{tr(title)}</Text>
+          <Small style={{ marginBottom: 18 }}>{tr(message)}</Small>
           <View style={{ gap: 8 }}>
-            <Button title={confirmLabel} variant={destructive ? "danger" : "primary"} onPress={onConfirm} />
-            <Button title="Annuler" variant="secondary" onPress={onCancel} />
+            <Button title={tr(confirmLabel)} variant={destructive ? "danger" : "primary"} onPress={onConfirm} />
+            <Button title={tr("Annuler")} variant="secondary" onPress={onCancel} />
           </View>
         </View>
       </View>
@@ -138,7 +139,7 @@ export function Chips<T extends string>({
         style={[f.chip, on && { backgroundColor: colors.brand, borderColor: colors.brand }]}
       >
         {o.icon ? <Icon name={o.icon} size={16} color={on ? colors.white : colors.muted} /> : null}
-        <Text style={[f.chipText, on && { color: colors.white }]}>{o.label}</Text>
+        <Text style={[f.chipText, on && { color: colors.white }]}>{tr(o.label)}</Text>
       </Pressable>
     );
   });
@@ -178,12 +179,12 @@ export function ToggleRow({
           </View>
         ) : null}
         <View style={{ flex: 1 }}>
-          <Text style={f.toggleLabel}>{label}</Text>
-          {sub ? <Small>{sub}</Small> : null}
+          <Text style={f.toggleLabel}>{tr(label)}</Text>
+          {sub ? <Small>{tr(sub)}</Small> : null}
         </View>
       </Pressable>
       <Switch
-        accessibilityLabel={label}
+        accessibilityLabel={tr(label)}
         value={value}
         onValueChange={onChange}
         disabled={disabled}
@@ -197,13 +198,13 @@ export function ToggleRow({
 
 /* ---------- Code à N chiffres ---------- */
 
-export function OtpInput({ length = 6, value, onChange, label = "Code de vérification" }: { length?: number; value: string; onChange: (v: string) => void; label?: string }) {
+export function OtpInput({ length = 6, value, onChange, label = tr("Code de vérification") }: { length?: number; value: string; onChange: (v: string) => void; label?: string }) {
   const ref = useRef<TextInput>(null);
   const { width } = useWindowDimensions();
   // 6 cases de 46 px ne tiennent pas sur un écran de 320 px : on réduit la case si besoin.
   const box = Math.min(46, Math.floor((Math.min(width, 480) - 40 - 8 * (length - 1)) / length));
   return (
-    <Pressable onPress={() => ref.current?.focus()} accessibilityLabel={label} style={{ marginVertical: 12 }}>
+    <Pressable onPress={() => ref.current?.focus()} accessibilityLabel={tr(label)} style={{ marginVertical: 12 }}>
       <View style={{ flexDirection: "row", gap: 8, justifyContent: "center" }}>
         {Array.from({ length }, (_, i) => {
           const ch = value[i] ?? "";
@@ -225,7 +226,7 @@ export function OtpInput({ length = 6, value, onChange, label = "Code de vérifi
         textContentType="oneTimeCode"
         maxLength={length}
         autoFocus
-        accessibilityLabel={label}
+        accessibilityLabel={tr(label)}
         style={f.otpHidden}
       />
     </Pressable>
@@ -236,7 +237,7 @@ export function OtpInput({ length = 6, value, onChange, label = "Code de vérifi
 
 export function PasswordChecklist({ value }: { value: string }) {
   const score = PASSWORD_RULES.filter((r) => r.test(value)).length;
-  const strength = ["Très faible", "Faible", "Moyenne", "Bonne", "Élevée"][score];
+  const strength = [tr("Très faible"), tr("Faible"), tr("Moyenne"), tr("Bonne"), tr("Élevée")][score];
   const color = score >= 4 ? colors.success : score >= 3 ? colors.brand : score >= 2 ? colors.warn : colors.danger;
   return (
     <View style={{ marginBottom: 14 }}>
@@ -247,7 +248,7 @@ export function PasswordChecklist({ value }: { value: string }) {
               <View key={i} style={{ flex: 1, height: 4, borderRadius: 2, backgroundColor: i < score ? color : colors.line }} />
             ))}
           </View>
-          <Small style={{ color }}>Force : {strength.toLowerCase()}</Small>
+          <Small style={{ color }}>{tr("Force : {0}", strength.toLowerCase())}</Small>
         </View>
       ) : null}
       {PASSWORD_RULES.map((r) => {
@@ -255,7 +256,7 @@ export function PasswordChecklist({ value }: { value: string }) {
         return (
           <View key={r.label} style={{ flexDirection: "row", alignItems: "center", gap: 8, paddingVertical: 3 }}>
             <Icon name={ok ? "check" : "close"} size={16} color={ok ? colors.success : colors.silver} strokeWidth={2.4} />
-            <Small style={{ color: ok ? colors.ink : colors.muted }}>{r.label}</Small>
+            <Small style={{ color: ok ? colors.ink : colors.muted }}>{tr(r.label)}</Small>
           </View>
         );
       })}
@@ -328,8 +329,8 @@ export function NumberedSteps({ steps }: { steps: { title: string; text: string 
             <Text style={{ color: colors.brand, fontFamily: fonts.heading }}>{i + 1}</Text>
           </View>
           <View style={{ flex: 1 }}>
-            <Text style={f.toggleLabel}>{s.title}</Text>
-            <Small>{s.text}</Small>
+            <Text style={f.toggleLabel}>{tr(s.title)}</Text>
+            <Small>{tr(s.text)}</Small>
           </View>
         </View>
       ))}

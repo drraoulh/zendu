@@ -5,6 +5,7 @@ import { Header, Notice, P, Screen } from "@/components/ui";
 import { payMethodsOf, useCorridors } from "@/lib/corridors";
 import { useSession } from "@/lib/session";
 import { useStore } from "@/lib/store";
+import { tr } from "@/lib/i18n";
 
 export default function AddCard() {
   const { profile } = useSession();
@@ -13,16 +14,16 @@ export default function AddCard() {
   const cardsOpen = useCorridors().some((c) => payMethodsOf(c).includes("card"));
   return (
     <Screen>
-      <Header title="Ajouter une carte" />
+      <Header title={tr("Ajouter une carte")} />
       {cardsOpen ? (
         <>
-          <P style={{ marginBottom: 10 }}>Carte de débit Visa ou Mastercard, à votre nom. Les cartes de crédit ne sont pas acceptées.</P>
+          <P style={{ marginBottom: 10 }}>{tr("Carte de débit Visa ou Mastercard, à votre nom. Les cartes de crédit ne sont pas acceptées.")}</P>
           <View style={{ marginBottom: 14 }}>
-            <Notice tone="warn" icon="info" text="Version de démonstration : aucune carte n'est débitée." />
+            <Notice tone="warn" icon="info" text={tr("Version de démonstration : aucune carte n'est débitée.")} />
           </View>
           <CardForm
             defaultHolder={profile ? `${profile.firstName} ${profile.lastName}` : ""}
-            submitLabel="Enregistrer la carte"
+            submitLabel={tr("Enregistrer la carte")}
             onSubmit={(c) => {
               saveCard(c);
               router.back();
@@ -30,7 +31,7 @@ export default function AddCard() {
           />
         </>
       ) : (
-        <Notice tone="neutral" icon="info" text="Le paiement par carte n'est pas encore disponible. Payez vos envois par virement Interac." />
+        <Notice tone="neutral" icon="info" text={tr("Le paiement par carte n'est pas encore disponible. Payez vos envois par virement Interac.")} />
       )}
     </Screen>
   );

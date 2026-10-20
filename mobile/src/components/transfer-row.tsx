@@ -6,8 +6,9 @@ import { colors, fonts } from "@/lib/theme";
 import { Flag } from "./flag";
 import { PaymentLogo } from "./payment-logo";
 import { Badge, ListItem } from "./ui";
+import { tr } from "@/lib/i18n";
 
-const MONTHS = ["janv.", "févr.", "mars", "avr.", "mai", "juin", "juil.", "août", "sept.", "oct.", "nov.", "déc."];
+const MONTHS = ["janv.", tr("févr."), "mars", "avr.", "mai", "juin", "juil.", tr("août"), "sept.", "oct.", "nov.", tr("déc.")];
 
 /** « Aujourd'hui · 20:11 », « Hier · 09:05 », « 7 oct. · 20:11 », « 7 oct. 2025 » : plus court que jj/mm/aaaa · hh:mm. */
 export function shortDate(iso: string, now = new Date()) {
@@ -16,8 +17,8 @@ export function shortDate(iso: string, now = new Date()) {
   const pad = (n: number) => String(n).padStart(2, "0");
   const time = `${pad(d.getHours())}:${pad(d.getMinutes())}`;
   const days = Math.round((new Date(now.toDateString()).getTime() - new Date(d.toDateString()).getTime()) / 86400000);
-  if (days === 0) return `Aujourd'hui · ${time}`;
-  if (days === 1) return `Hier · ${time}`;
+  if (days === 0) return tr("Aujourd'hui · {0}", time);
+  if (days === 1) return tr("Hier · {0}", time);
   const day = `${d.getDate()} ${MONTHS[d.getMonth()]}`;
   return d.getFullYear() === now.getFullYear() ? `${day} · ${time}` : `${day} ${d.getFullYear()}`;
 }
@@ -45,7 +46,7 @@ export function TransferRow({ transfer }: { transfer: Transfer }) {
       // Statut sous le nom : à droite, un long statut (« En attente de paiement ») écrasait le nom.
       extra={
         <View style={{ marginTop: 4, flexDirection: "row", alignItems: "center", justifyContent: "space-between", gap: 8, flexWrap: "wrap" }}>
-          <Badge label={info.label} tone={info.tone} />
+          <Badge label={tr(info.label)} tone={info.tone} />
           {narrow ? amount : null}
         </View>
       }

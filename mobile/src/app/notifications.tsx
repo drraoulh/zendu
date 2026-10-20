@@ -7,6 +7,7 @@ import { dateTime } from "@/lib/format";
 import { dayGroup } from "@/lib/notifications";
 import { colors, fonts } from "@/lib/theme";
 import { useNotifications } from "@/lib/use-notifications";
+import { tr } from "@/lib/i18n";
 
 export default function Notifications() {
   const { list, unread, isRead, markAllRead, markRead, loading, failed, reload } = useNotifications();
@@ -18,18 +19,18 @@ export default function Notifications() {
 
   return (
     <Screen>
-      <Header title="Notifications" right={<Button title="Réglages" variant="ghost" size="sm" onPress={() => router.push("/account/notifications")} />} />
+      <Header title={tr("Notifications")} right={<Button title={tr("Réglages")} variant="ghost" size="sm" onPress={() => router.push("/account/notifications")} />} />
       <View style={{ flexDirection: "row", justifyContent: "space-between", alignItems: "center", gap: 8, marginBottom: 4 }}>
         {/* flexShrink 0 : à 320 px, « 5 non lues » passait sur deux lignes à côté du bouton. */}
         <Text style={{ fontFamily: fonts.heading, color: colors.ink, flexShrink: 0 }}>
-          {unread.length} non lue{unread.length > 1 ? "s" : ""}
+          {tr("{0} non lue{1}", unread.length, unread.length > 1 ? "s" : "")}
         </Text>
-        {unread.length ? <Button title="Tout marquer comme lu" variant="ghost" size="sm" onPress={markAllRead} /> : null}
+        {unread.length ? <Button title={tr("Tout marquer comme lu")} variant="ghost" size="sm" onPress={markAllRead} /> : null}
       </View>
       {failed ? (
         <View style={{ marginVertical: 10, gap: 8 }}>
-          <Notice tone="warn" icon="alert" text="Impossible de charger vos transferts pour le moment. Vérifiez votre connexion." />
-          <Button title="Réessayer" variant="secondary" size="sm" onPress={() => void reload()} />
+          <Notice tone="warn" icon="alert" text={tr("Impossible de charger vos transferts pour le moment. Vérifiez votre connexion.")} />
+          <Button title={tr("Réessayer")} variant="secondary" size="sm" onPress={() => void reload()} />
         </View>
       ) : null}
       {/* Premier chargement : pas de « Aucune notification » trompeur pendant la requête. */}
@@ -45,7 +46,7 @@ export default function Notifications() {
                   key={n.id}
                   icon={n.icon}
                   tone={n.tone}
-                  title={n.title}
+                  title={tr(n.title)}
                   subtitle={`${n.text}\n${dateTime(n.at)}`}
                   subtitleLines={4}
                   onPress={() => {
@@ -59,9 +60,9 @@ export default function Notifications() {
           </View>
         ))
       ) : failed ? null : (
-        <Empty icon="bell" title="Aucune notification" text="Vous serez prévenu ici à chaque étape de vos transferts." />
+        <Empty icon="bell" title={tr("Aucune notification")} text={tr("Vous serez prévenu ici à chaque étape de vos transferts.")} />
       )}
-      <Small style={{ textAlign: "center", marginTop: 16 }}>Les notifications push arriveront avec la version publiée sur les stores. En attendant, vous êtes prévenu par courriel.</Small>
+      <Small style={{ textAlign: "center", marginTop: 16 }}>{tr("Vous êtes aussi prévenu par notification push et par courriel à chaque étape.")}</Small>
     </Screen>
   );
 }

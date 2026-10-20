@@ -16,6 +16,7 @@ import { useStore, type Recipient } from "@/lib/store";
 import { colors, fonts } from "@/lib/theme";
 import { useNotifications } from "@/lib/use-notifications";
 import { useMyTransfers } from "@/lib/use-transfers";
+import { tr } from "@/lib/i18n";
 
 /**
  * Accueil, inspiré des applis de transfert les plus simples : un convertisseur, un bouton,
@@ -55,12 +56,12 @@ export default function Home() {
   const corridor = findCorridor(corridors, draft.corridorId);
   const closed = payMethodsOf(corridor).length === 0;
   // Nom du pays en français (le serveur renvoie « Cameroon », « China »).
-  const closedText = `L'envoi depuis ${countryName(corridor.source)} arrive bientôt. Pour l'instant, les envois partent du Canada, par virement Interac.`;
+  const closedText = tr("L'envoi depuis {0} arrive bientôt. Pour l'instant, les envois partent du Canada, par virement Interac.", countryName(corridor.source));
 
   function startSend() {
     if (todo) return router.push("/kyc");
     if (kyc === "pending") return;
-    if (closed) return Alert.alert("Bientôt disponible", closedText);
+    if (closed) return Alert.alert(tr("Bientôt disponible"), closedText);
     router.push(selected ? "/send/review" : "/send/recipient");
   }
 
@@ -75,8 +76,8 @@ export default function Home() {
     <Screen edges={["top"]}>
       <View style={st.top}>
         <WstSymbol size={34} />
-        <Text style={st.hello} numberOfLines={1}>Bonjour {profile?.firstName}</Text>
-        <Pressable accessibilityRole="button" accessibilityLabel={`Notifications, ${unread.length} non lues`} onPress={() => router.push("/notifications")} style={st.bell}>
+        <Text style={st.hello} numberOfLines={1}>{tr("Bonjour {0}", profile?.firstName)}</Text>
+        <Pressable accessibilityRole="button" accessibilityLabel={tr("Notifications, {0} non lues", unread.length)} onPress={() => router.push("/notifications")} style={st.bell}>
           <Icon name="bell" color={colors.ink} size={20} />
           {unread.length ? (
             <View style={st.badge}>
@@ -93,13 +94,13 @@ export default function Home() {
         >
           <Icon name={kyc === "pending" ? "clock" : kyc === "rejected" ? "alert" : "shield"} color={kyc === "rejected" ? colors.danger : colors.warn} size={20} />
           <View style={{ flex: 1 }}>
-            <Text style={st.kycTitle}>{kyc === "none" ? "Vérifiez votre identité" : kyc === "rejected" ? "Vérification refusée" : "Vérification en cours"}</Text>
+            <Text style={st.kycTitle}>{kyc === "none" ? tr("Vérifiez votre identité") : kyc === "rejected" ? tr("Vérification refusée") : tr("Vérification en cours")}</Text>
             <Small>
               {kyc === "none"
-                ? "Obligatoire avant votre premier envoi · 2 min"
+                ? tr("Obligatoire avant votre premier envoi · 2 min")
                 : kyc === "rejected"
-                  ? profile?.kycNote ?? "Recommencez avec un document valide."
-                  : "Vous pourrez envoyer dès qu'elle sera confirmée."}
+                  ? profile?.kycNote ?? tr("Recommencez avec un document valide.")
+                  : tr("Vous pourrez envoyer dès qu'elle sera confirmée.")}
             </Small>
           </View>
           {todo ? <Icon name="chev" color={kyc === "rejected" ? colors.danger : colors.warn} size={18} /> : null}
@@ -113,22 +114,22 @@ export default function Home() {
         receiveAmount={draft.receiveAmount}
         onChange={(n) => setDraft(selected && !n.corridorId.endsWith(`-${selected.country}`) ? { ...n, recipient: null } : n)}
         onContinue={kyc === "pending" ? undefined : startSend}
-        ctaLabel={todo ? "Vérifier mon identité" : closed ? "Bientôt disponible" : selected ? `Envoyer à ${selected.fullName.split(" ")[0]}` : "Envoyer"}
+        ctaLabel={todo ? tr("Vérifier mon identité") : closed ? tr("Bientôt disponible") : selected ? tr("Envoyer à {0}", selected.fullName.split(" ")[0]) : tr("Envoyer")}
       />
       {/* Alert.alert ne s'affiche pas sur le web : le message reste visible sous le simulateur. */}
       {closed && !todo ? (
         <View style={{ marginTop: 12 }}>
-          <Notice tone="warn" icon="clock" title="Bientôt disponible" text={closedText} />
+          <Notice tone="warn" icon="clock" title={tr("Bientôt disponible")} text={tr(closedText)} />
         </View>
       ) : null}
 
-      <Text style={st.section}>Envoyer à nouveau</Text>
+      <Text style={st.section}>{tr("Envoyer à nouveau")}</Text>
       <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={st.people}>
-        <Pressable accessibilityRole="button" accessibilityLabel="Nouveau destinataire" onPress={() => router.push(todo ? "/kyc" : "/send/recipient")} style={st.person}>
+        <Pressable accessibilityRole="button" accessibilityLabel={tr("Nouveau destinataire")} onPress={() => router.push(todo ? "/kyc" : "/send/recipient")} style={st.person}>
           <View style={st.add}>
             <Icon name="plus" color={colors.brand} size={22} />
           </View>
-          <Text style={st.personName} numberOfLines={1}>Nouveau</Text>
+          <Text style={st.personName} numberOfLines={1}>{tr("Nouveau")}</Text>
         </Pressable>
         {recipients.slice(0, 10).map((r) => {
           const on = selected?.id === r.id;
@@ -137,7 +138,7 @@ export default function Home() {
               key={r.id}
               accessibilityRole="button"
               accessibilityState={{ selected: on }}
-              accessibilityLabel={`Envoyer à ${r.fullName}`}
+              accessibilityLabel={tr("Envoyer à {0}", r.fullName)}
               onPress={() => pickRecipient(r)}
               style={st.person}
             >
@@ -156,10 +157,10 @@ export default function Home() {
       </ScrollView>
 
       <View style={st.sectionRow}>
-        <Text style={[st.section, { marginTop: 0 }]}>Activité récente</Text>
+        <Text style={[st.section, { marginTop: 0 }]}>{tr("Activité récente")}</Text>
         {items.length ? (
           <Pressable onPress={() => router.push("/(tabs)/history")} hitSlop={8}>
-            <Text style={st.link}>Tout voir</Text>
+            <Text style={st.link}>{tr("Tout voir")}</Text>
           </Pressable>
         ) : null}
       </View>
@@ -172,11 +173,11 @@ export default function Home() {
       ) : (
         <View style={{ flexDirection: "row", alignItems: "center", justifyContent: "space-between", gap: 12, paddingHorizontal: 4 }}>
           <Small style={{ flex: 1 }}>
-            {loading ? "Chargement…" : failed ? "Impossible de charger votre activité. Vérifiez votre connexion." : "Vos envois apparaîtront ici, avec leur suivi en temps réel."}
+            {loading ? tr("Chargement…") : failed ? tr("Impossible de charger votre activité. Vérifiez votre connexion.") : tr("Vos envois apparaîtront ici, avec leur suivi en temps réel.")}
           </Small>
           {failed && !loading ? (
             <Pressable accessibilityRole="button" onPress={reload} hitSlop={8}>
-              <Text style={st.link}>Réessayer</Text>
+              <Text style={st.link}>{tr("Réessayer")}</Text>
             </Pressable>
           ) : null}
         </View>

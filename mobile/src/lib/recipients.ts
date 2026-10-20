@@ -1,8 +1,9 @@
 import { phone } from "./format";
 import type { Recipient } from "./store";
+import { tr } from "@/lib/i18n";
 
 export function recipientDetail(r: Recipient) {
-  if (r.network === "BANK") return `${r.bankName ?? "Banque"} •••• ${(r.accountNumber ?? r.accountMasked ?? "").slice(-4)}`;
+  if (r.network === "BANK") return `${r.bankName ?? tr("Banque")} •••• ${(r.accountNumber ?? r.accountMasked ?? "").slice(-4)}`;
   return r.phone ? phone(r.phone) : "";
 }
 

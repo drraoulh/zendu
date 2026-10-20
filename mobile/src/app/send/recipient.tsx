@@ -6,6 +6,7 @@ import { Button, Card, H1, H2, Header, ListItem, P, Screen, SEND_STEPS, Steps } 
 import { findCorridor, useCorridors, type CountryCode } from "@/lib/corridors";
 import { countryName, networkLabel, phone } from "@/lib/format";
 import { useStore, type Recipient } from "@/lib/store";
+import { tr } from "@/lib/i18n";
 
 export default function ChooseRecipient() {
   const { draft, setDraft, recipients } = useStore();
@@ -23,10 +24,10 @@ export default function ChooseRecipient() {
 
   return (
     <Screen>
-      <Header title="Bénéficiaire" subtitle={`Vers ${countryName(country)}`} />
-      <Steps current={2} total={3} label="Destinataire" names={SEND_STEPS} />
-      <H1>À qui envoyez-vous ?</H1>
-      <P style={{ marginTop: 6, marginBottom: 18 }}>Le nom doit correspondre à celui du compte ou de la pièce d&apos;identité du bénéficiaire.</P>
+      <Header title={tr("Bénéficiaire")} subtitle={tr("Vers {0}", countryName(country))} />
+      <Steps current={2} total={3} label={tr("Destinataire")} names={SEND_STEPS} />
+      <H1>{tr("À qui envoyez-vous ?")}</H1>
+      <P style={{ marginTop: 6, marginBottom: 18 }}>{tr("Le nom doit correspondre à celui du compte ou de la pièce d'identité du bénéficiaire.")}</P>
 
       {saved.length && !adding ? (
         <>
@@ -41,18 +42,18 @@ export default function ChooseRecipient() {
               />
             ))}
           </Card>
-          <Button title="Nouveau bénéficiaire" icon="plus" variant="secondary" onPress={() => setAdding(true)} />
+          <Button title={tr("Nouveau bénéficiaire")} icon="plus" variant="secondary" onPress={() => setAdding(true)} />
         </>
       ) : (
         <>
-          {saved.length ? <H2 style={{ fontSize: 17, marginBottom: 12 }}>Nouveau bénéficiaire</H2> : null}
+          {saved.length ? <H2 style={{ fontSize: 17, marginBottom: 12 }}>{tr("Nouveau bénéficiaire")}</H2> : null}
           <RecipientForm
             country={country}
             networks={corridor.networks}
-            submitLabel="Continuer"
+            submitLabel={tr("Continuer")}
             onSubmit={(r, save) => choose({ ...r, id: "draft" }, save)}
           />
-          {saved.length ? <Button title="Choisir un bénéficiaire enregistré" variant="ghost" onPress={() => setAdding(false)} style={{ marginTop: 6 }} /> : null}
+          {saved.length ? <Button title={tr("Choisir un bénéficiaire enregistré")} variant="ghost" onPress={() => setAdding(false)} style={{ marginTop: 6 }} /> : null}
         </>
       )}
     </Screen>

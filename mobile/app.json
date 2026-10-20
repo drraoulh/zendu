@@ -87,7 +87,8 @@
           "iosNfcEnabled": false,
           "androidNfcEnabled": false
         }
-      ]
+      ],
+      "expo-localization"
     ],
     "experiments": {
       "typedRoutes": true,

@@ -5,6 +5,7 @@ import { OtpInput } from "@/components/form";
 import { Button, H1, Header, Notice, P, Screen, Small } from "@/components/ui";
 import { useSession } from "@/lib/session";
 import { colors } from "@/lib/theme";
+import { tr } from "@/lib/i18n";
 
 /**
  * Étape 2 de la connexion : le code à 6 chiffres est vérifié par le serveur (/api/auth/verify-2fa),
@@ -35,7 +36,7 @@ export default function TwoFactor() {
   }, [pending, busy, restart]);
 
   async function verify() {
-    if (code.length !== 6) return setError("Saisissez les 6 chiffres.");
+    if (code.length !== 6) return setError(tr("Saisissez les 6 chiffres."));
     setBusy(true);
     setError(null);
     const r = await completeSignIn(code);
@@ -62,8 +63,8 @@ export default function TwoFactor() {
     // Mode démo : le nouveau code est prérempli aussi.
     if (r.demoCode) setCode(r.demoCode);
     // Le serveur bascule sur le courriel si le SMS n'est pas disponible : on le dit au lieu de laisser croire à un SMS.
-    if (wanted && r.channel && r.channel !== wanted) setInfo(wanted === "sms" ? "L'envoi par SMS n'est pas disponible : un nouveau code vous a été envoyé par courriel." : "Un nouveau code vous a été envoyé par SMS.");
-    else setInfo("Nouveau code envoyé.");
+    if (wanted && r.channel && r.channel !== wanted) setInfo(wanted === "sms" ? tr("L'envoi par SMS n'est pas disponible : un nouveau code vous a été envoyé par courriel.") : tr("Un nouveau code vous a été envoyé par SMS."));
+    else setInfo(tr("Nouveau code envoyé."));
     setCountdown(r.resendAfter ?? 30);
   }
 
@@ -78,31 +79,31 @@ export default function TwoFactor() {
     <Screen
       footer={
         restart ? (
-          <Button title="Revenir à la connexion" onPress={backToLogin} />
+          <Button title={tr("Revenir à la connexion")} onPress={backToLogin} />
         ) : (
-          <Button title="Vérifier" onPress={verify} loading={busy} disabled={code.length !== 6} />
+          <Button title={tr("Vérifier")} onPress={verify} loading={busy} disabled={code.length !== 6} />
         )
       }
     >
-      <Header title="Vérification" />
-      <H1>Vérification en deux étapes</H1>
+      <Header title={tr("Vérification")} />
+      <H1>{tr("Vérification en deux étapes")}</H1>
       <P style={{ marginTop: 6 }}>
-        Saisissez le code à 6 chiffres envoyé {channel === "sms" ? "par SMS au" : "par courriel à"}{" "}
+        {tr("Saisissez le code à 6 chiffres envoyé {0}", channel === "sms" ? tr("par SMS au") : tr("par courriel à"))}{" "}
         <Text style={{ color: colors.ink }}>{pending?.destination ?? ""}</Text>.
       </P>
       <OtpInput value={code} onChange={setCode} />
       {error ? <Text style={{ color: colors.danger, textAlign: "center", marginBottom: 8 }}>{error}</Text> : info ? <Small style={{ color: colors.success, textAlign: "center", marginBottom: 8 }}>{info}</Small> : null}
       {!restart ? (
         <>
-          <Small style={{ textAlign: "center", marginBottom: 8 }}>Le code expire dans 10 minutes · 5 essais au maximum.</Small>
+          <Small style={{ textAlign: "center", marginBottom: 8 }}>{tr("Le code expire dans 10 minutes · 5 essais au maximum.")}</Small>
           <View style={{ alignItems: "center", gap: 4, marginBottom: 16 }}>
             {countdown > 0 ? (
-              <Small>Renvoyer le code dans 0:{String(countdown).padStart(2, "0")}</Small>
+              <Small>{tr("Renvoyer le code dans 0:{0}", String(countdown).padStart(2, "0"))}</Small>
             ) : (
-              <Button title="Renvoyer le code" variant="ghost" size="sm" loading={sending} onPress={() => void resend()} />
+              <Button title={tr("Renvoyer le code")} variant="ghost" size="sm" loading={sending} onPress={() => void resend()} />
             )}
             <Button
-              title={channel === "sms" ? "Recevoir par courriel" : "Recevoir par SMS"}
+              title={channel === "sms" ? tr("Recevoir par courriel") : tr("Recevoir par SMS")}
               variant="ghost"
               size="sm"
               disabled={countdown > 0 || sending}
@@ -115,8 +116,8 @@ export default function TwoFactor() {
         <Notice
           tone="warn"
           icon="info"
-          title="Mode démo"
-          text={`Aucun SMS ni courriel n'est envoyé : le serveur de démonstration fournit le code (${demoCode}), déjà prérempli.`}
+          title={tr("Mode démo")}
+          text={tr("Aucun SMS ni courriel n'est envoyé : le serveur de démonstration fournit le code ({0}), déjà prérempli.", demoCode)}
         />
       ) : null}
     </Screen>

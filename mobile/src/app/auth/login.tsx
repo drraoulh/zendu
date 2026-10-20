@@ -6,6 +6,7 @@ import { Button, Field, H1, Notice, P, Screen, Small } from "@/components/ui";
 import { API_URL } from "@/lib/api";
 import { useSession } from "@/lib/session";
 import { colors, fonts } from "@/lib/theme";
+import { tr } from "@/lib/i18n";
 
 export default function Login() {
   const { startSignIn } = useSession();
@@ -17,7 +18,7 @@ export default function Login() {
 
   async function submit() {
     setError(null);
-    if (!email.trim() || !password) return setError("Saisissez votre courriel et votre mot de passe.");
+    if (!email.trim() || !password) return setError(tr("Saisissez votre courriel et votre mot de passe."));
     setBusy(true);
     const r = await startSignIn(email, password);
     setBusy(false);
@@ -30,9 +31,9 @@ export default function Login() {
     <Screen
       footer={
         <Text style={{ textAlign: "center", color: colors.muted, fontSize: 14, paddingBottom: 4 }}>
-          Pas encore de compte ?{" "}
+          {tr("Pas encore de compte ?")}{" "}
           <Link href="/auth/signup" replace style={{ color: colors.brand, fontFamily: fonts.semibold }}>
-            Créer un compte
+            {tr("Créer un compte")}
           </Link>
         </Text>
       }
@@ -40,10 +41,10 @@ export default function Login() {
       <View style={{ paddingTop: 24, marginBottom: 24 }}>
         <WstWordmark size={34} />
       </View>
-      <H1>Bon retour parmi nous</H1>
-      <P style={{ marginTop: 6, marginBottom: 22 }}>Connectez-vous à WorldSoft Transfer pour envoyer et suivre vos transferts.</P>
+      <H1>{tr("Bon retour parmi nous")}</H1>
+      <P style={{ marginTop: 6, marginBottom: 22 }}>{tr("Connectez-vous à WorldSoft Transfer pour envoyer et suivre vos transferts.")}</P>
       <Field
-        label="Courriel"
+        label={tr("Courriel")}
         value={email}
         onChangeText={setEmail}
         keyboardType="email-address"
@@ -56,7 +57,7 @@ export default function Login() {
       />
       <Field
         ref={passwordRef}
-        label="Mot de passe"
+        label={tr("Mot de passe")}
         value={password}
         onChangeText={setPassword}
         secureTextEntry
@@ -66,15 +67,15 @@ export default function Login() {
         onSubmitEditing={submit}
       />
       <Link href="/auth/forgot" style={{ color: colors.brand, fontFamily: fonts.semibold, fontSize: 14, marginBottom: 18 }}>
-        Mot de passe oublié ?
+        {tr("Mot de passe oublié ?")}
       </Link>
       {error ? (
         <View style={{ marginBottom: 12 }}>
           <Notice tone="danger" icon="alert" text={error} />
         </View>
       ) : null}
-      <Button title="Se connecter" onPress={submit} loading={busy} />
-      {__DEV__ ? <Small style={{ textAlign: "center", marginTop: 12 }}>Serveur : {API_URL}</Small> : null}
+      <Button title={tr("Se connecter")} onPress={submit} loading={busy} />
+      {__DEV__ ? <Small style={{ textAlign: "center", marginTop: 12 }}>{tr("Serveur : {0}", tr(API_URL))}</Small> : null}
     </Screen>
   );
 }

@@ -12,22 +12,23 @@ import { countryName, dateAt, dateTime, deliveryEstimate, etaLabel, eventTitle, 
 import { colors, fonts } from "@/lib/theme";
 import { useResend } from "@/lib/use-resend";
 import { PaymentLogo } from "@/components/payment-logo";
+import { tr } from "@/lib/i18n";
 
 const POLL_MS = 5000;
 
 /** Étapes du suivi et événements serveur qui les marquent (l'heure affichée est celle du premier). */
 const STEPS: { label: string; events: string[] }[] = [
-  { label: "Transfert créé", events: ["created"] },
-  { label: "Paiement reçu", events: ["payment_detected"] },
-  { label: "Versement envoyé", events: ["payout_sent", "payout_accepted", "bank_manual"] },
-  { label: "Livré", events: ["delivered"] },
+  { label: tr("Transfert créé"), events: ["created"] },
+  { label: tr("Paiement reçu"), events: ["payment_detected"] },
+  { label: tr("Versement envoyé"), events: ["payout_sent", "payout_accepted", "bank_manual"] },
+  { label: tr("Livré"), events: ["delivered"] },
 ];
 
 /** Libellés d'événements absents de format.ts (affichés « Mise à jour » sinon). */
 const EXTRA_EVENTS: Record<string, string> = {
-  interac_declared: "Virement Interac signalé envoyé",
-  payment_mismatch: "Montant reçu à vérifier",
-  momo_callback: "Confirmation de l'opérateur",
+  interac_declared: tr("Virement Interac signalé envoyé"),
+  payment_mismatch: tr("Montant reçu à vérifier"),
+  momo_callback: tr("Confirmation de l'opérateur"),
 };
 
 /** Ce qui se passe ensuite, ou que faire, selon le statut. */
@@ -37,36 +38,36 @@ function nextStep(t: Transfer, eta: string): { tone: "brand" | "success" | "warn
   switch (t.status) {
     case "payment_detected":
     case "payout_queued":
-      return { tone: "brand", icon: "clock", title: "Et ensuite ?", text: `Votre paiement est reçu. Nous préparons le versement vers ${networkLabel(t.beneficiary.network)} de ${first}. Délai habituel : ${eta.toLowerCase()}.` };
+      return { tone: "brand", icon: "clock", title: tr("Et ensuite ?"), text: tr("Votre paiement est reçu. Nous préparons le versement vers {0} de {1}. Délai habituel : {2}.", networkLabel(t.beneficiary.network), first, eta.toLowerCase()) };
     case "payout_sent":
       return {
         tone: "brand",
         icon: "send",
-        title: "Et ensuite ?",
+        title: tr("Et ensuite ?"),
         text: bank
-          ? `Le virement est parti vers la banque de ${first}. Comptez 1 à 2 jours ouvrables ; nous vous prévenons à l'arrivée.`
-          : `L'argent est en route vers ${first}. Délai habituel : ${eta.toLowerCase()}. Nous vous prévenons dès qu'il est arrivé.`,
+          ? tr("Le virement est parti vers la banque de {0}. Comptez 1 à 2 jours ouvrables ; nous vous prévenons à l'arrivée.", first)
+          : tr("L'argent est en route vers {0}. Délai habituel : {1}. Nous vous prévenons dès qu'il est arrivé.", first, eta.toLowerCase()),
       };
     case "delivered":
-      return { tone: "success", icon: "check", title: "Argent reçu", text: `${first} a bien reçu ${money(t.receiveAmountXaf, t.receiveCurrency)}. Vous pouvez lui envoyer l'avis de réception.` };
+      return { tone: "success", icon: "check", title: tr("Argent reçu"), text: tr("{0} a bien reçu {1}. Vous pouvez lui envoyer l'avis de réception.", first, money(t.receiveAmountXaf, t.receiveCurrency)) };
     case "payment_mismatch":
       return {
         tone: "danger",
         icon: "alert",
-        title: "Que se passe-t-il ?",
-        text: "Le montant reçu ne correspond pas à celui attendu. Ne refaites pas de paiement : notre équipe vérifie et vous contacte. Vous pouvez aussi nous écrire avec la référence ci-dessous.",
+        title: tr("Que se passe-t-il ?"),
+        text: tr("Le montant reçu ne correspond pas à celui attendu. Ne refaites pas de paiement : notre équipe vérifie et vous contacte. Vous pouvez aussi nous écrire avec la référence ci-dessous."),
       };
     case "payout_failed":
       return {
         tone: "danger",
         icon: "alert",
-        title: "Que se passe-t-il ?",
-        text: `Le versement à ${first} n'a pas abouti (numéro, compte ou opérateur indisponible). Votre argent n'est pas perdu : notre équipe vous contacte pour le relancer. Vérifiez les coordonnées de ${first} en attendant.`,
+        title: tr("Que se passe-t-il ?"),
+        text: tr("Le versement à {0} n'a pas abouti (numéro, compte ou opérateur indisponible). Votre argent n'est pas perdu : notre équipe vous contacte pour le relancer. Vérifiez les coordonnées de {1} en attendant.", first, first),
       };
     case "expired":
-      return { tone: "neutral", icon: "info", title: "Transfert expiré", text: "Aucun paiement n'a été reçu à temps, rien n'a été envoyé. Vous pouvez refaire ce transfert au taux du moment." };
+      return { tone: "neutral", icon: "info", title: tr("Transfert expiré"), text: tr("Aucun paiement n'a été reçu à temps, rien n'a été envoyé. Vous pouvez refaire ce transfert au taux du moment.") };
     case "cancelled":
-      return { tone: "neutral", icon: "info", title: "Transfert annulé", text: "Ce transfert a été annulé et ne sera pas versé. Si vous aviez déjà payé, contactez-nous avec la référence ci-dessous." };
+      return { tone: "neutral", icon: "info", title: tr("Transfert annulé"), text: tr("Ce transfert a été annulé et ne sera pas versé. Si vous aviez déjà payé, contactez-nous avec la référence ci-dessous.") };
     default:
       return null;
   }
@@ -92,7 +93,7 @@ export default function TransferScreen() {
       setTransfer(t);
       setError(null);
     } catch (e) {
-      setError(e instanceof Error ? e.message : "Chargement impossible");
+      setError(e instanceof Error ? e.message : tr("Chargement impossible"));
     }
   }, [id]);
 
@@ -115,7 +116,7 @@ export default function TransferScreen() {
       await api.simulatePay(id);
       await load();
     } catch (e) {
-      setActionError(e instanceof Error ? e.message : "Paiement impossible");
+      setActionError(e instanceof Error ? e.message : tr("Paiement impossible"));
     } finally {
       setBusy(false);
     }
@@ -133,12 +134,12 @@ export default function TransferScreen() {
   if (!transfer) {
     return (
       <Screen>
-        <Header title="Suivi" />
+        <Header title={tr("Suivi")} />
         <View style={{ alignItems: "center", paddingTop: 60, gap: 16 }}>
           {error ? (
             <>
               <Notice tone="danger" icon="alert" text={error} />
-              <Button title="Réessayer" size="sm" onPress={load} />
+              <Button title={tr("Réessayer")} size="sm" onPress={load} />
             </>
           ) : (
             <ActivityIndicator color={colors.brand} size="large" />
@@ -169,24 +170,24 @@ export default function TransferScreen() {
     i === 1
       ? transfer.interac
         ? declared
-          ? "Virement signalé · réception en cours de vérification"
-          : "En attente de votre virement Interac"
-        : "En attente de votre paiement"
+          ? tr("Virement signalé · réception en cours de vérification")
+          : tr("En attente de votre virement Interac")
+        : tr("En attente de votre paiement")
       : i === 2
-        ? "Préparation du versement…"
+        ? tr("Préparation du versement…")
         : transfer.beneficiary.network === "BANK"
-          ? "Sous 1 à 2 jours ouvrables"
-          : `Délai habituel : ${eta.toLowerCase()}`;
+          ? tr("Sous 1 à 2 jours ouvrables")
+          : tr("Délai habituel : {0}", eta.toLowerCase());
   const next = nextStep(transfer, eta);
-  const help = () => router.push({ pathname: "/help/contact", params: { subject: `Transfert ${transfer.reference}` } });
+  const help = () => router.push({ pathname: "/help/contact", params: { subject: tr("Transfert {0}", transfer.reference) } });
 
   return (
     <Screen>
-      <Header title="Suivi du transfert" right={<IconButton name="close" label="Fermer" onPress={close} />} back={false} />
+      <Header title={tr("Suivi du transfert")} right={<IconButton name="close" label={tr("Fermer")} onPress={close} />} back={false} />
 
       {created ? (
         <View style={{ marginBottom: 14 }}>
-          <Notice tone="success" icon="check" title="Transfert créé" text={awaiting ? "Il ne reste plus qu'à régler le paiement." : "Merci ! Nous vous tenons informé à chaque étape."} />
+          <Notice tone="success" icon="check" title={tr("Transfert créé")} text={awaiting ? tr("Il ne reste plus qu'à régler le paiement.") : tr("Merci ! Nous vous tenons informé à chaque étape.")} />
         </View>
       ) : null}
 
@@ -202,7 +203,7 @@ export default function TransferScreen() {
         <Text style={st.amount}>{money(transfer.receiveAmountXaf, transfer.receiveCurrency)}</Text>
         <Small>pour {transfer.beneficiary.fullName}</Small>
         <View style={{ marginTop: 10 }}>
-          <Badge label={info.label} tone={info.tone} />
+          <Badge label={tr(info.label)} tone={info.tone} />
         </View>
       </Card>
 
@@ -217,7 +218,7 @@ export default function TransferScreen() {
               key={label}
               style={st.step}
               accessible
-              accessibilityLabel={`${label} : ${done ? `terminé${at ? `, ${dateTime(at)}` : ""}` : stop ? info.label : i === pending ? pendingHint(i) : "à venir"}`}
+              accessibilityLabel={`${label} : ${done ? at ? tr("terminé, {0}", dateTime(at)) : tr("terminé") : stop ? info.label : i === pending ? pendingHint(i) : tr("à venir")}`}
             >
               <View style={{ alignItems: "center" }}>
                 <View
@@ -243,17 +244,17 @@ export default function TransferScreen() {
 
       {next ? (
         <View style={{ marginBottom: 14 }}>
-          <Notice tone={next.tone} icon={next.icon} title={next.title} text={next.text} />
+          <Notice tone={next.tone} icon={next.icon} title={tr(next.title)} text={tr(next.text)} />
         </View>
       ) : null}
 
       {terminal ? (
         <View style={{ gap: 10, marginBottom: 14 }}>
-          {failed ? <Button title="Contacter le support" icon="mail" onPress={help} /> : null}
+          {failed ? <Button title={tr("Contacter le support")} icon="mail" onPress={help} /> : null}
           {canResend ? (
             <Button
               // Petit écran : sans le montant, le libellé passait sur deux lignes.
-              title={narrow ? `Renvoyer à ${first}` : `Renvoyer ${money(transfer.sendAmountCad, transfer.sendCurrency)} à ${first}`}
+              title={narrow ? tr("Renvoyer à {0}", first) : tr("Renvoyer {0} à {1}", money(transfer.sendAmountCad, transfer.sendCurrency), first)}
               icon="refresh"
               variant={failed ? "secondary" : "primary"}
               onPress={() => resend(transfer)}
@@ -261,7 +262,7 @@ export default function TransferScreen() {
           ) : null}
           {transfer.status === "delivered" ? (
             <Button
-              title={`Prévenir ${first}`}
+              title={tr("Prévenir {0}", first)}
               icon="send"
               variant="secondary"
               onPress={() => router.push({ pathname: "/receipt/[id]", params: { id: transfer.id, mode: "recipient" } })}
@@ -278,18 +279,18 @@ export default function TransferScreen() {
                 <Notice
                   tone="brand"
                   icon="clock"
-                  title="Virement signalé"
-                  text={`Merci ! Nous vérifions la réception de votre virement Interac de ${money(transfer.interac.amount, transfer.interac.currency)}. Le versement part dès qu'elle est confirmée ; cet écran se met à jour automatiquement.`}
+                  title={tr("Virement signalé")}
+                  text={tr("Merci ! Nous vérifions la réception de votre virement Interac de {0}. Le versement part dès qu'elle est confirmée ; cet écran se met à jour automatiquement.", money(transfer.interac.amount, transfer.interac.currency))}
                 />
               ) : (
                 <Notice
                   tone="warn"
                   icon="clock"
-                  text={`En attente de votre virement Interac de ${money(transfer.interac.amount, transfer.interac.currency)}, à envoyer avant le ${dateAt(transfer.interac.expiresAt)}. Le versement part dès sa réception ; cet écran se met à jour automatiquement.`}
+                  text={tr("En attente de votre virement Interac de {0}, à envoyer avant le {1}. Le versement part dès sa réception ; cet écran se met à jour automatiquement.", money(transfer.interac.amount, transfer.interac.currency), dateAt(transfer.interac.expiresAt))}
                 />
               )}
               <Button
-                title="Instructions du virement"
+                title={tr("Instructions du virement")}
                 icon="bank"
                 variant={declared ? "secondary" : "primary"}
                 onPress={() => router.push({ pathname: "/send/interac", params: { id: transfer.id, from: "transfer" } })}
@@ -297,11 +298,11 @@ export default function TransferScreen() {
             </>
           ) : mock ? (
             <>
-              <Notice tone="warn" icon="info" text="Mode démonstration : aucun paiement réel n'est prélevé." />
-              <Button title={`Simuler le paiement de ${money(transfer.totalCad, transfer.sendCurrency)}`} icon="wallet" onPress={simulatePay} loading={busy} />
+              <Notice tone="warn" icon="info" text={tr("Mode démonstration : aucun paiement réel n'est prélevé.")} />
+              <Button title={tr("Simuler le paiement de {0}", money(transfer.totalCad, transfer.sendCurrency))} icon="wallet" onPress={simulatePay} loading={busy} />
             </>
           ) : (
-            <Notice tone="warn" icon="clock" text="Paiement en attente de confirmation. Cet écran se met à jour automatiquement." />
+            <Notice tone="warn" icon="clock" text={tr("Paiement en attente de confirmation. Cet écran se met à jour automatiquement.")} />
           )}
           {actionError ? <Notice tone="danger" icon="alert" text={actionError} /> : null}
         </View>
@@ -310,24 +311,24 @@ export default function TransferScreen() {
       <Card style={{ marginBottom: 14 }}>
         <View style={{ flexDirection: "row", justifyContent: "space-between", alignItems: "center" }}>
           <View>
-            <Small>Référence</Small>
+            <Small>{tr("Référence")}</Small>
             <Text style={{ fontFamily: fonts.heading, fontSize: 16, color: colors.ink }}>{transfer.reference}</Text>
           </View>
-          <Button title={copied ? "Copiée" : "Copier"} icon={copied ? "check" : "copy"} size="sm" variant="secondary" onPress={copyRef} />
+          <Button title={copied ? tr("Copiée") : tr("Copier")} icon={copied ? "check" : "copy"} size="sm" variant="secondary" onPress={copyRef} />
         </View>
         <Divider />
-        <SummaryRow label="Envoyé" value={money(transfer.sendAmountCad, transfer.sendCurrency)} />
-        <SummaryRow label="Frais" value={feeLabel(transfer.feeCad, transfer.sendCurrency)} />
-        <SummaryRow label="Total payé" value={money(transfer.totalCad, transfer.sendCurrency)} strong />
-        <SummaryRow label="Taux" value={rateLine(transfer.rate, transfer.sendCurrency, transfer.receiveCurrency)} />
-        <SummaryRow label="Reçu" value={money(transfer.receiveAmountXaf, transfer.receiveCurrency)} highlight />
+        <SummaryRow label={tr("Envoyé")} value={money(transfer.sendAmountCad, transfer.sendCurrency)} />
+        <SummaryRow label={tr("Frais")} value={feeLabel(transfer.feeCad, transfer.sendCurrency)} />
+        <SummaryRow label={tr("Total payé")} value={money(transfer.totalCad, transfer.sendCurrency)} strong />
+        <SummaryRow label={tr("Taux")} value={rateLine(transfer.rate, transfer.sendCurrency, transfer.receiveCurrency)} />
+        <SummaryRow label={tr("Reçu")} value={money(transfer.receiveAmountXaf, transfer.receiveCurrency)} highlight />
         <Divider />
-        <SummaryRow label="Bénéficiaire" value={transfer.beneficiary.fullName} />
-        <SummaryRow label="Pays" value={countryName(transfer.destCountry)} />
-        <SummaryRow label="Réception" value={networkLabel(transfer.beneficiary.network)} valueIcon={<PaymentLogo id={transfer.beneficiary.network} size={20} />} />
-        {transfer.beneficiary.accountMasked ? <SummaryRow label="Compte" value={transfer.beneficiary.accountMasked} /> : null}
-        {transfer.beneficiary.phone ? <SummaryRow label="Téléphone" value={phone(transfer.beneficiary.phone)} /> : null}
-        <SummaryRow label="Créé le" value={dateTime(transfer.createdAt)} />
+        <SummaryRow label={tr("Bénéficiaire")} value={transfer.beneficiary.fullName} />
+        <SummaryRow label={tr("Pays")} value={countryName(transfer.destCountry)} />
+        <SummaryRow label={tr("Réception")} value={networkLabel(transfer.beneficiary.network)} valueIcon={<PaymentLogo id={transfer.beneficiary.network} size={20} />} />
+        {transfer.beneficiary.accountMasked ? <SummaryRow label={tr("Compte")} value={transfer.beneficiary.accountMasked} /> : null}
+        {transfer.beneficiary.phone ? <SummaryRow label={tr("Téléphone")} value={phone(transfer.beneficiary.phone)} /> : null}
+        <SummaryRow label={tr("Créé le")} value={dateTime(transfer.createdAt)} />
       </Card>
 
       {transfer.events?.length ? (
@@ -338,7 +339,7 @@ export default function TransferScreen() {
             onPress={() => setShowEvents((v) => !v)}
             style={{ flexDirection: "row", alignItems: "center", justifyContent: "space-between", minHeight: 44 }}
           >
-            <Text style={{ fontFamily: fonts.semibold, color: colors.ink, fontSize: 14 }}>Historique détaillé ({transfer.events.length})</Text>
+            <Text style={{ fontFamily: fonts.semibold, color: colors.ink, fontSize: 14 }}>{tr("Historique détaillé ({0})", transfer.events.length)}</Text>
             <View style={{ transform: [{ rotate: showEvents ? "-90deg" : "90deg" }] }}>
               <Icon name="chev" size={18} color={colors.muted} />
             </View>
@@ -352,8 +353,8 @@ export default function TransferScreen() {
         </Card>
       ) : null}
 
-      {!awaiting ? <Button title="Voir le reçu" icon="history" variant="secondary" onPress={() => router.push({ pathname: "/receipt/[id]", params: { id: transfer.id } })} /> : null}
-      {!failed ? <Button title="Aide sur ce transfert" variant="ghost" icon="help" onPress={help} style={{ marginTop: 6 }} /> : null}
+      {!awaiting ? <Button title={tr("Voir le reçu")} icon="history" variant="secondary" onPress={() => router.push({ pathname: "/receipt/[id]", params: { id: transfer.id } })} /> : null}
+      {!failed ? <Button title={tr("Aide sur ce transfert")} variant="ghost" icon="help" onPress={help} style={{ marginTop: 6 }} /> : null}
     </Screen>
   );
 }

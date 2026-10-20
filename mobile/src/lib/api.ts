@@ -1,3 +1,4 @@
+import { tr } from "./i18n";
 /**
  * Client de l'API PWFINTECH (Next.js, dossier web/).
  * L'URL se règle avec EXPO_PUBLIC_API_URL (ex. https://pwfintech.vercel.app).
@@ -233,7 +234,7 @@ async function request<T>(path: string, init?: RequestInit & { token?: string | 
     });
   } catch {
     throw new ApiError(
-      __DEV__ ? `Serveur injoignable (${API_URL}). Vérifiez EXPO_PUBLIC_API_URL et votre réseau.` : "Connexion impossible. Vérifiez votre réseau.",
+      __DEV__ ? `Serveur injoignable (${API_URL}). Vérifiez EXPO_PUBLIC_API_URL et votre réseau.` : tr("Connexion impossible. Vérifiez votre réseau."),
       0,
     );
   }
@@ -241,7 +242,8 @@ async function request<T>(path: string, init?: RequestInit & { token?: string | 
   if (res.status === 401 && token && path.startsWith("/api/me")) onUnauthorized?.();
   if (!res.ok) {
     const code = data && typeof data === "object" && typeof (data as { code?: unknown }).code === "string" ? (data as { code: string }).code : undefined;
-    throw new ApiError(errorMessage(data) ?? "Une erreur est survenue.", res.status, code);
+    // Messages du serveur (en français) : traduits quand la phrase est connue du dictionnaire.
+    throw new ApiError(tr(errorMessage(data) ?? "Une erreur est survenue."), res.status, code);
   }
   return data as T;
 }

@@ -9,6 +9,7 @@ import type { CountryCode } from "@/lib/corridors";
 import { KYC_DOCUMENTS } from "@/lib/geo";
 import { useSession } from "@/lib/session";
 import { colors, fonts, radius } from "@/lib/theme";
+import { tr } from "@/lib/i18n";
 
 /**
  * Vérification d'identité (étapes 5 à 7 de l'inscription, qui en compte 7) puis « Compte créé ».
@@ -57,7 +58,7 @@ export default function Kyc() {
     await refreshKyc();
     setBusy(false);
     if (outcome.kind === "failed") return setError(outcome.message);
-    if (outcome.kind === "cancelled") return setError("Vérification interrompue. Vous pouvez la reprendre quand vous voulez.");
+    if (outcome.kind === "cancelled") return setError(tr("Vérification interrompue. Vous pouvez la reprendre quand vous voulez."));
     setStep(9);
   }
 
@@ -72,8 +73,8 @@ export default function Kyc() {
 
   async function enableBiometric() {
     const kind = await biometricKind();
-    if (kind === "none") return setBioMessage("Aucune biométrie configurée sur cet appareil. Vous pourrez l'activer plus tard dans Sécurité.");
-    const res = await authenticate(`Activer ${biometricLabel(kind)}`);
+    if (kind === "none") return setBioMessage(tr("Aucune biométrie configurée sur cet appareil. Vous pourrez l'activer plus tard dans Sécurité."));
+    const res = await authenticate(tr("Activer {0}", biometricLabel(kind)));
     if (!res.ok) return setBioMessage(res.error);
     await updateSettings({ biometric: true });
     router.dismissTo("/(tabs)");
@@ -86,35 +87,35 @@ export default function Kyc() {
       <Screen
         footer={
           <View style={{ gap: 6 }}>
-            <Button title="Commencer la vérification" icon="camera" onPress={verifyWithDidit} loading={busy} />
-            <Button title="Plus tard" variant="ghost" onPress={exit} disabled={busy} />
+            <Button title={tr("Commencer la vérification")} icon="camera" onPress={verifyWithDidit} loading={busy} />
+            <Button title={tr("Plus tard")} variant="ghost" onPress={exit} disabled={busy} />
           </View>
         }
       >
-        <Header title="Vérification d'identité" back={false} />
-        <Steps current={5} total={7} label="Pièce d'identité" />
-        <H1>Vérifions votre identité</H1>
-        <P style={{ marginTop: 6, marginBottom: 18 }}>Exigée par la réglementation sur les transferts d&apos;argent. Cela prend environ 2 minutes.</P>
+        <Header title={tr("Vérification d'identité")} back={false} />
+        <Steps current={5} total={7} label={tr("Pièce d'identité")} />
+        <H1>{tr("Vérifions votre identité")}</H1>
+        <P style={{ marginTop: 6, marginBottom: 18 }}>{tr("Exigée par la réglementation sur les transferts d'argent. Cela prend environ 2 minutes.")}</P>
         {profile?.kyc === "rejected" ? (
           <View style={{ marginBottom: 14 }}>
             <Notice
               tone="danger"
               icon="alert"
-              title="Votre précédente vérification a été refusée"
-              text={profile.kycNote ? `${profile.kycNote}` : "Recommencez avec un document valide et lisible."}
+              title={tr("Votre précédente vérification a été refusée")}
+              text={profile.kycNote ? `${profile.kycNote}` : tr("Recommencez avec un document valide et lisible.")}
             />
           </View>
         ) : null}
         <Card style={{ paddingVertical: 6, marginBottom: 14 }}>
-          <Tip icon="id" text="Photographiez votre pièce : passeport, carte d'identité ou permis de conduire" />
-          <Tip icon="face" text="Prenez un selfie : il est comparé à la photo de la pièce" />
-          <Tip icon="check" text="Réponse en général en quelques minutes" />
+          <Tip icon="id" text={tr("Photographiez votre pièce : passeport, carte d'identité ou permis de conduire")} />
+          <Tip icon="face" text={tr("Prenez un selfie : il est comparé à la photo de la pièce")} />
+          <Tip icon="check" text={tr("Réponse en général en quelques minutes")} />
         </Card>
         <Notice
           tone="brand"
           icon="lock"
-          title="Vérification sécurisée par Didit"
-          text="La vérification se fait sur la page sécurisée de notre prestataire. Revenez ensuite dans l'appli : votre statut se met à jour tout seul."
+          title={tr("Vérification sécurisée par Didit")}
+          text={tr("La vérification se fait sur la page sécurisée de notre prestataire. Revenez ensuite dans l'appli : votre statut se met à jour tout seul.")}
         />
         {error ? (
           <View style={{ marginTop: 12 }}>
@@ -130,34 +131,34 @@ export default function Kyc() {
       <Screen
         footer={
           <View style={{ gap: 6 }}>
-            <Button title={`Continuer avec : ${doc.label.toLowerCase()}`} onPress={() => setStep(7)} />
-            <Button title="Plus tard" variant="ghost" onPress={exit} />
+            <Button title={tr("Continuer avec : {0}", doc.label.toLowerCase())} onPress={() => setStep(7)} />
+            <Button title={tr("Plus tard")} variant="ghost" onPress={exit} />
           </View>
         }
       >
-        <Header title="Vérification d'identité" back={false} />
-        <Steps current={5} total={7} label="Pièce d'identité" />
-        <H1>Vérifions votre identité</H1>
-        <P style={{ marginTop: 6, marginBottom: 18 }}>Exigée par la réglementation sur les transferts d&apos;argent. Cela prend environ 2 minutes.</P>
+        <Header title={tr("Vérification d'identité")} back={false} />
+        <Steps current={5} total={7} label={tr("Pièce d'identité")} />
+        <H1>{tr("Vérifions votre identité")}</H1>
+        <P style={{ marginTop: 6, marginBottom: 18 }}>{tr("Exigée par la réglementation sur les transferts d'argent. Cela prend environ 2 minutes.")}</P>
         {profile?.kyc === "rejected" ? (
           <View style={{ marginBottom: 14 }}>
             <Notice
               tone="danger"
               icon="alert"
-              title="Votre précédente vérification a été refusée"
-              text={profile.kycNote ? `Motif : ${profile.kycNote}. Recommencez avec un document valide.` : "Recommencez avec un document valide et lisible."}
+              title={tr("Votre précédente vérification a été refusée")}
+              text={profile.kycNote ? tr("Motif : {0}. Recommencez avec un document valide.", tr(profile.kycNote)) : tr("Recommencez avec un document valide et lisible.")}
             />
           </View>
         ) : null}
-        <Small style={{ fontFamily: fonts.semibold, color: colors.ink, marginBottom: 8 }}>Choisissez un document valide</Small>
+        <Small style={{ fontFamily: fonts.semibold, color: colors.ink, marginBottom: 8 }}>{tr("Choisissez un document valide")}</Small>
         {docs.map((d) => (
-          <Choice key={d.id} icon="id" label={d.label} description={d.description} selected={docId === d.id} onPress={() => setDocId(d.id)} />
+          <Choice key={d.id} icon="id" label={tr(d.label)} description={tr(d.description)} selected={docId === d.id} onPress={() => setDocId(d.id)} />
         ))}
         <Notice
           tone="brand"
           icon="lock"
-          title="Vos données sont chiffrées."
-          text="Les photos servent uniquement à vérifier votre identité et ne sont jamais partagées à des fins commerciales."
+          title={tr("Vos données sont chiffrées.")}
+          text={tr("Les photos servent uniquement à vérifier votre identité et ne sont jamais partagées à des fins commerciales.")}
         />
       </Screen>
     );
@@ -166,45 +167,45 @@ export default function Kyc() {
   if (step === 7) {
     const ready = front && (!doc.twoSided || back);
     return (
-      <Screen footer={<Button title="Continuer" onPress={() => setStep(8)} disabled={!ready} />}>
-        <Header title="Photo de la pièce" onBack={() => setStep(6)} />
-        <Steps current={6} total={7} label="Photo de la pièce" />
-        <H1>{doc.label}</H1>
-        <P style={{ marginTop: 6, marginBottom: 18 }}>Placez la pièce dans le cadre, posée sur une surface sombre.</P>
-        <Capture label={doc.twoSided ? "Recto" : "Page photo"} done={front} onPress={() => setFront(true)} />
-        {doc.twoSided ? <Capture label="Verso" done={back} onPress={() => setBack(true)} disabled={!front} /> : null}
+      <Screen footer={<Button title={tr("Continuer")} onPress={() => setStep(8)} disabled={!ready} />}>
+        <Header title={tr("Photo de la pièce")} onBack={() => setStep(6)} />
+        <Steps current={6} total={7} label={tr("Photo de la pièce")} />
+        <H1>{tr(doc.label)}</H1>
+        <P style={{ marginTop: 6, marginBottom: 18 }}>{tr("Placez la pièce dans le cadre, posée sur une surface sombre.")}</P>
+        <Capture label={doc.twoSided ? tr("Recto") : tr("Page photo")} done={front} onPress={() => setFront(true)} />
+        {doc.twoSided ? <Capture label={tr("Verso")} done={back} onPress={() => setBack(true)} disabled={!front} /> : null}
         <Card style={{ paddingVertical: 6, marginBottom: 14 }}>
-          <Tip icon="id" text="Cadrez les 4 coins de la pièce" />
-          <Tip icon="eye" text="Bonne lumière, de préférence naturelle" />
-          <Tip icon="alert" text="Pas de reflets ni de flou sur le texte" />
+          <Tip icon="id" text={tr("Cadrez les 4 coins de la pièce")} />
+          <Tip icon="eye" text={tr("Bonne lumière, de préférence naturelle")} />
+          <Tip icon="alert" text={tr("Pas de reflets ni de flou sur le texte")} />
         </Card>
-        <Notice tone="neutral" icon="info" text="Version de démonstration : la prise de photo est simulée." />
+        <Notice tone="neutral" icon="info" text={tr("Version de démonstration : la prise de photo est simulée.")} />
       </Screen>
     );
   }
 
   if (step === 8) {
     return (
-      <Screen footer={<Button title="Envoyer pour vérification" onPress={submit} disabled={!selfie} loading={busy} />}>
-        <Header title="Vérification du visage" onBack={() => setStep(7)} />
-        <Steps current={7} total={7} label="Selfie" />
-        <H1>Prenez un selfie</H1>
-        <P style={{ marginTop: 6 }}>Nous comparons votre visage à la photo de votre pièce d&apos;identité.</P>
+      <Screen footer={<Button title={tr("Envoyer pour vérification")} onPress={submit} disabled={!selfie} loading={busy} />}>
+        <Header title={tr("Vérification du visage")} onBack={() => setStep(7)} />
+        <Steps current={7} total={7} label={tr("Selfie")} />
+        <H1>{tr("Prenez un selfie")}</H1>
+        <P style={{ marginTop: 6 }}>{tr("Nous comparons votre visage à la photo de votre pièce d'identité.")}</P>
         <View style={st.selfie}>
           <View style={[st.oval, selfie && { borderColor: colors.success, borderStyle: "solid" }]}>
             <Icon name={selfie ? "check" : "face"} color={selfie ? colors.success : colors.silver} size={64} strokeWidth={1.4} />
           </View>
         </View>
-        <Button title={selfie ? "Reprendre le selfie" : "Prendre le selfie"} icon="camera" variant="secondary" onPress={() => setSelfie(true)} />
+        <Button title={selfie ? tr("Reprendre le selfie") : tr("Prendre le selfie")} icon="camera" variant="secondary" onPress={() => setSelfie(true)} />
         {error ? (
           <View style={{ marginTop: 12 }}>
             <Notice tone="danger" icon="alert" text={error} />
           </View>
         ) : null}
         <Card style={{ paddingVertical: 6, marginTop: 14 }}>
-          <Tip icon="face" text="Centrez votre visage dans l'ovale" />
-          <Tip icon="user" text="Retirez lunettes et chapeau, seul(e) dans le cadre" />
-          <Tip icon="eye" text="Regardez l'objectif, visage bien éclairé" />
+          <Tip icon="face" text={tr("Centrez votre visage dans l'ovale")} />
+          <Tip icon="user" text={tr("Retirez lunettes et chapeau, seul(e) dans le cadre")} />
+          <Tip icon="eye" text={tr("Regardez l'objectif, visage bien éclairé")} />
         </Card>
       </Screen>
     );
@@ -215,11 +216,11 @@ export default function Kyc() {
     <Screen
       footer={
         <View style={{ gap: 8 }}>
-          <Button title="Découvrir l'application" onPress={exit} />
+          <Button title={tr("Découvrir l'application")} onPress={exit} />
           {didit && !verified ? (
-            <Button title="Reprendre la vérification" variant="ghost" onPress={verifyWithDidit} loading={busy} />
+            <Button title={tr("Reprendre la vérification")} variant="ghost" onPress={verifyWithDidit} loading={busy} />
           ) : null}
-          {Platform.OS === "web" ? null : <Button title="Activer Face ID / empreinte" icon="face" variant="secondary" onPress={enableBiometric} />}
+          {Platform.OS === "web" ? null : <Button title={tr("Activer Face ID / empreinte")} icon="face" variant="secondary" onPress={enableBiometric} />}
         </View>
       }
     >
@@ -227,15 +228,15 @@ export default function Kyc() {
         <View style={[st.heroIcon, { backgroundColor: colors.successSoft }]}>
           <Icon name="check" color={colors.success} size={40} strokeWidth={2.4} />
         </View>
-        <H1 style={{ textAlign: "center" }}>Bienvenue sur WorldSoft Transfer</H1>
-        <P style={{ textAlign: "center", marginTop: 6 }}>Votre compte est créé, {profile?.firstName}.</P>
+        <H1 style={{ textAlign: "center" }}>{tr("Bienvenue sur WorldSoft Transfer")}</H1>
+        <P style={{ textAlign: "center", marginTop: 6 }}>{tr("Votre compte est créé, {0}.", profile?.firstName)}</P>
       </View>
       <View style={{ marginTop: 18 }}>
         <Notice
           tone={verified ? "success" : "warn"}
           icon={verified ? "shield" : "clock"}
-          title={verified ? "Identité vérifiée" : "Identité en cours de vérification"}
-          text={verified ? "Vous pouvez envoyer de l'argent dès maintenant." : "Généralement quelques minutes. Vous serez prévenu dans l'appli dès qu'elle sera terminée."}
+          title={verified ? tr("Identité vérifiée") : tr("Identité en cours de vérification")}
+          text={verified ? tr("Vous pouvez envoyer de l'argent dès maintenant.") : tr("Généralement quelques minutes. Vous serez prévenu dans l'appli dès qu'elle sera terminée.")}
         />
         {error ? (
           <View style={{ marginTop: 12 }}>
@@ -243,16 +244,16 @@ export default function Kyc() {
           </View>
         ) : null}
       </View>
-      <Small style={{ fontFamily: fonts.heading, letterSpacing: 0.8, marginTop: 20, marginBottom: 8 }}>ENSUITE, VOUS POURREZ</Small>
+      <Small style={{ fontFamily: fonts.heading, letterSpacing: 0.8, marginTop: 20, marginBottom: 8 }}>{tr("ENSUITE, VOUS POURREZ")}</Small>
       <Card style={{ paddingVertical: 6 }}>
-        <ListItem icon="send" title="Envoyer de l'argent" subtitle="Mobile Money, virement bancaire, Interac, Alipay, WeChat Pay" />
-        <ListItem icon="user" title="Enregistrer vos destinataires" subtitle="Vos proches, en un geste" />
-        <ListItem icon="history" title="Suivre chaque transfert" subtitle="Étapes en temps réel et reçus" />
-        <ListItem icon="ship" title="Suivre vos colis" subtitle="Avec le numéro indiqué sur votre reçu d'expédition" />
+        <ListItem icon="send" title={tr("Envoyer de l'argent")} subtitle={tr("Mobile Money, virement bancaire, Interac, Alipay, WeChat Pay")} />
+        <ListItem icon="user" title={tr("Enregistrer vos destinataires")} subtitle={tr("Vos proches, en un geste")} />
+        <ListItem icon="history" title={tr("Suivre chaque transfert")} subtitle={tr("Étapes en temps réel et reçus")} />
+        <ListItem icon="ship" title={tr("Suivre vos colis")} subtitle={tr("Avec le numéro indiqué sur votre reçu d'expédition")} />
       </Card>
       {bioMessage ? (
         <View style={{ marginTop: 12 }}>
-          <Notice tone="neutral" icon="info" text={bioMessage} />
+          <Notice tone="neutral" icon="info" text={tr(bioMessage)} />
         </View>
       ) : null}
     </Screen>
@@ -263,7 +264,7 @@ function Tip({ icon, text }: { icon: IconName; text: string }) {
   return (
     <View style={{ flexDirection: "row", alignItems: "center", gap: 10, paddingVertical: 8 }}>
       <Icon name={icon} color={colors.brand} size={18} />
-      <Small style={{ color: colors.ink, flex: 1 }}>{text}</Small>
+      <Small style={{ color: colors.ink, flex: 1 }}>{tr(text)}</Small>
     </View>
   );
 }
@@ -272,8 +273,8 @@ function Capture({ label, done, onPress, disabled = false }: { label: string; do
   return (
     <View style={[st.capture, done && { borderColor: colors.success, backgroundColor: colors.successSoft, borderStyle: "solid" }, disabled && { opacity: 0.5 }]}>
       <Icon name={done ? "check" : "id"} color={done ? colors.success : colors.brand} size={30} />
-      <Text style={st.captureLabel}>{done ? `${label} · photo prise` : label}</Text>
-      <Button title={done ? "Reprendre" : "Prendre la photo"} icon="camera" size="sm" variant={done ? "secondary" : "primary"} onPress={onPress} disabled={disabled} />
+      <Text style={st.captureLabel}>{done ? tr("{0} · photo prise", tr(label)) : label}</Text>
+      <Button title={done ? tr("Reprendre") : tr("Prendre la photo")} icon="camera" size="sm" variant={done ? "secondary" : "primary"} onPress={onPress} disabled={disabled} />
     </View>
   );
 }

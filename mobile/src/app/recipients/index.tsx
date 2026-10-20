@@ -6,6 +6,7 @@ import { Button, Card, Empty, Field, Header, ListItem, Screen, Small } from "@/c
 import { countryName, networkLabel } from "@/lib/format";
 import { recipientDetail } from "@/lib/recipients";
 import { useStore } from "@/lib/store";
+import { tr } from "@/lib/i18n";
 
 export default function Recipients() {
   const { recipients } = useStore();
@@ -13,9 +14,9 @@ export default function Recipients() {
   const list = recipients.filter((r) => r.fullName.toLowerCase().includes(q.trim().toLowerCase()));
 
   return (
-    <Screen footer={<Button title="Ajouter un destinataire" icon="plus" onPress={() => router.push("/recipients/new")} />}>
-      <Header title="Mes destinataires" />
-      {recipients.length > 3 ? <Field label="Rechercher" placeholder="Rechercher un destinataire" value={q} onChangeText={setQ} /> : null}
+    <Screen footer={<Button title={tr("Ajouter un destinataire")} icon="plus" onPress={() => router.push("/recipients/new")} />}>
+      <Header title={tr("Mes destinataires")} />
+      {recipients.length > 3 ? <Field label={tr("Rechercher")} placeholder={tr("Rechercher un destinataire")} value={q} onChangeText={setQ} /> : null}
       {recipients.length ? (
         <Small style={{ marginBottom: 8 }}>
           {list.length} DESTINATAIRE{list.length > 1 ? "S" : ""}
@@ -33,7 +34,7 @@ export default function Recipients() {
             />
           ))
         ) : (
-          <Empty icon="user" title={recipients.length ? "Aucun résultat" : "Aucun destinataire"} text="Enregistrez vos proches pour leur envoyer de l'argent en un geste." />
+          <Empty icon="user" title={recipients.length ? tr("Aucun résultat") : tr("Aucun destinataire")} text={tr("Enregistrez vos proches pour leur envoyer de l'argent en un geste.")} />
         )}
       </Card>
       <View style={{ height: 8 }} />

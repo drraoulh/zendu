@@ -7,6 +7,7 @@ import { parseScannedCard } from "@/lib/cards";
 import { colors, fonts, radius } from "@/lib/theme";
 import { Icon } from "./icons";
 import { Button } from "./ui";
+import { tr } from "@/lib/i18n";
 
 /**
  * Reconnaissance de texte sur l'appareil (ML Kit sur Android, Vision sur iOS) via expo-text-extractor.
@@ -76,19 +77,19 @@ export function CardScanner({ visible, onClose, onScanned }: { visible: boolean;
         ) : null}
         <SafeAreaView style={s.overlay} edges={["top", "bottom"]}>
           <View style={s.top}>
-            <Pressable accessibilityRole="button" accessibilityLabel="Fermer" onPress={close} style={s.close} hitSlop={10}>
+            <Pressable accessibilityRole="button" accessibilityLabel={tr("Fermer")} onPress={close} style={s.close} hitSlop={10}>
               <Icon name="close" color={colors.white} size={22} />
             </Pressable>
-            <Text style={s.title}>Scanner ma carte</Text>
+            <Text style={s.title}>{tr("Scanner ma carte")}</Text>
             <View style={{ width: 44 }} />
           </View>
 
           {denied ? (
             <View style={s.denied}>
               <Icon name="camera" color={colors.white} size={36} />
-              <Text style={s.deniedText}>Autorisez l&apos;appareil photo pour scanner votre carte.</Text>
+              <Text style={s.deniedText}>{tr("Autorisez l'appareil photo pour scanner votre carte.")}</Text>
               <Button
-                title={permission.canAskAgain ? "Autoriser l'appareil photo" : "Ouvrir les réglages"}
+                title={permission.canAskAgain ? tr("Autoriser l'appareil photo") : tr("Ouvrir les réglages")}
                 onPress={() => (permission.canAskAgain ? requestPermission() : Linking.openSettings())}
               />
             </View>
@@ -100,17 +101,17 @@ export function CardScanner({ visible, onClose, onScanned }: { visible: boolean;
                 <View style={[s.corner, s.bl]} />
                 <View style={[s.corner, s.br]} />
               </View>
-              <Text style={s.help}>Placez le recto de la carte dans le cadre, bien éclairé et à plat.</Text>
-              {slow ? <Text style={s.slow}>Approchez ou éloignez légèrement la carte, évitez les reflets.</Text> : null}
+              <Text style={s.help}>{tr("Placez le recto de la carte dans le cadre, bien éclairé et à plat.")}</Text>
+              {slow ? <Text style={s.slow}>{tr("Approchez ou éloignez légèrement la carte, évitez les reflets.")}</Text> : null}
             </View>
           )}
 
           <View style={s.bottom}>
             <View style={s.privacy}>
               <Icon name="lock" color="rgba(255,255,255,0.75)" size={14} />
-              <Text style={s.privacyText}>Lecture sur votre téléphone · aucune photo enregistrée ni envoyée</Text>
+              <Text style={s.privacyText}>{tr("Lecture sur votre téléphone · aucune photo enregistrée ni envoyée")}</Text>
             </View>
-            <Button title="Saisir à la main" variant="light" onPress={close} />
+            <Button title={tr("Saisir à la main")} variant="light" onPress={close} />
           </View>
         </SafeAreaView>
       </View>

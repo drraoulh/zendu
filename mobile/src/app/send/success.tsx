@@ -10,6 +10,7 @@ import { deliveryEstimate, etaLabel, money, networkLabel } from "@/lib/format";
 import { useStore } from "@/lib/store";
 import { colors, fonts } from "@/lib/theme";
 import { PaymentLogo } from "@/components/payment-logo";
+import { tr } from "@/lib/i18n";
 
 export default function Success() {
   const { id, card } = useLocalSearchParams<{ id: string; card?: string }>();
@@ -36,8 +37,8 @@ export default function Success() {
         footer={
           failed ? (
             <View style={{ gap: 8 }}>
-              <Button title="Suivre le transfert" onPress={() => router.replace({ pathname: "/transfer/[id]", params: { id } })} />
-              <Button title="Retour à l'accueil" variant="ghost" onPress={() => router.dismissTo("/(tabs)")} />
+              <Button title={tr("Suivre le transfert")} onPress={() => router.replace({ pathname: "/transfer/[id]", params: { id } })} />
+              <Button title={tr("Retour à l'accueil")} variant="ghost" onPress={() => router.dismissTo("/(tabs)")} />
             </View>
           ) : undefined
         }
@@ -45,8 +46,8 @@ export default function Success() {
         {failed ? (
           <View style={{ alignItems: "center", paddingTop: 60, gap: 10 }}>
             <Icon name="check" color={colors.success} size={42} strokeWidth={2.4} />
-            <H1 style={{ textAlign: "center" }}>Paiement réussi</H1>
-            <P style={{ textAlign: "center" }}>Le détail du transfert n&apos;a pas pu être chargé. Vous le retrouverez dans votre historique.</P>
+            <H1 style={{ textAlign: "center" }}>{tr("Paiement réussi")}</H1>
+            <P style={{ textAlign: "center" }}>{tr("Le détail du transfert n'a pas pu être chargé. Vous le retrouverez dans votre historique.")}</P>
           </View>
         ) : (
           <ActivityIndicator style={{ marginTop: 120 }} color={colors.brand} size="large" />
@@ -63,18 +64,18 @@ export default function Success() {
     <Screen
       footer={
         <View style={{ gap: 8 }}>
-          <Button title="Suivre le transfert" onPress={() => router.replace({ pathname: "/transfer/[id]", params: { id: t.id } })} />
+          <Button title={tr("Suivre le transfert")} onPress={() => router.replace({ pathname: "/transfer/[id]", params: { id: t.id } })} />
           <View style={{ flexDirection: "row", gap: 8 }}>
-            <Button title="Voir le reçu" variant="secondary" size="sm" style={{ flex: 1 }} onPress={() => router.push({ pathname: "/receipt/[id]", params: { id: t.id, card: card ?? "" } })} />
+            <Button title={tr("Voir le reçu")} variant="secondary" size="sm" style={{ flex: 1 }} onPress={() => router.push({ pathname: "/receipt/[id]", params: { id: t.id, card: card ?? "" } })} />
             <Button
-              title={`Prévenir ${first}`}
+              title={tr("Prévenir {0}", first)}
               variant="secondary"
               size="sm"
               style={{ flex: 1 }}
               onPress={() => router.push({ pathname: "/receipt/[id]", params: { id: t.id, card: card ?? "", mode: "recipient" } })}
             />
           </View>
-          {short ? null : <Button title="Retour à l'accueil" variant="ghost" onPress={() => router.dismissTo("/(tabs)")} />}
+          {short ? null : <Button title={tr("Retour à l'accueil")} variant="ghost" onPress={() => router.dismissTo("/(tabs)")} />}
         </View>
       }
     >
@@ -85,7 +86,7 @@ export default function Success() {
         <View style={{ width: 84, height: 84, borderRadius: 28, backgroundColor: colors.successSoft, alignItems: "center", justifyContent: "center" }}>
           <Icon name="check" color={colors.success} size={42} strokeWidth={2.4} />
         </View>
-        <H1 style={{ textAlign: "center" }}>Paiement réussi</H1>
+        <H1 style={{ textAlign: "center" }}>{tr("Paiement réussi")}</H1>
         <P style={{ textAlign: "center" }}>{t.beneficiary.fullName} recevra</P>
         <Text style={{ fontFamily: fonts.display, fontSize: 32, color: colors.brand }}>{money(t.receiveAmountXaf, t.receiveCurrency)}</Text>
         <View style={{ flexDirection: "row", alignItems: "center", gap: 8 }}>
@@ -94,13 +95,13 @@ export default function Success() {
         </View>
       </View>
       <Card style={{ marginTop: 20 }}>
-        <SummaryRow label="Référence" value={t.reference} strong />
-        <SummaryRow label="Montant payé" value={money(t.totalCad, t.sendCurrency)} />
-        <SummaryRow label="Délai estimé" value={etaLabel(eta)} />
-        {card ? <SummaryRow label="Payé avec" value={card} /> : null}
+        <SummaryRow label={tr("Référence")} value={t.reference} strong />
+        <SummaryRow label={tr("Montant payé")} value={money(t.totalCad, t.sendCurrency)} />
+        <SummaryRow label={tr("Délai estimé")} value={etaLabel(eta)} />
+        {card ? <SummaryRow label={tr("Payé avec")} value={card} /> : null}
       </Card>
-      <Small style={{ textAlign: "center", marginTop: 12 }}>Un reçu a été envoyé à {t.senderEmail}.</Small>
-      {short ? <Button title="Retour à l'accueil" variant="ghost" style={{ marginTop: 8 }} onPress={() => router.dismissTo("/(tabs)")} /> : null}
+      <Small style={{ textAlign: "center", marginTop: 12 }}>{tr("Un reçu a été envoyé à {0}.", t.senderEmail)}</Small>
+      {short ? <Button title={tr("Retour à l'accueil")} variant="ghost" style={{ marginTop: 8 }} onPress={() => router.dismissTo("/(tabs)")} /> : null}
     </Screen>
   );
 }

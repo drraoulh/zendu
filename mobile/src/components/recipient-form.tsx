@@ -12,6 +12,7 @@ import { PaymentLogo } from "./payment-logo";
 import { Chips } from "./form";
 import { Icon } from "./icons";
 import { Button, Choice, Field, Label, Small } from "./ui";
+import { tr } from "@/lib/i18n";
 
 
 const PHONE_DIGITS: Record<CountryCode, [number, number]> = { CA: [10, 10], CM: [9, 9], CN: [11, 11] };
@@ -49,29 +50,29 @@ export function RecipientForm({
     try {
       picked = await pickContact();
     } catch {
-      return Alert.alert("Contacts indisponibles", "Autorisez l'accès aux contacts dans les réglages, ou saisissez le numéro.");
+      return Alert.alert(tr("Contacts indisponibles"), tr("Autorisez l'accès aux contacts dans les réglages, ou saisissez le numéro."));
     }
     if (!picked) return;
     if (picked.fullName) setFullName(picked.fullName);
     const numbers = [...new Set(picked.phones.map((n) => localNumber(n, c.dialCode)).filter(Boolean))];
     if (numbers.length <= 1) return setPhone(numbers[0] ?? "");
     // Plusieurs numéros : le client choisit celui du compte mobile money.
-    Alert.alert("Quel numéro ?", picked.fullName || undefined, [
+    Alert.alert(tr("Quel numéro ?"), picked.fullName || undefined, [
       ...numbers.slice(0, 4).map((n) => ({ text: `+${c.dialCode} ${n}`, onPress: () => setPhone(n) })),
-      { text: "Annuler", style: "cancel" as const },
+      { text: tr("Annuler"), style: "cancel" as const },
     ]);
   }
 
   function submit() {
     const e: Record<string, string> = {};
-    if (fullName.trim().split(/\s+/).length < 2) e.fullName = "Prénom et nom, comme sur la pièce d'identité";
+    if (fullName.trim().split(/\s+/).length < 2) e.fullName = tr("Prénom et nom, comme sur la pièce d'identité");
     const digits = phone.replace(/\D/g, "").replace(new RegExp(`^${c.dialCode}`), "").replace(/^0+/, "");
     const [min, max] = PHONE_DIGITS[country];
-    if (!bank && (digits.length < min || digits.length > max)) e.phone = `Numéro invalide pour ${c.name}`;
+    if (!bank && (digits.length < min || digits.length > max)) e.phone = tr("Numéro invalide pour {0}", c.name);
     if (bank) {
-      if (bankName.trim().length < 2) e.bankName = "Nom de la banque requis";
-      if (!/^[A-Za-z0-9]{6,34}$/.test(accountNumber.replace(/[\s-]/g, ""))) e.accountNumber = "IBAN, RIB ou numéro de compte (6 à 34 caractères)";
-      if (bankCode && !/^[A-Za-z0-9]{3,11}$/.test(bankCode.replace(/\s/g, ""))) e.bankCode = "Code SWIFT/BIC invalide";
+      if (bankName.trim().length < 2) e.bankName = tr("Nom de la banque requis");
+      if (!/^[A-Za-z0-9]{6,34}$/.test(accountNumber.replace(/[\s-]/g, ""))) e.accountNumber = tr("IBAN, RIB ou numéro de compte (6 à 34 caractères)");
+      if (bankCode && !/^[A-Za-z0-9]{3,11}$/.test(bankCode.replace(/\s/g, ""))) e.bankCode = tr("Code SWIFT/BIC invalide");
     }
     setErrors(e);
     if (Object.keys(e).length) return;
@@ -95,11 +96,11 @@ export function RecipientForm({
   return (
     <View>
       {Platform.OS !== "web" && !initial?.id ? (
-        <Button title="Choisir dans mes contacts" icon="user" variant="secondary" size="sm" onPress={() => void fromContacts()} style={{ marginBottom: 14 }} />
+        <Button title={tr("Choisir dans mes contacts")} icon="user" variant="secondary" size="sm" onPress={() => void fromContacts()} style={{ marginBottom: 14 }} />
       ) : null}
-      <Field label="Nom complet du bénéficiaire" value={fullName} onChangeText={setFullName} autoCapitalize="words" error={errors.fullName} />
+      <Field label={tr("Nom complet du bénéficiaire")} value={fullName} onChangeText={setFullName} autoCapitalize="words" error={errors.fullName} />
 
-      <Label>Mode de réception</Label>
+      <Label>{tr("Mode de réception")}</Label>
       {networks.map((n) => (
         <Choice key={n.id} leading={<PaymentLogo id={n.id} size={26} />} label={networkLabel(n.id)} selected={network === n.id} onPress={() => setNetwork(n.id)} />
       ))}
@@ -107,13 +108,13 @@ export function RecipientForm({
       <View style={{ height: 6 }} />
       {bank ? (
         <>
-          <Field label="Banque" value={bankName} onChangeText={setBankName} error={errors.bankName} />
-          <Field label="Numéro de compte / IBAN / RIB" value={accountNumber} onChangeText={setAccountNumber} autoCapitalize="characters" error={errors.accountNumber} />
-          <Field label="Code SWIFT / BIC (facultatif)" value={bankCode} onChangeText={setBankCode} autoCapitalize="characters" error={errors.bankCode} />
+          <Field label={tr("Banque")} value={bankName} onChangeText={setBankName} error={errors.bankName} />
+          <Field label={tr("Numéro de compte / IBAN / RIB")} value={accountNumber} onChangeText={setAccountNumber} autoCapitalize="characters" error={errors.accountNumber} />
+          <Field label={tr("Code SWIFT / BIC (facultatif)")} value={bankCode} onChangeText={setBankCode} autoCapitalize="characters" error={errors.bankCode} />
         </>
       ) : null}
       <Field
-        label={bank ? "Téléphone (facultatif)" : network === "INTERAC" ? "Téléphone lié au compte Interac" : `Numéro ${networkLabel(network)}`}
+        label={bank ? tr("Téléphone (facultatif)") : network === "INTERAC" ? tr("Téléphone lié au compte Interac") : tr("Numéro {0}", networkLabel(network))}
         value={phone}
         onChangeText={setPhone}
         keyboardType="phone-pad"
@@ -129,8 +130,8 @@ export function RecipientForm({
 
       {withRelation ? (
         <>
-          <Label>Relation</Label>
-          <Chips options={RELATIONS.map((r) => ({ value: r, label: r }))} value={relation} onChange={(v) => setRelation(v === relation ? "" : v)} />
+          <Label>{tr("Relation")}</Label>
+          <Chips options={RELATIONS.map((r) => ({ value: r, label: tr(r) }))} value={relation} onChange={(v) => setRelation(v === relation ? "" : v)} />
         </>
       ) : null}
 
@@ -155,11 +156,11 @@ export function RecipientForm({
           >
             {save ? <Icon name="check" color={colors.white} size={14} strokeWidth={3} /> : null}
           </View>
-          <Small style={{ color: colors.ink }}>Enregistrer ce bénéficiaire pour mes prochains envois</Small>
+          <Small style={{ color: colors.ink }}>{tr("Enregistrer ce bénéficiaire pour mes prochains envois")}</Small>
         </Pressable>
       ) : null}
 
-      <Button title={submitLabel} onPress={submit} />
+      <Button title={tr(submitLabel)} onPress={submit} />
     </View>
   );
 }

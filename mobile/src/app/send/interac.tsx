@@ -8,6 +8,7 @@ import { Button, Card, Header, Notice, Screen, Small } from "@/components/ui";
 import { api, type Transfer } from "@/lib/api";
 import { dateAt, money } from "@/lib/format";
 import { colors, fonts, radius } from "@/lib/theme";
+import { tr } from "@/lib/i18n";
 
 const POLL_MS = 6000;
 
@@ -32,7 +33,7 @@ export default function InteracPayment() {
       if (["payment_mismatch", "expired", "cancelled"].includes(t.status)) {
         router.replace({ pathname: "/transfer/[id]", params: { id } });
       } else {
-        router.replace({ pathname: "/send/success", params: { id, card: "Virement Interac" } });
+        router.replace({ pathname: "/send/success", params: { id, card: tr("Virement Interac") } });
       }
     },
     [id],
@@ -45,7 +46,7 @@ export default function InteracPayment() {
       setError(null);
       if (t.status !== "awaiting_payment") finish(t);
     } catch (e) {
-      setError(e instanceof Error ? e.message : "Chargement impossible");
+      setError(e instanceof Error ? e.message : tr("Chargement impossible"));
     }
   }, [id, finish]);
 
@@ -71,7 +72,7 @@ export default function InteracPayment() {
       await api.interacDeclare(id);
       router.replace({ pathname: "/transfer/[id]", params: { id } });
     } catch (e) {
-      setError(e instanceof Error ? e.message : "Envoi impossible");
+      setError(e instanceof Error ? e.message : tr("Envoi impossible"));
     } finally {
       setBusy(null);
     }
@@ -83,7 +84,7 @@ export default function InteracPayment() {
     try {
       finish(await api.simulatePay(id));
     } catch (e) {
-      setError(e instanceof Error ? e.message : "Simulation impossible");
+      setError(e instanceof Error ? e.message : tr("Simulation impossible"));
     } finally {
       setBusy(null);
     }
@@ -95,10 +96,10 @@ export default function InteracPayment() {
   if (!transfer || !info) {
     return (
       <Screen>
-        <Header title="Virement Interac" onBack={leave} />
+        <Header title={tr("Virement Interac")} onBack={leave} />
         <View style={{ alignItems: "center", paddingTop: 60, gap: 16 }}>
           {error ? <Notice tone="danger" icon="alert" text={error} /> : <ActivityIndicator color={colors.brand} />}
-          {error ? <Button title="Réessayer" size="sm" onPress={load} /> : null}
+          {error ? <Button title={tr("Réessayer")} size="sm" onPress={load} /> : null}
         </View>
       </Screen>
     );
@@ -112,44 +113,44 @@ export default function InteracPayment() {
     <Screen
       footer={
         <View style={{ gap: 8 }}>
-          <Button title={declared ? "Voir le suivi" : "J'ai envoyé le virement"} icon="check" onPress={declared && from === "transfer" ? leave : declare} loading={busy === "declare"} disabled={busy !== null} />
+          <Button title={declared ? tr("Voir le suivi") : tr("J'ai envoyé le virement")} icon="check" onPress={declared && from === "transfer" ? leave : declare} loading={busy === "declare"} disabled={busy !== null} />
           {info.simulate ? (
-            <Button title="Simuler la réception (démo)" variant="ghost" size="sm" onPress={simulate} loading={busy === "simulate"} disabled={busy !== null} />
+            <Button title={tr("Simuler la réception (démo)")} variant="ghost" size="sm" onPress={simulate} loading={busy === "simulate"} disabled={busy !== null} />
           ) : null}
         </View>
       }
     >
-      <Header title="Virement Interac" subtitle={`Réf. ${transfer.reference}`} onBack={leave} />
+      <Header title={tr("Virement Interac")} subtitle={tr("Réf. {0}", transfer.reference)} onBack={leave} />
 
       <Card style={s.hero}>
         <PaymentLogo id="INTERAC" size={30} />
-        <Text style={s.heroLabel}>MONTANT EXACT À ENVOYER</Text>
+        <Text style={s.heroLabel}>{tr("MONTANT EXACT À ENVOYER")}</Text>
         <Text style={s.heroAmount} numberOfLines={1} adjustsFontSizeToFit>
           {amount}
         </Text>
         <Small style={{ color: "rgba(255,255,255,0.75)", textAlign: "center" }}>
-          {transfer.beneficiary.fullName} reçoit {money(transfer.receiveAmountXaf, transfer.receiveCurrency)}
+          {tr("{0} reçoit {1}", transfer.beneficiary.fullName, money(transfer.receiveAmountXaf, transfer.receiveCurrency))}
         </Small>
       </Card>
 
-      <Text style={s.section}>Dans l&apos;appli de votre banque</Text>
+      <Text style={s.section}>{tr("Dans l'appli de votre banque")}</Text>
       <Card style={{ paddingVertical: 4, marginBottom: 14 }}>
-        <Step n={1} title={"Ouvrez «\u00a0Virement Interac\u00a0»"} hint={"Appelé «\u00a0Interac e-Transfer\u00a0» dans les applis en anglais."} />
+        <Step n={1} title={tr("Ouvrez « Virement Interac »")} hint={tr("Appelé « Interac e-Transfer » dans les applis en anglais.")} />
         <Step
           n={2}
-          title="Destinataire"
-          value={info.email ?? (info.simulate ? "Non requise en démonstration" : "Adresse indisponible : contactez le support")}
+          title={tr("Destinataire")}
+          value={info.email ?? (info.simulate ? tr("Non requise en démonstration") : tr("Adresse indisponible : contactez le support"))}
           muted={!info.email}
-          hint={info.email && info.name ? `Votre banque affichera « ${info.name} » : c'est bien notre compte de réception.` : undefined}
+          hint={info.email && info.name ? tr("Votre banque affichera « {0} » : c'est bien notre compte de réception.", info.name) : undefined}
           copied={copied === "email"}
           onCopy={info.email ? () => copy("email", info.email!) : undefined}
         />
-        <Step n={3} title="Montant exact" value={amount} copied={copied === "amount"} onCopy={() => copy("amount", info.amount.toFixed(2))} />
+        <Step n={3} title={tr("Montant exact")} value={amount} copied={copied === "amount"} onCopy={() => copy("amount", info.amount.toFixed(2))} />
         <Step
           n={4}
-          title="Message (obligatoire)"
+          title={tr("Message (obligatoire)")}
           value={info.message}
-          hint="C'est ce qui relie votre virement à ce transfert."
+          hint={tr("C'est ce qui relie votre virement à ce transfert.")}
           copied={copied === "message"}
           onCopy={() => copy("message", info.message)}
           last
@@ -159,11 +160,11 @@ export default function InteracPayment() {
       <Notice
         tone="neutral"
         icon="clock"
-        text={`À envoyer avant le ${dateAt(info.expiresAt)}. Dès que votre virement est reçu, l'argent part vers ${transfer.beneficiary.fullName.split(" ")[0]} et vous êtes notifié.`}
+        text={tr("À envoyer avant le {0}. Dès que votre virement est reçu, l'argent part vers {1} et vous êtes notifié.", dateAt(info.expiresAt), transfer.beneficiary.fullName.split(" ")[0])}
       />
       {info.simulate ? (
         <View style={{ marginTop: 10 }}>
-          <Notice tone="warn" icon="info" text={"Mode démonstration : aucun virement réel n'est attendu. Touchez «\u00a0Simuler la réception\u00a0»."} />
+          <Notice tone="warn" icon="info" text={tr("Mode démonstration : aucun virement réel n'est attendu. Touchez « Simuler la réception ».")} />
         </View>
       ) : null}
       {error ? (
@@ -200,24 +201,24 @@ function Step({
         <Text style={s.numText}>{n}</Text>
       </View>
       <View style={{ flex: 1, minWidth: 0 }}>
-        <Text style={s.stepTitle}>{title}</Text>
+        <Text style={s.stepTitle}>{tr(title)}</Text>
         {value ? (
           <Text style={[s.value, muted && { color: colors.muted, fontFamily: fonts.semibold, fontSize: 14 }]} selectable>
             {value}
           </Text>
         ) : null}
-        {hint ? <Small>{hint}</Small> : null}
+        {hint ? <Small>{tr(hint)}</Small> : null}
       </View>
       {onCopy ? (
         <Pressable
           accessibilityRole="button"
-          accessibilityLabel={`Copier ${title.toLowerCase()}`}
+          accessibilityLabel={tr("Copier {0}", title.toLowerCase())}
           onPress={onCopy}
           hitSlop={8}
           style={({ pressed }) => [s.copy, copied && s.copied, pressed && { opacity: 0.8 }]}
         >
           <Icon name={copied ? "check" : "copy"} color={copied ? colors.success : colors.brand} size={16} />
-          <Text style={[s.copyText, copied && { color: colors.success }]}>{copied ? "Copié" : "Copier"}</Text>
+          <Text style={[s.copyText, copied && { color: colors.success }]}>{copied ? tr("Copié") : tr("Copier")}</Text>
         </Pressable>
       ) : null}
     </View>

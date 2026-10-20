@@ -12,6 +12,7 @@ import { useMyTransfers } from "@/lib/use-transfers";
 import { corridorFor, recipientDetail } from "@/lib/recipients";
 import { useSession } from "@/lib/session";
 import { PaymentLogo } from "@/components/payment-logo";
+import { tr } from "@/lib/i18n";
 
 export default function RecipientDetail() {
   const { id } = useLocalSearchParams<{ id: string }>();
@@ -24,8 +25,8 @@ export default function RecipientDetail() {
   if (!r) {
     return (
       <Screen>
-        <Header title="Destinataire" />
-        <Empty icon="user" title="Destinataire introuvable" text="Il a peut-être été supprimé." />
+        <Header title={tr("Destinataire")} />
+        <Empty icon="user" title={tr("Destinataire introuvable")} text={tr("Il a peut-être été supprimé.")} />
       </Screen>
     );
   }
@@ -44,15 +45,15 @@ export default function RecipientDetail() {
     <Screen
       footer={
         <View style={{ gap: 8 }}>
-          <Button title="Envoyer de l'argent" icon="send" onPress={send} />
+          <Button title={tr("Envoyer de l'argent")} icon="send" onPress={send} />
           <View style={{ flexDirection: "row", gap: 8 }}>
-            <Button title="Modifier" variant="secondary" size="sm" style={{ flex: 1 }} onPress={() => router.push({ pathname: "/recipients/new", params: { id: r.id } })} />
-            <Button title="Supprimer" variant="danger" size="sm" style={{ flex: 1 }} onPress={() => setConfirm(true)} />
+            <Button title={tr("Modifier")} variant="secondary" size="sm" style={{ flex: 1 }} onPress={() => router.push({ pathname: "/recipients/new", params: { id: r.id } })} />
+            <Button title={tr("Supprimer")} variant="danger" size="sm" style={{ flex: 1 }} onPress={() => setConfirm(true)} />
           </View>
         </View>
       }
     >
-      <Header title="Destinataire" />
+      <Header title={tr("Destinataire")} />
       <View style={{ alignItems: "center", gap: 8, marginBottom: 16 }}>
         <Avatar name={r.fullName} size={72} />
         <Text style={{ fontFamily: fonts.display, fontSize: 22, color: colors.navy }}>{r.fullName}</Text>
@@ -65,23 +66,23 @@ export default function RecipientDetail() {
         </View>
       </View>
       <Card style={{ marginBottom: 12 }}>
-        <SummaryRow label="Mode de réception" value={networkLabel(r.network)} valueIcon={<PaymentLogo id={r.network} size={20} />} />
-        {r.network === "BANK" && r.bankName ? <SummaryRow label="Banque" value={r.bankName} /> : null}
-        <SummaryRow label={r.network === "BANK" ? "Compte" : "Numéro"} value={recipientDetail(r) || "—"} />
-        <SummaryRow label="Envois" value={String(sent.length)} />
+        <SummaryRow label={tr("Mode de réception")} value={networkLabel(r.network)} valueIcon={<PaymentLogo id={r.network} size={20} />} />
+        {r.network === "BANK" && r.bankName ? <SummaryRow label={tr("Banque")} value={r.bankName} /> : null}
+        <SummaryRow label={r.network === "BANK" ? tr("Compte") : tr("Numéro")} value={recipientDetail(r) || "—"} />
+        <SummaryRow label={tr("Envois")} value={String(sent.length)} />
         {Object.entries(totals).map(([cur, v]) => (
-          <SummaryRow key={cur} label="Total envoyé" value={money(v, cur)} strong />
+          <SummaryRow key={cur} label={tr("Total envoyé")} value={money(v, cur)} strong />
         ))}
       </Card>
-      <SectionTitle>Derniers envois</SectionTitle>
+      <SectionTitle>{tr("Derniers envois")}</SectionTitle>
       <Card style={{ paddingVertical: 6 }}>
-        {sent.length ? sent.slice(0, 5).map((t) => <TransferRow key={t.id} transfer={t} />) : <Small style={{ padding: 12 }}>Aucun envoi pour l&apos;instant.</Small>}
+        {sent.length ? sent.slice(0, 5).map((t) => <TransferRow key={t.id} transfer={t} />) : <Small style={{ padding: 12 }}>{tr("Aucun envoi pour l'instant.")}</Small>}
       </Card>
       <ConfirmDialog
         visible={confirm}
-        title="Supprimer ce destinataire ?"
-        message={`${r.fullName} sera retiré de vos destinataires. Vos transferts passés restent dans l'historique.`}
-        confirmLabel="Supprimer"
+        title={tr("Supprimer ce destinataire ?")}
+        message={tr("{0} sera retiré de vos destinataires. Vos transferts passés restent dans l'historique.", r.fullName)}
+        confirmLabel={tr("Supprimer")}
         destructive
         onCancel={() => setConfirm(false)}
         onConfirm={() => {
