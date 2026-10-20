@@ -257,8 +257,8 @@ export async function POST(request: Request) {
           create: {
             type: "created",
             message: interac
-              ? `Transfert ${quoteData.corridorId} créé — en attente du virement Interac`
-              : `Transfert ${quoteData.corridorId} créé — en attente de paiement`,
+              ? `Transfert ${quoteData.corridorId} créé, en attente du virement Interac`
+              : `Transfert ${quoteData.corridorId} créé, en attente de paiement`,
           },
         },
       },

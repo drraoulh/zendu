@@ -27,14 +27,14 @@ export default function Info() {
       />
       <Card style={{ marginTop: 14, marginBottom: 14 }}>
         <SummaryRow label={tr("Nom légal")} value={`${profile.firstName} ${profile.lastName}`} />
-        <SummaryRow label={tr("Date de naissance")} value={profile.birthDate ?? "—"} />
+        <SummaryRow label={tr("Date de naissance")} value={profile.birthDate ?? "-"} />
         <SummaryRow label={tr("Courriel")} value={profile.email} />
         <SummaryRow label={tr("Téléphone")} value={phone(profile.phone) || profile.phone} />
         <SummaryRow
           label={tr("Adresse")}
           value={a ? [a.line1, a.line2, a.region ? `${a.city} (${a.region})` : a.city, a.postalCode, countryName(profile.country)].filter(Boolean).join(", ") : countryName(profile.country)}
         />
-        <SummaryRow label={tr("Profession")} value={[profile.occupation, profile.jobTitle].filter(Boolean).join(" · ") || "—"} />
+        <SummaryRow label={tr("Profession")} value={[profile.occupation, profile.jobTitle].filter(Boolean).join(" · ") || "-"} />
       </Card>
       <Notice tone="neutral" icon="info" text={tr("Votre nom légal et votre date de naissance ne peuvent être modifiés qu'en fournissant une nouvelle pièce d'identité valide.")} />
     </Screen>

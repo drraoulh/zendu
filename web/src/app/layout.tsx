@@ -45,7 +45,7 @@ export async function generateMetadata(): Promise<Metadata> {
   const base = siteOrigin(site, host) ?? fallback;
 
   if (site === "wst") {
-    const title = "WorldSoft Transfer — Canada · Cameroun · Chine";
+    const title = "WorldSoft Transfer · Canada, Cameroun, Chine";
     const description =
       "WorldSoft Transfer, l'application de transfert d'argent de PWFINTECH : sans frais vers le Cameroun, taux, frais et délai affichés avant de payer.";
     const og = "/brand/wst/og-image-1200x630.png";
@@ -59,7 +59,7 @@ export async function generateMetadata(): Promise<Metadata> {
     };
   }
 
-  const title = `${appName} — ${appFullName}`;
+  const title = `${appName} · ${appFullName}`;
   const description =
     "Transfert d'argent, AVI pour visa études, paiement de fournisseurs, finances, technologies et shipping. Plus qu'un service, une solution pour votre avenir.";
   return {

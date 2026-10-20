@@ -417,7 +417,7 @@ export const adminPanelMessages = defineMessages({
     lbl_delivered: "Colis livré",
     lbl_exception: "Incident de livraison : notre équipe vous contactera",
 
-    mailSubject: "Votre demande {ref} — {brand}",
+    mailSubject: "Votre demande {ref} · {brand}",
     mailBody: "Bonjour {name},\n\nMerci pour votre demande {ref}.\n\n\n\nCordialement,\nL'équipe {brand}",
 
     loginTitle: "Connexion à l'espace équipe",
@@ -622,7 +622,7 @@ export const adminPanelMessages = defineMessages({
     lbl_delivered: "Parcel delivered",
     lbl_exception: "Delivery issue: our team will contact you",
 
-    mailSubject: "Your request {ref} — {brand}",
+    mailSubject: "Your request {ref} · {brand}",
     mailBody: "Hello {name},\n\nThank you for your request {ref}.\n\n\n\nBest regards,\nThe {brand} team",
 
     loginTitle: "Sign in to the team workspace",

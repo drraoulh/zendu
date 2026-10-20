@@ -31,7 +31,7 @@ export function dateAt(iso: string) {
 }
 
 export function rate(value: number) {
-  if (!Number.isFinite(value)) return "—";
+  if (!Number.isFinite(value)) return "-";
   const sep = getLang() === "en" || getLang() === "zh" ? "." : ",";
   if (value >= 100) return value.toFixed(2).replace(".", sep);
   return value.toPrecision(4).replace(".", sep);

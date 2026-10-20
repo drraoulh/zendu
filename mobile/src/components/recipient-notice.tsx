@@ -23,9 +23,9 @@ export function recipientMessage(t: Transfer) {
   return [
     tr("Bonjour {0},", first),
     tr("{0} vous a envoyé {1} avec WorldSoft Transfer.", t.senderName, money(t.receiveAmountXaf, t.receiveCurrency)),
-    delivered ? tr("L'argent est disponible {0}.", where) : tr("Vous le recevrez {0} — délai estimé : {1}.", where, etaLabel(etaFor(t)).toLowerCase()),
+    delivered ? tr("L'argent est disponible {0}.", where) : tr("Vous le recevrez {0}. Délai estimé : {1}.", where, etaLabel(etaFor(t)).toLowerCase()),
     tr("Référence : {0}", t.reference),
-    tr("WorldSoft Transfer — une solution PWFINTECH"),
+    tr("WorldSoft Transfer, une solution PWFINTECH"),
   ].join("\n");
 }
 

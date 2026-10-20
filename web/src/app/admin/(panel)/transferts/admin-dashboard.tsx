@@ -392,7 +392,7 @@ export function AdminDashboard({
                     {t("byStatus")}
                   </h2>
                   {counts.length === 0 ? (
-                    <p className="mt-3 text-sm text-muted">—</p>
+                    <p className="mt-3 text-sm text-muted">-</p>
                   ) : (
                     <ul className="mt-4 space-y-3">
                       {counts.map(([status, n]) => (

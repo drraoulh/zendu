@@ -402,7 +402,7 @@ function ShipmentCard({ shipment, tag }: { shipment: Shipment; tag: string }) {
           <div>
             <dt className="text-xs text-muted">{t("weight")}</dt>
             <dd className="mt-0.5 text-sm font-semibold text-ink">
-              {typeof shipment.weightKg === "number" ? `${shipment.weightKg.toLocaleString(tag)} kg` : "—"}
+              {typeof shipment.weightKg === "number" ? `${shipment.weightKg.toLocaleString(tag)} kg` : "-"}
             </dd>
           </div>
           <div>

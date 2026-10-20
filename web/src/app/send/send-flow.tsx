@@ -425,7 +425,7 @@ export function SendFlow({ live = false }: { live?: boolean }) {
                           </strong>
                         </span>
                       ) : (
-                        <span>{amountError ? "—" : quoteState === "error" ? t("quoteError") : t("quoteLoading")}</span>
+                        <span>{amountError ? "-" : quoteState === "error" ? t("quoteError") : t("quoteLoading")}</span>
                       )}
                     </span>
                     {currentQuote && (
@@ -451,7 +451,7 @@ export function SendFlow({ live = false }: { live?: boolean }) {
                           ? new Intl.NumberFormat(L.intlLocale, {
                               maximumFractionDigits: dest.currency === "XAF" || dest.currency === "XOF" ? 0 : 2,
                             }).format(currentQuote.receiveAmount)
-                          : "—"}
+                          : "-"}
                       </p>
                       <CurrencyPill code={dest.code} currency={dest.currency} />
                     </div>

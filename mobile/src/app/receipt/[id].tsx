@@ -63,12 +63,12 @@ export default function Receipt() {
   function receiptText() {
     if (!t) return "";
     return [
-      tr("Reçu WorldSoft Transfer — une solution PWFINTECH"),
+      tr("Reçu WorldSoft Transfer, une solution PWFINTECH"),
       tr("Référence : {0}", t.reference),
       tr("Date : {0}", dateTime(t.createdAt)),
       tr("Statut : {0}", tr(info.label)),
-      tr("Expéditeur : {0} — {1}", t.senderName, countryName(t.sourceCountry)),
-      tr("Destinataire : {0} — {1} — {2}", ben.fullName, benLine, countryName(t.destCountry)),
+      tr("Expéditeur : {0} ({1})", t.senderName, countryName(t.sourceCountry)),
+      tr("Destinataire : {0}, {1} ({2})", ben.fullName, benLine, countryName(t.destCountry)),
       tr("Montant envoyé : {0}", money(t.sendAmountCad, t.sendCurrency)),
       tr("Frais : {0}", feeLabel(t.feeCad, t.sendCurrency)),
       tr("Total payé : {0}", money(t.totalCad, t.sendCurrency)),

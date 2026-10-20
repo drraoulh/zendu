@@ -58,7 +58,7 @@ export function LogoFull({ className = "h-auto w-full", priority = false }: { cl
       src={logo.full.src}
       width={logo.full.width}
       height={logo.full.height}
-      alt={`${appName} — ${appFullName}`}
+      alt={`${appName} · ${appFullName}`}
       className={className}
       priority={priority}
     />

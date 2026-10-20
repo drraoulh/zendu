@@ -94,9 +94,9 @@ export function CustomerDetail({ initial }: { initial: Detail }) {
       <div className="grid gap-6 lg:grid-cols-2">
         <Panel title={t("kycTitle")} id="kyc">
           <dl className="divide-y divide-line">
-            <Row label={t("kycDocument")}>{c.kycDocument ?? "—"}</Row>
-            <Row label={t("kycSubmitted")}>{c.kycSubmittedAt ? dateTime(c.kycSubmittedAt) : "—"}</Row>
-            <Row label={t("kycReviewed")}>{c.kycReviewedAt ? dateTime(c.kycReviewedAt) : "—"}</Row>
+            <Row label={t("kycDocument")}>{c.kycDocument ?? "-"}</Row>
+            <Row label={t("kycSubmitted")}>{c.kycSubmittedAt ? dateTime(c.kycSubmittedAt) : "-"}</Row>
+            <Row label={t("kycReviewed")}>{c.kycReviewedAt ? dateTime(c.kycReviewedAt) : "-"}</Row>
           </dl>
           <Field id="kyc-note" label={t("kycNoteLabel")} className="mt-3">
             <textarea id="kyc-note" rows={2} value={kycNote} onChange={(e) => setKycNote(e.target.value)} className={inputClass} maxLength={500} />
@@ -129,12 +129,12 @@ export function CustomerDetail({ initial }: { initial: Detail }) {
         <Panel title={t("identity")} id="identity">
           <dl className="divide-y divide-line">
             <Row label={t("legalName")}>{name}</Row>
-            <Row label={t("birthDate")}>{c.birthDate ?? "—"}</Row>
-            <Row label={t("occupation")}>{[c.occupation, c.jobTitle].filter(Boolean).join(" · ") || "—"}</Row>
+            <Row label={t("birthDate")}>{c.birthDate ?? "-"}</Row>
+            <Row label={t("occupation")}>{[c.occupation, c.jobTitle].filter(Boolean).join(" · ") || "-"}</Row>
             <Row label={t("email")}>{c.email}</Row>
             <Row label={t("phone")}>{c.phone}</Row>
             <Row label={t("address")}>
-              {a ? [a.line1, a.line2, `${a.city} (${a.region})`, a.postalCode].filter(Boolean).join(", ") : "—"}
+              {a ? [a.line1, a.line2, `${a.city} (${a.region})`, a.postalCode].filter(Boolean).join(", ") : "-"}
             </Row>
             <Row label={t("country")}>{COUNTRY_LABEL[c.country] ?? c.country}</Row>
             <Row label={t("created")}>{dateTime(c.createdAt)}</Row>

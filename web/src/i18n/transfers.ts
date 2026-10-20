@@ -111,7 +111,7 @@ export const transfersMessages = defineMessages({
     receiptUnavailable: "Reçu momentanément indisponible",
     receiptUnavailableBody:
       "Nous ne parvenons pas à charger ce reçu pour l'instant. Réessayez dans quelques instants.",
-    shareText: "Reçu {ref} — {amount} pour {name}",
+    shareText: "Reçu {ref} : {amount} pour {name}",
   },
   en: {
     status_draft: "Draft",
@@ -220,7 +220,7 @@ export const transfersMessages = defineMessages({
     corridor: "Corridor",
     receiptUnavailable: "Receipt temporarily unavailable",
     receiptUnavailableBody: "We can't load this receipt right now. Please try again in a moment.",
-    shareText: "Receipt {ref} — {amount} for {name}",
+    shareText: "Receipt {ref}: {amount} for {name}",
   },
   es: {
     status_awaiting_payment: "Pendiente de pago",

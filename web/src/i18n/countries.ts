@@ -229,5 +229,5 @@ export function groupByDelivery<T extends { delivery: string }>(
     const key = delivery(n.delivery);
     groups.set(key, [...(groups.get(key) ?? []), label(n)]);
   }
-  return [...groups.entries()].map(([d, names]) => `${names.join(", ")} — ${d.toLowerCase()}`).join(" · ");
+  return [...groups.entries()].map(([d, names]) => `${names.join(", ")} : ${d.toLowerCase()}`).join(" · ");
 }

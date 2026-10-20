@@ -122,7 +122,7 @@ export async function queueAndRunPayout(transferId: string) {
         transferId,
         bank ? "bank_manual" : "payout_manual",
         bank
-          ? `Virement bancaire à traiter manuellement — ${b.bankName ?? "banque"} ${maskAccount(b.accountNumber) ?? ""}`.trim()
+          ? `Virement bancaire à traiter manuellement : ${b.bankName ?? "banque"} ${maskAccount(b.accountNumber) ?? ""}`.trim()
           : `Versement ${b.network} à faire par l'équipe`,
       );
     }
@@ -273,6 +273,6 @@ export async function cancelTransfer(transferId: string, note: string) {
     if (!t) throw new Error("Transfert introuvable");
     throw new Error(`Ce transfert ne peut pas être annulé (statut « ${t.status} »). Rechargez la page.`);
   }
-  await addEvent(transferId, "cancelled", `Annulé par l'équipe — ${reason}`);
+  await addEvent(transferId, "cancelled", `Annulé par l'équipe : ${reason}`);
   return prisma.transfer.findUnique({ where: { id: transferId }, include: WITH_EVENTS });
 }

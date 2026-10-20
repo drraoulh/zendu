@@ -57,9 +57,9 @@ function useHelpVars(numbers: HelpNumbers) {
     return {
       min: L.money(numbers.min, numbers.sendCurrency),
       max: L.money(numbers.max, numbers.sendCurrency),
-      flat: numbers.flat != null ? L.money(numbers.flat, numbers.sendCurrency) : "—",
-      percent: numbers.percent != null ? L.number(numbers.percent) : "—",
-      margin: numbers.margin != null ? L.number(numbers.margin) : "—",
+      flat: numbers.flat != null ? L.money(numbers.flat, numbers.sendCurrency) : "-",
+      percent: numbers.percent != null ? L.number(numbers.percent) : "-",
+      margin: numbers.margin != null ? L.number(numbers.margin) : "-",
       ttl: numbers.ttl,
       countries: numbers.countries,
       hours: company.hours ?? (showPlaceholders ? placeholder : t("hoursHidden")),

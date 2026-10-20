@@ -21,9 +21,9 @@ export function FeesContent({ destinations }: { destinations: DestinationInfo[] 
   const sample = destinations.find((d) => d.corridorId === "CA-CM") ?? destinations[0];
   const q100 = sample?.quotes[0];
   const sendCurrency = sample?.sendCurrency ?? "CAD";
-  const flat = q100 ? L.money(q100.feeFlat, sendCurrency) : "—";
-  const percent = q100 ? L.number(q100.feePercent) : "—";
-  const margin = sample?.marginPercent != null ? L.number(sample.marginPercent) : "—";
+  const flat = q100 ? L.money(q100.feeFlat, sendCurrency) : "-";
+  const percent = q100 ? L.number(q100.feePercent) : "-";
+  const margin = sample?.marginPercent != null ? L.number(sample.marginPercent) : "-";
 
   const fetchedAt = destinations.find((d) => d.fxFetchedAt)?.fxFetchedAt ?? null;
   const allStale = destinations.every((d) => d.fxStale);
@@ -171,7 +171,7 @@ export function FeesContent({ destinations }: { destinations: DestinationInfo[] 
                                 <CountryFlag code={d.code} size={28} title={L.country(d.code, d.name)} />
                                 <span>
                                   <span className="block font-semibold text-ink group-hover:text-brand-strong">{L.country(d.code, d.name)}</span>
-                                  <span className="block text-xs text-muted">{t("rateLine", { from: d.sendCurrency, rate: d.rate != null ? L.number(d.rate, 4) : "—", to: d.currency })}</span>
+                                  <span className="block text-xs text-muted">{t("rateLine", { from: d.sendCurrency, rate: d.rate != null ? L.number(d.rate, 4) : "-", to: d.currency })}</span>
                                 </span>
                               </Link>
                             </th>
@@ -209,7 +209,7 @@ export function FeesContent({ destinations }: { destinations: DestinationInfo[] 
                           <CountryFlag code={d.code} size={32} title={L.country(d.code, d.name)} />
                           <span className="min-w-0">
                             <span className="block font-display font-bold text-ink">{L.country(d.code, d.name)}</span>
-                            <span className="block text-xs text-muted">{t("rateLine", { from: d.sendCurrency, rate: d.rate != null ? L.number(d.rate, 4) : "—", to: d.currency })}</span>
+                            <span className="block text-xs text-muted">{t("rateLine", { from: d.sendCurrency, rate: d.rate != null ? L.number(d.rate, 4) : "-", to: d.currency })}</span>
                           </span>
                         </Link>
                         <div className="mt-4"><NetworkChips d={d} /></div>

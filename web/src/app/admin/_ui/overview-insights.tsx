@@ -127,7 +127,7 @@ export function ActivitySection({ insights, period }: { insights: TransferInsigh
 
   const max = Math.max(1, ...insights.series.map((s) => s.created));
   const labelEvery = insights.series.length > 14 ? Math.ceil(insights.series.length / 6) : 1;
-  const success = insights.successRate === null ? "—" : `${Math.round(insights.successRate * 100)} %`;
+  const success = insights.successRate === null ? "-" : `${Math.round(insights.successRate * 100)} %`;
 
   return (
     <section aria-labelledby="ov-activity" className="space-y-4">

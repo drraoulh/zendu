@@ -15,7 +15,7 @@ export const filterMessages = defineMessages({
     apply: "Filtrer",
     reset: "Effacer",
     results: "{n} résultat(s)",
-    resultsCapped: "{n} premiers résultats — affinez la recherche",
+    resultsCapped: "{n} premiers résultats : affinez la recherche",
     noResults: "Aucun transfert ne correspond à cette recherche.",
   },
   en: {
@@ -31,7 +31,7 @@ export const filterMessages = defineMessages({
     apply: "Filter",
     reset: "Clear",
     results: "{n} result(s)",
-    resultsCapped: "First {n} results — refine your search",
+    resultsCapped: "First {n} results: refine your search",
     noResults: "No transfer matches this search.",
   },
 });

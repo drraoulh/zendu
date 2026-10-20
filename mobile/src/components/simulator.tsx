@@ -195,7 +195,7 @@ export function Simulator({
                 setMode("receive");
                 setReceiveText(groupDigits(t));
               }}
-              placeholder="—"
+              placeholder="-"
               placeholderTextColor={colors.muted}
               keyboardType="decimal-pad"
               inputMode="decimal"

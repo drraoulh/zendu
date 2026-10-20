@@ -215,7 +215,7 @@ export function createMomoPayout(): PayoutProvider {
         provider: "momo",
         payoutRef,
         status: "sent",
-        message: "Accepté par MoMo (202) — en attente callback / statut",
+        message: "Accepté par MoMo (202), en attente callback / statut",
       };
     },
   };

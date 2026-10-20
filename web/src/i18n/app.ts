@@ -31,7 +31,7 @@ export const appMessages = defineMessages({
     emailLabel: "Courriel",
     emailPlaceholder: "vous@exemple.com",
     countryLabel: "Pays de destination (facultatif)",
-    countryNone: "— Je ne sais pas encore —",
+    countryNone: "Je ne sais pas encore",
     consentLabel:
       "J'accepte que PWFINTECH m'écrive par courriel au sujet du lancement de WorldSoft Transfer. Je peux me désinscrire à tout moment.",
     join: "M'avertir",
@@ -86,7 +86,7 @@ export const appMessages = defineMessages({
     emailLabel: "Email",
     emailPlaceholder: "you@example.com",
     countryLabel: "Destination country (optional)",
-    countryNone: "— Not sure yet —",
+    countryNone: "Not sure yet",
     consentLabel:
       "I agree that PWFINTECH may email me about the launch of WorldSoft Transfer. I can unsubscribe at any time.",
     join: "Notify me",

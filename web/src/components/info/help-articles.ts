@@ -79,11 +79,11 @@ export const HELP_ARTICLES: HelpArticle[] = [
     links: ["linkApp", "linkFees"],
     fr: {
       q: "Qu'est-ce que WorldSoft Transfer ?",
-      a: "WorldSoft Transfer est l'application mobile de transfert d'argent de PWFINTECH (« une solution PWFINTECH »). Elle relie {countries} pays — le Canada, le Cameroun et la Chine. Pour l'instant, les envois partent du Canada et se paient par virement Interac ; votre proche reçoit sur MTN MoMo ou Orange Money au Cameroun, sur Alipay ou WeChat Pay en Chine, ou sur un compte bancaire. L'envoi depuis le Cameroun et la Chine arrive bientôt.\n\nDans l'application, vous enregistrez vos destinataires, voyez les frais et le taux avant de payer, puis suivez chaque transfert jusqu'à sa livraison.",
+      a: "WorldSoft Transfer est l'application mobile de transfert d'argent de PWFINTECH (« une solution PWFINTECH »). Elle relie {countries} pays : le Canada, le Cameroun et la Chine. Pour l'instant, les envois partent du Canada et se paient par virement Interac ; votre proche reçoit sur MTN MoMo ou Orange Money au Cameroun, sur Alipay ou WeChat Pay en Chine, ou sur un compte bancaire. L'envoi depuis le Cameroun et la Chine arrive bientôt.\n\nDans l'application, vous enregistrez vos destinataires, voyez les frais et le taux avant de payer, puis suivez chaque transfert jusqu'à sa livraison.",
     },
     en: {
       q: "What is WorldSoft Transfer?",
-      a: "WorldSoft Transfer is PWFINTECH's money transfer mobile app (“a PWFINTECH solution”). It connects {countries} countries — Canada, Cameroon and China. For now, transfers leave from Canada and are paid by Interac e-Transfer; your recipient receives on MTN MoMo or Orange Money in Cameroon, on Alipay or WeChat Pay in China, or in a bank account. Sending from Cameroon and China is coming soon.\n\nIn the app, you save your recipients, see the fees and rate before paying, then track each transfer until it's delivered.",
+      a: "WorldSoft Transfer is PWFINTECH's money transfer mobile app (“a PWFINTECH solution”). It connects {countries} countries: Canada, Cameroon and China. For now, transfers leave from Canada and are paid by Interac e-Transfer; your recipient receives on MTN MoMo or Orange Money in Cameroon, on Alipay or WeChat Pay in China, or in a bank account. Sending from Cameroon and China is coming soon.\n\nIn the app, you save your recipients, see the fees and rate before paying, then track each transfer until it's delivered.",
     },
     es: { q: "¿Qué es WorldSoft Transfer?" },
     zh: { q: "什么是 WorldSoft Transfer？" },

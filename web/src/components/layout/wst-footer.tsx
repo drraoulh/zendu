@@ -126,7 +126,7 @@ export function WstFooter() {
       <div className="border-t border-white/10">
         <Container className="flex flex-col gap-3 py-6 text-xs text-white/55 sm:flex-row sm:items-center sm:justify-between">
           <p>
-            © {year} WorldSoft Transfer — {t("wstBy")} ({company.legalName ?? appFullName}). {t("rights")}
+            © {year} WorldSoft Transfer · {t("wstBy")} ({company.legalName ?? appFullName}). {t("rights")}
             {company.registration && <span className="block sm:inline"> {f("registration", { n: company.registration })}</span>}
           </p>
           <div className="-my-2 flex flex-wrap gap-x-5 sm:my-0">

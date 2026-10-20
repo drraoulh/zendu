@@ -102,7 +102,7 @@ function IssueItem({ row, nl, date }: { row: AdminTransferRow; nl: string; date:
             {row.senderName} → {row.recipientName}
           </p>
           <p className="text-sm text-muted">
-            {row.recipientNetwork} · {row.recipientPhone ? `+${row.recipientPhone}` : "—"}
+            {row.recipientNetwork} · {row.recipientPhone ? `+${row.recipientPhone}` : "-"}
           </p>
         </div>
         <div className="shrink-0 text-right">

@@ -20,23 +20,23 @@ function content(kind: NotifyKind, t: { sandbox?: boolean; reference: string; re
   const paid = formatMoney(t.totalCad, t.sendCurrency, "fr-CA");
   switch (kind) {
     case "payment_detected":
-      return { subject: `Paiement reçu — transfert ${t.reference}`, text: `Nous avons bien reçu votre paiement de ${paid}. L'envoi de ${received} à ${who} est en cours.` };
+      return { subject: `Paiement reçu : transfert ${t.reference}`, text: `Nous avons bien reçu votre paiement de ${paid}. L'envoi de ${received} à ${who} est en cours.` };
     case "delivered":
       if (t.sandbox) {
         return {
-          subject: `Versement de TEST — transfert ${t.reference}`,
+          subject: `Versement de TEST : transfert ${t.reference}`,
           text: `Phase de test : le versement de ${received} à ${who} a été simulé chez MTN (sandbox). AUCUN argent réel n'a été versé. Si vous avez payé, contactez-nous avec la référence ${t.reference} pour être remboursé.`,
         };
       }
-      return { subject: `Argent livré — transfert ${t.reference}`, text: `Bonne nouvelle : ${who} a reçu ${received}.` };
+      return { subject: `Argent livré : transfert ${t.reference}`, text: `Bonne nouvelle : ${who} a reçu ${received}.` };
     case "payout_failed":
-      return { subject: `Problème de versement — transfert ${t.reference}`, text: `Le versement à ${who} n'a pas abouti${t.failureReason ? ` (${t.failureReason})` : ""}. Notre équipe vous contacte pour le relancer ou vous rembourser.` };
+      return { subject: `Problème de versement : transfert ${t.reference}`, text: `Le versement à ${who} n'a pas abouti${t.failureReason ? ` (${t.failureReason})` : ""}. Notre équipe vous contacte pour le relancer ou vous rembourser.` };
     case "payment_mismatch":
-      return { subject: `Paiement à vérifier — transfert ${t.reference}`, text: `Le paiement reçu ne correspond pas au transfert (montant ou message). Notre équipe vous contacte.` };
+      return { subject: `Paiement à vérifier : transfert ${t.reference}`, text: `Le paiement reçu ne correspond pas au transfert (montant ou message). Notre équipe vous contacte.` };
     case "cancelled":
-      return { subject: `Transfert annulé — ${t.reference}`, text: `Votre transfert a été annulé${t.failureReason ? ` (${t.failureReason})` : ""}. Si vous l'aviez payé, le remboursement vous est envoyé par virement Interac. Une question ? Répondez à ce courriel avec la référence ${t.reference}.` };
+      return { subject: `Transfert annulé : ${t.reference}`, text: `Votre transfert a été annulé${t.failureReason ? ` (${t.failureReason})` : ""}. Si vous l'aviez payé, le remboursement vous est envoyé par virement Interac. Une question ? Répondez à ce courriel avec la référence ${t.reference}.` };
     case "expired":
-      return { subject: `Transfert expiré — ${t.reference}`, text: `Nous n'avons pas reçu votre paiement dans le délai prévu : le transfert a été annulé. Si vous avez déjà payé, contactez-nous avec la référence ${t.reference}.` };
+      return { subject: `Transfert expiré : ${t.reference}`, text: `Nous n'avons pas reçu votre paiement dans le délai prévu : le transfert a été annulé. Si vous avez déjà payé, contactez-nous avec la référence ${t.reference}.` };
   }
 }
 
@@ -59,7 +59,7 @@ export async function notifyCustomer(transferId: string, kind: NotifyKind): Prom
 <tr><td style="font-size:20px;font-weight:bold;color:#061a52">WorldSoft <span style="color:#0b4dff">Transfer</span></td></tr>
 <tr><td style="padding-top:24px;font-size:16px">Bonjour ${esc(name)},</td></tr>
 <tr><td style="padding-top:8px;font-size:15px;color:#4a5878;line-height:1.5">${esc(c.text)}</td></tr>
-<tr><td style="padding-top:16px;font-size:13px;color:#8090ad">Référence : ${esc(t.reference)} — suivez votre transfert dans l'application.</td></tr>
+<tr><td style="padding-top:16px;font-size:13px;color:#8090ad">Référence : ${esc(t.reference)}. Suivez votre transfert dans l'application.</td></tr>
 </table></td></tr></table></body></html>`;
     const base = (process.env.BREVO_API_URL?.trim() || "https://api.brevo.com/v3").replace(/\/$/, "");
     const res = await fetch(`${base}/smtp/email`, {

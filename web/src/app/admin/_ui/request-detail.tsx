@@ -48,7 +48,7 @@ export function RequestDetail({ request }: { request: AdminRequest }) {
   const extra = Object.keys(p).filter((k) => !known.includes(k));
 
   function renderValue(key: string, v: unknown): ReactNode {
-    if (v === undefined || v === null || v === "") return <span className="text-muted">—</span>;
+    if (v === undefined || v === null || v === "") return <span className="text-muted">-</span>;
     if (typeof v === "boolean") return v ? t("yes") : t("no");
     if (key === "subject" && request.kind === "contact" && typeof v === "string") return label("subj_", v);
     if (key === "mode" && typeof v === "string")
@@ -169,13 +169,13 @@ export function RequestDetail({ request }: { request: AdminRequest }) {
                       {request.phone}
                     </a>
                   ) : (
-                    "—"
+                    "-"
                   )}
                 </dd>
               </div>
               <div>
                 <dt className="text-xs font-semibold text-muted">{t("fieldLocale")}</dt>
-                <dd className="mt-0.5 uppercase text-ink">{request.locale ?? "—"}</dd>
+                <dd className="mt-0.5 uppercase text-ink">{request.locale ?? "-"}</dd>
               </div>
             </dl>
             <div className="mt-5 flex flex-wrap gap-2">

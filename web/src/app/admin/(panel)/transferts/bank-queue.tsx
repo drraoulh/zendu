@@ -83,7 +83,7 @@ function BankQueueItem({
   const [done, setDone] = useState(false);
   const [message, setMessage] = useState<{ ok: boolean; text: string } | null>(null);
   const amount = formatMoney(row.receiveAmountXaf, row.receiveCurrency, nl);
-  const phoneDisplay = row.recipientPhone ? `+${row.recipientPhone}` : "—";
+  const phoneDisplay = row.recipientPhone ? `+${row.recipientPhone}` : "-";
   // Portefeuille mobile : tout est déjà connu, pas besoin de « Afficher les coordonnées ».
   const ready = !row.isBank || details !== null;
   const dest = row.isBank
@@ -163,9 +163,9 @@ function BankQueueItem({
             <CopyRow label={t("payoutRecipient")} value={details?.fullName ?? row.recipientName} />
             {row.isBank ? (
               <>
-                <CopyRow label={t("bankName")} value={details?.bankName ?? ""} display={details?.bankName ?? "—"} />
-                <CopyRow label={t("account")} value={details?.accountNumber ?? ""} display={details?.accountNumber ?? "—"} />
-                <CopyRow label={t("bankCode")} value={details?.bankCode ?? ""} display={details?.bankCode || "—"} />
+                <CopyRow label={t("bankName")} value={details?.bankName ?? ""} display={details?.bankName ?? "-"} />
+                <CopyRow label={t("account")} value={details?.accountNumber ?? ""} display={details?.accountNumber ?? "-"} />
+                <CopyRow label={t("bankCode")} value={details?.bankCode ?? ""} display={details?.bankCode || "-"} />
                 {row.recipientPhone && <CopyRow label={t("phoneLabel")} value={row.recipientNational} display={phoneDisplay} />}
               </>
             ) : (

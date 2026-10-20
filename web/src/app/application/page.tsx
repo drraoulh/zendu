@@ -6,12 +6,12 @@ import { getCorridor, getCountry, getDestinationCountries } from "@/lib/corridor
 const appUrl = (process.env.NEXT_PUBLIC_APP_URL ?? "http://localhost:3000").replace(/\/+$/, "");
 
 export const metadata: Metadata = {
-  title: { absolute: "WorldSoft Transfer — l'application" },
+  title: { absolute: "WorldSoft Transfer, l'application" },
   description:
     "WorldSoft Transfer, une solution PWFINTECH : envoyez de l'argent depuis votre téléphone, avec des frais clairs, la livraison mobile money ou bancaire et le suivi en temps réel.",
   alternates: { canonical: "/application" },
   openGraph: {
-    title: "WorldSoft Transfer — l'application",
+    title: "WorldSoft Transfer, l'application",
     description: "Envoyez de l'argent depuis votre téléphone. Une solution PWFINTECH.",
     url: "/application",
     images: [{ url: "/brand/wst/og-image-1200x630.png", width: 1200, height: 630 }],

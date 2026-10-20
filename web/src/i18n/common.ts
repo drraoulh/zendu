@@ -55,7 +55,7 @@ export const common = defineMessages({
     rights: "Tous droits réservés.",
     basedIn: "Basée au Canada, ouverte sur le Cameroun et la Chine.",
     demoBanner:
-      "Mode démo — paiements simulés, aucun argent réel n'est débité.",
+      "Mode démo : paiements simulés, aucun argent réel n'est débité.",
     learnMore: "En savoir plus",
     getQuote: "Demander un devis",
     contactUs: "Nous contacter",
@@ -112,7 +112,7 @@ export const common = defineMessages({
     terms: "Terms of use",
     rights: "All rights reserved.",
     basedIn: "Based in Canada, connected to Cameroon and China.",
-    demoBanner: "Demo mode — payments are simulated, no real money is charged.",
+    demoBanner: "Demo mode: payments are simulated, no real money is charged.",
     learnMore: "Learn more",
     getQuote: "Get a quote",
     contactUs: "Contact us",

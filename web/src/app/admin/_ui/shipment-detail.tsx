@@ -288,7 +288,7 @@ export function ShipmentDetail({ shipment }: { shipment: AdminShipment }) {
                       {shipment.requestReference}
                     </Link>
                   ) : (
-                    "—"
+                    "-"
                   )}
                 </dd>
               </div>

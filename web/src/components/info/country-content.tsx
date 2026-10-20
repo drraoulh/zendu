@@ -42,7 +42,7 @@ export function CountryContent({ country: c, others }: { country: CountryInfo; o
 
   const example = mainInbound?.quotes[0]
     ? `${L.money(mainInbound.quotes[0].sendAmount, mainInbound.sendCurrency)} → ${mainInbound.quotes[0].fee === 0 ? t("feeFree") : L.money(mainInbound.quotes[0].fee, mainInbound.sendCurrency)}`
-    : "—";
+    : "-";
 
   const facts: Array<{ icon: IconName; label: string; value: React.ReactNode }> = [
     { icon: "globe", label: t("factCurrency"), value: `${c.currency} · ${currencyName}` },
@@ -62,7 +62,7 @@ export function CountryContent({ country: c, others }: { country: CountryInfo; o
   const tips = [t("tipName"), t("tipPhone", { dial: c.dialCode }), ...(hasBank ? [t("tipBank")] : []), t("tipRef"), t("tipScam")];
 
   const faq = [
-    { q: t("faq1Q", { to }), a: t("faq1A", { modesDelays: c.networks.map((n) => `${L.network(n)} — ${L.delivery(n.delivery)}`).join(" ; ") }) },
+    { q: t("faq1Q", { to }), a: t("faq1A", { modesDelays: c.networks.map((n) => `${L.network(n)} : ${L.delivery(n.delivery)}`).join(" ; ") }) },
     { q: t("faq2Q", { to }), a: t("faq2A", { example }) },
     { q: t("faq3Q"), a: t("faq3A", { currency: c.currency, currencyName }) },
     { q: t("faq4Q"), a: t("faq4A") },

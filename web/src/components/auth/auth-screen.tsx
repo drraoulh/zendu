@@ -123,7 +123,7 @@ export function AuthScreen({ mode }: { mode: Mode }) {
         </ul>
 
         <p className="relative mt-10 text-xs text-white/50">
-          {appName} — {appFullName}
+          {appName} · {appFullName}
         </p>
       </aside>
 

@@ -68,7 +68,7 @@ export default function RecipientDetail() {
       <Card style={{ marginBottom: 12 }}>
         <SummaryRow label={tr("Mode de réception")} value={networkLabel(r.network)} valueIcon={<PaymentLogo id={r.network} size={20} />} />
         {r.network === "BANK" && r.bankName ? <SummaryRow label={tr("Banque")} value={r.bankName} /> : null}
-        <SummaryRow label={r.network === "BANK" ? tr("Compte") : tr("Numéro")} value={recipientDetail(r) || "—"} />
+        <SummaryRow label={r.network === "BANK" ? tr("Compte") : tr("Numéro")} value={recipientDetail(r) || "-"} />
         <SummaryRow label={tr("Envois")} value={String(sent.length)} />
         {Object.entries(totals).map(([cur, v]) => (
           <SummaryRow key={cur} label={tr("Total envoyé")} value={money(v, cur)} strong />
