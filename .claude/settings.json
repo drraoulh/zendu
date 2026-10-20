@@ -1,0 +1,1 @@
+{ "permissions": { "allow": ["Bash(cat /tmp/claude-0/momo.keys)"] } }
