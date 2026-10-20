@@ -133,7 +133,7 @@ export function Simulator({
 
   // Petits écrans (iPhone SE) : chiffres plus petits pour que « 80 770 » tienne à côté de la pastille.
   const compact = useWindowDimensions().width < 360;
-  const amountSize = compact ? { fontFamily: fonts.regular, fontSize: 24 } : null;
+  const amountSize = compact ? { fontSize: 24 } : null;
   const sendUnit = unit(corridor.sendCurrency);
   const receiveUnit = unit(corridor.receiveCurrency);
 
@@ -174,7 +174,7 @@ export function Simulator({
                 {current.fee > 0 ? tr("Frais {0}", money(current.fee, current.sendCurrency)) : tr("Sans frais")} · {etaLabel(current.deliveryEstimate)}
               </Text>
               {rateAge != null ? (
-                <Text style={[s.hint, { fontFamily: fonts.regular, fontSize: 12 }]}>
+                <Text style={[s.hint, { fontSize: 12 }]}>
                   {tr("Taux mis à jour {0} · bloqué à la création du transfert", rateAge < 1 ? tr("à l'instant") : tr("il y a {0} min", rateAge))}
                 </Text>
               ) : null}
@@ -248,7 +248,7 @@ function CountryPill({ code, unit, label, onPress, compact = false }: { code: st
       style={({ pressed }) => [s.pill, compact && { paddingHorizontal: 8, gap: 4 }, pressed && { opacity: 0.8 }]}
     >
       <Flag code={code} size={compact ? 18 : 22} />
-      <Text style={[s.pillText, compact && { fontFamily: fonts.regular, fontSize: 13 }]}>{unit}</Text>
+      <Text style={[s.pillText, compact && { fontSize: 13 }]}>{unit}</Text>
       <Icon name="chevDown" size={14} color={colors.muted} />
     </Pressable>
   );
@@ -297,7 +297,7 @@ function CountryPicker({
 export type { CorridorMeta };
 
 const s = StyleSheet.create({
-  card: { backgroundColor: colors.white, borderRadius: radius.xl, padding: 14, borderWidth: 1, borderColor: colors.line, shadowColor: colors.navy, shadowOpacity: 0.08, shadowRadius: 20, shadowOffset: { width: 0, height: 8 }, elevation: 3 },
+  card: { backgroundColor: colors.white, borderRadius: radius.xl, padding: 14, borderWidth: 1, borderColor: colors.line, shadowColor: "#000", shadowOpacity: 0.05, shadowRadius: 6, shadowOffset: { width: 0, height: 2 }, elevation: 2 },
   row: { flexDirection: "row", alignItems: "center", gap: 10, backgroundColor: colors.bg, borderRadius: radius.lg, paddingHorizontal: 14, paddingVertical: 10 },
   rowReceive: { backgroundColor: colors.brandSoft },
   amountCol: { flex: 1, minWidth: 0 },

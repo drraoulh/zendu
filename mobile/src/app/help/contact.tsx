@@ -1,5 +1,4 @@
 import { useLocalSearchParams } from "expo-router";
-import { fonts } from "@/lib/theme";
 import * as Linking from "expo-linking";
 import { useState } from "react";
 import { View } from "react-native";
@@ -79,7 +78,7 @@ export default function Contact() {
         />
       </Card>
 
-      <H2 style={{ fontFamily: fonts.regular, fontSize: 18, marginBottom: 6 }}>{tr("Écrire à l'équipe")}</H2>
+      <H2 style={{ fontSize: 18, marginBottom: 6 }}>{tr("Écrire à l'équipe")}</H2>
       <Small style={{ marginBottom: 14 }}>{tr("Bonjour {0} ! Comment pouvons-nous vous aider aujourd'hui ?", profile?.firstName)}</Small>
       {sent ? (
         <View style={{ gap: 10 }}>

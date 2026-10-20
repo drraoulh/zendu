@@ -8,7 +8,7 @@ import { PinPad } from "@/components/pin-pad";
 import { Button, H1, P, Small } from "@/components/ui";
 import { authenticate, biometricLabel, biometricKind, type BiometricKind } from "@/lib/biometrics";
 import { useSession } from "@/lib/session";
-import { colors, fonts } from "@/lib/theme";
+import { colors } from "@/lib/theme";
 import { tr } from "@/lib/i18n";
 
 /** Ouverture de l'appli : code PIN et/ou Face ID / empreinte (écran « Connexion biométrique »). */
@@ -68,7 +68,7 @@ export default function Lock() {
   return (
     <SafeAreaView style={{ flex: 1, backgroundColor: colors.bg, alignItems: "center", justifyContent: "center", gap: 16, padding: 20 }}>
       <WstSymbol size={52} />
-      <H1 style={{ fontFamily: fonts.regular, textAlign: "center", fontSize: 24 }}>{profile?.firstName ? tr("Bonjour {0}", profile.firstName) : tr("Bonjour")}</H1>
+      <H1 style={{ textAlign: "center", fontSize: 24 }}>{profile?.firstName ? tr("Bonjour {0}", profile.firstName) : tr("Bonjour")}</H1>
       {usePin ? (
         <>
           <Small>{tr("Saisissez votre code PIN")}</Small>
@@ -89,7 +89,7 @@ export default function Lock() {
           >
             <Icon name={recognized ? "check" : "face"} size={60} color={recognized ? colors.success : colors.brand} strokeWidth={1.6} />
           </View>
-          <H1 style={{ fontFamily: fonts.regular, textAlign: "center", fontSize: 22 }}>{recognized ? tr("Identité reconnue") : kind === "fingerprint" ? tr("Posez votre doigt sur le capteur") : tr("Regardez votre téléphone")}</H1>
+          <H1 style={{ textAlign: "center", fontSize: 22 }}>{recognized ? tr("Identité reconnue") : kind === "fingerprint" ? tr("Posez votre doigt sur le capteur") : tr("Regardez votre téléphone")}</H1>
           <P style={{ textAlign: "center" }}>
             {kind === "none"
               ? tr("Aucune biométrie n'est disponible sur cet appareil. Connectez-vous avec votre mot de passe.")

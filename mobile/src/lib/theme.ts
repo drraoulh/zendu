@@ -1,17 +1,20 @@
-/** Palette WorldSoft Transfer (identique au site PWFINTECH). */
+/**
+ * Palette WorldSoft Transfer, identique au site (esprit logitech.com) : texte presque noir, gris neutres,
+ * sections sombres graphite ; le bleu du logo reste la couleur d'accent.
+ */
 export const colors = {
   brand: "#0b4dff",
   brandStrong: "#0637c9",
-  brandSoft: "#e6edff",
-  navy: "#061a52",
-  navyDeep: "#040f33",
+  brandSoft: "#e8eeff",
+  navy: "#17181b",
+  navyDeep: "#000000",
   sky: "#3fa0ff",
   silver: "#c9d3e6",
   maple: "#e11d2b",
-  ink: "#0a1838",
-  muted: "#4f5b78",
-  line: "#dfe5f2",
-  bg: "#f5f8ff",
+  ink: "#1b1b1b",
+  muted: "#6b6d73",
+  line: "#e4e4e7",
+  bg: "#f4f4f5",
   white: "#ffffff",
   success: "#0e8a59",
   successSoft: "#e3f6ee",
@@ -30,6 +33,7 @@ export const fonts = {
   regular: "DMSans-400",
 };
 
-export const radius = { sm: 12, md: 16, lg: 22, xl: 28, pill: 999 };
+// Coins plus sobres, comme les cartes du site (12 à 20 px) ; boutons en pilule.
+export const radius = { sm: 10, md: 14, lg: 18, xl: 22, pill: 999 };
 
 export const space = (n: number) => n * 4;

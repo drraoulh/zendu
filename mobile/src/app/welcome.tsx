@@ -80,7 +80,7 @@ export default function Welcome() {
               <Icon name={slide.icon} color={colors.brand} size={24} />
             </View>
           )}
-          <Text style={[st.title, compact && { fontFamily: fonts.regular, fontSize: 21, lineHeight: 26 }]} accessibilityRole="header">{tr(slide.title)}</Text>
+          <Text style={[st.title, compact && { fontSize: 21, lineHeight: 26 }]} accessibilityRole="header">{tr(slide.title)}</Text>
           <Text style={st.text}>{tr(slide.text)}</Text>
 
           <View style={[st.dots, compact && { marginVertical: 14 }]} accessibilityLabel={tr("Écran {0} sur {1}", index + 1, tr(SLIDES.length))}>

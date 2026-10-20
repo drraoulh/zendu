@@ -106,7 +106,7 @@ export default function Review() {
         )}
       </Card>
 
-      <H1 style={{ fontFamily: fonts.regular, fontSize: 18, marginBottom: 10 }}>{tr("Payer avec")}</H1>
+      <H1 style={{ fontSize: 18, marginBottom: 10 }}>{tr("Payer avec")}</H1>
       {interacOk ? (
         <Choice
           leading={<PaymentLogo id="INTERAC" size={22} />}

@@ -191,9 +191,10 @@ export function Button({
   style?: StyleProp<ViewStyle>;
 }) {
   const v = {
-    primary: { bg: colors.brand, fg: colors.white, border: colors.brand },
-    secondary: { bg: colors.white, fg: colors.ink, border: colors.line },
-    ghost: { bg: "transparent", fg: colors.brand, border: "transparent" },
+    // Boutons pilule noirs et blancs, comme sur le site.
+    primary: { bg: colors.ink, fg: colors.white, border: colors.ink },
+    secondary: { bg: colors.white, fg: colors.ink, border: "rgba(27,27,27,0.2)" },
+    ghost: { bg: "transparent", fg: colors.ink, border: "transparent" },
     danger: { bg: colors.dangerSoft, fg: colors.danger, border: colors.dangerSoft },
     light: { bg: colors.white, fg: colors.navy, border: colors.white },
   }[variant];
@@ -215,7 +216,7 @@ export function Button({
       ) : (
         <>
           {icon ? <Icon name={icon} color={v.fg} size={size === "sm" ? 18 : 20} /> : null}
-          <Text style={[styles.btnText, size === "sm" && { fontFamily: fonts.regular, fontSize: 14 }, { color: v.fg }]} numberOfLines={2}>{tr(title)}</Text>
+          <Text style={[styles.btnText, size === "sm" && { fontSize: 14 }, { color: v.fg }]} numberOfLines={2}>{tr(title)}</Text>
         </>
       )}
     </Pressable>
@@ -412,7 +413,7 @@ export function Choice({
     >
       {leading ?? (icon ? <Icon name={icon} color={selected ? colors.brand : colors.muted} size={20} /> : null)}
       <View style={{ flex: 1 }}>
-        <Text style={[styles.listTitle, { fontFamily: fonts.regular, fontSize: 15 }]}>{tr(label)}</Text>
+        <Text style={[styles.listTitle, { fontSize: 15 }]}>{tr(label)}</Text>
         {description ? <Small>{tr(description)}</Small> : null}
       </View>
       <View style={[styles.radio, selected && { borderColor: colors.brand }]}>
@@ -428,7 +429,7 @@ export function Empty({ icon, title, text, action }: { icon: IconName; title: st
       <View style={[styles.listIcon, { width: 56, height: 56, borderRadius: 18, backgroundColor: colors.brandSoft }]}>
         <Icon name={icon} color={colors.brand} size={26} />
       </View>
-      <Text style={[styles.h2, { fontFamily: fonts.regular, fontSize: 18, textAlign: "center" }]}>{tr(title)}</Text>
+      <Text style={[styles.h2, { fontSize: 18, textAlign: "center" }]}>{tr(title)}</Text>
       <P style={{ textAlign: "center" }}>{tr(text)}</P>
       {action ? <View style={{ marginTop: 8, alignSelf: "stretch" }}>{action}</View> : null}
     </View>
@@ -443,15 +444,16 @@ export const styles = StyleSheet.create({
   headerSide: { minWidth: 44, flexShrink: 0 },
   headerTitle: { fontFamily: fonts.heading, fontSize: 17, lineHeight: 21, color: colors.ink, textAlign: "center" },
   iconBtn: { width: 44, height: 44, borderRadius: 14, alignItems: "center", justifyContent: "center", backgroundColor: colors.white, borderWidth: 1, borderColor: colors.line },
-  h1: { fontFamily: fonts.display, fontSize: 28, lineHeight: 34, color: colors.navy, letterSpacing: -0.5 },
-  h2: { fontFamily: fonts.heading, fontSize: 20, lineHeight: 26, color: colors.ink },
+  // Titres serrés et francs (-3 %), comme sur le site.
+  h1: { fontFamily: fonts.display, fontSize: 28, lineHeight: 34, color: colors.ink, letterSpacing: -0.85 },
+  h2: { fontFamily: fonts.heading, fontSize: 20, lineHeight: 26, color: colors.ink, letterSpacing: -0.6 },
   p: { fontFamily: fonts.regular, fontSize: 15, lineHeight: 22, color: colors.muted },
   small: { fontFamily: fonts.regular, fontSize: 13, lineHeight: 18, color: colors.muted },
   label: { fontFamily: fonts.semibold, fontSize: 13, color: colors.ink, marginBottom: 6 },
-  btn: { minHeight: 54, borderRadius: radius.md, borderWidth: 1, flexDirection: "row", alignItems: "center", justifyContent: "center", gap: 8, paddingHorizontal: 18 },
-  btnSm: { minHeight: 44, borderRadius: radius.sm, paddingHorizontal: 14 },
+  btn: { minHeight: 54, borderRadius: radius.pill, borderWidth: 1, flexDirection: "row", alignItems: "center", justifyContent: "center", gap: 8, paddingHorizontal: 18 },
+  btnSm: { minHeight: 44, borderRadius: radius.pill, paddingHorizontal: 16 },
   btnText: { fontFamily: fonts.heading, fontSize: 16, textAlign: "center", flexShrink: 1 },
-  card: { backgroundColor: colors.white, borderRadius: radius.lg, padding: 18, borderWidth: 1, borderColor: colors.line, shadowColor: colors.navy, shadowOpacity: 0.06, shadowRadius: 16, shadowOffset: { width: 0, height: 6 }, elevation: 2 },
+  card: { backgroundColor: colors.white, borderRadius: radius.lg, padding: 18, borderWidth: 1, borderColor: colors.line, shadowColor: "#000", shadowOpacity: 0.04, shadowRadius: 2, shadowOffset: { width: 0, height: 1 }, elevation: 1 },
   badge: { flexDirection: "row", alignItems: "center", gap: 6, paddingHorizontal: 10, paddingVertical: 5, borderRadius: radius.pill, alignSelf: "flex-start" },
   dot: { width: 6, height: 6, borderRadius: 3 },
   badgeText: { fontFamily: fonts.semibold, fontSize: 12 },

@@ -167,14 +167,14 @@ function Steps({ current, total, label }: { current: number; total: number; labe
 }
 
 function Card({ children, className = "" }: { children: ReactNode; className?: string }) {
-  return <div className={`rounded-[16px] border border-line bg-white shadow-[0_6px_16px_-10px_rgba(6,26,82,0.18)] ${className}`}>{children}</div>;
+  return <div className={`rounded-[14px] border border-line bg-white shadow-[0_1px_2px_rgba(0,0,0,0.04)] ${className}`}>{children}</div>;
 }
 
 function Button({ children, tone = "primary", icon }: { children: ReactNode; tone?: "primary" | "secondary"; icon?: string }) {
   return (
     <span
-      className={`flex h-10 items-center justify-center gap-1 rounded-[12px] border px-2 text-[11px] font-bold ${
-        tone === "primary" ? "border-brand bg-brand text-white" : "border-line bg-white text-ink"
+      className={`flex h-10 items-center justify-center gap-1 rounded-full border px-2 text-[11px] font-bold ${
+        tone === "primary" ? "border-ink bg-ink text-white" : "border-ink/20 bg-white text-ink"
       }`}
     >
       {icon && <Svg d={icon} className="h-3.5 w-3.5 shrink-0" />}

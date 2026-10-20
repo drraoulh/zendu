@@ -162,7 +162,7 @@ export function CardForm({ defaultHolder, submitLabel, onSubmit }: { defaultHold
               )}
             </View>
             <View style={c.chip} />
-            <Text style={[c.number, { fontFamily: fonts.regular, fontSize: numberSize, letterSpacing: numberSize * 0.075 }]} numberOfLines={1}>
+            <Text style={[c.number, { fontSize: numberSize, letterSpacing: numberSize * 0.075 }]} numberOfLines={1}>
               {shown}
             </Text>
             <View style={{ flexDirection: "row", justifyContent: "space-between", gap: 12 }}>
