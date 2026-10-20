@@ -29,6 +29,7 @@ export function SuppliersContent() {
         secondary={{ href: "#etapes", label: t("heroCta2") }}
         highlights={[t("hl1"), t("hl2"), t("hl3")]}
         icon="wallet"
+        image={{ src: "/images/suppliers.jpg", alt: t("heroEyebrow") }}
       />
 
       <Section>

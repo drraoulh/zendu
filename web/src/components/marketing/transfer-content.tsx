@@ -301,7 +301,7 @@ function Hero() {
           <p className="mt-6 max-w-xl font-display text-lg font-bold text-white sm:text-xl">{t("heroSubtitle")}</p>
           <p className="mt-3 max-w-xl text-base leading-relaxed text-white/75">{t("heroLead")}</p>
           <div className="mt-8 flex flex-col gap-3 sm:flex-row">
-            <AppDownloadButton size="lg" />
+            <AppDownloadButton variant="white" size="lg" />
             <ButtonLink href="#simulateur" variant="outline-light" size="lg">
               {t("heroCta2")}
             </ButtonLink>

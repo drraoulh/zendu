@@ -1,7 +1,8 @@
+import Image from "next/image";
 import type { ReactNode } from "react";
 
 export function Container({ children, className = "" }: { children: ReactNode; className?: string }) {
-  return <div className={`mx-auto w-full max-w-6xl px-5 sm:px-6 ${className}`}>{children}</div>;
+  return <div className={`mx-auto w-full max-w-7xl px-5 sm:px-8 ${className}`}>{children}</div>;
 }
 
 /** Bloc de section avec espacement vertical standard. */
@@ -15,7 +16,7 @@ export function Section({
   id?: string;
 }) {
   return (
-    <section id={id} className={`py-16 sm:py-20 ${className}`}>
+    <section id={id} className={`py-16 sm:py-24 ${className}`}>
       {children}
     </section>
   );
@@ -23,14 +24,7 @@ export function Section({
 
 export function Eyebrow({ children, light = false }: { children: ReactNode; light?: boolean }) {
   return (
-    <p
-      className={`inline-flex items-center gap-2 font-display text-xs font-bold uppercase tracking-[0.18em] ${
-        light ? "text-sky" : "text-brand"
-      }`}
-    >
-      <span className={`h-px w-6 ${light ? "bg-sky" : "bg-brand"}`} />
-      {children}
-    </p>
+    <p className={`font-display text-base font-semibold sm:text-lg ${light ? "text-white/80" : "text-ink/70"}`}>{children}</p>
   );
 }
 
@@ -52,7 +46,7 @@ export function SectionHeading({
     <div className={center ? "mx-auto max-w-2xl text-center" : "max-w-2xl"}>
       {eyebrow && <Eyebrow light={light}>{eyebrow}</Eyebrow>}
       <h2
-        className={`mt-3 break-words font-display text-[1.75rem] font-extrabold leading-tight tracking-tight min-[375px]:text-3xl sm:text-4xl ${
+        className={`mt-2 break-words font-display text-[2rem] font-bold leading-[1.05] min-[375px]:text-4xl sm:text-5xl ${
           light ? "text-white" : "text-ink"
         }`}
       >
@@ -88,29 +82,51 @@ export function Badge({ children, tone = "brand" }: { children: ReactNode; tone?
   );
 }
 
-/** En-tête de page intérieure (pages services, compte…), sur fond bleu nuit. */
+/**
+ * En-tête de page intérieure, sur fond graphite. Avec `image` : grande bannière photo
+ * dans un cadre arrondi, texte blanc sur un fondu sombre (bannières de logitech.com).
+ */
 export function PageHero({
   eyebrow,
   title,
   subtitle,
   children,
+  image,
 }: {
   eyebrow?: ReactNode;
   title: ReactNode;
   subtitle?: ReactNode;
   children?: ReactNode;
+  image?: { src: string; alt: string };
 }) {
+  const content = (
+    <>
+      {eyebrow && <Eyebrow light>{eyebrow}</Eyebrow>}
+      <h1 className="mt-3 max-w-3xl break-words font-display text-[2.25rem] font-bold leading-[1.04] min-[375px]:text-[2.6rem] sm:text-6xl">
+        {title}
+      </h1>
+      {subtitle && <p className="mt-5 max-w-2xl text-lg leading-relaxed text-white/80">{subtitle}</p>}
+      {children && <div className="mt-8">{children}</div>}
+    </>
+  );
+
+  if (image) {
+    return (
+      <section className="bg-white pt-4 sm:pt-6">
+        <Container>
+          <div className="relative isolate overflow-hidden rounded-3xl bg-navy text-white">
+            <Image src={image.src} alt={image.alt} fill priority sizes="(min-width: 1280px) 1216px, 100vw" className="-z-10 object-cover" />
+            <div aria-hidden className="absolute inset-0 -z-10 bg-gradient-to-r from-black/85 via-black/55 to-black/10" />
+            <div className="px-6 py-16 sm:px-12 sm:py-24 lg:py-28">{content}</div>
+          </div>
+        </Container>
+      </section>
+    );
+  }
+
   return (
     <section className="bg-navy-gradient relative overflow-hidden text-white">
-      <div className="bg-grid absolute inset-0 opacity-40 [mask-image:linear-gradient(to_bottom,black,transparent)]" />
-      <Container className="relative py-16 sm:py-20">
-        {eyebrow && <Eyebrow light>{eyebrow}</Eyebrow>}
-        <h1 className="mt-4 max-w-3xl break-words font-display text-[2rem] font-extrabold leading-[1.08] tracking-tight min-[375px]:text-4xl sm:text-5xl">
-          {title}
-        </h1>
-        {subtitle && <p className="mt-5 max-w-2xl text-lg leading-relaxed text-white/75">{subtitle}</p>}
-        {children && <div className="mt-8">{children}</div>}
-      </Container>
+      <Container className="relative py-16 sm:py-24">{content}</Container>
     </section>
   );
 }

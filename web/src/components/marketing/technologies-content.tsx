@@ -50,6 +50,7 @@ export function TechnologiesContent() {
         secondary={{ href: "#methode", label: t("heroCta2") }}
         highlights={[t("hl1"), t("hl2"), t("hl3")]}
         icon="code"
+        image={{ src: "/images/tech.jpg", alt: t("heroEyebrow") }}
       />
 
       <DetailedOffers

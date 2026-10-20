@@ -1,10 +1,10 @@
 "use client";
 
+import Image from "next/image";
 import Link from "next/link";
 import { AppDownloadButton } from "@/components/app/app-download-button";
 import { useSite } from "@/components/site-provider";
 import { ButtonLink } from "@/components/ui/button";
-import { Icon, type IconName } from "@/components/ui/icon";
 import { Container } from "@/components/ui/layout";
 import { useT } from "@/i18n/define";
 import { homeMessages } from "@/i18n/home";
@@ -12,184 +12,75 @@ import { homeMessages } from "@/i18n/home";
 type HomeKey = keyof typeof homeMessages.fr;
 
 /** Les six activités, dans l'ordre fixé par la direction. */
-export const ACTIVITIES: { n: 1 | 2 | 3 | 4 | 5 | 6; href: string; icon: IconName }[] = [
-  { n: 1, href: "/transfert", icon: "transfer" },
-  { n: 2, href: "/avi", icon: "plane" },
-  { n: 3, href: "/paiement-fournisseurs", icon: "wallet" },
-  { n: 4, href: "/finances", icon: "finance" },
-  { n: 5, href: "/technologies", icon: "tech" },
-  { n: 6, href: "/shipping", icon: "ship" },
+export const ACTIVITIES: { n: 1 | 2 | 3 | 4 | 5 | 6; href: string; image: string }[] = [
+  { n: 1, href: "/transfert", image: "/images/transfer.jpg" },
+  { n: 2, href: "/avi", image: "/images/avi.jpg" },
+  { n: 3, href: "/paiement-fournisseurs", image: "/images/suppliers.jpg" },
+  { n: 4, href: "/finances", image: "/images/finances.jpg" },
+  { n: 5, href: "/technologies", image: "/images/tech.jpg" },
+  { n: 6, href: "/shipping", image: "/images/shipping.jpg" },
 ];
 
-/** Carte du hero : les six activités en accès direct. */
-function ActivitiesPanel() {
-  const t = useT(homeMessages);
-  const { link } = useSite();
-  return (
-    <div className="rounded-[1.75rem] border border-white/15 bg-white p-4 text-ink shadow-float sm:p-5">
-      <p className="px-2 pt-1 font-display text-xs font-bold uppercase tracking-[0.16em] text-muted">{t("activitiesTitle")}</p>
-      <ul className="mt-3 grid gap-1.5">
-        {ACTIVITIES.map((a) => (
-          <li key={a.n}>
-            <Link
-              href={link(a.href)}
-              className="group flex items-center gap-3 rounded-2xl p-2.5 transition hover:bg-surface-soft focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand/40"
-            >
-              <span className="grid h-10 w-10 shrink-0 place-items-center rounded-xl bg-brand-soft text-brand transition group-hover:bg-brand group-hover:text-white">
-                <Icon name={a.icon} className="h-5 w-5" />
-              </span>
-              <span className="min-w-0 flex-1">
-                <span className="block text-sm font-bold text-ink">{t(`act${a.n}Title` as HomeKey)}</span>
-                <span className="block truncate text-xs text-muted">{t(`act${a.n}Text` as HomeKey)}</span>
-              </span>
-              <Icon name="arrowRight" className="h-4 w-4 shrink-0 text-brand opacity-0 transition group-hover:opacity-100" />
-            </Link>
-          </li>
-        ))}
-      </ul>
-    </div>
-  );
-}
-
+/** Grande bannière photo arrondie, titre en surimpression (accueil de logitech.com). */
 export function HomeHero() {
   const t = useT(homeMessages);
-  const chips: { icon: IconName; label: string }[] = [
-    { icon: "receipt", label: t("chipFees") },
-    { icon: "clock", label: t("chipTracking") },
-    { icon: "shield", label: t("chipSecure") },
-  ];
 
   return (
-    <section className="bg-navy-gradient relative isolate overflow-hidden text-white">
-      {/* Décor : grille, halo, orbites */}
-      <div
-        aria-hidden
-        className="bg-grid absolute inset-0 -z-10 opacity-50 [mask-image:radial-gradient(80%_70%_at_50%_30%,black,transparent)]"
-      />
-      <div
-        aria-hidden
-        className="absolute -right-32 top-10 -z-10 h-[34rem] w-[34rem] rounded-full bg-brand/30 blur-3xl"
-      />
-      <div aria-hidden className="pointer-events-none absolute -right-40 -top-40 -z-10 hidden lg:block">
-        <svg width="760" height="760" viewBox="0 0 760 760" fill="none" className="animate-orbit opacity-60">
-          <circle cx="380" cy="380" r="370" stroke="url(#ringA)" strokeWidth="1" />
-          <circle cx="380" cy="380" r="290" stroke="rgba(201,211,230,0.18)" strokeWidth="1" strokeDasharray="2 10" />
-          <circle cx="380" cy="380" r="210" stroke="url(#ringA)" strokeWidth="1" />
-          <circle cx="750" cy="380" r="5" fill="#3fa0ff" />
-          <circle cx="380" cy="90" r="3.5" fill="#c9d3e6" />
-          <circle cx="170" cy="380" r="4" fill="#0b4dff" />
-          <defs>
-            <linearGradient id="ringA" x1="0" y1="0" x2="760" y2="760" gradientUnits="userSpaceOnUse">
-              <stop stopColor="#3fa0ff" stopOpacity="0.6" />
-              <stop offset="0.5" stopColor="#c9d3e6" stopOpacity="0.15" />
-              <stop offset="1" stopColor="#0b4dff" stopOpacity="0.5" />
-            </linearGradient>
-          </defs>
-        </svg>
-      </div>
+    <section className="bg-white pt-4 sm:pt-6">
+      <Container>
+        <div className="relative isolate flex min-h-[34rem] items-end overflow-hidden rounded-3xl bg-navy text-white sm:min-h-[36rem] lg:min-h-[40rem] lg:items-center">
+          <Image
+            src="/images/hero.jpg"
+            alt=""
+            fill
+            priority
+            sizes="(min-width: 1280px) 1216px, 100vw"
+            className="-z-10 object-cover object-[72%_center]"
+          />
+          <div aria-hidden className="absolute inset-0 -z-10 bg-gradient-to-t from-black/85 via-black/45 to-black/0 lg:bg-gradient-to-r lg:from-black/80 lg:via-black/45 lg:to-black/0" />
 
-      {/* Hauteur maîtrisée : le simulateur tient au-dessus de la ligne de flottaison à 1366×768. */}
-      <Container className="relative grid grid-cols-1 gap-8 pb-12 pt-7 sm:pt-10 lg:grid-cols-[1.08fr_minmax(0,0.92fr)] lg:items-center lg:gap-12 lg:pb-14 lg:pt-6">
-        <div className="animate-rise min-w-0">
-          <p className="inline-flex max-w-full flex-wrap items-center gap-x-2 gap-y-1 rounded-2xl border border-white/15 bg-white/5 px-3 py-1.5 text-xs backdrop-blur sm:rounded-full">
-            <span className="inline-flex items-center gap-1.5 font-display font-black tracking-[0.12em] text-white">
-              <Icon name="maple" className="h-3.5 w-3.5 shrink-0 text-maple" />
-              {t("heroEyebrow")}
-            </span>
-            <span aria-hidden className="hidden h-3 w-px bg-white/25 sm:block" />
-            <span className="min-w-0 font-medium italic text-sky">{t("heroTagline")}</span>
-          </p>
-
-          <h1 className="mt-5 font-display text-[2.15rem] font-black leading-[1.06] tracking-tight sm:text-5xl lg:text-[3.15rem] xl:text-[3.4rem]">
-            {t("heroTitleA")}{" "}
-            <span className="bg-gradient-to-r from-sky via-white to-silver bg-clip-text text-transparent">
-              {t("heroTitleAccent")}
-            </span>
-            {t("heroTitleB")}
-          </h1>
-
-          <p className="mt-4 max-w-xl text-base leading-relaxed text-white/75 sm:mt-5 sm:text-lg">{t("heroSubtitle")}</p>
-
-          <div className="mt-6 flex flex-col gap-3 sm:flex-row sm:flex-wrap">
-            <AppDownloadButton size="lg" label={t("heroCtaSend")} />
-            <ButtonLink href="#services" variant="outline-light" size="lg">
-              {t("heroCtaServices")}
-            </ButtonLink>
+          <div className="animate-rise w-full max-w-3xl px-6 pb-10 pt-40 sm:px-12 sm:pb-14 lg:py-20">
+            <p className="text-base font-semibold text-white/85 sm:text-lg">{t("heroTagline")}</p>
+            <h1 className="mt-3 font-display text-[2.6rem] font-bold leading-[1] min-[375px]:text-5xl sm:text-6xl lg:text-7xl">
+              {t("heroTitleA")} {t("heroTitleAccent")}
+              {t("heroTitleB")}
+            </h1>
+            <p className="mt-5 max-w-xl text-base leading-relaxed text-white/85 sm:text-lg">{t("heroSubtitle")}</p>
+            <div className="mt-8 flex flex-col gap-3 sm:flex-row sm:flex-wrap">
+              <AppDownloadButton variant="white" size="lg" label={t("heroCtaSend")} />
+              <ButtonLink href="#services" variant="outline-light" size="lg">
+                {t("heroCtaServices")}
+              </ButtonLink>
+            </div>
           </div>
-
-          <ul className="mt-6 hidden flex-wrap gap-2.5 sm:flex">
-            {chips.map((c) => (
-              <li
-                key={c.icon}
-                className="inline-flex items-center gap-2 rounded-full border border-white/10 bg-white/[0.06] px-3 py-1.5 text-sm text-white/85"
-              >
-                <Icon name={c.icon} className="h-4 w-4 text-sky" />
-                {c.label}
-              </li>
-            ))}
-          </ul>
-        </div>
-
-        <div className="animate-rise-2 relative mx-auto w-full max-w-md lg:max-w-none">
-          <div aria-hidden className="absolute -inset-4 -z-10 rounded-[2rem] bg-sky/20 blur-2xl" />
-          <ActivitiesPanel />
         </div>
       </Container>
     </section>
   );
 }
 
-const SHORTCUTS: { n: 1 | 2 | 3 | 4 | 5; href: string; icon: IconName }[] = [
-  { n: 1, href: "/transfert#simulateur", icon: "chart" },
-  { n: 2, href: "/contact?sujet=avi", icon: "plane" },
-  { n: 3, href: "/contact?sujet=fournisseurs", icon: "wallet" },
-  { n: 4, href: "/finances/rendez-vous", icon: "clock" },
-  { n: 5, href: "/technologies/projet", icon: "code" },
-];
-
-/** Bande de raccourcis vers les parcours principaux, juste sous le hero. */
-export function ShortcutsBand() {
+/** Rangée de vignettes rondes, une par activité (catégories de logitech.com). */
+export function ActivitiesRow() {
   const t = useT(homeMessages);
   const { link } = useSite();
   return (
-    <nav aria-label={t("shortcutsTitle")} className="border-b border-line bg-white">
-      <Container className="py-5 sm:py-6">
-        <ul className="grid grid-cols-2 gap-2.5 sm:grid-cols-3 sm:gap-3 lg:grid-cols-5">
-          {SHORTCUTS.map((s) => {
-            const cls =
-              `group flex h-full rounded-2xl border border-line bg-white p-3 transition hover:-translate-y-0.5 hover:border-brand/30 hover:shadow-card focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-brand/20 sm:p-3.5 ${
-                // Très petits écrans : icône au-dessus du titre pour ne pas couper les mots un par un.
-                s.n === 1 ? "items-center gap-3" : "flex-col items-start gap-2 min-[375px]:flex-row min-[375px]:items-center min-[375px]:gap-3"
-              }`;
-            const inner = (
-              <>
-                <span className="grid h-10 w-10 shrink-0 place-items-center rounded-xl bg-brand-soft text-brand transition group-hover:bg-brand group-hover:text-white">
-                  <Icon name={s.icon} className="h-5 w-5" />
+    <nav aria-label={t("activitiesTitle")} className="bg-white">
+      <Container className="py-10 sm:py-14">
+        <ul className="-mx-5 flex snap-x gap-5 overflow-x-auto px-5 pb-2 sm:mx-0 sm:grid sm:grid-cols-3 sm:gap-8 sm:overflow-visible sm:px-0 lg:grid-cols-6">
+          {ACTIVITIES.map((a) => (
+            <li key={a.n} className="shrink-0 snap-start">
+              <Link
+                href={link(a.href)}
+                className="group flex w-28 flex-col items-center text-center focus-visible:outline-none sm:w-auto"
+              >
+                <span className="relative block h-28 w-28 overflow-hidden rounded-full bg-surface-soft ring-offset-4 transition group-focus-visible:ring-2 group-focus-visible:ring-ink sm:h-36 sm:w-36">
+                  <Image src={a.image} alt="" fill sizes="144px" className="zoom-on-hover object-cover" />
                 </span>
-                <span className="min-w-0 flex-1">
-                  <span className="block text-sm font-bold leading-snug text-ink">
-                    {t(`sc${s.n}Title` as HomeKey)}
-                  </span>
-                  <span className="mt-0.5 hidden text-xs text-muted min-[420px]:block">
-                    {t(`sc${s.n}Text` as HomeKey)}
-                  </span>
-                </span>
-              </>
-            );
-            return (
-              <li key={s.n} className={s.n === 1 ? "col-span-2 sm:col-span-1" : ""}>
-                {s.href.startsWith("#") ? (
-                  <a href={s.href} className={cls}>
-                    {inner}
-                  </a>
-                ) : (
-                  <Link href={link(s.href)} className={cls}>
-                    {inner}
-                  </Link>
-                )}
-              </li>
-            );
-          })}
+                <span className="mt-4 text-sm font-semibold leading-snug text-ink sm:text-base">{t(`act${a.n}Title` as HomeKey)}</span>
+                <span className="mt-0.5 hidden text-xs text-muted sm:block">{t(`act${a.n}Text` as HomeKey)}</span>
+              </Link>
+            </li>
+          ))}
         </ul>
       </Container>
     </nav>

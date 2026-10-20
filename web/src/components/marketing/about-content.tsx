@@ -45,7 +45,12 @@ export function AboutContent() {
 
   return (
     <>
-      <PageHero eyebrow={t("heroEyebrow")} title={t("heroTitle")} subtitle={t("heroSubtitle")}>
+      <PageHero
+        eyebrow={t("heroEyebrow")}
+        title={t("heroTitle")}
+        subtitle={t("heroSubtitle")}
+        image={{ src: "/images/team.jpg", alt: t("heroTitle") }}
+      >
         <div className="flex flex-col gap-3 sm:flex-row">
           <ButtonLink href="#poles" variant="white" size="lg">
             {t("heroCta")}

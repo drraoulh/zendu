@@ -1,4 +1,4 @@
-import { HomeHero, ShortcutsBand } from "@/app/home/home-hero";
+import { ActivitiesRow, HomeHero } from "@/app/home/home-hero";
 import { AppSection, FaqSection, FinalCta } from "@/app/home/home-more";
 import { ServicesSection, ValuesSection } from "@/app/home/home-sections";
 
@@ -7,7 +7,7 @@ export default function HomePage() {
   return (
     <>
       <HomeHero />
-      <ShortcutsBand />
+      <ActivitiesRow />
       <ServicesSection />
       <AppSection />
       <ValuesSection />

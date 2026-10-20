@@ -28,6 +28,7 @@ export function AviContent() {
         secondary={{ href: "#etapes", label: t("heroCta2") }}
         highlights={[t("hl1"), t("hl2"), t("hl3")]}
         icon="plane"
+        image={{ src: "/images/avi.jpg", alt: t("heroEyebrow") }}
       />
 
       <Section>

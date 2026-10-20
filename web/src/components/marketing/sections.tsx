@@ -30,6 +30,7 @@ export function ServiceHero({
   secondary,
   icon,
   highlights,
+  image,
 }: {
   eyebrow: string;
   title: ReactNode;
@@ -38,10 +39,12 @@ export function ServiceHero({
   secondary?: CtaLink;
   icon?: IconName;
   highlights?: string[];
+  /** Photo de bannière : remplace l'illustration d'icône. */
+  image?: { src: string; alt: string };
 }) {
   return (
     <div className="relative overflow-hidden">
-      <PageHero eyebrow={eyebrow} title={title} subtitle={subtitle}>
+      <PageHero eyebrow={eyebrow} title={title} subtitle={subtitle} image={image}>
         <div className="flex flex-col gap-6">
           {(primary || secondary) && (
             <div className="flex flex-col gap-3 sm:flex-row sm:flex-wrap">
@@ -70,7 +73,7 @@ export function ServiceHero({
           )}
         </div>
       </PageHero>
-      {icon && (
+      {icon && !image && (
         <div
           aria-hidden
           className="pointer-events-none absolute top-1/2 hidden -translate-y-1/2 xl:right-[max(1.5rem,calc((100vw-72rem)/2))] xl:block"
@@ -280,16 +283,14 @@ export function Faq({
       <Container>
         <div className="grid gap-10 lg:grid-cols-[1fr_1.6fr] lg:gap-16">
           <SectionHeading eyebrow={eyebrow} title={title} subtitle={subtitle} />
-          <div className="divide-y divide-line overflow-hidden rounded-3xl border border-line bg-white shadow-card">
+          <div className="divide-y divide-line border-y border-line">
             {items.map((item) => (
               <details key={item.q} className="group">
-                <summary className="flex cursor-pointer list-none items-center justify-between gap-4 px-5 py-5 font-display text-base font-bold text-ink transition hover:text-brand-strong sm:px-6 [&::-webkit-details-marker]:hidden">
+                <summary className="flex cursor-pointer list-none items-center justify-between gap-4 py-5 font-display text-lg font-bold text-ink [&::-webkit-details-marker]:hidden">
                   {item.q}
-                  <span className="grid h-8 w-8 shrink-0 place-items-center rounded-full bg-surface-soft text-brand transition group-open:rotate-180 group-open:bg-brand group-open:text-white">
-                    <Icon name="chevronDown" className="h-4 w-4" strokeWidth={2.2} />
-                  </span>
+                  <Icon name="chevronDown" className="h-5 w-5 shrink-0 text-ink transition group-open:rotate-180" strokeWidth={2.2} />
                 </summary>
-                <p className="px-5 pb-6 text-sm leading-relaxed text-muted sm:px-6">{item.a}</p>
+                <p className="max-w-2xl pb-6 text-base leading-relaxed text-muted">{item.a}</p>
               </details>
             ))}
           </div>
@@ -317,15 +318,10 @@ export function CtaBand({
   return (
     <Section className="pt-4 sm:pt-6">
       <Container>
-        <div className="bg-brand-gradient relative overflow-hidden rounded-[2rem] px-6 py-12 text-white shadow-float sm:px-12 sm:py-16">
-          <div className="bg-grid absolute inset-0 opacity-50 [mask-image:radial-gradient(circle_at_80%_20%,black,transparent_70%)]" />
-          <div
-            aria-hidden
-            className="absolute -right-16 -top-16 h-64 w-64 rounded-full bg-sky/30 blur-3xl"
-          />
+        <div className="bg-brand-gradient relative overflow-hidden rounded-3xl px-6 py-12 text-white sm:px-12 sm:py-16">
           <div className="relative flex flex-col gap-8 lg:flex-row lg:items-center lg:justify-between">
             <div className="max-w-2xl">
-              <h2 className="font-display text-3xl font-extrabold tracking-tight sm:text-4xl">{title}</h2>
+              <h2 className="font-display text-4xl font-bold leading-[1.05] sm:text-5xl">{title}</h2>
               {text && <p className="mt-4 text-base leading-relaxed text-white/80 sm:text-lg">{text}</p>}
             </div>
             <div className="flex shrink-0 flex-col gap-3 sm:flex-row">

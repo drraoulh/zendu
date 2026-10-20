@@ -5,14 +5,15 @@ type Variant = "primary" | "secondary" | "ghost" | "white" | "outline-light" | "
 type Size = "sm" | "md" | "lg";
 
 const base =
-  "inline-flex items-center justify-center gap-2 rounded-full font-semibold transition disabled:cursor-not-allowed disabled:opacity-55";
+  "inline-flex items-center justify-center gap-2 rounded-full font-bold transition disabled:cursor-not-allowed disabled:opacity-55";
 
+/** Boutons « pilule » noirs ou blancs, à la manière de logitech.com. */
 const variants: Record<Variant, string> = {
-  primary: "bg-brand text-white shadow-[0_8px_20px_-8px_rgba(11,77,255,0.7)] hover:bg-brand-strong",
-  secondary: "border border-line bg-white text-ink hover:border-brand/40 hover:text-brand-strong",
+  primary: "bg-ink text-white hover:bg-black",
+  secondary: "border border-ink/20 bg-white text-ink hover:border-ink",
   ghost: "text-ink hover:bg-surface-soft",
-  white: "bg-white text-navy hover:bg-brand-soft",
-  "outline-light": "border border-white/30 bg-white/5 text-white backdrop-blur hover:bg-white/15",
+  white: "bg-white text-ink hover:bg-white/85",
+  "outline-light": "border border-white/40 bg-transparent text-white hover:border-white hover:bg-white/10",
   danger: "bg-danger text-white hover:opacity-90",
 };
 

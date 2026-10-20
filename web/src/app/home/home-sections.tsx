@@ -1,9 +1,10 @@
 "use client";
 
+import Image from "next/image";
 import Link from "next/link";
 import { WstLogo } from "@/components/brand/wst-logo";
 import { useSite } from "@/components/site-provider";
-import { ButtonLink, buttonClass } from "@/components/ui/button";
+import { ButtonLink } from "@/components/ui/button";
 import { Icon, type IconName } from "@/components/ui/icon";
 import { Container, Section, SectionHeading } from "@/components/ui/layout";
 import { useT } from "@/i18n/define";
@@ -11,226 +12,66 @@ import { homeMessages } from "@/i18n/home";
 
 type HomeKey = keyof typeof homeMessages.fr;
 
-type Action = { href: string; key: HomeKey; icon?: IconName };
+type Action = { href: string; key: HomeKey };
 
-const POLES: {
-  n: 1 | 2 | 3 | 4 | 5 | 6;
-  href: string;
-  icon: IconName;
-  accent: string;
-  primary: Action;
-  more: Action[];
-}[] = [
-  {
-    n: 1,
-    href: "/transfert",
-    icon: "transfer",
-    accent: "from-brand to-sky",
-    primary: { href: "/transfert#simulateur", key: "actSimulate", icon: "chart" },
-    more: [
-      { href: "/transfert", key: "actWst" },
-      { href: "/frais", key: "actFees" },
-    ],
-  },
-  {
-    n: 5,
-    href: "/avi",
-    icon: "plane",
-    accent: "from-navy to-sky",
-    primary: { href: "/contact?sujet=avi", key: "actAviRequest", icon: "mail" },
-    more: [{ href: "/avi", key: "actLearn" }],
-  },
+/** `n` renvoie aux textes s{n}… ; l'ordre du tableau est l'ordre d'affichage. */
+const POLES: { n: 1 | 2 | 3 | 4 | 5 | 6; href: string; image: string; primary: Action; more: Action }[] = [
+  { n: 1, href: "/transfert", image: "/images/transfer.jpg", primary: { href: "/transfert#simulateur", key: "actSimulate" }, more: { href: "/transfert", key: "actWst" } },
+  { n: 5, href: "/avi", image: "/images/avi.jpg", primary: { href: "/contact?sujet=avi", key: "actAviRequest" }, more: { href: "/avi", key: "actLearn" } },
   {
     n: 6,
     href: "/paiement-fournisseurs",
-    icon: "wallet",
-    accent: "from-brand-strong to-brand",
-    primary: { href: "/contact?sujet=fournisseurs", key: "actSupplierRequest", icon: "mail" },
-    more: [{ href: "/paiement-fournisseurs", key: "actLearn" }],
+    image: "/images/suppliers.jpg",
+    primary: { href: "/contact?sujet=fournisseurs", key: "actSupplierRequest" },
+    more: { href: "/paiement-fournisseurs", key: "actLearn" },
   },
-  {
-    n: 2,
-    href: "/finances",
-    icon: "finance",
-    accent: "from-navy to-brand",
-    primary: { href: "/finances/rendez-vous", key: "actAppointment", icon: "clock" },
-    more: [{ href: "/finances", key: "actLearn" }],
-  },
-  {
-    n: 3,
-    href: "/technologies",
-    icon: "tech",
-    accent: "from-brand-strong to-sky",
-    primary: { href: "/technologies/projet", key: "actProject", icon: "code" },
-    more: [{ href: "/technologies", key: "actLearn" }],
-  },
-  {
-    n: 4,
-    href: "/shipping",
-    icon: "ship",
-    accent: "from-navy to-sky",
-    primary: { href: "/shipping/devis", key: "actQuote", icon: "box" },
-    more: [{ href: "/shipping", key: "actLearn" }],
-  },
+  { n: 2, href: "/finances", image: "/images/finances.jpg", primary: { href: "/finances/rendez-vous", key: "actAppointment" }, more: { href: "/finances", key: "actLearn" } },
+  { n: 3, href: "/technologies", image: "/images/tech.jpg", primary: { href: "/technologies/projet", key: "actProject" }, more: { href: "/technologies", key: "actLearn" } },
+  { n: 4, href: "/shipping", image: "/images/shipping.jpg", primary: { href: "/shipping/devis", key: "actQuote" }, more: { href: "/shipping", key: "actLearn" } },
 ];
 
-/** Les six activités en cartes détaillées, chacune avec ses actions principales. */
+/** Les six activités en tuiles photo (« Acheter par centre d'intérêt » de logitech.com). */
 export function ServicesSection() {
   const t = useT(homeMessages);
   const { link } = useSite();
   return (
-    <Section id="services" className="scroll-mt-20 bg-bg">
+    <Section id="services" className="scroll-mt-20 bg-white pt-6 sm:pt-10">
       <Container>
-        <SectionHeading
-          align="center"
-          eyebrow={t("servicesEyebrow")}
-          title={t("servicesTitle")}
-          subtitle={t("servicesSubtitle")}
-        />
-        <ul className="mt-12 grid gap-5 md:grid-cols-2 xl:grid-cols-3">
+        <SectionHeading eyebrow={t("servicesEyebrow")} title={t("servicesTitle")} subtitle={t("servicesSubtitle")} />
+        <ul className="mt-12 grid gap-x-6 gap-y-12 sm:grid-cols-2 lg:grid-cols-3">
           {POLES.map((p) => {
             const k = (suffix: string) => `s${p.n}${suffix}` as HomeKey;
             return (
-              <li
-                key={p.n}
-                className="relative flex flex-col overflow-hidden rounded-3xl border border-line bg-white p-6 shadow-card sm:p-7"
-              >
-                <div
-                  aria-hidden
-                  className={`absolute -right-16 -top-16 h-40 w-40 rounded-full bg-gradient-to-br ${p.accent} opacity-[0.08]`}
-                />
-                <div className="flex items-start gap-4">
-                  <span
-                    className={`flex h-12 w-12 shrink-0 items-center justify-center rounded-2xl bg-gradient-to-br ${p.accent} text-white shadow-[0_10px_24px_-10px_rgba(11,77,255,0.8)]`}
-                  >
-                    <Icon name={p.icon} className="h-6 w-6" />
-                  </span>
-                  <div className="min-w-0">
-                    <h3 className="font-display text-xl font-extrabold tracking-tight text-ink">
-                      <Link href={link(p.href)} className="rounded hover:text-brand focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand/40">
-                        {t(k("Title"))}
-                      </Link>
-                    </h3>
-                    {p.n === 1 && (
-                      <p className="mt-1.5 inline-flex items-center gap-1.5 rounded-full bg-brand-soft px-2.5 py-1 font-display text-xs font-extrabold text-navy">
-                        <span aria-hidden className="shrink-0">
-                          <WstLogo variant="symbol" className="h-4 w-4" />
-                        </span>
-                        {t("s1Brand")}
-                      </p>
-                    )}
-                  </div>
-                </div>
-                <p className="mt-4 text-sm leading-relaxed text-muted sm:text-base">{t(k("Pitch"))}</p>
-                <ul className="mt-5 space-y-2.5 text-sm text-ink">
-                  {(["b1", "b2", "b3"] as const).map((b) => (
-                    <li key={b} className="flex gap-2.5">
-                      <Icon name="check" className="mt-0.5 h-4 w-4 shrink-0 text-brand" strokeWidth={2.2} />
-                      <span>{t(k(b))}</span>
-                    </li>
-                  ))}
-                </ul>
-                <div className="mt-auto flex flex-col gap-3 pt-6 sm:flex-row sm:flex-wrap sm:items-center">
-                  <ButtonLink href={link(p.primary.href)}>
-                    {p.primary.icon && <Icon name={p.primary.icon} className="h-4 w-4" />}
-                    {t(p.primary.key)}
-                  </ButtonLink>
-                  {p.more.map((a) => (
-                    <Link
-                      key={a.href}
-                      href={link(a.href)}
-                      className="group inline-flex min-h-10 items-center gap-1.5 self-start rounded px-1 py-1 text-sm font-semibold text-brand hover:text-brand-strong focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand/40 sm:self-auto"
-                    >
-                      {t(a.key)}
-                      <Icon name="arrowRight" className="h-4 w-4 transition group-hover:translate-x-0.5" />
-                    </Link>
-                  ))}
+              <li key={p.n} className="group flex flex-col">
+                <Link
+                  href={link(p.href)}
+                  className="relative block aspect-[4/3] overflow-hidden rounded-3xl bg-surface-soft focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ink focus-visible:ring-offset-4"
+                  aria-label={t(k("Title"))}
+                >
+                  <Image src={p.image} alt="" fill sizes="(min-width: 1024px) 400px, (min-width: 640px) 50vw, 100vw" className="zoom-on-hover object-cover" />
+                  {p.n === 1 && (
+                    <span className="absolute left-4 top-4 inline-flex items-center gap-1.5 rounded-full bg-white px-3 py-1.5 text-xs font-bold text-ink">
+                      <WstLogo variant="symbol" className="h-4 w-4" />
+                      {t("s1Brand")}
+                    </span>
+                  )}
+                </Link>
+                <h3 className="mt-6 font-display text-2xl font-bold text-ink sm:text-[1.75rem]">
+                  <Link href={link(p.href)} className="hover:underline hover:decoration-2 hover:underline-offset-4">
+                    {t(k("Title"))}
+                  </Link>
+                </h3>
+                <p className="mt-2 flex-1 text-base leading-relaxed text-muted">{t(k("Pitch"))}</p>
+                <div className="mt-5 flex flex-wrap items-center gap-x-5 gap-y-3">
+                  <ButtonLink href={link(p.primary.href)}>{t(p.primary.key)}</ButtonLink>
+                  <Link href={link(p.more.href)} className="inline-flex items-center gap-1.5 text-sm font-bold text-ink underline decoration-ink/30 underline-offset-4 hover:decoration-ink">
+                    {t(p.more.key)}
+                  </Link>
                 </div>
               </li>
             );
           })}
         </ul>
-      </Container>
-    </Section>
-  );
-}
-
-const STEPS: { n: 1 | 2 | 3 | 4; icon: IconName }[] = [
-  { n: 1, icon: "chart" },
-  { n: 2, icon: "user" },
-  { n: 3, icon: "lock" },
-  { n: 4, icon: "clock" },
-];
-
-export function StepsSection() {
-  const t = useT(homeMessages);
-  return (
-    <Section className="bg-bg">
-      <Container>
-        <SectionHeading eyebrow={t("stepsEyebrow")} title={t("stepsTitle")} subtitle={t("stepsSubtitle")} />
-        <ol className="relative mt-12 grid gap-5 sm:grid-cols-2 lg:grid-cols-4">
-          <span
-            aria-hidden
-            className="absolute left-6 right-6 top-6 hidden h-px bg-gradient-to-r from-brand/40 via-sky/40 to-transparent lg:block"
-          />
-          {STEPS.map((s) => (
-            <li key={s.n} className="relative">
-              <div className="flex items-center gap-3">
-                <span className="relative flex h-12 w-12 items-center justify-center rounded-full bg-brand font-display text-lg font-black text-white ring-8 ring-bg">
-                  {s.n}
-                </span>
-                <Icon name={s.icon} className="h-5 w-5 text-brand" />
-              </div>
-              <h3 className="mt-5 font-display text-lg font-extrabold tracking-tight text-ink">
-                {t(`step${s.n}Title` as HomeKey)}
-              </h3>
-              <p className="mt-2 text-sm leading-relaxed text-muted">{t(`step${s.n}Text` as HomeKey)}</p>
-            </li>
-          ))}
-        </ol>
-      </Container>
-    </Section>
-  );
-}
-
-const FEES: { n: 1 | 2 | 3; icon: IconName }[] = [
-  { n: 1, icon: "check" },
-  { n: 2, icon: "receipt" },
-  { n: 3, icon: "chart" },
-];
-
-/** Frais transparents : la structure (tarifs de src/lib/pricing.ts) + lien vers /frais. */
-export function FeesSection() {
-  const t = useT(homeMessages);
-  return (
-    <Section className="bg-white">
-      <Container className="grid gap-10 lg:grid-cols-[0.9fr_1.1fr] lg:items-center lg:gap-14">
-        <div>
-          <SectionHeading eyebrow={t("feesEyebrow")} title={t("feesTitle")} subtitle={t("feesSubtitle")} />
-          <div className="mt-8 flex flex-col gap-3 sm:flex-row sm:flex-wrap">
-            <ButtonLink href="/frais">
-              <Icon name="receipt" className="h-4 w-4" />
-              {t("feesAll")}
-            </ButtonLink>
-            <a href="#simulateur" className={buttonClass("secondary", "md")}>
-              {t("feesSim")}
-              <Icon name="arrowRight" className="h-4 w-4" />
-            </a>
-          </div>
-        </div>
-        <ol className="grid gap-4 sm:grid-cols-3 lg:grid-cols-1">
-          {FEES.map((f) => (
-            <li key={f.n} className="flex gap-4 rounded-3xl border border-line bg-white p-5 shadow-card sm:flex-col sm:gap-3 lg:flex-row lg:gap-4">
-              <span className="grid h-11 w-11 shrink-0 place-items-center rounded-2xl bg-brand-soft text-brand">
-                <Icon name={f.icon} className="h-5 w-5" />
-              </span>
-              <span className="min-w-0">
-                <span className="block font-display font-bold text-ink">{t(`fee${f.n}Title` as HomeKey)}</span>
-                <span className="mt-1 block text-sm leading-relaxed text-muted">{t(`fee${f.n}Text` as HomeKey)}</span>
-              </span>
-            </li>
-          ))}
-        </ol>
       </Container>
     </Section>
   );
@@ -244,29 +85,22 @@ const VALUES: { n: 1 | 2 | 3 | 4 | 5; icon: IconName }[] = [
   { n: 5, icon: "sparkle" },
 ];
 
+/** Engagements en colonnes simples sur fond gris (« Raisons d'acheter » de logitech.com). */
 export function ValuesSection() {
   const t = useT(homeMessages);
   return (
-    <Section className="bg-navy-gradient relative overflow-hidden text-white">
-      <div aria-hidden className="bg-grid absolute inset-0 opacity-30 [mask-image:linear-gradient(to_bottom,black,transparent)]" />
-      <Container className="relative">
-        <SectionHeading light align="center" eyebrow={t("whyEyebrow")} title={t("whyTitle")} subtitle={t("whySubtitle")} />
-        <div className="mt-12 grid gap-4 sm:grid-cols-2 lg:grid-cols-6">
-          {VALUES.map((v, i) => (
-            <div
-              key={v.n}
-              className={`rounded-3xl border border-white/10 bg-white/[0.05] p-6 backdrop-blur transition hover:bg-white/[0.08] lg:col-span-2 ${
-                i === 3 ? "lg:col-start-2" : ""
-              } ${i === 4 ? "sm:col-span-2 lg:col-span-2" : ""}`}
-            >
-              <span className="flex h-11 w-11 items-center justify-center rounded-2xl bg-white/10 text-sky">
-                <Icon name={v.icon} className="h-5 w-5" />
-              </span>
-              <h3 className="mt-4 font-display text-lg font-extrabold tracking-tight">{t(`v${v.n}Title` as HomeKey)}</h3>
-              <p className="mt-2 text-sm leading-relaxed text-white/70">{t(`v${v.n}Text` as HomeKey)}</p>
-            </div>
+    <Section className="bg-bg">
+      <Container>
+        <SectionHeading eyebrow={t("whyEyebrow")} title={t("whyTitle")} subtitle={t("whySubtitle")} />
+        <ul className="mt-12 grid gap-x-8 gap-y-10 sm:grid-cols-2 lg:grid-cols-5">
+          {VALUES.map((v) => (
+            <li key={v.n}>
+              <Icon name={v.icon} className="h-8 w-8 text-ink" strokeWidth={1.6} />
+              <h3 className="mt-4 font-display text-lg font-bold text-ink">{t(`v${v.n}Title` as HomeKey)}</h3>
+              <p className="mt-2 text-sm leading-relaxed text-muted">{t(`v${v.n}Text` as HomeKey)}</p>
+            </li>
           ))}
-        </div>
+        </ul>
       </Container>
     </Section>
   );

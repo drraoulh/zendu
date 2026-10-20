@@ -1,6 +1,6 @@
 import type { Metadata, Viewport } from "next";
 import { headers } from "next/headers";
-import { Inter, Montserrat } from "next/font/google";
+import { DM_Sans } from "next/font/google";
 import { I18nProvider } from "@/components/i18n-provider";
 import { AuthProvider } from "@/components/auth-provider";
 import { SiteProvider } from "@/components/site-provider";
@@ -15,15 +15,11 @@ import { appFullName, appName, logo } from "@/lib/brand";
 import { siteForHost, siteOrigin, type SiteId } from "@/lib/site";
 import "./globals.css";
 
-const montserrat = Montserrat({
-  variable: "--font-montserrat",
+/** Une seule famille géométrique, titres et texte (esprit « Brown » de logitech.com). */
+const dmSans = DM_Sans({
+  variable: "--font-brand",
   subsets: ["latin"],
-  weight: ["500", "600", "700", "800", "900"],
-});
-
-const inter = Inter({
-  variable: "--font-inter",
-  subsets: ["latin"],
+  weight: ["400", "500", "600", "700", "800", "900"],
 });
 
 async function currentHost() {
@@ -73,7 +69,7 @@ export async function generateMetadata(): Promise<Metadata> {
 }
 
 export const viewport: Viewport = {
-  themeColor: "#061a52",
+  themeColor: "#17181b",
 };
 
 export default async function RootLayout({ children }: Readonly<{ children: React.ReactNode }>) {
@@ -81,7 +77,7 @@ export default async function RootLayout({ children }: Readonly<{ children: Reac
   const siteValue = await currentSite();
   const wst = siteValue.site === "wst";
   return (
-    <html lang="fr" className={`${montserrat.variable} ${inter.variable}`}>
+    <html lang="fr" className={dmSans.variable}>
       <body className="flex min-h-screen flex-col">
         <SiteProvider value={siteValue}>
           <I18nProvider>

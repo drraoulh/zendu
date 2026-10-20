@@ -22,6 +22,7 @@ export function ShippingContent() {
         secondary={{ href: "/shipping/suivi", label: t("trackHeroCta") }}
         highlights={[t("hl1"), t("hl2"), t("hl3")]}
         icon="box"
+        image={{ src: "/images/shipping.jpg", alt: t("heroEyebrow") }}
       />
 
       <FeatureGrid

@@ -1,18 +1,21 @@
 @import "tailwindcss";
 
-/* PWFINTECH — couleurs tirées du logo : bleu électrique, bleu nuit, ciel, argent, érable. */
+/*
+ * Esprit logitech.com : texte presque noir, gris neutres, sections sombres graphite,
+ * une seule typographie géométrique. Le bleu du logo PWFINTECH reste la couleur d'accent.
+ */
 :root {
-  --bg: #f5f8ff;
+  --bg: #f4f4f5;
   --surface: #ffffff;
-  --surface-soft: #eef3ff;
-  --ink: #0a1838;
-  --muted: #56627f;
-  --line: rgba(10, 24, 56, 0.1);
+  --surface-soft: #f1f1f2;
+  --ink: #1b1b1b;
+  --muted: #6b6d73;
+  --line: rgba(0, 0, 0, 0.1);
   --brand: #0b4dff;
   --brand-strong: #0637c9;
-  --brand-soft: #e6edff;
-  --navy: #061a52;
-  --navy-deep: #040f33;
+  --brand-soft: #e8eeff;
+  --navy: #17181b;
+  --navy-deep: #000000;
   --sky: #3fa0ff;
   --silver: #c9d3e6;
   --maple: #e11d2b;
@@ -39,8 +42,11 @@
   --color-success: var(--success);
   --color-warn: var(--warn);
   --color-danger: var(--danger);
-  --font-display: var(--font-montserrat), "Montserrat", system-ui, sans-serif;
-  --font-sans: var(--font-inter), "Inter", system-ui, sans-serif;
+  --font-display: var(--font-brand), "DM Sans", "Helvetica Neue", Arial, sans-serif;
+  --font-sans: var(--font-brand), "DM Sans", "Helvetica Neue", Arial, sans-serif;
+  /* Coins plus sobres (cartes de logitech.com : 12 à 20 px). */
+  --radius-2xl: 0.875rem;
+  --radius-3xl: 1.125rem;
 }
 
 @layer base {
@@ -64,6 +70,13 @@
 
   ::selection {
     background: rgba(11, 77, 255, 0.18);
+  }
+
+  /* Titres serrés et francs, comme sur logitech.com (-3 %). */
+  h1,
+  h2,
+  h3 {
+    letter-spacing: -0.03em;
   }
 
   /* Un élément de grille ne doit jamais élargir la page (sélecteurs, montants longs…). */
@@ -91,28 +104,34 @@
 
 .bg-navy-gradient {
   background:
-    radial-gradient(70% 60% at 85% 10%, rgba(63, 160, 255, 0.28), transparent 70%),
-    radial-gradient(50% 50% at 0% 100%, rgba(11, 77, 255, 0.35), transparent 70%),
-    linear-gradient(160deg, var(--navy) 0%, var(--navy-deep) 100%);
+    radial-gradient(60% 50% at 90% 0%, rgba(11, 77, 255, 0.16), transparent 70%),
+    linear-gradient(180deg, var(--navy) 0%, var(--navy-deep) 100%);
 }
 
 .bg-grid {
   background-image:
-    linear-gradient(rgba(255, 255, 255, 0.06) 1px, transparent 1px),
-    linear-gradient(90deg, rgba(255, 255, 255, 0.06) 1px, transparent 1px);
+    linear-gradient(rgba(255, 255, 255, 0.04) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(255, 255, 255, 0.04) 1px, transparent 1px);
   background-size: 44px 44px;
 }
 
 .shadow-card {
-  box-shadow:
-    0 1px 2px rgba(10, 24, 56, 0.05),
-    0 12px 32px -12px rgba(10, 24, 56, 0.18);
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.04);
 }
 
 .shadow-float {
   box-shadow:
-    0 30px 60px -20px rgba(4, 15, 51, 0.45),
-    0 2px 6px rgba(4, 15, 51, 0.08);
+    0 24px 48px -24px rgba(0, 0, 0, 0.35),
+    0 2px 6px rgba(0, 0, 0, 0.06);
+}
+
+/* Image qui grossit légèrement au survol de sa carte (tuiles de logitech.com). */
+.zoom-on-hover {
+  transition: transform 0.6s cubic-bezier(0.2, 0.7, 0.2, 1);
+}
+
+.group:hover .zoom-on-hover {
+  transform: scale(1.04);
 }
 
 @keyframes rise {
@@ -179,5 +198,11 @@
   .animate-orbit,
   .live-dot {
     animation: none;
+  }
+
+  .zoom-on-hover,
+  .group:hover .zoom-on-hover {
+    transition: none;
+    transform: none;
   }
 }
