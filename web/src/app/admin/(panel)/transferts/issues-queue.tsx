@@ -94,7 +94,7 @@ function IssueItem({ row, nl, date }: { row: AdminTransferRow; nl: string; date:
     <li className="rounded-2xl border border-line p-4">
       <div className="flex flex-wrap items-start justify-between gap-3">
         <div className="min-w-0">
-          <Link href={`/transfers/${row.id}`} className="font-mono text-xs font-semibold text-brand hover:underline">
+          <Link href={`/admin/transferts/${row.reference}`} className="font-mono text-xs font-semibold text-brand hover:underline">
             {row.reference}
           </Link>
           <p className="mt-0.5 text-xs text-muted">{date(row.createdAt)}</p>

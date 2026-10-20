@@ -261,9 +261,9 @@ export function CustomerDetail({ initial }: { initial: Detail }) {
             {initial.transfers.map((tr) => (
               <li key={tr.id} className="grid gap-1 py-3 sm:grid-cols-[minmax(0,1.4fr)_1fr_1fr_auto] sm:items-center sm:gap-3">
                 <div className="min-w-0">
-                  <a href={`/transfers/${tr.id}`} target="_blank" rel="noreferrer" className="font-semibold text-brand hover:underline">
+                  <Link href={`/admin/transferts/${tr.reference}`} className="font-semibold text-brand hover:underline">
                     {tr.reference}
-                  </a>
+                  </Link>
                   <p className="truncate text-sm text-muted">
                     {tr.recipient} · {label("net_", tr.network)}
                     {tr.account ? ` · ${tr.account}` : ""}

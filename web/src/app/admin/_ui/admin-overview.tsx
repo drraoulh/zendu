@@ -4,9 +4,11 @@ import Link from "next/link";
 import { Icon, type IconName } from "@/components/ui/icon";
 import { REQUEST_KINDS, REQUEST_STATUSES, SHIPMENT_STATUSES } from "@/lib/requests";
 import type { AdminRequest } from "../_server/data";
+import type { ActionCounts, InsightPeriod, TransferInsights } from "../_server/insights";
 import { useTransferLabels } from "@/components/transfer-app/use-transfer-labels";
 import { useCustomersT } from "./customers-kit";
 import { DbError, KIND_ICON, PageTitle, Panel, RequestStatusBadge, useAdminT } from "./kit";
+import { ActivitySection, TodoStrip } from "./overview-insights";
 
 type Data = {
   requests: { kind: string; status: string; count: number }[];
@@ -43,7 +45,17 @@ function Bars({ rows, total }: { rows: { label: string; count: number; href?: st
   );
 }
 
-export function AdminOverview({ data }: { data: Data | null }) {
+export function AdminOverview({
+  data,
+  insights,
+  counts,
+  period,
+}: {
+  data: Data | null;
+  insights: TransferInsights | null;
+  counts: ActionCounts | null;
+  period: InsightPeriod;
+}) {
   const { t, label, dateTime } = useAdminT();
   const { t: tc } = useCustomersT();
   const { status: transferStatus } = useTransferLabels();
@@ -52,6 +64,7 @@ export function AdminOverview({ data }: { data: Data | null }) {
     return (
       <div className="space-y-6">
         <PageTitle title={t("ovTitle")} subtitle={t("ovSubtitle")} />
+        {counts && <TodoStrip counts={counts} />}
         <DbError />
       </div>
     );
@@ -81,20 +94,17 @@ export function AdminOverview({ data }: { data: Data | null }) {
       href: "/admin/demandes?status=in_progress",
     },
     { label: t("kpiActiveShipments"), value: String(activeShipments), icon: "box", tone: "bg-sky/15 text-brand-strong", href: "/admin/colis?status=active" },
-    {
-      label: t("kpiTransfers"),
-      value: transferTotal === null ? "—" : String(transferTotal),
-      icon: "transfer",
-      tone: "bg-success/10 text-success",
-      href: "/admin/transferts",
-    },
   ];
 
   return (
     <div className="space-y-6">
       <PageTitle title={t("ovTitle")} subtitle={t("ovSubtitle")} />
 
-      <ul className="grid grid-cols-2 gap-3 sm:gap-4 xl:grid-cols-4">
+      {counts && <TodoStrip counts={counts} />}
+
+      <ActivitySection insights={insights} period={period} />
+
+      <ul className="grid grid-cols-1 gap-3 min-[420px]:grid-cols-3 sm:gap-4">
         {kpis.map((k) => (
           <li key={k.label}>
             <Link

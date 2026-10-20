@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import type { ReactNode } from "react";
 import { requireAdminPage } from "../_server/session";
+import { actionCounts } from "../_server/insights";
 import { AdminShell } from "../_ui/admin-shell";
 
 export const dynamic = "force-dynamic";
@@ -12,5 +13,13 @@ export const metadata: Metadata = {
 
 export default async function AdminPanelLayout({ children }: { children: ReactNode }) {
   const mode = await requireAdminPage();
-  return <AdminShell devOpen={mode === "dev-open"}>{children}</AdminShell>;
+  const counts = await actionCounts().catch((err: unknown) => {
+    console.error("[admin] compteurs indisponibles", err);
+    return null;
+  });
+  return (
+    <AdminShell devOpen={mode === "dev-open"} counts={counts}>
+      {children}
+    </AdminShell>
+  );
 }

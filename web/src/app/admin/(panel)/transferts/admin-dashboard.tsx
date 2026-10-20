@@ -331,7 +331,7 @@ export function AdminDashboard({
                               </td>
                               <td className="px-4 py-3 text-right align-top">
                                 <Link
-                                  href={`/transfers/${r.id}`}
+                                  href={`/admin/transferts/${r.reference}`}
                                   aria-label={t("openTransfer", { ref: r.reference })}
                                   className="inline-flex items-center gap-1 rounded-full px-3 py-1.5 text-xs font-semibold text-brand transition hover:bg-brand-soft"
                                 >
@@ -350,7 +350,7 @@ export function AdminDashboard({
                       {list.map((r) => (
                         <li key={r.id}>
                           <Link
-                            href={`/transfers/${r.id}`}
+                            href={`/admin/transferts/${r.reference}`}
                             aria-label={t("openTransfer", { ref: r.reference })}
                             className="block rounded-3xl border border-line bg-white p-4 shadow-card transition active:scale-[0.99]"
                           >

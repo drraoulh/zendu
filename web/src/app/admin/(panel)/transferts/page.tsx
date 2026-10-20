@@ -3,9 +3,9 @@ import type { Prisma } from "@prisma/client";
 import { prisma } from "@/lib/prisma";
 import { getPayInMode } from "@/lib/providers/payin";
 import { getPayoutMode, momoLiveReady } from "@/lib/providers/payout";
-import { isBankNetwork, MANUAL_BANK_PROVIDER, MANUAL_PAYOUT_PROVIDER, maskAccount } from "@/lib/bank";
-import { INTERAC_PROVIDER } from "@/lib/providers/interac";
+import { isBankNetwork, maskAccount } from "@/lib/bank";
 import { expireStaleTransfers } from "@/lib/transfer-service";
+import { workQueueWhere } from "../../_server/insights";
 import { isLiveMode } from "@/lib/mode";
 import { COUNTRIES } from "@/lib/corridors";
 import { AdminDashboard, type AdminTransferRow } from "./admin-dashboard";
@@ -95,26 +95,7 @@ export default async function AdminPage({ searchParams }: Props) {
   const [transfers, results, queue] = await Promise.all([
     loadTransfers(),
     filtering ? loadTransfers(filterWhere(filters), RESULTS_LIMIT) : Promise.resolve(undefined),
-    // Files de travail chargées à part : un dossier en attente ne doit jamais disparaître parce que
-    // d'autres transferts plus récents ont été créés.
-    loadTransfers(
-      {
-        OR: [
-          { payInProvider: INTERAC_PROVIDER, status: "awaiting_payment" },
-          // Virement signalé envoyé par le client mais arrivé après l'expiration : encore confirmable.
-          {
-            payInProvider: INTERAC_PROVIDER,
-            status: "expired",
-            createdAt: { gte: new Date(Date.now() - 7 * 86400_000) },
-            events: { some: { type: "interac_declared" } },
-          },
-          { payoutProvider: { in: [MANUAL_BANK_PROVIDER, MANUAL_PAYOUT_PROVIDER] }, status: { in: ["payout_queued", "payout_sent"] } },
-          // À régulariser : paiement non conforme ou versement en échec récents.
-          { status: { in: ["payment_mismatch", "payout_failed"] }, updatedAt: { gte: new Date(Date.now() - 30 * 86400_000) } },
-        ],
-      },
-      200,
-    ),
+    loadTransfers(workQueueWhere(), 200),
   ]);
   return (
     <AdminDashboard

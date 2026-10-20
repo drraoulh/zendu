@@ -5,7 +5,7 @@
  * sur https://momodeveloper.mtn.com
  *
  * Usage:
- *   node scripts/momo-sandbox-keys.mjs VOTRE_SUBSCRIPTION_KEY
+ *   node scripts/momo-sandbox-keys.mjs VOTRE_SUBSCRIPTION_KEY [CALLBACK_HOST]
  *   # ou
  *   set MTN_SUBSCRIPTION_KEY=... && node scripts/momo-sandbox-keys.mjs
  */
@@ -14,6 +14,8 @@ import { randomUUID } from "crypto";
 
 const subscriptionKey =
   process.argv[2] || process.env.MTN_SUBSCRIPTION_KEY || "";
+const callbackHost =
+  process.argv[3] || process.env.MTN_CALLBACK_HOST || "localhost";
 
 if (!subscriptionKey) {
   console.error(
@@ -34,8 +36,7 @@ async function main() {
       "Content-Type": "application/json",
     },
     body: JSON.stringify({
-      // Domaine des rappels MTN (doit correspondre à MTN_CALLBACK_URL) : 3e argument ou MTN_CALLBACK_HOST.
-      providerCallbackHost: process.argv[3] || process.env.MTN_CALLBACK_HOST || "localhost",
+      providerCallbackHost: callbackHost,
     }),
   });
 
@@ -70,6 +71,8 @@ async function main() {
   console.log(
     `MTN_BASE_URL="https://sandbox.momodeveloper.mtn.com/disbursement"`,
   );
+  console.log(`MTN_CALLBACK_HOST="${callbackHost}"`);
+  console.log(`MTN_CALLBACK_URL="https://${callbackHost}/api/webhooks/momo"`);
   console.log("");
 }
 
