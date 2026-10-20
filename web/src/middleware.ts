@@ -1,6 +1,7 @@
 import { NextResponse, type NextRequest } from "next/server";
 import { updateSession } from "@/lib/supabase/middleware";
 import { ADMIN_COOKIE, adminMode, verifySessionToken } from "@/lib/admin-auth";
+import { siteForHost, siteOfPath, siteOrigin } from "@/lib/site";
 
 /**
  * Écrans d'envoi web conservés dans le code (moteur de l'app WorldSoft Transfer) mais fermés au
@@ -95,6 +96,36 @@ async function route(request: NextRequest): Promise<NextResponse> {
       target.search = "";
       if (mode === "configured") target.searchParams.set("next", pathname + request.nextUrl.search);
       return NextResponse.redirect(target, 307);
+    }
+  }
+
+  // Deux sites sur un même projet (voir src/lib/site.ts) : une page de l'autre site renvoie vers son domaine.
+  const host = request.headers.get("x-forwarded-host") ?? request.headers.get("host");
+  const site = siteForHost(host);
+  const owner = siteOfPath(pathname);
+  if (owner && owner !== site) {
+    const origin = siteOrigin(owner, host);
+    if (origin) {
+      const target = new URL(pathname + request.nextUrl.search, origin);
+      if (owner === "wst" && pathname.replace(/\/+$/, "") === "/transfert") target.pathname = "/";
+      return NextResponse.redirect(target, 307);
+    }
+  }
+  if (site === "wst") {
+    const path = pathname.replace(/\/+$/, "") || "/";
+    // La page produit /transfert est l'accueil de WorldSoft Transfer.
+    if (path === "/transfert") {
+      const target = request.nextUrl.clone();
+      target.pathname = "/";
+      return NextResponse.redirect(target, 308);
+    }
+    if (path === "/") {
+      const session = await updateSession(request);
+      const target = request.nextUrl.clone();
+      target.pathname = "/transfert";
+      const rewritten = NextResponse.rewrite(target);
+      session.cookies.getAll().forEach((c) => rewritten.cookies.set(c));
+      return rewritten;
     }
   }
 

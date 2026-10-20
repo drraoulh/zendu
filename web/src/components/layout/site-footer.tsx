@@ -9,6 +9,7 @@ import { Icon } from "@/components/ui/icon";
 import { WstLogo } from "@/components/brand/wst-logo";
 import { StoreBadges } from "@/components/app/store-badges";
 import { CompanyValue } from "@/components/info/shared";
+import { useSite } from "@/components/site-provider";
 import { appMessages } from "@/i18n/app";
 import { appFullName, appName } from "@/lib/brand";
 import { company, companyLocality, socialLinks, telHref, whatsappHref } from "@/lib/company";
@@ -23,7 +24,8 @@ const COLUMNS: Array<{ title: FooterKey; links: Array<{ href: string; key: Foote
     title: "services",
     links: [
       { href: "/transfert", key: "transfer" },
-      { href: "/application", key: "wst" },
+      { href: "/avi", key: "avi" },
+      { href: "/paiement-fournisseurs", key: "suppliers" },
       { href: "/finances", key: "finances" },
       { href: "/technologies", key: "tech" },
       { href: "/shipping", key: "shipping" },
@@ -32,8 +34,6 @@ const COLUMNS: Array<{ title: FooterKey; links: Array<{ href: string; key: Foote
   {
     title: "info",
     links: [
-      { href: "/frais", key: "fees" },
-      { href: "/pays", key: "countries" },
       { href: "/aide", key: "help" },
       { href: "/shipping/suivi", key: "tracking" },
     ],
@@ -43,7 +43,7 @@ const COLUMNS: Array<{ title: FooterKey; links: Array<{ href: string; key: Foote
     links: [
       { href: "/a-propos", key: "about" },
       { href: "/contact", key: "contact" },
-      { href: "/application", key: "download" },
+      { href: "/application", key: "wst" },
     ],
   },
   {
@@ -64,6 +64,7 @@ export function SiteFooter() {
   const locality = companyLocality();
   const wa = whatsappHref(company.whatsapp);
   const socials = socialLinks();
+  const { link } = useSite();
 
   return (
     <footer className="bg-navy-gradient text-white">
@@ -144,7 +145,7 @@ export function SiteFooter() {
             {COLUMNS.map((col) => (
               <FooterColumn key={col.title} title={f(col.title)}>
                 {col.links.map((l) => (
-                  <FooterLink key={`${l.href}-${l.key}`} href={l.href}>
+                  <FooterLink key={`${l.href}-${l.key}`} href={link(l.href)}>
                     {f(l.key)}
                   </FooterLink>
                 ))}
@@ -156,7 +157,7 @@ export function SiteFooter() {
         <div className="mt-14 flex flex-col gap-6 rounded-3xl border border-white/10 bg-white/5 p-6 sm:p-8 md:flex-row md:items-center md:justify-between">
           <div>
             <p className="font-display text-xs font-bold uppercase tracking-[0.18em] text-sky">{ta("ourApp")}</p>
-            <Link href="/application" className="mt-3 inline-block" aria-label="WorldSoft Transfer">
+            <Link href={link("/application")} className="mt-3 inline-block" aria-label="WorldSoft Transfer">
               <WstLogo variant="negative" className="h-7 w-auto" />
             </Link>
             <p className="mt-3 max-w-md text-sm text-white/70">{ta("ourAppText")}</p>

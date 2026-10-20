@@ -6,35 +6,20 @@ import { usePathname } from "next/navigation";
 import { useCallback, useEffect, useId, useRef, useState, type ReactNode } from "react";
 import { LogoWordmark } from "@/components/brand/logo";
 import { LanguageSelect } from "@/components/layout/language-select";
-import { ButtonLink, buttonClass } from "@/components/ui/button";
+import { ButtonLink } from "@/components/ui/button";
 import { Icon, type IconName } from "@/components/ui/icon";
-import { displayName, useAuth } from "@/components/auth-provider";
 import { StoreBadges } from "@/components/app/store-badges";
-import { webTransfersEnabled } from "@/lib/app-links";
+import { useSite } from "@/components/site-provider";
 import { appMessages } from "@/i18n/app";
 import { common } from "@/i18n/common";
 import { useT } from "@/i18n/define";
 
 type CommonKey = keyof typeof common.fr;
-type NavKey = "navTransfer" | "navFinances" | "navTech" | "navShipping" | "navAbout" | "navContact";
-
-/**
- * Liste plate historique (utilisée par le pied de page : 4 pôles puis À propos / Contact).
- * Forme conservée : { href, key, icon }.
- */
-export const NAV: { href: string; key: NavKey; icon: IconName }[] = [
-  { href: "/transfert", key: "navTransfer", icon: "transfer" },
-  { href: "/finances", key: "navFinances", icon: "finance" },
-  { href: "/technologies", key: "navTech", icon: "tech" },
-  { href: "/shipping", key: "navShipping", icon: "ship" },
-  { href: "/a-propos", key: "navAbout", icon: "info" },
-  { href: "/contact", key: "navContact", icon: "mail" },
-];
 
 export type MenuLink = { href: string; key: CommonKey };
 export type MenuItem = { href: string; key: CommonKey; desc: CommonKey; icon: IconName; actions: MenuLink[] };
 
-/** Menu « Services » : un pôle par entrée, avec ses actions principales. */
+/** Menu « Services » : les six activités de PWFINTECH, chacune avec ses actions principales. */
 export const SERVICES_MENU: MenuItem[] = [
   {
     href: "/transfert",
@@ -45,6 +30,20 @@ export const SERVICES_MENU: MenuItem[] = [
       { href: "/transfert#simulateur", key: "actSimulate" },
       { href: "/frais", key: "navFees" },
     ],
+  },
+  {
+    href: "/avi",
+    key: "navAvi",
+    desc: "descAvi",
+    icon: "plane",
+    actions: [{ href: "/contact?sujet=avi", key: "actRequest" }],
+  },
+  {
+    href: "/paiement-fournisseurs",
+    key: "navSuppliers",
+    desc: "descSuppliers",
+    icon: "wallet",
+    actions: [{ href: "/contact?sujet=fournisseurs", key: "actRequest" }],
   },
   {
     href: "/finances",
@@ -72,20 +71,14 @@ export const SERVICES_MENU: MenuItem[] = [
   },
 ];
 
-/** Menu « Informations ». */
-export const INFO_MENU: MenuItem[] = [
-  { href: "/frais", key: "navFees", desc: "descFees", icon: "receipt", actions: [] },
-  { href: "/pays", key: "navCountries", desc: "descCountries", icon: "globe", actions: [] },
-  { href: "/aide", key: "navHelp", desc: "descHelp", icon: "info", actions: [] },
-];
-
-/** Liens directs (hors menus déroulants). */
+/** Liens directs (hors menu déroulant). */
 export const DIRECT_LINKS: MenuLink[] = [
   { href: "/a-propos", key: "navAbout" },
+  { href: "/aide", key: "navHelp" },
   { href: "/contact", key: "navContact" },
 ];
 
-type MenuId = "services" | "info";
+type MenuId = "services";
 
 /** Petit symbole WST blanc pour le bouton « Télécharger l'app ». */
 function WstGlyph({ className = "h-4 w-4" }: { className?: string }) {
@@ -100,7 +93,7 @@ export function SiteHeader() {
   const t = useT(common);
   const ta = useT(appMessages);
   const pathname = usePathname();
-  const { user, loading, signOut } = useAuth();
+  const { link } = useSite();
   const [open, setOpen] = useState(false);
   const [menu, setMenu] = useState<MenuId | null>(null);
   const [scrolled, setScrolled] = useState(false);
@@ -182,7 +175,7 @@ export function SiteHeader() {
                 <ul className="grid gap-1 p-3 sm:grid-cols-2">
                   {SERVICES_MENU.map((item) => (
                     <li key={item.href}>
-                      <ServicePanelItem item={item} t={t} active={isActive(item.href)} onNavigate={closeMenu} />
+                      <ServicePanelItem item={item} t={t} link={link} active={isActive(item.href)} onNavigate={closeMenu} />
                     </li>
                   ))}
                 </ul>
@@ -192,7 +185,7 @@ export function SiteHeader() {
                     {ta("ourAppText")}
                   </p>
                   <Link
-                    href="/application"
+                    href={link("/application")}
                     onClick={closeMenu}
                     className="inline-flex items-center gap-1 rounded text-sm font-semibold text-brand hover:text-brand-strong focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand/40"
                   >
@@ -200,38 +193,6 @@ export function SiteHeader() {
                     <Icon name="arrowRight" className="h-4 w-4" />
                   </Link>
                 </div>
-              </Dropdown>
-            </li>
-            <li>
-              <Dropdown
-                id="info"
-                label={t("navInfo")}
-                active={groupActive(INFO_MENU)}
-                open={menu === "info"}
-                onToggle={(v) => setMenu(v ? "info" : null)}
-                onClose={closeMenu}
-                panelClassName="w-80 left-0"
-              >
-                <ul className="grid gap-1 p-3">
-                  {INFO_MENU.map((item) => (
-                    <li key={item.href}>
-                      <Link
-                        href={item.href}
-                        onClick={closeMenu}
-                        aria-current={isActive(item.href) ? "page" : undefined}
-                        className="group flex gap-3 rounded-2xl p-3 transition hover:bg-surface-soft focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand/40"
-                      >
-                        <span className="grid h-10 w-10 shrink-0 place-items-center rounded-xl bg-brand-soft text-brand">
-                          <Icon name={item.icon} className="h-5 w-5" />
-                        </span>
-                        <span className="min-w-0">
-                          <span className="block text-sm font-bold text-ink group-hover:text-brand">{t(item.key)}</span>
-                          <span className="mt-0.5 block text-xs leading-snug text-muted">{t(item.desc)}</span>
-                        </span>
-                      </Link>
-                    </li>
-                  ))}
-                </ul>
               </Dropdown>
             </li>
             {DIRECT_LINKS.map((l) => (
@@ -254,35 +215,8 @@ export function SiteHeader() {
           <div className="hidden md:block">
             <LanguageSelect />
           </div>
-          {webTransfersEnabled && !loading && user ? (
-            <div className="hidden items-center gap-1 xl:flex">
-              <Link
-                href="/history"
-                className="inline-flex items-center gap-2 rounded-full px-3 py-2 text-sm font-semibold text-ink/80 hover:bg-surface-soft"
-              >
-                <Icon name="user" className="h-4 w-4" />
-                <span className="max-w-[8rem] truncate">{displayName(user)}</span>
-              </Link>
-              <button
-                type="button"
-                onClick={() => void signOut()}
-                className="rounded-full p-2 text-muted hover:bg-surface-soft hover:text-ink"
-                aria-label={t("logOut")}
-                title={t("logOut")}
-              >
-                <Icon name="logout" className="h-4 w-4" />
-              </button>
-            </div>
-          ) : webTransfersEnabled ? (
-            <Link
-              href="/login"
-              className="hidden whitespace-nowrap rounded-full px-3 py-2 text-sm font-semibold text-ink hover:bg-surface-soft xl:inline-flex"
-            >
-              {t("logIn")}
-            </Link>
-          ) : null}
           <div className="hidden sm:block">
-            <ButtonLink href="/application" size="sm" className="whitespace-nowrap">
+            <ButtonLink href={link("/application")} size="sm" className="whitespace-nowrap">
               <WstGlyph />
               {ta("downloadApp")}
             </ButtonLink>
@@ -320,7 +254,7 @@ export function SiteHeader() {
                 {SERVICES_MENU.map((item) => (
                   <li key={item.href} className="rounded-2xl">
                     <Link
-                      href={item.href}
+                      href={link(item.href)}
                       aria-current={isActive(item.href) ? "page" : undefined}
                       className={`flex items-center gap-3 rounded-2xl px-3 py-2.5 ${
                         isActive(item.href) ? "bg-brand-soft" : "hover:bg-surface-soft"
@@ -339,7 +273,7 @@ export function SiteHeader() {
                         {item.actions.map((a) => (
                           <li key={a.href}>
                             <Link
-                              href={a.href}
+                              href={link(a.href)}
                               className="inline-flex min-h-10 items-center gap-1 rounded-full border border-brand/20 bg-white px-3.5 py-2 text-xs font-semibold text-brand-strong hover:bg-brand-soft"
                             >
                               {t(a.key)}
@@ -354,30 +288,6 @@ export function SiteHeader() {
               </ul>
             </Accordion>
 
-            <Accordion title={t("navInfo")} icon="info">
-              <ul className="space-y-1">
-                {INFO_MENU.map((item) => (
-                  <li key={item.href}>
-                    <Link
-                      href={item.href}
-                      aria-current={isActive(item.href) ? "page" : undefined}
-                      className={`flex items-center gap-3 rounded-2xl px-3 py-2.5 ${
-                        isActive(item.href) ? "bg-brand-soft" : "hover:bg-surface-soft"
-                      }`}
-                    >
-                      <span className="grid h-9 w-9 shrink-0 place-items-center rounded-xl bg-brand-soft text-brand">
-                        <Icon name={item.icon} className="h-5 w-5" />
-                      </span>
-                      <span className="min-w-0">
-                        <span className="block font-semibold text-ink">{t(item.key)}</span>
-                        <span className="block text-xs leading-snug text-muted">{t(item.desc)}</span>
-                      </span>
-                    </Link>
-                  </li>
-                ))}
-              </ul>
-            </Accordion>
-
             {DIRECT_LINKS.map((l) => (
               <Link
                 key={l.href}
@@ -387,41 +297,14 @@ export function SiteHeader() {
                   isActive(l.href) ? "bg-brand-soft text-brand-strong" : "text-ink hover:bg-surface-soft"
                 }`}
               >
-                <Icon name={l.key === "navAbout" ? "users" : "mail"} className="h-5 w-5 text-brand" />
+                <Icon name={l.key === "navAbout" ? "users" : l.key === "navHelp" ? "info" : "mail"} className="h-5 w-5 text-brand" />
                 {t(l.key)}
               </Link>
             ))}
 
             <div className="my-3 border-t border-line" />
 
-            {!webTransfersEnabled ? null : !loading && user ? (
-              <>
-                <Link href="/history" className="flex items-center gap-3 rounded-2xl px-4 py-3 font-semibold hover:bg-surface-soft">
-                  <Icon name="receipt" /> {t("navHistory")}
-                </Link>
-                <Link href="/refer" className="flex items-center gap-3 rounded-2xl px-4 py-3 font-semibold hover:bg-surface-soft">
-                  <Icon name="gift" /> {t("navRefer")}
-                </Link>
-                <button
-                  type="button"
-                  onClick={() => void signOut()}
-                  className="flex items-center gap-3 rounded-2xl px-4 py-3 text-left font-semibold text-muted hover:bg-surface-soft"
-                >
-                  <Icon name="logout" /> {t("logOut")} · {displayName(user)}
-                </button>
-              </>
-            ) : (
-              <div className="grid grid-cols-2 gap-3">
-                <Link href="/login" className={buttonClass("secondary", "lg")}>
-                  {t("logIn")}
-                </Link>
-                <Link href="/signup" className={buttonClass("primary", "lg")}>
-                  {t("signUp")}
-                </Link>
-              </div>
-            )}
-
-            <ButtonLink href="/application" size="lg" className={`w-full ${webTransfersEnabled ? "mt-3" : ""}`}>
+            <ButtonLink href={link("/application")} size="lg" className="w-full">
               <WstGlyph className="h-5 w-5" />
               {ta("downloadApp")}
             </ButtonLink>
@@ -525,11 +408,13 @@ function Dropdown({
 function ServicePanelItem({
   item,
   t,
+  link,
   active,
   onNavigate,
 }: {
   item: MenuItem;
   t: (key: CommonKey) => string;
+  link: (href: string) => string;
   active: boolean;
   onNavigate: () => void;
 }) {
@@ -540,7 +425,7 @@ function ServicePanelItem({
       </span>
       <div className="min-w-0">
         <Link
-          href={item.href}
+          href={link(item.href)}
           onClick={onNavigate}
           aria-current={active ? "page" : undefined}
           className="rounded text-sm font-bold text-ink hover:text-brand focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand/40"
@@ -552,7 +437,7 @@ function ServicePanelItem({
           {item.actions.map((a) => (
             <li key={a.href}>
               <Link
-                href={a.href}
+                href={link(a.href)}
                 onClick={onNavigate}
                 className="inline-flex items-center gap-1 rounded text-xs font-semibold text-brand hover:text-brand-strong focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand/40"
               >

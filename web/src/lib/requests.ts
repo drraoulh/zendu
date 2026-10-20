@@ -14,7 +14,7 @@ export type RequestKind = (typeof REQUEST_KINDS)[number];
 export const REQUEST_STATUSES = ["new", "in_progress", "answered", "closed"] as const;
 export type RequestStatus = (typeof REQUEST_STATUSES)[number];
 
-export const CONTACT_SUBJECTS = ["transfert", "finances", "technologies", "shipping", "autre"] as const;
+export const CONTACT_SUBJECTS = ["transfert", "avi", "fournisseurs", "finances", "technologies", "shipping", "autre"] as const;
 export const SHIPPING_MODES = ["air", "sea"] as const;
 export const APPOINTMENT_MODES = ["video", "phone", "in_person"] as const;
 

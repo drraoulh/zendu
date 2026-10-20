@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { AppDownloadButton } from "@/components/app/app-download-button";
-import { TransferCalculator } from "@/components/transfer/transfer-calculator";
+import { useSite } from "@/components/site-provider";
 import { ButtonLink } from "@/components/ui/button";
 import { Icon, type IconName } from "@/components/ui/icon";
 import { Container } from "@/components/ui/layout";
@@ -10,6 +10,46 @@ import { useT } from "@/i18n/define";
 import { homeMessages } from "@/i18n/home";
 
 type HomeKey = keyof typeof homeMessages.fr;
+
+/** Les six activités, dans l'ordre fixé par la direction. */
+export const ACTIVITIES: { n: 1 | 2 | 3 | 4 | 5 | 6; href: string; icon: IconName }[] = [
+  { n: 1, href: "/transfert", icon: "transfer" },
+  { n: 2, href: "/avi", icon: "plane" },
+  { n: 3, href: "/paiement-fournisseurs", icon: "wallet" },
+  { n: 4, href: "/finances", icon: "finance" },
+  { n: 5, href: "/technologies", icon: "tech" },
+  { n: 6, href: "/shipping", icon: "ship" },
+];
+
+/** Carte du hero : les six activités en accès direct. */
+function ActivitiesPanel() {
+  const t = useT(homeMessages);
+  const { link } = useSite();
+  return (
+    <div className="rounded-[1.75rem] border border-white/15 bg-white p-4 text-ink shadow-float sm:p-5">
+      <p className="px-2 pt-1 font-display text-xs font-bold uppercase tracking-[0.16em] text-muted">{t("activitiesTitle")}</p>
+      <ul className="mt-3 grid gap-1.5">
+        {ACTIVITIES.map((a) => (
+          <li key={a.n}>
+            <Link
+              href={link(a.href)}
+              className="group flex items-center gap-3 rounded-2xl p-2.5 transition hover:bg-surface-soft focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand/40"
+            >
+              <span className="grid h-10 w-10 shrink-0 place-items-center rounded-xl bg-brand-soft text-brand transition group-hover:bg-brand group-hover:text-white">
+                <Icon name={a.icon} className="h-5 w-5" />
+              </span>
+              <span className="min-w-0 flex-1">
+                <span className="block text-sm font-bold text-ink">{t(`act${a.n}Title` as HomeKey)}</span>
+                <span className="block truncate text-xs text-muted">{t(`act${a.n}Text` as HomeKey)}</span>
+              </span>
+              <Icon name="arrowRight" className="h-4 w-4 shrink-0 text-brand opacity-0 transition group-hover:opacity-100" />
+            </Link>
+          </li>
+        ))}
+      </ul>
+    </div>
+  );
+}
 
 export function HomeHero() {
   const t = useT(homeMessages);
@@ -92,7 +132,7 @@ export function HomeHero() {
 
         <div className="animate-rise-2 relative mx-auto w-full max-w-md lg:max-w-none">
           <div aria-hidden className="absolute -inset-4 -z-10 rounded-[2rem] bg-sky/20 blur-2xl" />
-          <TransferCalculator id="simulateur" compact />
+          <ActivitiesPanel />
         </div>
       </Container>
     </section>
@@ -100,16 +140,17 @@ export function HomeHero() {
 }
 
 const SHORTCUTS: { n: 1 | 2 | 3 | 4 | 5; href: string; icon: IconName }[] = [
-  { n: 1, href: "#simulateur", icon: "chart" },
-  { n: 2, href: "/shipping/devis", icon: "box" },
-  { n: 3, href: "/finances/rendez-vous", icon: "clock" },
-  { n: 4, href: "/technologies/projet", icon: "code" },
-  { n: 5, href: "/shipping/suivi", icon: "pin" },
+  { n: 1, href: "/transfert#simulateur", icon: "chart" },
+  { n: 2, href: "/contact?sujet=avi", icon: "plane" },
+  { n: 3, href: "/contact?sujet=fournisseurs", icon: "wallet" },
+  { n: 4, href: "/finances/rendez-vous", icon: "clock" },
+  { n: 5, href: "/technologies/projet", icon: "code" },
 ];
 
 /** Bande de raccourcis vers les parcours principaux, juste sous le hero. */
 export function ShortcutsBand() {
   const t = useT(homeMessages);
+  const { link } = useSite();
   return (
     <nav aria-label={t("shortcutsTitle")} className="border-b border-line bg-white">
       <Container className="py-5 sm:py-6">
@@ -142,7 +183,7 @@ export function ShortcutsBand() {
                     {inner}
                   </a>
                 ) : (
-                  <Link href={s.href} className={cls}>
+                  <Link href={link(s.href)} className={cls}>
                     {inner}
                   </Link>
                 )}

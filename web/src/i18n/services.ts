@@ -872,6 +872,11 @@ export const techPage = defineMessages({
 export const shippingPage = defineMessages({
   fr: {
     heroEyebrow: "Shipping",
+    travelEyebrow: "Shipping · PAUL WORLD TRAVEL",
+    travelSubtitle: "Fret aérien ou maritime, sur devis, avec le suivi de votre envoi.",
+    travelNoteTitle: "Un service PAUL WORLD TRAVEL",
+    travelNote:
+      "L'expédition de colis relève des activités de PAUL WORLD TRAVEL. Demandez votre devis ici : vous recevez une réponse personnalisée.",
     heroTitle: "Vos colis et marchandises entre le Canada, la Chine et le Cameroun",
     heroSubtitle:
       "Fret aérien ou maritime, achat pour votre compte, accompagnement au dédouanement et suivi : nous vous aidons à expédier en toute sérénité.",
@@ -1052,6 +1057,11 @@ export const shippingPage = defineMessages({
   },
   en: {
     heroEyebrow: "Shipping",
+    travelEyebrow: "Shipping · PAUL WORLD TRAVEL",
+    travelSubtitle: "Air or sea freight, on quote, with tracking of your shipment.",
+    travelNoteTitle: "A PAUL WORLD TRAVEL service",
+    travelNote:
+      "Parcel shipping is part of PAUL WORLD TRAVEL's activities. Request your quote here: you receive a personalized reply.",
     heroTitle: "Your parcels and goods between Canada, China and Cameroon",
     heroSubtitle:
       "Air or sea freight, shopping on your behalf, customs support and tracking: we help you ship with peace of mind.",

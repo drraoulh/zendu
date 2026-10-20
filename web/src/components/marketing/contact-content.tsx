@@ -14,10 +14,12 @@ import { EMAIL_RE, Field, fieldAria, inputClass } from "./form";
 
 type K = keyof typeof contactPage.fr;
 
-const SUBJECTS = ["transfert", "finances", "technologies", "shipping", "autre"] as const;
+const SUBJECTS = ["transfert", "avi", "fournisseurs", "finances", "technologies", "shipping", "autre"] as const;
 type Subject = (typeof SUBJECTS)[number];
 const SUBJECT_LABEL: Record<Subject, K> = {
   transfert: "subjectTransfer",
+  avi: "subjectAvi",
+  fournisseurs: "subjectSuppliers",
   finances: "subjectFinances",
   technologies: "subjectTech",
   shipping: "subjectShipping",

@@ -2,6 +2,7 @@
 
 import Link from "next/link";
 import { WstLogo } from "@/components/brand/wst-logo";
+import { useSite } from "@/components/site-provider";
 import { ButtonLink, buttonClass } from "@/components/ui/button";
 import { Icon, type IconName } from "@/components/ui/icon";
 import { Container, Section, SectionHeading } from "@/components/ui/layout";
@@ -13,7 +14,7 @@ type HomeKey = keyof typeof homeMessages.fr;
 type Action = { href: string; key: HomeKey; icon?: IconName };
 
 const POLES: {
-  n: 1 | 2 | 3 | 4;
+  n: 1 | 2 | 3 | 4 | 5 | 6;
   href: string;
   icon: IconName;
   accent: string;
@@ -25,11 +26,27 @@ const POLES: {
     href: "/transfert",
     icon: "transfer",
     accent: "from-brand to-sky",
-    primary: { href: "#simulateur", key: "actSimulate", icon: "chart" },
+    primary: { href: "/transfert#simulateur", key: "actSimulate", icon: "chart" },
     more: [
       { href: "/transfert", key: "actWst" },
       { href: "/frais", key: "actFees" },
     ],
+  },
+  {
+    n: 5,
+    href: "/avi",
+    icon: "plane",
+    accent: "from-navy to-sky",
+    primary: { href: "/contact?sujet=avi", key: "actAviRequest", icon: "mail" },
+    more: [{ href: "/avi", key: "actLearn" }],
+  },
+  {
+    n: 6,
+    href: "/paiement-fournisseurs",
+    icon: "wallet",
+    accent: "from-brand-strong to-brand",
+    primary: { href: "/contact?sujet=fournisseurs", key: "actSupplierRequest", icon: "mail" },
+    more: [{ href: "/paiement-fournisseurs", key: "actLearn" }],
   },
   {
     n: 2,
@@ -53,16 +70,14 @@ const POLES: {
     icon: "ship",
     accent: "from-navy to-sky",
     primary: { href: "/shipping/devis", key: "actQuote", icon: "box" },
-    more: [
-      { href: "/shipping/suivi", key: "actTrack" },
-      { href: "/shipping", key: "actLearn" },
-    ],
+    more: [{ href: "/shipping", key: "actLearn" }],
   },
 ];
 
-/** Les 4 pôles en cartes détaillées, chacune avec ses actions principales. */
+/** Les six activités en cartes détaillées, chacune avec ses actions principales. */
 export function ServicesSection() {
   const t = useT(homeMessages);
+  const { link } = useSite();
   return (
     <Section id="services" className="scroll-mt-20 bg-bg">
       <Container>
@@ -72,7 +87,7 @@ export function ServicesSection() {
           title={t("servicesTitle")}
           subtitle={t("servicesSubtitle")}
         />
-        <ul className="mt-12 grid gap-5 md:grid-cols-2">
+        <ul className="mt-12 grid gap-5 md:grid-cols-2 xl:grid-cols-3">
           {POLES.map((p) => {
             const k = (suffix: string) => `s${p.n}${suffix}` as HomeKey;
             return (
@@ -92,7 +107,7 @@ export function ServicesSection() {
                   </span>
                   <div className="min-w-0">
                     <h3 className="font-display text-xl font-extrabold tracking-tight text-ink">
-                      <Link href={p.href} className="rounded hover:text-brand focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand/40">
+                      <Link href={link(p.href)} className="rounded hover:text-brand focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand/40">
                         {t(k("Title"))}
                       </Link>
                     </h3>
@@ -116,21 +131,14 @@ export function ServicesSection() {
                   ))}
                 </ul>
                 <div className="mt-auto flex flex-col gap-3 pt-6 sm:flex-row sm:flex-wrap sm:items-center">
-                  {p.primary.href.startsWith("#") ? (
-                    <a href={p.primary.href} className={buttonClass("primary", "md")}>
-                      {p.primary.icon && <Icon name={p.primary.icon} className="h-4 w-4" />}
-                      {t(p.primary.key)}
-                    </a>
-                  ) : (
-                    <ButtonLink href={p.primary.href}>
-                      {p.primary.icon && <Icon name={p.primary.icon} className="h-4 w-4" />}
-                      {t(p.primary.key)}
-                    </ButtonLink>
-                  )}
+                  <ButtonLink href={link(p.primary.href)}>
+                    {p.primary.icon && <Icon name={p.primary.icon} className="h-4 w-4" />}
+                    {t(p.primary.key)}
+                  </ButtonLink>
                   {p.more.map((a) => (
                     <Link
                       key={a.href}
-                      href={a.href}
+                      href={link(a.href)}
                       className="group inline-flex min-h-10 items-center gap-1.5 self-start rounded px-1 py-1 text-sm font-semibold text-brand hover:text-brand-strong focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand/40 sm:self-auto"
                     >
                       {t(a.key)}

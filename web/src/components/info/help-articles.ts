@@ -482,11 +482,11 @@ export const HELP_ARTICLES: HelpArticle[] = [
     links: ["linkAbout"],
     fr: {
       q: "Qui est PWFINTECH ?",
-      a: "PWFINTECH (Paul World Finances and Technologies) est une entreprise basée au Canada qui réunit quatre pôles : transfert d'argent avec l'application WorldSoft Transfer, accompagnement financier, technologies et shipping.\n\nNotre devise : « Plus qu'un service, une solution pour votre avenir. »",
+      a: "PWFINTECH (Paul World Finances and Technologies) est une entreprise basée au Canada qui réunit six activités : transfert d'argent avec l'application WorldSoft Transfer, AVI pour visa études, paiement de fournisseurs, finances, technologies et shipping (avec PAUL WORLD TRAVEL).\n\nNotre devise : « Plus qu'un service, une solution pour votre avenir. »",
     },
     en: {
       q: "Who is PWFINTECH?",
-      a: "PWFINTECH (Paul World Finances and Technologies) is a Canada-based company with four business lines: money transfer with the WorldSoft Transfer app, financial guidance, technology and shipping.\n\nOur motto: “More than a service, a solution for your future.”",
+      a: "PWFINTECH (Paul World Finances and Technologies) is a Canada-based company with six business lines: money transfer with the WorldSoft Transfer app, student visa AVIs, supplier payments, finances, technology and shipping (with PAUL WORLD TRAVEL).\n\nOur motto: “More than a service, a solution for your future.”",
     },
   },
   {

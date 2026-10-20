@@ -6,6 +6,7 @@ import { StoreBadges } from "@/components/app/store-badges";
 import { WstLogo } from "@/components/brand/wst-logo";
 import { CountryFlag } from "@/components/country-flag";
 import { useI18n } from "@/components/i18n-provider";
+import { useSite } from "@/components/site-provider";
 import { HomeScreen, PhoneFrame } from "@/components/marketing/wst/phone-screens";
 import { countryName, selectCalculatorCorridor } from "@/components/transfer/transfer-calculator";
 import { ButtonLink } from "@/components/ui/button";
@@ -103,6 +104,7 @@ export function DestinationsSection({ routes }: { routes: HomeRoute[] }) {
 
 export function AppSection() {
   const t = useT(homeMessages);
+  const { link } = useSite();
   return (
     <Section className="bg-white">
       <Container>
@@ -125,11 +127,11 @@ export function AppSection() {
               <StoreBadges dark />
             </div>
             <div className="mt-6 flex flex-col gap-3 sm:flex-row sm:flex-wrap">
-              <ButtonLink href="/application" variant="white">
+              <ButtonLink href={link("/application")} variant="white">
                 {t("appLink")}
                 <Icon name="arrowRight" className="h-4 w-4" />
               </ButtonLink>
-              <ButtonLink href="/transfert" variant="outline-light">
+              <ButtonLink href={link("/transfert")} variant="outline-light">
                 {t("appProduct")}
               </ButtonLink>
             </div>

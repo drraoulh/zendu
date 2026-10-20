@@ -7,6 +7,7 @@ import { Container, PageHero, Section, SectionHeading } from "@/components/ui/la
 import { ButtonLink } from "@/components/ui/button";
 import { WstLogo } from "@/components/brand/wst-logo";
 import { CompanyValue } from "@/components/info/shared";
+import { useSite } from "@/components/site-provider";
 import { company, companyLocality, telHref } from "@/lib/company";
 import { aboutPage } from "@/i18n/company";
 import { common } from "@/i18n/common";
@@ -18,6 +19,8 @@ type K = keyof typeof aboutPage.fr;
 const VALUE_ICONS: IconName[] = ["shield", "sparkle", "users", "star", "tech", "check"];
 const POLES: Array<{ href: string; icon: IconName }> = [
   { href: "/transfert", icon: "transfer" },
+  { href: "/avi", icon: "plane" },
+  { href: "/paiement-fournisseurs", icon: "wallet" },
   { href: "/finances", icon: "finance" },
   { href: "/technologies", icon: "code" },
   { href: "/shipping", icon: "ship" },
@@ -27,6 +30,7 @@ export function AboutContent() {
   const t = useT(aboutPage);
   const c = useT(common);
   const k = (key: string) => t(key as K);
+  const { link } = useSite();
   const locality = companyLocality();
   const facts: Array<{ label: string; value: string | null; href?: string | null }> = [
     { label: t("factLegalName"), value: company.legalName },
@@ -126,17 +130,17 @@ export function AboutContent() {
         }))}
       />
 
-      {/* 4 pôles */}
+      {/* Les six activités */}
       <Section id="poles" className="bg-navy-gradient scroll-mt-20 text-white">
         <Container>
           <SectionHeading light eyebrow={t("polesEyebrow")} title={t("polesTitle")} subtitle={t("polesSubtitle")} />
-          <ul className="mt-10 grid gap-5 sm:grid-cols-2 lg:grid-cols-4">
+          <ul className="mt-10 grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
             {POLES.map((pole, idx) => {
               const i = idx + 1;
               return (
                 <li key={pole.href}>
                   <Link
-                    href={pole.href}
+                    href={link(pole.href)}
                     className="group flex h-full flex-col rounded-3xl border border-white/10 bg-white/5 p-6 backdrop-blur transition hover:-translate-y-1 hover:border-sky/50 hover:bg-white/10"
                   >
                     <span className="bg-brand-gradient grid h-12 w-12 place-items-center rounded-2xl text-white ring-1 ring-white/20">
@@ -167,14 +171,14 @@ export function AboutContent() {
                 <p>{t("wstText2")}</p>
               </div>
               <div className="mt-8 flex flex-col gap-3 sm:flex-row sm:flex-wrap">
-                <ButtonLink href="/application" size="lg">
+                <ButtonLink href={link("/application")} size="lg">
                   {t("wstCtaApp")}
                   <Icon name="arrowRight" className="h-4 w-4" />
                 </ButtonLink>
-                <ButtonLink href="/frais" variant="secondary" size="lg">
+                <ButtonLink href={link("/frais")} variant="secondary" size="lg">
                   {t("wstCtaFees")}
                 </ButtonLink>
-                <ButtonLink href="/pays" variant="ghost" size="lg">
+                <ButtonLink href={link("/pays")} variant="ghost" size="lg">
                   {t("wstCtaCountries")}
                 </ButtonLink>
               </div>
