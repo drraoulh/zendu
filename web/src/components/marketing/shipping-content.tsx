@@ -29,9 +29,9 @@ export function ShippingContent() {
         eyebrow={m("offerEyebrow")}
         title={t("offerTitle")}
         items={[
-          { icon: "plane", title: t("offer1Title"), text: t("offer1Text") },
-          { icon: "ship", title: t("offer2Title"), text: t("offer2Text") },
-          { icon: "pin", title: t("offer5Title"), text: t("offer5Text") },
+          { icon: "plane", title: t("offer1Title"), text: t("offer1Text"), image: "/images/shipping/air.jpg" },
+          { icon: "ship", title: t("offer2Title"), text: t("offer2Text"), image: "/images/shipping/sea.jpg" },
+          { icon: "pin", title: t("offer5Title"), text: t("offer5Text"), image: "/images/shipping/tracking.jpg" },
         ]}
       />
 

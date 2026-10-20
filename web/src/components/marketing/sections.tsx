@@ -1,3 +1,4 @@
+import Image from "next/image";
 import Link from "next/link";
 import type { ReactNode } from "react";
 import { ButtonLink } from "@/components/ui/button";
@@ -9,7 +10,7 @@ import { Container, PageHero, Section, SectionHeading } from "@/components/ui/la
 /* -------------------------------------------------------------------------- */
 
 export type CtaLink = { href: string; label: string };
-export type Feature = { icon: IconName; title: string; text: string };
+export type Feature = { icon: IconName; title: string; text: string; image?: string };
 export type StepItem = { title: string; text: string };
 export type FaqItem = { q: string; a: string };
 
@@ -122,8 +123,17 @@ export function FeatureGrid({
     <Section id={id} className={`scroll-mt-20 ${bg} ${className}`}>
       <Container>
         <SectionHeading eyebrow={eyebrow} title={title} subtitle={subtitle} light={dark} />
-        <ul className={`mt-10 grid gap-5 ${cols}`}>
-          {items.map((item) => (
+        <ul className={`mt-10 grid ${cols} ${items.some((i) => i.image) ? "gap-x-6 gap-y-12" : "gap-5"}`}>
+          {items.map((item) =>
+            item.image ? (
+              <li key={item.title} className="group">
+                <div className="relative aspect-[4/3] overflow-hidden rounded-3xl bg-surface-soft">
+                  <Image src={item.image} alt="" fill sizes="(min-width: 1024px) 400px, (min-width: 640px) 50vw, 100vw" className="zoom-on-hover object-cover" />
+                </div>
+                <h3 className={`mt-5 font-display text-xl font-bold ${dark ? "text-white" : "text-ink"}`}>{item.title}</h3>
+                <p className={`mt-2 text-base leading-relaxed ${dark ? "text-white/70" : "text-muted"}`}>{item.text}</p>
+              </li>
+            ) : (
             <li
               key={item.title}
               className={
@@ -142,7 +152,8 @@ export function FeatureGrid({
               <h3 className={`mt-5 font-display text-lg font-bold ${dark ? "text-white" : "text-ink"}`}>{item.title}</h3>
               <p className={`mt-2 text-sm leading-relaxed ${dark ? "text-white/70" : "text-muted"}`}>{item.text}</p>
             </li>
-          ))}
+            ),
+          )}
         </ul>
       </Container>
     </Section>

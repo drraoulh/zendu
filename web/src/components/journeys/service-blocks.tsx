@@ -1,5 +1,6 @@
 "use client";
 
+import Image from "next/image";
 import { useRouter } from "next/navigation";
 import { type FormEvent, type ReactNode, useState } from "react";
 import { Icon, type IconName } from "@/components/ui/icon";
@@ -9,7 +10,7 @@ import { trackingMessages } from "@/i18n/journeys";
 import { inputClass } from "./fields";
 import { normalizeTrackingNumber } from "./tracking";
 
-/** Cartes d'offres détaillées : icône, titre, texte et points inclus. */
+/** Cartes d'offres détaillées : icône (ou photo), titre, texte et points inclus. */
 export function DetailedOffers({
   id,
   eyebrow,
@@ -22,15 +23,32 @@ export function DetailedOffers({
   eyebrow?: string;
   title: string;
   subtitle?: string;
-  items: { icon: IconName; title: string; text: string; points: string[] }[];
+  items: { icon: IconName; title: string; text: string; points: string[]; image?: string }[];
   footer?: ReactNode;
 }) {
   return (
     <Section id={id} className="scroll-mt-20">
       <Container>
         <SectionHeading eyebrow={eyebrow} title={title} subtitle={subtitle} />
-        <ul className="mt-10 grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
-          {items.map((item) => (
+        <ul className={`mt-10 grid sm:grid-cols-2 lg:grid-cols-3 ${items.some((i) => i.image) ? "gap-x-6 gap-y-12" : "gap-5"}`}>
+          {items.map((item) =>
+            item.image ? (
+              <li key={item.title} className="group flex flex-col">
+                <div className="relative aspect-[4/3] overflow-hidden rounded-3xl bg-surface-soft">
+                  <Image src={item.image} alt="" fill sizes="(min-width: 1024px) 400px, (min-width: 640px) 50vw, 100vw" className="zoom-on-hover object-cover" />
+                </div>
+                <h3 className="mt-5 font-display text-2xl font-bold text-ink">{item.title}</h3>
+                <p className="mt-2 text-base leading-relaxed text-muted">{item.text}</p>
+                <ul className="mt-4 grid gap-2">
+                  {item.points.map((p) => (
+                    <li key={p} className="flex items-start gap-2.5 text-sm text-ink">
+                      <Icon name="check" className="mt-0.5 h-4 w-4 shrink-0 text-brand" strokeWidth={2.6} />
+                      {p}
+                    </li>
+                  ))}
+                </ul>
+              </li>
+            ) : (
             <li
               key={item.title}
               className="group flex flex-col rounded-3xl border border-line bg-white p-6 shadow-card transition hover:-translate-y-0.5 hover:border-brand/30"
@@ -49,7 +67,8 @@ export function DetailedOffers({
                 ))}
               </ul>
             </li>
-          ))}
+            ),
+          )}
         </ul>
         {footer && <div className="mt-8">{footer}</div>}
       </Container>

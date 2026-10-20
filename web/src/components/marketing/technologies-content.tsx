@@ -12,6 +12,8 @@ type K = keyof typeof techPage.fr;
 const OFFER_ICONS: IconName[] = ["code", "card", "tech", "shield", "users"];
 const COMMIT_ICONS: IconName[] = ["star", "lock", "sparkle", "globe"];
 const STACK_ICONS: IconName[] = ["globe", "phone", "code", "box", "card", "shield"];
+const OFFER_IMAGES = ["dev", "fintech", "consulting", "support", "training"];
+const STACK_IMAGES = ["stack-web", "stack-mobile", "stack-api", "stack-cloud", "stack-payments", "stack-security"];
 const PROJECT = "/technologies/projet";
 
 /** Petite illustration « fenêtre de code » en CSS/SVG pour la section « Pour qui ». */
@@ -63,6 +65,7 @@ export function TechnologiesContent() {
           title: k(`offer${i}Title`),
           text: k(`offer${i}Text`),
           points: [k(`d${i}a`), k(`d${i}b`), k(`d${i}c`)],
+          image: `/images/tech/${OFFER_IMAGES[i - 1]}.jpg`,
         }))}
       />
 
@@ -84,6 +87,7 @@ export function TechnologiesContent() {
           icon: STACK_ICONS[i - 1],
           title: k(`stack${i}Title`),
           text: k(`stack${i}Text`),
+          image: `/images/tech/${STACK_IMAGES[i - 1]}.jpg`,
         }))}
       />
 

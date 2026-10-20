@@ -14,6 +14,7 @@ type K = keyof typeof financesPage.fr;
 
 const BOOK = "/finances/rendez-vous";
 const OFFER_ICONS: IconName[] = ["chart", "wallet", "finance", "globe", "sparkle", "receipt"];
+const OFFER_IMAGES = ["budget", "savings", "sme", "diaspora", "education", "paperwork"];
 const COMMIT_ICONS: IconName[] = ["users", "lock", "info", "shield"];
 
 export function FinancesContent() {
@@ -52,6 +53,7 @@ export function FinancesContent() {
           title: k(`offer${i}Title`),
           text: k(`offer${i}Text`),
           points: [k(`d${i}a`), k(`d${i}b`), k(`d${i}c`)],
+          image: `/images/finances/${OFFER_IMAGES[i - 1]}.jpg`,
         }))}
         footer={
           <Notice title={t("disclaimerTitle")} icon="info">
