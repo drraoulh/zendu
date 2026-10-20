@@ -39,7 +39,7 @@ export default function Home() {
     seeded.current = profile.id;
     if (!draft.corridorId.startsWith(`${profile.country}-`)) {
       const currency = { CA: "CAD", CM: "XAF", CN: "CNY" }[profile.country] ?? "CAD";
-      setDraft({ corridorId: defaultCorridorFor(profile.country), sendAmount: SAMPLE_AMOUNT[currency] ?? 200, quote: null });
+      setDraft({ corridorId: defaultCorridorFor(profile.country), sendAmount: SAMPLE_AMOUNT[currency] ?? 200, receiveAmount: null, quote: null });
     }
   }, [profile, draft.corridorId, setDraft]);
 
@@ -68,7 +68,7 @@ export default function Home() {
     if (selected?.id === r.id) return setDraft({ recipient: null });
     const corridorId = corridorFor(home, r);
     const sameCurrency = corridorId.split("-")[0] === draft.corridorId.split("-")[0];
-    setDraft({ recipient: r, recipientFromHome: true, saveRecipient: false, corridorId, quote: null, ...(sameCurrency ? {} : { sendAmount: SAMPLE_AMOUNT[{ CA: "CAD", CM: "XAF", CN: "CNY" }[home] ?? "CAD"] ?? 200 }) });
+    setDraft({ recipient: r, recipientFromHome: true, saveRecipient: false, corridorId, quote: null, ...(sameCurrency ? {} : { receiveAmount: null, sendAmount: SAMPLE_AMOUNT[{ CA: "CAD", CM: "XAF", CN: "CNY" }[home] ?? "CAD"] ?? 200 }) });
   }
 
   return (
@@ -110,6 +110,7 @@ export default function Home() {
         key={draft.corridorId.split("-")[0]}
         corridorId={draft.corridorId}
         amount={draft.sendAmount}
+        receiveAmount={draft.receiveAmount}
         onChange={(n) => setDraft(selected && !n.corridorId.endsWith(`-${selected.country}`) ? { ...n, recipient: null } : n)}
         onContinue={kyc === "pending" ? undefined : startSend}
         ctaLabel={todo ? "Vérifier mon identité" : closed ? "Bientôt disponible" : selected ? `Envoyer à ${selected.fullName.split(" ")[0]}` : "Envoyer"}

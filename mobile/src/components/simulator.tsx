@@ -10,69 +10,100 @@ import { Button } from "./ui";
 
 /**
  * Simulateur de transfert : choix du trajet, montant, devis en direct (API /api/quotes).
+ * Les deux montants sont modifiables : « Vous envoyez » ou « Ils reçoivent » (le réflexe
+ * « je veux qu'il reçoive 50 000 F »). Le dernier champ touché fait foi.
  */
 export function Simulator({
   corridorId,
   amount,
+  receiveAmount = null,
   onChange,
   onContinue,
   ctaLabel = "Continuer",
 }: {
   corridorId: string;
   amount: number;
-  onChange: (next: { corridorId: string; sendAmount: number; quote: Quote | null }) => void;
+  /** Montant reçu imposé par le client (null : c'est le montant envoyé qui fait foi). */
+  receiveAmount?: number | null;
+  onChange: (next: { corridorId: string; sendAmount: number; receiveAmount: number | null; quote: Quote | null }) => void;
   onContinue?: () => void;
   ctaLabel?: string;
 }) {
   const corridors = useCorridors();
   const corridor = findCorridor(corridors, corridorId);
+  const [mode, setMode] = useState<"send" | "receive">(receiveAmount ? "receive" : "send");
   const [text, setText] = useState(groupDigits(String(amount)));
+  const [receiveText, setReceiveText] = useState(receiveAmount ? groupDigits(String(receiveAmount)) : "");
   const [quoted, setQuoted] = useState<{ key: string; quote: Quote } | null>(null);
   const [remoteError, setRemoteError] = useState<{ key: string; message: string } | null>(null);
   const [picker, setPicker] = useState<"source" | "destination" | null>(null);
+  const [now, setNow] = useState(() => Date.now());
   const onChangeRef = useRef(onChange);
   useEffect(() => {
     onChangeRef.current = onChange;
   });
+  // Horloge pour « taux mis à jour il y a … ».
+  useEffect(() => {
+    const id = setInterval(() => setNow(Date.now()), 15_000);
+    return () => clearInterval(id);
+  }, []);
 
-  const value = parseAmount(text);
-  const key = `${corridor.id}:${value}`;
+  const value = parseAmount(mode === "send" ? text : receiveText);
+  const key = `${corridor.id}:${mode}:${value}`;
   const localError =
     !Number.isFinite(value) || value <= 0
       ? "Saisissez un montant."
-      : value < corridor.minSend || value > corridor.maxSend
+      : mode === "send" && (value < corridor.minSend || value > corridor.maxSend)
         ? `Le montant doit être compris entre ${money(corridor.minSend, corridor.sendCurrency)} et ${money(corridor.maxSend, corridor.sendCurrency)}.`
         : null;
   // Le devis affiché doit correspondre exactement au trajet et au montant saisis.
   const current = !localError && quoted?.key === key ? quoted.quote : null;
-  const error = localError ?? (remoteError?.key === key ? remoteError.message : null);
+  // Montant reçu demandé : le montant envoyé calculé doit rester dans les limites du trajet.
+  const rangeError =
+    current && mode === "receive" && (current.sendAmount < corridor.minSend || current.sendAmount > corridor.maxSend)
+      ? `Le montant envoyé doit être compris entre ${money(corridor.minSend, corridor.sendCurrency)} et ${money(corridor.maxSend, corridor.sendCurrency)}.`
+      : null;
+  const error = localError ?? rangeError ?? (remoteError?.key === key ? remoteError.message : null);
   const loading = !error && !current;
 
   useEffect(() => {
+    const receive = mode === "receive";
     if (localError) {
-      onChangeRef.current({ corridorId: corridor.id, sendAmount: Number.isFinite(value) ? value : 0, quote: null });
+      onChangeRef.current({ corridorId: corridor.id, sendAmount: receive ? 0 : Number.isFinite(value) ? value : 0, receiveAmount: null, quote: null });
       return;
     }
     let alive = true;
+    const k = `${corridor.id}:${mode}:${value}`;
     const timer = setTimeout(() => {
       api
-        .quote(corridor.id, value)
+        .quote(corridor.id, value, mode)
         .then((q) => {
           if (!alive) return;
-          setQuoted({ key: `${corridor.id}:${value}`, quote: q });
-          onChangeRef.current({ corridorId: corridor.id, sendAmount: value, quote: q });
+          setQuoted({ key: k, quote: q });
+          // L'autre champ suit le devis.
+          if (receive) setText(groupDigits(String(q.sendAmount)));
+          else setReceiveText(groupDigits(String(q.receiveAmount)));
+          const inRange = !receive || (q.sendAmount >= corridor.minSend && q.sendAmount <= corridor.maxSend);
+          onChangeRef.current({ corridorId: corridor.id, sendAmount: q.sendAmount, receiveAmount: receive ? value : null, quote: inRange ? q : null });
         })
         .catch((e: Error) => {
           if (!alive) return;
-          setRemoteError({ key: `${corridor.id}:${value}`, message: e.message });
-          onChangeRef.current({ corridorId: corridor.id, sendAmount: value, quote: null });
+          setRemoteError({ key: k, message: e.message });
+          onChangeRef.current({ corridorId: corridor.id, sendAmount: receive ? 0 : value, receiveAmount: null, quote: null });
         });
     }, 350);
     return () => {
       alive = false;
       clearTimeout(timer);
     };
-  }, [value, corridor.id, localError]);
+  }, [value, mode, corridor.id, corridor.minSend, corridor.maxSend, localError]);
+
+  function resetTo(next: CorridorMeta, amount: number) {
+    setMode("send");
+    setText(groupDigits(String(amount)));
+    setReceiveText("");
+    onChange({ corridorId: next.id, sendAmount: amount, receiveAmount: null, quote: null });
+  }
 
   function pick(code: CountryCode) {
     const side = picker;
@@ -88,17 +119,16 @@ export function Simulator({
       if (source === code) source = corridor.destination;
     }
     const next = findCorridor(corridors, `${source}-${destination}`);
-    const amount = next.sendCurrency !== corridor.sendCurrency ? (SAMPLE_AMOUNT[next.sendCurrency] ?? 100) : value;
-    setText(groupDigits(String(amount)));
-    onChange({ corridorId: next.id, sendAmount: amount, quote: null });
+    const sendValue = parseAmount(text);
+    resetTo(next, next.sendCurrency !== corridor.sendCurrency || !Number.isFinite(sendValue) ? (SAMPLE_AMOUNT[next.sendCurrency] ?? 100) : sendValue);
   }
 
   function swap() {
     const next = findCorridor(corridors, `${corridor.destination}-${corridor.source}`);
-    const amount = SAMPLE_AMOUNT[next.sendCurrency] ?? 100;
-    setText(groupDigits(String(amount)));
-    onChange({ corridorId: next.id, sendAmount: amount, quote: null });
+    resetTo(next, SAMPLE_AMOUNT[next.sendCurrency] ?? 100);
   }
+
+  const rateAge = current?.fx?.fetchedAt ? Math.max(0, Math.round((now - new Date(current.fx.fetchedAt).getTime()) / 60_000)) : null;
 
   // Petits écrans (iPhone SE) : chiffres plus petits pour que « 80 770 » tienne à côté de la pastille.
   const compact = useWindowDimensions().width < 360;
@@ -113,7 +143,10 @@ export function Simulator({
           <Text style={s.fieldLabel}>Vous envoyez</Text>
           <TextInput
             value={text}
-            onChangeText={(t) => setText(groupDigits(t))}
+            onChangeText={(t) => {
+              setMode("send");
+              setText(groupDigits(t));
+            }}
             keyboardType="decimal-pad"
             inputMode="decimal"
             accessibilityLabel="Montant envoyé"
@@ -139,6 +172,11 @@ export function Simulator({
               <Text style={s.hint}>
                 {current.fee > 0 ? `Frais ${money(current.fee, current.sendCurrency)}` : "Sans frais"} · {etaLabel(current.deliveryEstimate)}
               </Text>
+              {rateAge != null ? (
+                <Text style={[s.hint, { fontSize: 12 }]}>
+                  Taux mis à jour {rateAge < 1 ? "à l'instant" : `il y a ${rateAge} min`} · bloqué à la création du transfert
+                </Text>
+              ) : null}
             </>
           ) : (
             <Text style={s.hint}>Calcul du taux…</Text>
@@ -149,13 +187,23 @@ export function Simulator({
       <View style={[s.row, s.rowReceive]}>
         <View style={s.amountCol}>
           <Text style={s.fieldLabel}>Ils reçoivent</Text>
-          {loading ? (
-            <ActivityIndicator color={colors.brand} style={{ alignSelf: "flex-start", marginVertical: 10 }} />
-          ) : (
-            <Text style={[s.amountInput, amountSize, { color: colors.brand }]} numberOfLines={1} adjustsFontSizeToFit>
-              {current ? money(current.receiveAmount, current.receiveCurrency).replace(/\s\S+$/, "") : "—"}
-            </Text>
-          )}
+          <View style={{ flexDirection: "row", alignItems: "center", gap: 8 }}>
+            <TextInput
+              value={receiveText}
+              onChangeText={(t) => {
+                setMode("receive");
+                setReceiveText(groupDigits(t));
+              }}
+              placeholder="—"
+              placeholderTextColor={colors.muted}
+              keyboardType="decimal-pad"
+              inputMode="decimal"
+              accessibilityLabel="Montant reçu par le destinataire"
+              style={[s.amountInput, amountSize, { color: colors.brand, flex: 1 }]}
+              maxLength={13}
+            />
+            {loading && mode === "send" ? <ActivityIndicator color={colors.brand} /> : null}
+          </View>
         </View>
         <CountryPill compact={compact} code={corridor.destination} unit={receiveUnit} label="Pays de réception" onPress={() => setPicker("destination")} />
       </View>

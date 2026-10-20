@@ -1,7 +1,7 @@
 import { Redirect, router, useFocusEffect } from "expo-router";
 import { useCallback, useEffect, useRef, useState } from "react";
 import { Text, View } from "react-native";
-import { Button, Card, Choice, Divider, H1, Header, Notice, Screen, Small, Steps, SummaryRow } from "@/components/ui";
+import { Button, Card, Choice, Divider, H1, Header, Notice, Screen, Small, SEND_STEPS, Steps, SummaryRow } from "@/components/ui";
 import { api, type Quote } from "@/lib/api";
 import { countryName, deliveryEstimate, etaLabel, feeLabel, money, networkLabel, phone, rateLine } from "@/lib/format";
 import { findCorridor, payMethodsOf, useCorridors } from "@/lib/corridors";
@@ -43,16 +43,16 @@ export default function Review() {
 
   // Devis rafraîchi à l'ouverture : c'est ce montant que le serveur appliquera.
   useEffect(() => {
-    if (!draft.sendAmount) return;
+    if (!draft.sendAmount && !draft.receiveAmount) return;
     api
-      .quote(draft.corridorId, draft.sendAmount, "send", recipient?.network)
+      .quote(draft.corridorId, draft.receiveAmount ?? draft.sendAmount, draft.receiveAmount ? "receive" : "send", recipient?.network)
       .then((q) => {
         setQuote(q);
         // Le paiement et le reçu reprennent ce devis à jour.
         setDraft({ quote: q });
       })
       .catch((e: Error) => setError(e.message));
-  }, [draft.corridorId, draft.sendAmount, recipient?.network, setDraft]);
+  }, [draft.corridorId, draft.sendAmount, draft.receiveAmount, recipient?.network, setDraft]);
 
   if (!recipient) return <Redirect href="/(tabs)" />;
 
@@ -71,7 +71,7 @@ export default function Review() {
       }
     >
       <Header title="Vérification" />
-      <Steps current={3} total={3} label="Paiement" />
+      <Steps current={3} total={3} label="Paiement" names={SEND_STEPS} />
 
       <Card style={{ alignItems: "center", marginBottom: 14, backgroundColor: colors.navy, borderColor: colors.navy }}>
         <Text style={{ color: colors.silver, fontFamily: fonts.heading, fontSize: 12, letterSpacing: 0.8 }}>{recipient.fullName.toUpperCase()} REÇOIT</Text>
@@ -133,6 +133,14 @@ export default function Review() {
         <Notice tone="warn" icon="info" text="Aucun moyen de paiement n'est encore ouvert pour ce trajet. Les envois partent pour l'instant du Canada, par virement Interac." />
       ) : null}
       {error ? <Notice tone="danger" icon="alert" text={error} /> : null}
+      <View style={{ marginTop: 14 }}>
+        <Notice
+          tone="brand"
+          icon="shield"
+          title="Votre argent est protégé"
+          text="Taux et frais sont bloqués dès la création du transfert. Si le versement ne peut pas aboutir, nous annulons le transfert et vous remboursons votre virement."
+        />
+      </View>
     </Screen>
   );
 }

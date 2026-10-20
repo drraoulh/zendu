@@ -2,6 +2,7 @@ import { useFocusEffect } from "expo-router";
 import { useCallback, useState } from "react";
 import { api, type Transfer } from "./api";
 import { useSession } from "./session";
+import { useStore } from "./store";
 
 /** Transferts du compte (tous appareils), rechargés à chaque affichage de l'écran. */
 export function useMyTransfers(limit?: number) {
@@ -10,6 +11,7 @@ export function useMyTransfers(limit?: number) {
   const [loading, setLoading] = useState(true);
   const [failed, setFailed] = useState(false);
   const signedIn = Boolean(profile);
+  const { restoreRecipients } = useStore();
 
   const load = useCallback(async () => {
     if (!signedIn) {
@@ -19,14 +21,16 @@ export function useMyTransfers(limit?: number) {
     }
     setLoading(true);
     try {
-      setAll(await api.myTransfers());
+      const list = await api.myTransfers();
+      setAll(list);
+      restoreRecipients(list);
       setFailed(false);
     } catch {
       setFailed(true);
     } finally {
       setLoading(false);
     }
-  }, [signedIn]);
+  }, [signedIn, restoreRecipients]);
 
   useFocusEffect(
     useCallback(() => {

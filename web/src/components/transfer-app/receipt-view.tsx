@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from "react";
 import Link from "next/link";
+import { useI18n } from "@/components/i18n-provider";
 import type { ReceiptData } from "@/lib/receipt";
 import { contact } from "@/lib/brand";
 import { LogoEmblem } from "@/components/brand/logo";
@@ -43,6 +44,7 @@ export function ReceiptView({
   deliveryEstimate: string;
 }) {
   const { t, money, network, country, dateTime, eta } = useTransferLabels();
+  const { locale } = useI18n();
   const [copied, setCopied] = useState(false);
   const [generatedAt, setGeneratedAt] = useState<string | null>(null);
 
@@ -94,10 +96,16 @@ export function ReceiptView({
             <Icon name="transfer" className="h-4 w-4" />
             {copied ? t("linkCopied") : t("share")}
           </Button>
-          <Button size="sm" onClick={() => window.print()}>
-            <Icon name="receipt" className="h-4 w-4" />
-            {t("print")}
+          <Button variant="secondary" size="sm" onClick={() => window.print()}>
+            {t("printOnly")}
           </Button>
+          <a
+            href={`/api/transfers/${transferId}/receipt/pdf?lang=${locale}&download=1`}
+            className="inline-flex min-h-9 items-center gap-1.5 rounded-full bg-brand px-4 text-sm font-semibold text-white hover:bg-brand-strong"
+          >
+            <Icon name="receipt" className="h-4 w-4" />
+            {t("downloadPdf")}
+          </a>
         </div>
       </div>
 

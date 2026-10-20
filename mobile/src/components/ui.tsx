@@ -117,7 +117,10 @@ export function Header({
   );
 }
 
-export function Steps({ current, total, label }: { current: number; total: number; label?: string }) {
+/** Étapes de l'envoi d'argent. */
+export const SEND_STEPS = ["Montant", "Destinataire", "Paiement"];
+
+export function Steps({ current, total, label, names }: { current: number; total: number; label?: string; names?: string[] }) {
   return (
     <View style={{ marginBottom: 18 }} accessibilityLabel={`Étape ${current} sur ${total}${label ? ` : ${label}` : ""}`}>
       <View style={{ flexDirection: "row", gap: 6 }}>
@@ -125,7 +128,20 @@ export function Steps({ current, total, label }: { current: number; total: numbe
           <View key={i} style={{ flex: 1, height: 4, borderRadius: 2, backgroundColor: i < current ? colors.brand : colors.line }} />
         ))}
       </View>
-      {label ? (
+      {names ? (
+        // Nom de chaque étape sous sa barre : les étapes faites sont cochées (le montant, saisi à l'accueil, compte comme étape 1).
+        <View style={{ flexDirection: "row", gap: 6, marginTop: 8 }}>
+          {names.map((n, i) => (
+            <Text
+              key={n}
+              numberOfLines={1}
+              style={[styles.small, { flex: 1, fontFamily: i === current - 1 ? fonts.semibold : undefined, color: i < current ? colors.brand : colors.muted }]}
+            >
+              {i < current - 1 ? `✓ ${n}` : n}
+            </Text>
+          ))}
+        </View>
+      ) : label ? (
         <Text style={[styles.small, { marginTop: 8, fontFamily: fonts.semibold, color: colors.brand }]}>
           Étape {current} sur {total} · {label}
         </Text>

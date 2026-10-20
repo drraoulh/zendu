@@ -1,5 +1,6 @@
 import { useState } from "react";
-import { Pressable, Text, View } from "react-native";
+import { Alert, Platform, Pressable, Text, View } from "react-native";
+import { localNumber, pickContact } from "@/lib/contacts";
 import type { Network } from "@/lib/api";
 import { COUNTRIES, type CountryCode } from "@/lib/corridors";
 import { networkLabel } from "@/lib/format";
@@ -43,6 +44,24 @@ export function RecipientForm({
   const bank = type === "bank";
   const c = COUNTRIES[country];
 
+  async function fromContacts() {
+    let picked;
+    try {
+      picked = await pickContact();
+    } catch {
+      return Alert.alert("Contacts indisponibles", "Autorisez l'accès aux contacts dans les réglages, ou saisissez le numéro.");
+    }
+    if (!picked) return;
+    if (picked.fullName) setFullName(picked.fullName);
+    const numbers = [...new Set(picked.phones.map((n) => localNumber(n, c.dialCode)).filter(Boolean))];
+    if (numbers.length <= 1) return setPhone(numbers[0] ?? "");
+    // Plusieurs numéros : le client choisit celui du compte mobile money.
+    Alert.alert("Quel numéro ?", picked.fullName || undefined, [
+      ...numbers.slice(0, 4).map((n) => ({ text: `+${c.dialCode} ${n}`, onPress: () => setPhone(n) })),
+      { text: "Annuler", style: "cancel" as const },
+    ]);
+  }
+
   function submit() {
     const e: Record<string, string> = {};
     if (fullName.trim().split(/\s+/).length < 2) e.fullName = "Prénom et nom, comme sur la pièce d'identité";
@@ -75,6 +94,9 @@ export function RecipientForm({
 
   return (
     <View>
+      {Platform.OS !== "web" && !initial?.id ? (
+        <Button title="Choisir dans mes contacts" icon="user" variant="secondary" size="sm" onPress={() => void fromContacts()} style={{ marginBottom: 14 }} />
+      ) : null}
       <Field label="Nom complet du bénéficiaire" value={fullName} onChangeText={setFullName} autoCapitalize="words" error={errors.fullName} />
 
       <Label>Mode de réception</Label>

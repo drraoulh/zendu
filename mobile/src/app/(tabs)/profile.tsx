@@ -7,7 +7,7 @@ import { Avatar, ConfirmDialog, SectionTitle } from "@/components/form";
 import { Icon } from "@/components/icons";
 import { Badge, Card, ListItem, Screen, Small } from "@/components/ui";
 import { payMethodsOf, useCorridors } from "@/lib/corridors";
-import { referralCode, useSession } from "@/lib/session";
+import { useSession } from "@/lib/session";
 import { useStore } from "@/lib/store";
 import { dateTime } from "@/lib/format";
 import { colors, fonts } from "@/lib/theme";
@@ -43,14 +43,7 @@ export default function Profile() {
         <Icon name="chev" color={colors.muted} size={18} />
       </Card>
 
-      <Card onPress={go("/account/referral")} style={{ flexDirection: "row", alignItems: "center", gap: 12, backgroundColor: colors.brandSoft, borderColor: colors.brandSoft }}>
-        <Icon name="user" color={colors.brand} />
-        <View style={{ flex: 1 }}>
-          <Text style={{ fontFamily: fonts.heading, color: colors.ink }}>Parrainez vos proches</Text>
-          <Small>Code {referralCode(profile)}</Small>
-        </View>
-        <Icon name="chev" color={colors.brand} size={18} />
-      </Card>
+      {/* Parrainage masqué tant que le programme de récompenses n'est pas actif (écran /account/referral conservé). */}
 
       <SectionTitle>Compte</SectionTitle>
       <Card style={{ paddingVertical: 4 }}>

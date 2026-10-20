@@ -2,7 +2,7 @@ import { router } from "expo-router";
 import { useState } from "react";
 import { PaymentLogo } from "@/components/payment-logo";
 import { RecipientForm } from "@/components/recipient-form";
-import { Button, Card, H1, H2, Header, ListItem, P, Screen, Steps } from "@/components/ui";
+import { Button, Card, H1, H2, Header, ListItem, P, Screen, SEND_STEPS, Steps } from "@/components/ui";
 import { findCorridor, useCorridors, type CountryCode } from "@/lib/corridors";
 import { countryName, networkLabel, phone } from "@/lib/format";
 import { useStore, type Recipient } from "@/lib/store";
@@ -24,7 +24,7 @@ export default function ChooseRecipient() {
   return (
     <Screen>
       <Header title="Bénéficiaire" subtitle={`Vers ${countryName(country)}`} />
-      <Steps current={2} total={3} label="Destinataire" />
+      <Steps current={2} total={3} label="Destinataire" names={SEND_STEPS} />
       <H1>À qui envoyez-vous ?</H1>
       <P style={{ marginTop: 6, marginBottom: 18 }}>Le nom doit correspondre à celui du compte ou de la pièce d&apos;identité du bénéficiaire.</P>
 

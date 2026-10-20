@@ -7,6 +7,10 @@ const nextConfig: NextConfig = {
     remotePatterns: [{ protocol: "https", hostname: "flagcdn.com" }],
   },
   poweredByHeader: false,
+  // Logo embarqué dans le reçu PDF (lu sur disque par la fonction serveur).
+  outputFileTracingIncludes: {
+    "/api/transfers/[id]/receipt/pdf": ["./public/brand/wst/logo-horizontal@2x.png"],
+  },
 };
 
 export default nextConfig;

@@ -7,7 +7,7 @@ import { RecipientNotice, recipientMessage } from "@/components/recipient-notice
 import { Button, Header, Notice, Screen, Small } from "@/components/ui";
 import { api, type Transfer } from "@/lib/api";
 import { countryName, dateTime, feeLabel, money, networkLabel, phone, rateLine, statusInfo } from "@/lib/format";
-import { openSite } from "@/lib/links";
+import { shareReceiptPdf } from "@/lib/receipt-pdf";
 import { shareViewAsImage } from "@/lib/share-image";
 import { colors, fonts, radius } from "@/lib/theme";
 import { cardLogoId, PaymentLogo } from "@/components/payment-logo";
@@ -20,6 +20,8 @@ export default function Receipt() {
   const [error, setError] = useState<string | null>(null);
   const [mode, setMode] = useState<Mode>(params.mode === "recipient" ? "recipient" : "mine");
   const [copied, setCopied] = useState(false);
+  const [pdfBusy, setPdfBusy] = useState(false);
+  const [pdfError, setPdfError] = useState<string | null>(null);
   const mineRef = useRef<View>(null);
   const noticeRef = useRef<View>(null);
 
@@ -76,6 +78,19 @@ export default function Receipt() {
     ].join("\n");
   }
 
+  async function sharePdf() {
+    if (!t || pdfBusy) return;
+    setPdfBusy(true);
+    setPdfError(null);
+    try {
+      await shareReceiptPdf(t.id, t.reference);
+    } catch (e) {
+      setPdfError(e instanceof Error ? e.message : "Reçu indisponible pour le moment.");
+    } finally {
+      setPdfBusy(false);
+    }
+  }
+
   async function share() {
     if (!t) return;
     const r =
@@ -97,9 +112,12 @@ export default function Receipt() {
             <Small style={{ textAlign: "center" }}>Par WhatsApp, SMS ou courriel · sans frais ni données de paiement</Small>
           </View>
         ) : (
-          <View style={{ flexDirection: "row", gap: 8 }}>
-            <Button title="Reçu PDF" variant="secondary" style={{ flex: 1 }} onPress={() => openSite(`/transfers/${t.id}/receipt`)} />
-            <Button title={copied ? "Copié" : "Partager"} icon={copied ? "check" : "send"} style={{ flex: 1 }} onPress={share} />
+          <View style={{ gap: 8 }}>
+            {pdfError ? <Notice tone="danger" icon="alert" text={pdfError} /> : null}
+            <View style={{ flexDirection: "row", gap: 8 }}>
+              <Button title="Reçu PDF" icon="download" variant="secondary" loading={pdfBusy} style={{ flex: 1 }} onPress={sharePdf} />
+              <Button title={copied ? "Copié" : "Image"} icon={copied ? "check" : "send"} style={{ flex: 1 }} onPress={share} />
+            </View>
           </View>
         )
       }

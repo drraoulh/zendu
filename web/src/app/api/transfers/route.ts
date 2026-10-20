@@ -21,6 +21,8 @@ const createSchema = z.object({
   corridorId: z.string().default("CA-CM"),
   sendAmount: z.number().positive().optional(),
   sendAmountCad: z.number().positive().optional(),
+  /** Montant exact que le destinataire doit recevoir (le montant envoyé est alors calculé). */
+  receiveAmount: z.number().positive().optional(),
   // Facultatifs pour un client connecté (remplacés par le titulaire du compte), vérifiés plus bas sinon.
   senderName: z.string().trim().min(2).max(120).optional(),
   senderEmail: z.string().trim().toLowerCase().pipe(z.email().max(254)).optional(),
@@ -34,6 +36,7 @@ const FIELD_ERRORS: Record<string, string> = {
   corridorId: "Corridor invalide",
   sendAmount: "Montant invalide",
   sendAmountCad: "Montant invalide",
+  receiveAmount: "Montant invalide",
   senderName: "Nom de l'expéditeur requis (2 caractères minimum)",
   senderEmail: "Courriel de l'expéditeur invalide",
   "beneficiary.fullName": "Nom du bénéficiaire requis (2 caractères minimum)",
@@ -72,7 +75,8 @@ export async function POST(request: Request) {
     }
     const data = createSchema.parse(json);
     const sendAmount = data.sendAmount ?? data.sendAmountCad;
-    if (sendAmount == null) {
+    const receiveAmount = sendAmount == null ? data.receiveAmount : undefined;
+    if (sendAmount == null && receiveAmount == null) {
       return NextResponse.json({ error: "Montant requis" }, { status: 400 });
     }
 
@@ -116,6 +120,17 @@ export async function POST(request: Request) {
       );
     }
 
+    // Compte bancaire réutilisé par son id : il doit appartenir à un transfert de ce client
+    // (en mode réel, jamais le compte enregistré par quelqu'un d'autre).
+    if (data.beneficiary.savedId && !data.beneficiary.accountNumber?.trim() && (authed || isLiveMode())) {
+      const owned = authed
+        ? await prisma.transfer.findFirst({ where: { customerId: authed.customer.id, beneficiaryId: data.beneficiary.savedId }, select: { id: true } })
+        : null;
+      if (!owned) {
+        return NextResponse.json({ error: "Compte du destinataire introuvable : saisissez de nouveau le numéro de compte." }, { status: 400 });
+      }
+    }
+
     const normalized = await normalizeBeneficiary(data.beneficiary, corridor.destination);
     if (!normalized.ok) {
       return NextResponse.json({ error: normalized.error }, { status: 400 });
@@ -129,6 +144,7 @@ export async function POST(request: Request) {
     const quoteData = await buildQuote({
       corridorId: data.corridorId,
       sendAmount,
+      receiveAmount,
       network: normalized.data.network,
     });
     if (data.payMethod === "interac" && quoteData.sendCurrency !== "CAD") {

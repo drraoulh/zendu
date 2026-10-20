@@ -30,11 +30,12 @@ export default function Processing() {
     started.current = true;
     void (async () => {
       try {
-        await new Promise((r) => setTimeout(r, interac ? 300 : 700));
+        // Pas d'attente artificielle : le transfert est créé immédiatement.
         setPhase(1);
         const { transfer, payIn } = await api.createTransfer({
           corridorId: draft.corridorId,
-          sendAmount: draft.sendAmount,
+          // Montant reçu demandé : le serveur recalcule le montant envoyé au taux du moment.
+          ...(draft.receiveAmount ? { receiveAmount: draft.receiveAmount } : { sendAmount: draft.sendAmount }),
           senderName: `${profile.firstName} ${profile.lastName}`,
           senderEmail: profile.email,
           beneficiary: {
@@ -43,6 +44,7 @@ export default function Processing() {
             network: recipient.network,
             bankName: recipient.bankName,
             accountNumber: recipient.accountNumber,
+            savedId: recipient.accountNumber ? undefined : recipient.savedId,
             bankCode: recipient.bankCode,
           },
           payMethod: interac ? "interac" : "card",
@@ -68,14 +70,13 @@ export default function Processing() {
         }
         await api.simulatePay(transfer.id);
         setPhase(3);
-        await new Promise((r) => setTimeout(r, 600));
         router.dismissAll();
         router.replace({ pathname: "/send/success", params: { id: transfer.id, card: card ? cardLabel(card) : "" } });
       } catch (e) {
         setError(e instanceof Error ? e.message : "Paiement impossible");
       }
     })();
-  }, [recipient, profile, quote, interac, draft.corridorId, draft.sendAmount, draft.saveRecipient, addTransfer, saveRecipient, card]);
+  }, [recipient, profile, quote, interac, draft.corridorId, draft.sendAmount, draft.receiveAmount, draft.saveRecipient, addTransfer, saveRecipient, card]);
 
   if (!recipient || !quote) return <Redirect href="/(tabs)" />;
 

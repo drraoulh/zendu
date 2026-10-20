@@ -1,9 +1,9 @@
 import { createContext, useCallback, useContext, useEffect, useMemo, useRef, useState, type ReactNode } from "react";
-import type { BeneficiaryInput, PayMethod, Quote } from "./api";
+import type { BeneficiaryInput, PayMethod, Quote, Transfer } from "./api";
 import { storage } from "./storage";
 
 /** Bénéficiaire enregistré sur l'appareil (le numéro de compte complet n'est gardé que localement). */
-export type Recipient = BeneficiaryInput & { id: string; country: string; relation?: string };
+export type Recipient = BeneficiaryInput & { id: string; country: string; relation?: string; accountMasked?: string };
 
 /** Carte enregistrée : seuls la marque, les 4 derniers chiffres et l'expiration sont conservés. */
 export type SavedCard = { id: string; brand: "Visa" | "Mastercard" | "Amex" | "Carte"; last4: string; exp: string; holder: string; isDefault: boolean };
@@ -21,6 +21,8 @@ export type SentTransfer = { id: string; reference: string; createdAt: string };
 export type Draft = {
   corridorId: string;
   sendAmount: number;
+  /** Montant reçu imposé par le client (null : le montant envoyé fait foi). */
+  receiveAmount: number | null;
   quote: Quote | null;
   recipient: Recipient | null;
   /** Bénéficiaire choisi d'un geste sur l'accueil (gardé) ou pendant un envoi (oublié si l'envoi est abandonné). */
@@ -39,6 +41,8 @@ type StoreValue = {
   recipients: Recipient[];
   saveRecipient: (r: Omit<Recipient, "id"> & { id?: string }) => Recipient;
   removeRecipient: (id: string) => void;
+  /** Nouvel appareil : reconstruit le carnet de destinataires à partir des transferts du compte. */
+  restoreRecipients: (from: Transfer[]) => void;
   transfers: SentTransfer[];
   addTransfer: (t: SentTransfer) => void;
   cards: SavedCard[];
@@ -59,7 +63,7 @@ const KEY_REQUESTS = "wst.requests";
 const KEY_READ = "wst.read";
 
 export const DEFAULT_CORRIDOR = "CA-CM";
-const EMPTY_DRAFT: Draft = { corridorId: DEFAULT_CORRIDOR, sendAmount: 200, quote: null, recipient: null, recipientFromHome: false, saveRecipient: false, cardId: null, payMethod: "interac" };
+const EMPTY_DRAFT: Draft = { corridorId: DEFAULT_CORRIDOR, sendAmount: 200, receiveAmount: null, quote: null, recipient: null, recipientFromHome: false, saveRecipient: false, cardId: null, payMethod: "interac" };
 
 const StoreContext = createContext<StoreValue | null>(null);
 
@@ -71,6 +75,7 @@ export function StoreProvider({ children }: { children: ReactNode }) {
   const [draft, setDraftState] = useState<Draft>(EMPTY_DRAFT);
   const [recipients, setRecipients] = useState<Recipient[]>([]);
   const recipientsRef = useRef(recipients);
+  const loadedRef = useRef(false);
   useEffect(() => {
     recipientsRef.current = recipients;
   }, [recipients]);
@@ -86,6 +91,7 @@ export function StoreProvider({ children }: { children: ReactNode }) {
       setCards((await storage.get<SavedCard[]>(KEY_CARDS)) ?? []);
       setRequests((await storage.get<ServiceRequest[]>(KEY_REQUESTS)) ?? []);
       setRead((await storage.get<string[]>(KEY_READ)) ?? []);
+      loadedRef.current = true;
     })();
   }, []);
 
@@ -157,6 +163,35 @@ export function StoreProvider({ children }: { children: ReactNode }) {
     return saved;
   }, []);
 
+  const restoreRecipients = useCallback((from: Transfer[]) => {
+    // Seulement si le carnet local est vide (nouveau téléphone, réinstallation) : une suppression
+    // volontaire n'est jamais annulée.
+    if (!loadedRef.current || recipientsRef.current.length || !from.length) return;
+    const seen = new Set<string>();
+    const restored: Recipient[] = [];
+    for (const t of from) {
+      const b = t.beneficiary;
+      const bank = b.network === "BANK";
+      if (bank && !b.id) continue;
+      const key = `${b.country}:${b.network}:${bank ? b.accountMasked : b.phone}`;
+      if (seen.has(key)) continue;
+      seen.add(key);
+      restored.push({
+        id: uid(),
+        fullName: b.fullName,
+        phone: b.phone || undefined,
+        network: b.network,
+        country: b.country,
+        ...(bank ? { bankName: b.bankName ?? undefined, bankCode: b.bankCode ?? undefined, savedId: b.id, accountMasked: b.accountMasked ?? undefined } : {}),
+      });
+      if (restored.length >= 20) break;
+    }
+    if (!restored.length) return;
+    recipientsRef.current = restored;
+    setRecipients(restored);
+    void storage.set(KEY_RECIPIENTS, restored);
+  }, []);
+
   const removeRecipient = useCallback((id: string) => {
     setRecipients((list) => {
       const next = list.filter((x) => x.id !== id);
@@ -191,6 +226,7 @@ export function StoreProvider({ children }: { children: ReactNode }) {
       recipients,
       saveRecipient,
       removeRecipient,
+      restoreRecipients,
       transfers,
       addTransfer,
       cards,
@@ -203,7 +239,7 @@ export function StoreProvider({ children }: { children: ReactNode }) {
       markRead,
       clearAll,
     }),
-    [draft, setDraft, resetDraft, recipients, saveRecipient, removeRecipient, transfers, addTransfer, cards, saveCard, removeCard, setDefaultCard, requests, addRequest, readNotifications, markRead, clearAll],
+    [draft, setDraft, resetDraft, recipients, saveRecipient, removeRecipient, restoreRecipients, transfers, addTransfer, cards, saveCard, removeCard, setDefaultCard, requests, addRequest, readNotifications, markRead, clearAll],
   );
 
   return <StoreContext.Provider value={value}>{children}</StoreContext.Provider>;

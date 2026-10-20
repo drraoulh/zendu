@@ -44,6 +44,8 @@ export type Quote = {
   total: number;
   deliveryEstimate: string;
   expiresAt: string;
+  /** Heure de relevé du taux de marché (affichage « mis à jour il y a … »). */
+  fx?: { fetchedAt: string };
 };
 
 export type TransferEvent = { id: string; type: string; message: string; createdAt: string };
@@ -69,6 +71,7 @@ export type Transfer = {
   /** Virement Interac en attente : où et comment envoyer l'argent. */
   interac?: InteracInstructions;
   beneficiary: {
+    id?: string;
     fullName: string;
     phone: string;
     network: string;
@@ -105,6 +108,8 @@ export type BeneficiaryInput = {
   bankName?: string;
   accountNumber?: string;
   bankCode?: string;
+  /** Compte bancaire déjà utilisé (restauré depuis le serveur) : le numéro complet n'est jamais renvoyé à l'appli. */
+  savedId?: string;
 };
 
 export type ServiceKind = "contact" | "shipping_quote" | "finance_appointment" | "tech_project";
@@ -204,6 +209,11 @@ export function setAuthToken(token: string | null) {
   authToken = token;
 }
 
+/** En-tête d'authentification du client connecté (téléchargements hors fetch JSON). */
+export function authHeaders(): Record<string, string> {
+  return authToken ? { Authorization: `Bearer ${authToken}` } : {};
+}
+
 export function setUnauthorizedHandler(fn: (() => void) | null) {
   onUnauthorized = fn;
 }
@@ -270,7 +280,9 @@ export const api = {
     }),
   createTransfer: (input: {
     corridorId: string;
-    sendAmount: number;
+    sendAmount?: number;
+    /** Montant exact à recevoir : le serveur calcule alors le montant envoyé. */
+    receiveAmount?: number;
     senderName: string;
     senderEmail: string;
     beneficiary: BeneficiaryInput;

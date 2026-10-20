@@ -2,7 +2,7 @@ import { phone } from "./format";
 import type { Recipient } from "./store";
 
 export function recipientDetail(r: Recipient) {
-  if (r.network === "BANK") return `${r.bankName ?? "Banque"} •••• ${(r.accountNumber ?? "").slice(-4)}`;
+  if (r.network === "BANK") return `${r.bankName ?? "Banque"} •••• ${(r.accountNumber ?? r.accountMasked ?? "").slice(-4)}`;
   return r.phone ? phone(r.phone) : "";
 }
 

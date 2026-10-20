@@ -45,6 +45,12 @@
         }
       ],
       [
+        "expo-contacts",
+        {
+          "contactsPermission": "WorldSoft Transfer lit uniquement le contact que vous choisissez pour remplir le nom et le numéro de votre destinataire."
+        }
+      ],
+      [
         "expo-local-authentication",
         {
           "faceIDPermission": "WorldSoft Transfer utilise Face ID pour vous connecter et valider vos envois."
