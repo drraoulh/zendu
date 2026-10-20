@@ -20,3 +20,6 @@ web/prisma/*.db-journal
 .DS_Store
 *.pem
 .vercel
+
+# Brouillons de conformité (questionnaires partenaires) : gardés hors du dépôt
+docs/conformite/
