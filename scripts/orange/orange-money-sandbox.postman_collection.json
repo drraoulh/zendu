@@ -1,0 +1,327 @@
+{
+  "info": {
+    "name": "Orange Money Cameroun — Sandbox (WorldSoft Transfer)",
+    "description": "Scénarios du guide d'intégration Orange Money (section 14.1). Renseignez les variables de la collection (onglet Variables). Ne partagez jamais cette collection avec vos clés dedans.",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "variable": [
+    {
+      "key": "token_url",
+      "value": "https://apistore.orange.cm/oauth2/token"
+    },
+    {
+      "key": "base_url",
+      "value": "https://apistore-gateway.orange.cm/omcoreapis/1.0.2"
+    },
+    {
+      "key": "consumer_key",
+      "value": ""
+    },
+    {
+      "key": "consumer_secret",
+      "value": ""
+    },
+    {
+      "key": "x_auth_token",
+      "value": ""
+    },
+    {
+      "key": "channel_msisdn",
+      "value": "691301143"
+    },
+    {
+      "key": "pin",
+      "value": ""
+    },
+    {
+      "key": "subscriber_msisdn",
+      "value": "690000000"
+    },
+    {
+      "key": "notif_url",
+      "value": "https://worldsoft-transfer.vercel.app/api/webhooks/orange"
+    },
+    {
+      "key": "access_token",
+      "value": ""
+    },
+    {
+      "key": "mp_pay_token",
+      "value": ""
+    },
+    {
+      "key": "ci_pay_token",
+      "value": ""
+    }
+  ],
+  "item": [
+    {
+      "name": "T01 — Jeton d'accès",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test('HTTP 200', () => pm.response.to.have.status(200));",
+              "pm.collectionVariables.set('access_token', pm.response.json().access_token);"
+            ]
+          }
+        }
+      ],
+      "request": {
+        "method": "POST",
+        "auth": {
+          "type": "basic",
+          "basic": [
+            {
+              "key": "username",
+              "value": "{{consumer_key}}"
+            },
+            {
+              "key": "password",
+              "value": "{{consumer_secret}}"
+            }
+          ]
+        },
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/x-www-form-urlencoded"
+          }
+        ],
+        "body": {
+          "mode": "urlencoded",
+          "urlencoded": [
+            {
+              "key": "grant_type",
+              "value": "client_credentials"
+            }
+          ]
+        },
+        "url": "{{token_url}}"
+      }
+    },
+    {
+      "name": "T02 — Paiement marchand : init",
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "wso2-auth",
+            "value": "Bearer {{access_token}}"
+          },
+          {
+            "key": "X-AUTH-TOKEN",
+            "value": "{{x_auth_token}}"
+          },
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "url": "{{base_url}}/mp/init"
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "const j = pm.response.json();",
+              "if (j.data && j.data.payToken) pm.collectionVariables.set('mp_pay_token', j.data.payToken);",
+              "pm.test('HTTP 200', () => pm.response.to.have.status(200));"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "T03 — Paiement marchand : pay (PENDING attendu)",
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "wso2-auth",
+            "value": "Bearer {{access_token}}"
+          },
+          {
+            "key": "X-AUTH-TOKEN",
+            "value": "{{x_auth_token}}"
+          },
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "url": "{{base_url}}/mp/pay",
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"subscriberMsisdn\": \"{{subscriber_msisdn}}\",\n  \"channelUserMsisdn\": \"{{channel_msisdn}}\",\n  \"amount\": \"100\",\n  \"description\": \"WorldSoft Transfer test T03\",\n  \"orderId\": \"WST-{{$timestamp}}\",\n  \"pin\": \"{{pin}}\",\n  \"payToken\": \"{{mp_pay_token}}\",\n  \"notifUrl\": \"{{notif_url}}\"\n}",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        }
+      }
+    },
+    {
+      "name": "T04 — Relance confirmation",
+      "request": {
+        "method": "GET",
+        "header": [
+          {
+            "key": "wso2-auth",
+            "value": "Bearer {{access_token}}"
+          },
+          {
+            "key": "X-AUTH-TOKEN",
+            "value": "{{x_auth_token}}"
+          },
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "url": "{{base_url}}/mp/push/{{mp_pay_token}}"
+      }
+    },
+    {
+      "name": "T05 / T06 — Statut du paiement",
+      "request": {
+        "method": "GET",
+        "header": [
+          {
+            "key": "wso2-auth",
+            "value": "Bearer {{access_token}}"
+          },
+          {
+            "key": "X-AUTH-TOKEN",
+            "value": "{{x_auth_token}}"
+          },
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "url": "{{base_url}}/mp/paymentstatus/{{mp_pay_token}}"
+      }
+    },
+    {
+      "name": "T07 — Réutiliser le même payToken (erreur attendue)",
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "wso2-auth",
+            "value": "Bearer {{access_token}}"
+          },
+          {
+            "key": "X-AUTH-TOKEN",
+            "value": "{{x_auth_token}}"
+          },
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "url": "{{base_url}}/mp/pay",
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"subscriberMsisdn\": \"{{subscriber_msisdn}}\",\n  \"channelUserMsisdn\": \"{{channel_msisdn}}\",\n  \"amount\": \"100\",\n  \"description\": \"WorldSoft Transfer test T07\",\n  \"orderId\": \"WST-{{$timestamp}}\",\n  \"pin\": \"{{pin}}\",\n  \"payToken\": \"{{mp_pay_token}}\",\n  \"notifUrl\": \"{{notif_url}}\"\n}",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        }
+      }
+    },
+    {
+      "name": "T09a — Cashin : init",
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "wso2-auth",
+            "value": "Bearer {{access_token}}"
+          },
+          {
+            "key": "X-AUTH-TOKEN",
+            "value": "{{x_auth_token}}"
+          },
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "url": "{{base_url}}/cashin/init"
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "const j = pm.response.json();",
+              "if (j.data && j.data.payToken) pm.collectionVariables.set('ci_pay_token', j.data.payToken);",
+              "pm.test('HTTP 200', () => pm.response.to.have.status(200));"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "T09b — Cashin : pay (SUCCESSFULL attendu)",
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "wso2-auth",
+            "value": "Bearer {{access_token}}"
+          },
+          {
+            "key": "X-AUTH-TOKEN",
+            "value": "{{x_auth_token}}"
+          },
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "url": "{{base_url}}/cashin/pay",
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"subscriberMsisdn\": \"{{subscriber_msisdn}}\",\n  \"channelUserMsisdn\": \"{{channel_msisdn}}\",\n  \"amount\": 500,\n  \"description\": \"WorldSoft Transfer test T09\",\n  \"orderId\": \"WST-{{$timestamp}}\",\n  \"pin\": \"{{pin}}\",\n  \"payToken\": \"{{ci_pay_token}}\",\n  \"notifUrl\": \"{{notif_url}}\"\n}",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        }
+      }
+    },
+    {
+      "name": "T09c — Cashin : statut",
+      "request": {
+        "method": "GET",
+        "header": [
+          {
+            "key": "wso2-auth",
+            "value": "Bearer {{access_token}}"
+          },
+          {
+            "key": "X-AUTH-TOKEN",
+            "value": "{{x_auth_token}}"
+          },
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "url": "{{base_url}}/cashin/paymentstatus/{{ci_pay_token}}"
+      }
+    }
+  ]
+}
