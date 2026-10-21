@@ -1,6 +1,7 @@
 import { prisma } from "@/lib/prisma";
 import { formatMoney } from "@/lib/money";
 import { momoIsSandbox } from "@/lib/providers/payout";
+import { orangeIsSandbox } from "@/lib/providers/orange";
 import { pushTransfer } from "@/lib/push";
 
 /**
@@ -47,7 +48,7 @@ export async function notifyCustomer(transferId: string, kind: NotifyKind): Prom
   try {
     const t = await prisma.transfer.findUnique({ where: { id: transferId }, include: { beneficiary: true } });
     if (!t) return;
-    const sandbox = t.payoutProvider === "momo" && momoIsSandbox();
+    const sandbox = (t.payoutProvider === "momo" && momoIsSandbox()) || (t.payoutProvider === "orange" && orangeIsSandbox());
     await pushTransfer(t, kind, sandbox);
     if (!key || !senderEmail || !t.senderEmail) return;
     const who = t.beneficiary.fullName.split(" ")[0] || t.beneficiary.fullName;

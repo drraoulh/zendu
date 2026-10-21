@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server";
 import { expireStaleTransfers } from "@/lib/transfer-service";
+import { syncOrangePayout } from "@/lib/orange-sync";
 import { prisma } from "@/lib/prisma";
 import { publicTransfer } from "@/lib/bank";
 import { INTERAC_PROVIDER, interacInstructions } from "@/lib/providers/interac";
@@ -17,6 +18,8 @@ type Params = { params: Promise<{ id: string }> };
 export async function GET(request: Request, { params }: Params) {
   const { id } = await params;
   await expireStaleTransfers({ id }).catch(() => 0);
+  // Versement Orange Money en attente : statut relu chez Orange (les notifications n'existent pas en sandbox).
+  await syncOrangePayout(id, "lecture").catch(() => undefined);
   const transfer = await prisma.transfer.findUnique({
     where: { id },
     include: {

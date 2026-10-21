@@ -3,6 +3,7 @@ import { assertTransition } from "@/lib/transfer-machine";
 import { momoIsSandbox, payoutProviderFor } from "@/lib/providers/payout";
 import { mockMomo } from "@/lib/providers/mock-momo";
 import { createMomoPayout } from "@/lib/providers/momo";
+import { createOrangePayout, orangeIsSandbox } from "@/lib/providers/orange";
 import { mockBank } from "@/lib/providers/mock-bank";
 import { isBankNetwork, isManualPayoutProvider, maskAccount } from "@/lib/bank";
 import { INTERAC_PAYMENT_HOURS } from "@/lib/providers/interac";
@@ -143,10 +144,14 @@ export async function queueAndRunPayout(transferId: string) {
       ? momoIsSandbox()
         ? "Versement MTN MoMo de TEST (sandbox) : aucun argent réel n'est versé"
         : "Appel disbursement MTN MoMo"
-      : bank ? "Virement bancaire simulé (mode démo)" : "Versement simulé (mode démo)",
+      : route === "orange"
+        ? orangeIsSandbox()
+          ? "Versement Orange Money de TEST (sandbox) : aucun argent réel n'est versé"
+          : "Appel Cashin Orange Money"
+        : bank ? "Virement bancaire simulé (mode démo)" : "Versement simulé (mode démo)",
   );
 
-  const provider = route === "momo" ? createMomoPayout() : bank ? mockBank : mockMomo;
+  const provider = route === "momo" ? createMomoPayout() : route === "orange" ? createOrangePayout() : bank ? mockBank : mockMomo;
 
   try {
     const result = await provider.disburse({
@@ -188,7 +193,7 @@ export async function queueAndRunPayout(transferId: string) {
         where: { id: transferId },
         data: { payoutRef: result.payoutRef },
       });
-      await addEvent(transferId, "payout_accepted", "Accepté par MoMo, en attente webhook");
+      await addEvent(transferId, "payout_accepted", route === "orange" ? "Accepté par Orange Money, en attente de confirmation" : "Accepté par MoMo, en attente webhook");
     }
   } catch (error) {
     const message = error instanceof Error ? error.message : "Erreur payout";
