@@ -1,7 +1,7 @@
 import { tr } from "./i18n";
 /**
  * Client de l'API PWFINTECH (Next.js, dossier web/).
- * L'URL se règle avec EXPO_PUBLIC_API_URL (ex. https://pwfintech.vercel.app).
+ * L'URL se règle avec EXPO_PUBLIC_API_URL (ex. https://worldsofttransfer.com).
  */
 /** Adresse normalisée : guillemets et espaces retirés, https:// ajouté si absent, sans « / » ni « /api » final. */
 export function normalizeApiUrl(raw: string | undefined) {

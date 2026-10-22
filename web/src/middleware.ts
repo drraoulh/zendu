@@ -68,8 +68,36 @@ export async function middleware(request: NextRequest) {
   return withSecurityHeaders(await route(request), request.nextUrl.pathname);
 }
 
+/**
+ * Anciennes adresses Vercel des deux sites : leurs PAGES renvoient vers les vrais domaines
+ * (NEXT_PUBLIC_PWFINTECH_URL / NEXT_PUBLIC_WST_URL). Les API n'y sont jamais redirigées : les
+ * versions déjà installées de l'appli les appellent encore (une redirection perdrait l'en-tête
+ * Authorization). zendu-vert.vercel.app (webhooks MTN et Didit) n'est pas concerné.
+ */
+const LEGACY_HOSTS: Record<string, string | undefined> = {
+  "pwfintech.vercel.app": process.env.NEXT_PUBLIC_PWFINTECH_URL,
+  "worldsoft-transfer.vercel.app": process.env.NEXT_PUBLIC_WST_URL,
+};
+
+function legacyRedirect(request: NextRequest): NextResponse | null {
+  if (request.method !== "GET" && request.method !== "HEAD") return null;
+  const { pathname, search } = request.nextUrl;
+  if (pathname.startsWith("/api/") || pathname.startsWith("/auth/")) return null;
+  const host = (request.headers.get("x-forwarded-host") ?? request.headers.get("host") ?? "").split(",")[0].trim().toLowerCase();
+  const target = LEGACY_HOSTS[host.replace(/:\d+$/, "")]?.trim().replace(/\/+$/, "");
+  if (!target) return null;
+  try {
+    return NextResponse.redirect(new URL(pathname + search, target), 308);
+  } catch {
+    return null;
+  }
+}
+
 async function route(request: NextRequest): Promise<NextResponse> {
   const { pathname, searchParams } = request.nextUrl;
+
+  const legacy = legacyRedirect(request);
+  if (legacy) return legacy;
 
   if (PUBLIC_API.test(pathname)) {
     const origin = corsOrigin(request);

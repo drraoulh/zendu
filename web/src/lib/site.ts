@@ -4,7 +4,7 @@
  * - WorldSoft Transfer (le site de l'application de transfert d'argent).
  *
  * Le site affiché dépend du nom de domaine. Adresses à configurer :
- *   NEXT_PUBLIC_PWFINTECH_URL="https://pwfintech.ca"
+ *   NEXT_PUBLIC_PWFINTECH_URL="https://pwfintec.com"
  *   NEXT_PUBLIC_WST_URL="https://worldsofttransfer.com"
  * En développement : http://localhost:3000 ou http://pwfintech.localhost:3000 (PWFINTECH)
  * et http://wst.localhost:3000 (WorldSoft Transfer).

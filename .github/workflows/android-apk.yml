@@ -1,7 +1,7 @@
 # Construit l'APK Android de WorldSoft Transfer (installable directement sur un téléphone).
 # Le fichier est à télécharger dans l'onglet Actions → ce workflow → « Artifacts ».
 # L'URL de l'API est intégrée à la construction : variable de dépôt EXPO_PUBLIC_API_URL
-# (Settings → Secrets and variables → Actions → Variables), sinon https://worldsoft-transfer.vercel.app.
+# (Settings → Secrets and variables → Actions → Variables), sinon https://worldsofttransfer.com.
 name: APK Android
 
 on:
@@ -19,7 +19,7 @@ jobs:
     runs-on: ubuntu-latest
     timeout-minutes: 60
     env:
-      EXPO_PUBLIC_API_URL: ${{ vars.EXPO_PUBLIC_API_URL || 'https://worldsoft-transfer.vercel.app' }}
+      EXPO_PUBLIC_API_URL: ${{ vars.EXPO_PUBLIC_API_URL || 'https://worldsofttransfer.com' }}
       EXPO_PUBLIC_SITE_URL: ${{ vars.EXPO_PUBLIC_SITE_URL }}
       EXPO_PUBLIC_COMPANY_EMAIL: ${{ vars.EXPO_PUBLIC_COMPANY_EMAIL }}
       EXPO_PUBLIC_COMPANY_PHONE: ${{ vars.EXPO_PUBLIC_COMPANY_PHONE }}
