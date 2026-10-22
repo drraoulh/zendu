@@ -5,6 +5,11 @@
 name: Build Android (EAS)
 
 on:
+  # Le bouton « Run workflow » n'apparaît que pour la branche par défaut : ce fichier sert aussi de
+  # déclencheur (une modification poussée sur la branche lance une construction « preview »).
+  push:
+    branches: [claude/loving-meitner-akjeks]
+    paths: [".github/workflows/eas-android.yml"]
   workflow_dispatch:
     inputs:
       profile:
@@ -48,4 +53,4 @@ jobs:
           if [ -n "$GOOGLE_SERVICES_JSON" ]; then printf '%s' "$GOOGLE_SERVICES_JSON" > google-services.json; fi
 
       - name: Construction sur EAS (la clé de signature est créée au premier lancement)
-        run: npx --yes eas-cli@latest build --platform android --profile "${{ inputs.profile }}" --non-interactive --no-wait
+        run: npx --yes eas-cli@latest build --platform android --profile "${{ inputs.profile || 'preview' }}" --non-interactive --no-wait
