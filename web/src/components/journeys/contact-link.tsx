@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { company } from "@/lib/company";
+import { useSiteEmails } from "@/components/site-provider";
 import { useT } from "@/i18n/define";
 import { wizardMessages } from "@/i18n/journeys";
 
@@ -9,10 +9,11 @@ import { wizardMessages } from "@/i18n/journeys";
 export function ContactLink({ className = "", subject }: { className?: string; subject?: string }) {
   const t = useT(wizardMessages);
   const cls = `break-all font-semibold text-brand hover:text-brand-strong ${className}`;
-  if (company.email) {
+  const { contact: email } = useSiteEmails();
+  if (email) {
     return (
-      <a href={`mailto:${company.email}`} className={cls}>
-        {company.email}
+      <a href={`mailto:${email}`} className={cls}>
+        {email}
       </a>
     );
   }

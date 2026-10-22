@@ -20,10 +20,12 @@ jobs:
     timeout-minutes: 60
     env:
       EXPO_PUBLIC_API_URL: ${{ vars.EXPO_PUBLIC_API_URL || 'https://worldsofttransfer.com' }}
-      EXPO_PUBLIC_SITE_URL: ${{ vars.EXPO_PUBLIC_SITE_URL }}
-      EXPO_PUBLIC_COMPANY_EMAIL: ${{ vars.EXPO_PUBLIC_COMPANY_EMAIL }}
+      EXPO_PUBLIC_SITE_URL: ${{ vars.EXPO_PUBLIC_SITE_URL || 'https://worldsofttransfer.com' }}
+      EXPO_PUBLIC_COMPANY_EMAIL: ${{ vars.EXPO_PUBLIC_COMPANY_EMAIL || 'support@worldsofttransfer.com' }}
       EXPO_PUBLIC_COMPANY_PHONE: ${{ vars.EXPO_PUBLIC_COMPANY_PHONE }}
       EXPO_PUBLIC_COMPANY_WHATSAPP: ${{ vars.EXPO_PUBLIC_COMPANY_WHATSAPP }}
+      # Notifications push : identifiant du projet Expo (variable) et fichier Firebase (secret).
+      EXPO_PUBLIC_EAS_PROJECT_ID: ${{ vars.EXPO_PUBLIC_EAS_PROJECT_ID }}
     defaults:
       run:
         working-directory: mobile
@@ -44,6 +46,12 @@ jobs:
       - uses: gradle/actions/setup-gradle@v4
 
       - run: npm ci
+
+      - name: Fichier Firebase (notifications Android)
+        env:
+          GOOGLE_SERVICES_JSON: ${{ secrets.GOOGLE_SERVICES_JSON }}
+        run: |
+          if [ -n "$GOOGLE_SERVICES_JSON" ]; then printf '%s' "$GOOGLE_SERVICES_JSON" > google-services.json; fi
 
       - name: Projet natif Android
         run: npx expo prebuild --platform android --no-install

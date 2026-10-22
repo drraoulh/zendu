@@ -7,6 +7,7 @@ import { Container, PageHero } from "@/components/ui/layout";
 import { CompanyValue } from "@/components/info/shared";
 import { appFullName } from "@/lib/brand";
 import { company } from "@/lib/company";
+import { useSiteEmails } from "@/components/site-provider";
 import { type MessageBundle, useT } from "@/i18n/define";
 import { legalCommon, privacyDoc, termsDoc } from "@/i18n/legal";
 import { common } from "@/i18n/common";
@@ -66,8 +67,9 @@ function LegalDocument<K extends string>({
 }) {
   const t = useT(bundle);
   const l = useT(legalCommon);
+  const emails = useSiteEmails();
   const vars = {
-    email: company.email ?? l("emailFallback"),
+    email: emails.contact ?? l("emailFallback"),
     company: company.legalName ?? appFullName,
     cityPart: company.city ? ` (${company.city})` : "",
   };
@@ -142,11 +144,11 @@ function LegalDocument<K extends string>({
               <div>
                 <p className="font-display font-bold text-ink">{l("questions")}</p>
                 <CompanyValue
-                  value={company.email}
-                  href={company.email ? `mailto:${company.email}` : null}
+                  value={emails.contact}
+                  href={emails.contact ? `mailto:${emails.contact}` : null}
                   className="mt-1 inline-block break-all text-sm font-semibold text-brand hover:text-brand-strong"
                 />
-                {!company.email && (
+                {!emails.contact && (
                   <Link href="/contact" className="mt-1 inline-flex min-h-10 items-center text-sm font-semibold text-brand hover:text-brand-strong">
                     {l("contactUs")}
                   </Link>

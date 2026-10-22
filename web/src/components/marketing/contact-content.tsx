@@ -8,6 +8,7 @@ import { Button, ButtonLink } from "@/components/ui/button";
 import { Icon, type IconName } from "@/components/ui/icon";
 import { Container, PageHero, Section, SectionHeading } from "@/components/ui/layout";
 import { company, companyLocality, telHref, whatsappHref } from "@/lib/company";
+import { useSiteEmails } from "@/components/site-provider";
 import { contactPage } from "@/i18n/company";
 import { useT } from "@/i18n/define";
 import { EMAIL_RE, Field, fieldAria, inputClass } from "./form";
@@ -73,6 +74,7 @@ type Status =
 
 function ContactForm() {
   const t = useT(contactPage);
+  const emails = useSiteEmails();
   const { locale } = useI18n();
   const [values, setValues] = useState<Values>(INITIAL);
   const [errors, setErrors] = useState<Errors>({});
@@ -139,7 +141,7 @@ function ContactForm() {
         return;
       }
       if (res.status === 503) {
-        setStatus({ state: "error", key: company.email ? "errUnavailable" : "errUnavailableNoEmail" });
+        setStatus({ state: "error", key: emails.contact ? "errUnavailable" : "errUnavailableNoEmail" });
         return;
       }
       if (res.status === 429) {
@@ -211,9 +213,9 @@ function ContactForm() {
           className="rounded-2xl bg-danger/10 px-4 py-3 text-sm font-medium text-danger focus:outline-none"
         >
           {t(status.key)}
-          {status.key === "errUnavailable" && company.email && (
-            <a href={`mailto:${company.email}`} className="ml-1 font-semibold underline">
-              {company.email}
+          {status.key === "errUnavailable" && emails.contact && (
+            <a href={`mailto:${emails.contact}`} className="ml-1 font-semibold underline">
+              {emails.contact}
             </a>
           )}
         </div>
@@ -315,6 +317,7 @@ function ContactForm() {
 
 export function ContactContent() {
   const t = useT(contactPage);
+  const emails = useSiteEmails();
   const wa = whatsappHref(company.whatsapp);
   const locality = companyLocality();
 
@@ -328,10 +331,15 @@ export function ContactContent() {
             <ul className="grid content-start gap-4">
               <ContactCard icon="mail" title={t("cardEmail")}>
                 <CompanyValue
-                  value={company.email}
-                  href={company.email ? `mailto:${company.email}` : null}
+                  value={emails.contact}
+                  href={emails.contact ? `mailto:${emails.contact}` : null}
                   className="break-all font-semibold text-brand hover:text-brand-strong"
                 />
+                {emails.support && emails.support !== emails.contact && (
+                  <a href={`mailto:${emails.support}`} className="mt-1 block break-all font-semibold text-brand hover:text-brand-strong">
+                    {emails.support}
+                  </a>
+                )}
                 <span className="mt-1 block text-xs">{t("responseNote")}</span>
               </ContactCard>
               <ContactCard icon="phone" title={t("cardPhone")}>

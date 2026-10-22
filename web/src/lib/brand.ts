@@ -11,7 +11,7 @@ export const appFullName = "Paul World Finances and Technologies";
  * ne pas casser les liens mailto: existants).
  */
 export const contact = {
-  email: company.email ?? "contact@pwfintech.ca",
+  email: company.email ?? "contact@pwfintec.com",
   phone: company.phone ?? "",
   whatsapp: company.whatsapp ?? "",
   city: company.city ?? "",

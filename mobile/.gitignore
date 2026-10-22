@@ -44,3 +44,6 @@ example
 
 # agent web export
 dist-agent/
+
+# Firebase (notifications Android) : fourni à la construction
+google-services.json

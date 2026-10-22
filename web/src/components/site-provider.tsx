@@ -2,6 +2,7 @@
 
 import { createContext, useCallback, useContext, type ReactNode } from "react";
 import { siteOfPath, type SiteId } from "@/lib/site";
+import { siteEmails } from "@/lib/company";
 
 type SiteContext = {
   site: SiteId;
@@ -32,4 +33,10 @@ export function useSite() {
     [site, origins],
   );
   return { site, origins, siteHref, link };
+}
+
+/** Courriels (contact, assistance) du site affiché. */
+export function useSiteEmails() {
+  const { site } = useContext(Ctx);
+  return siteEmails(site);
 }

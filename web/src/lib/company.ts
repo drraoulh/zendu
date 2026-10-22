@@ -33,7 +33,13 @@ export type Company = {
   legalName: string | null;
   brandName: string;
   tagline: string;
+  /** Courriel de contact PWFINTECH (contact@pwfintec.com). */
   email: string | null;
+  /** Courriel d'assistance PWFINTECH (support@pwfintec.com). */
+  supportEmail: string | null;
+  /** Courriels de WorldSoft Transfer (contact@ et support@worldsofttransfer.com). */
+  wstEmail: string | null;
+  wstSupportEmail: string | null;
   phone: string | null;
   whatsapp: string | null;
   address: string | null;
@@ -53,6 +59,9 @@ export const company: Company = {
   tagline:
     v(process.env.NEXT_PUBLIC_COMPANY_TAGLINE) ?? "Plus qu'un service, une solution pour votre avenir.",
   email: v(process.env.NEXT_PUBLIC_COMPANY_EMAIL, process.env.NEXT_PUBLIC_CONTACT_EMAIL),
+  supportEmail: v(process.env.NEXT_PUBLIC_COMPANY_SUPPORT_EMAIL),
+  wstEmail: v(process.env.NEXT_PUBLIC_WST_EMAIL),
+  wstSupportEmail: v(process.env.NEXT_PUBLIC_WST_SUPPORT_EMAIL),
   phone: v(process.env.NEXT_PUBLIC_COMPANY_PHONE, process.env.NEXT_PUBLIC_CONTACT_PHONE),
   whatsapp: v(process.env.NEXT_PUBLIC_COMPANY_WHATSAPP, process.env.NEXT_PUBLIC_CONTACT_WHATSAPP),
   address: v(process.env.NEXT_PUBLIC_COMPANY_ADDRESS),
@@ -114,4 +123,12 @@ export function socialLinks(c: Company = company): Array<{ id: keyof CompanySoci
   return (Object.keys(labels) as Array<keyof CompanySocial>)
     .map((id) => ({ id, label: labels[id], href: c.social[id] }))
     .filter((s): s is { id: keyof CompanySocial; label: string; href: string } => Boolean(s.href));
+}
+
+/** Courriels de contact et d'assistance du site affiché (WorldSoft Transfer ou PWFINTECH). */
+export function siteEmails(site: "pwfintech" | "wst"): { contact: string | null; support: string | null } {
+  if (site === "wst") {
+    return { contact: company.wstEmail ?? company.email, support: company.wstSupportEmail ?? company.supportEmail };
+  }
+  return { contact: company.email, support: company.supportEmail };
 }

@@ -9,7 +9,7 @@ import { useSite } from "@/components/site-provider";
 import { Container } from "@/components/ui/layout";
 import { Icon } from "@/components/ui/icon";
 import { appFullName } from "@/lib/brand";
-import { company, telHref, whatsappHref } from "@/lib/company";
+import { company, siteEmails, telHref, whatsappHref } from "@/lib/company";
 import { appMessages } from "@/i18n/app";
 import { common } from "@/i18n/common";
 import { footerMessages } from "@/i18n/info";
@@ -77,7 +77,7 @@ export function WstFooter() {
             <ul className="mt-4 grid gap-3 text-sm text-white/70">
               <li className="flex items-center gap-2.5">
                 <Icon name="mail" className="h-4 w-4 shrink-0 text-sky" />
-                <CompanyValue value={company.email} href={company.email ? `mailto:${company.email}` : null} light className="break-all hover:text-white" />
+                <CompanyValue value={siteEmails("wst").contact} href={siteEmails("wst").contact ? `mailto:${siteEmails("wst").contact}` : null} light className="break-all hover:text-white" />
               </li>
               <li className="flex items-center gap-2.5">
                 <Icon name="phone" className="h-4 w-4 shrink-0 text-sky" />
