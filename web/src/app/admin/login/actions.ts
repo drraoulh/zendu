@@ -3,7 +3,7 @@
 import { cookies, headers } from "next/headers";
 import { redirect } from "next/navigation";
 import { ADMIN_COOKIE, adminMode, checkAdminPassword, createSessionToken, sessionCookieOptions } from "@/lib/admin-auth";
-import { rateLimit } from "@/lib/requests";
+import { rateLimit } from "@/lib/rate-limit";
 import { safeNext } from "../_server/session";
 
 export type LoginState = { error: "invalid" | "rate_limited" | "locked" | null };
@@ -14,7 +14,7 @@ export async function loginAction(_prev: LoginState, formData: FormData): Promis
 
   const h = await headers();
   const ip = h.get("x-forwarded-for")?.split(",")[0]?.trim() || h.get("x-real-ip") || "unknown";
-  if (!rateLimit(`admin-login:${ip}`, 10, 15 * 60 * 1000)) return { error: "rate_limited" };
+  if (!(await rateLimit(`admin-login:${ip}`, 10, 15 * 60 * 1000))) return { error: "rate_limited" };
 
   const password = String(formData.get("password") ?? "");
   const username = String(formData.get("username") ?? "");

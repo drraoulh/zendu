@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
-import { clientIp, isDbUnavailable, normalizeReference, rateLimit, safeEmail } from "@/lib/requests";
+import { clientIp, isDbUnavailable, normalizeReference, safeEmail } from "@/lib/requests";
+import { rateLimit } from "@/lib/rate-limit";
 
 export const dynamic = "force-dynamic";
 
@@ -18,7 +19,7 @@ export async function GET(request: Request, { params }: Params) {
   if (!email) {
     return NextResponse.json({ ok: false, error: "Courriel requis" }, { status: 400 });
   }
-  if (!rateLimit(`requests-status:${clientIp(request)}`, 30)) {
+  if (!(await rateLimit(`requests-status:${clientIp(request)}`, 30))) {
     return NextResponse.json({ ok: false, code: "rate_limited", error: "Trop de requêtes" }, { status: 429 });
   }
   const notFound = NextResponse.json({ ok: false, error: "Introuvable" }, { status: 404 });

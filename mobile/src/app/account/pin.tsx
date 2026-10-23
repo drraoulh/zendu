@@ -6,8 +6,10 @@ import { H1, Header, P, Screen } from "@/components/ui";
 import { useSession } from "@/lib/session";
 import { colors } from "@/lib/theme";
 import { tr } from "@/lib/i18n";
+import { useSecureScreen } from "@/lib/secure-screen";
 
 export default function PinSetup() {
+  useSecureScreen();
   const { setPin } = useSession();
   const [first, setFirst] = useState<string | null>(null);
   const [value, setValue] = useState("");

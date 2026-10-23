@@ -7,10 +7,12 @@ import type { CountryCode } from "@/lib/corridors";
 import { OCCUPATIONS, POSTAL_LABEL, REGION_LABEL, REGIONS } from "@/lib/geo";
 import { useSession } from "@/lib/session";
 import { tr } from "@/lib/i18n";
+import { useSecureScreen } from "@/lib/secure-screen";
 
 const EMAIL = /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/;
 
 export default function EditInfo() {
+  useSecureScreen();
   const { profile, update } = useSession();
   const country = (profile?.country ?? "CA") as CountryCode;
   const [email, setEmail] = useState(profile?.email ?? "");

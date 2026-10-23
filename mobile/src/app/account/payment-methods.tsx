@@ -9,6 +9,7 @@ import { useStore, type SavedCard } from "@/lib/store";
 import { colors, fonts } from "@/lib/theme";
 import { cardLogoId, PaymentLogo } from "@/components/payment-logo";
 import { tr } from "@/lib/i18n";
+import { useSecureScreen } from "@/lib/secure-screen";
 
 /**
  * Moyens de paiement : le virement Interac (envois depuis le Canada) passe en premier.
@@ -16,6 +17,7 @@ import { tr } from "@/lib/i18n";
  * que si le serveur l'ouvre sur au moins un trajet.
  */
 export default function PaymentMethods() {
+  useSecureScreen();
   const { cards, removeCard, setDefaultCard } = useStore();
   const corridors = useCorridors();
   const [toRemove, setToRemove] = useState<SavedCard | null>(null);

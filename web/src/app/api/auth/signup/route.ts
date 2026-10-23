@@ -3,13 +3,14 @@ import { z } from "zod";
 import { createSession, hashPassword, passwordProblem, publicCustomer } from "@/lib/customer-auth";
 import { profileErrorMessage, signupSchema } from "@/lib/customer-input";
 import { prisma } from "@/lib/prisma";
-import { clientIp, isDbUnavailable, isUniqueViolation, rateLimit, zodIssues } from "@/lib/requests";
+import { clientIp, isDbUnavailable, isUniqueViolation, zodIssues } from "@/lib/requests";
+import { rateLimit } from "@/lib/rate-limit";
 
 export const dynamic = "force-dynamic";
 
 /** POST /api/auth/signup → 201 { token, customer } · 409 courriel déjà utilisé. */
 export async function POST(request: Request) {
-  if (!rateLimit(`signup:${clientIp(request)}`, 10)) {
+  if (!(await rateLimit(`signup:${clientIp(request)}`, 10))) {
     return NextResponse.json({ ok: false, code: "rate_limited", error: "Trop de tentatives. Réessayez plus tard." }, { status: 429 });
   }
   try {

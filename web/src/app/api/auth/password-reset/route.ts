@@ -1,7 +1,8 @@
 import { NextResponse } from "next/server";
 import { emailSchema } from "@/lib/customer-input";
 import { prisma } from "@/lib/prisma";
-import { clientIp, generateReference, rateLimit } from "@/lib/requests";
+import { clientIp, generateReference } from "@/lib/requests";
+import { rateLimit } from "@/lib/rate-limit";
 
 export const dynamic = "force-dynamic";
 
@@ -14,7 +15,7 @@ export async function POST(request: Request) {
   const body = (await request.json().catch(() => ({}))) as { email?: unknown };
   const email = emailSchema.safeParse(body.email);
   if (!email.success) return NextResponse.json({ ok: false, error: "Adresse courriel invalide" }, { status: 400 });
-  if (!rateLimit(`reset:${clientIp(request)}`, 5) || !rateLimit(`reset:${email.data}`, 3)) {
+  if (!(await rateLimit(`reset:${clientIp(request)}`, 5)) || !(await rateLimit(`reset:${email.data}`, 3))) {
     return NextResponse.json({ ok: false, code: "rate_limited", error: "Trop de demandes. Réessayez plus tard." }, { status: 429 });
   }
   try {

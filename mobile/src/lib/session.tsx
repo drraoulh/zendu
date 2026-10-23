@@ -1,7 +1,7 @@
 import * as Crypto from "expo-crypto";
 import * as Device from "expo-device";
 import { createContext, useCallback, useContext, useEffect, useMemo, useRef, useState, type ReactNode } from "react";
-import { Platform } from "react-native";
+import { AppState, Platform } from "react-native";
 import { api, ApiError, setAuthToken, setUnauthorizedHandler, type Customer, type LoginChallenge, type SignupInput } from "./api";
 import { getLang, setLang, tr } from "./i18n";
 import { registerPush, unregisterPush } from "./push";
@@ -12,6 +12,9 @@ import { storage } from "./storage";
  * L'appareil ne garde que le jeton de session (Keychain / Keystore), une copie du profil pour
  * l'affichage hors ligne, les réglages et le code PIN (haché) propres à cet appareil.
  */
+/** Durée en arrière-plan après laquelle l'appli se verrouille de nouveau (2 minutes). */
+export const AUTO_LOCK_MS = 2 * 60_000;
+
 export type Profile = Customer;
 export type KycStatus = Customer["kyc"];
 
@@ -116,6 +119,7 @@ export function SessionProvider({ children }: { children: ReactNode }) {
   const [pinHash, setPinHash] = useState<string | null>(null);
   const [unlocked, setUnlocked] = useState(false);
   const [pending, setPending] = useState<Pending | null>(null);
+  const backgroundAt = useRef<number | null>(null);
   const tempPassword = useRef<string | null>(null);
 
   const clearSession = useCallback(async () => {
@@ -189,6 +193,21 @@ export function SessionProvider({ children }: { children: ReactNode }) {
     }, 15000);
     return () => clearInterval(t);
   }, [kycPending, saveProfile]);
+
+  // Verrouillage automatique : de retour au premier plan après AUTO_LOCK_MS en arrière-plan,
+  // l'appli redemande le code PIN ou la biométrie (seulement si l'un des deux est activé).
+  useEffect(() => {
+    const sub = AppState.addEventListener("change", (state) => {
+      if (state === "background") {
+        backgroundAt.current ??= Date.now();
+      } else if (state === "active") {
+        const at = backgroundAt.current;
+        backgroundAt.current = null;
+        if (at !== null && Date.now() - at >= AUTO_LOCK_MS) setUnlocked(false);
+      }
+    });
+    return () => sub.remove();
+  }, []);
 
   const commit = useCallback(
     async (t: string, c: Customer) => {

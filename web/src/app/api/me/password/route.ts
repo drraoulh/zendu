@@ -1,7 +1,7 @@
 import { NextResponse } from "next/server";
 import { hashPassword, passwordProblem, publicCustomer, requireCustomer, verifyPassword } from "@/lib/customer-auth";
 import { prisma } from "@/lib/prisma";
-import { rateLimit } from "@/lib/requests";
+import { rateLimit } from "@/lib/rate-limit";
 
 export const dynamic = "force-dynamic";
 
@@ -18,7 +18,7 @@ export async function POST(request: Request) {
   }
   if (body.current.length > 200 || body.next.length > 200) return NextResponse.json({ ok: false, error: "Mot de passe trop long." }, { status: 400 });
   // Jeton volé : pas de recherche du mot de passe actuel par essais successifs.
-  if (!rateLimit(`me-password:${authed.customer.id}`, 10)) {
+  if (!(await rateLimit(`me-password:${authed.customer.id}`, 10))) {
     return NextResponse.json({ ok: false, code: "rate_limited", error: "Trop de tentatives. Réessayez dans une heure." }, { status: 429 });
   }
   if (!(await verifyPassword(body.current, authed.customer.passwordHash))) {

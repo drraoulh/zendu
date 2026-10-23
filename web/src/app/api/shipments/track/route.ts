@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
-import { clientIp, isDbUnavailable, normalizeShipmentNumber, rateLimit } from "@/lib/requests";
+import { clientIp, isDbUnavailable, normalizeShipmentNumber } from "@/lib/requests";
+import { rateLimit } from "@/lib/rate-limit";
 
 export const dynamic = "force-dynamic";
 
@@ -14,7 +15,7 @@ export async function GET(request: Request) {
   if (!raw || !raw.trim()) {
     return NextResponse.json({ ok: false, error: "Numéro de suivi requis" }, { status: 400 });
   }
-  if (!rateLimit(`track:${clientIp(request)}`, 60)) {
+  if (!(await rateLimit(`track:${clientIp(request)}`, 60))) {
     return NextResponse.json({ ok: false, code: "rate_limited", error: "Trop de requêtes" }, { status: 429 });
   }
   const notFound = NextResponse.json({ ok: false, error: "Colis introuvable" }, { status: 404 });

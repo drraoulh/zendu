@@ -1,17 +1,8 @@
 import { NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { availableSlots, checkAppointmentDate } from "@/lib/appointments";
-import {
-  appointmentSlotKey,
-  clientIp,
-  generateReference,
-  isDbUnavailable,
-  isUniqueViolation,
-  rateLimit,
-  requestBodySchema,
-  requestErrorMessage,
-  zodIssues,
-} from "@/lib/requests";
+import { appointmentSlotKey, clientIp, generateReference, isDbUnavailable, isUniqueViolation, requestBodySchema, requestErrorMessage, zodIssues } from "@/lib/requests";
+import { rateLimit } from "@/lib/rate-limit";
 
 export const dynamic = "force-dynamic";
 
@@ -72,7 +63,7 @@ export async function POST(request: Request) {
     );
   }
 
-  if (!rateLimit(`requests:${clientIp(request)}`, MAX_PER_HOUR)) {
+  if (!(await rateLimit(`requests:${clientIp(request)}`, MAX_PER_HOUR))) {
     return NextResponse.json(
       { ok: false, code: "rate_limited", error: "Trop de demandes. Réessayez dans une heure." },
       { status: 429 },

@@ -1,7 +1,8 @@
 import { NextResponse } from "next/server";
 import { resendLoginChallenge } from "@/lib/otp";
 import { OtpDeliveryError } from "@/lib/otp-delivery";
-import { clientIp, isDbUnavailable, rateLimit } from "@/lib/requests";
+import { clientIp, isDbUnavailable } from "@/lib/requests";
+import { rateLimit } from "@/lib/rate-limit";
 
 export const dynamic = "force-dynamic";
 
@@ -10,7 +11,7 @@ export async function POST(request: Request) {
   const body = (await request.json().catch(() => ({}))) as { challengeId?: unknown; channel?: unknown };
   const challengeId = typeof body.challengeId === "string" ? body.challengeId.trim() : "";
   if (!challengeId || challengeId.length > 64) return NextResponse.json({ ok: false, code: "invalid_request", error: "Requête invalide" }, { status: 400 });
-  if (!rateLimit(`2fa-resend:${clientIp(request)}`, 15)) {
+  if (!(await rateLimit(`2fa-resend:${clientIp(request)}`, 15))) {
     return NextResponse.json({ ok: false, code: "rate_limited", error: "Trop de demandes. Réessayez plus tard." }, { status: 429 });
   }
   try {

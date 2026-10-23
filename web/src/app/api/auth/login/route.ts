@@ -4,7 +4,8 @@ import { emailSchema } from "@/lib/customer-input";
 import { createLoginChallenge, OtpRateLimitError } from "@/lib/otp";
 import { OtpDeliveryError } from "@/lib/otp-delivery";
 import { prisma } from "@/lib/prisma";
-import { clientIp, isDbUnavailable, rateLimit } from "@/lib/requests";
+import { clientIp, isDbUnavailable } from "@/lib/requests";
+import { rateLimit } from "@/lib/rate-limit";
 
 export const dynamic = "force-dynamic";
 
@@ -20,7 +21,7 @@ export async function POST(request: Request) {
   const body = (await request.json().catch(() => ({}))) as { email?: unknown; password?: unknown; device?: unknown; channel?: unknown };
   const email = emailSchema.safeParse(body.email);
   if (!email.success || typeof body.password !== "string" || !body.password || body.password.length > 200) return invalid();
-  if (!rateLimit(`login:${clientIp(request)}`, 20) || !rateLimit(`login:${email.data}`, 10)) {
+  if (!(await rateLimit(`login:${clientIp(request)}`, 20)) || !(await rateLimit(`login:${email.data}`, 10))) {
     return NextResponse.json({ ok: false, code: "rate_limited", error: "Trop de tentatives. Réessayez dans une heure." }, { status: 429 });
   }
   try {

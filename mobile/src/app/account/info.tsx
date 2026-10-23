@@ -3,8 +3,10 @@ import { Button, Card, Header, Notice, Screen, SummaryRow } from "@/components/u
 import { countryName, phone } from "@/lib/format";
 import { useSession } from "@/lib/session";
 import { tr } from "@/lib/i18n";
+import { useSecureScreen } from "@/lib/secure-screen";
 
 export default function Info() {
+  useSecureScreen();
   const { profile } = useSession();
   if (!profile) return null;
   const a = profile.address;

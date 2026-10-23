@@ -1,7 +1,8 @@
 import { NextResponse } from "next/server";
 import { createSession, publicCustomer } from "@/lib/customer-auth";
 import { verifyLoginChallenge } from "@/lib/otp";
-import { clientIp, isDbUnavailable, rateLimit } from "@/lib/requests";
+import { clientIp, isDbUnavailable } from "@/lib/requests";
+import { rateLimit } from "@/lib/rate-limit";
 
 export const dynamic = "force-dynamic";
 
@@ -18,7 +19,7 @@ export async function POST(request: Request) {
   if (!challengeId || challengeId.length > 64 || !/^\d{6}$/.test(code)) {
     return NextResponse.json({ ok: false, code: "invalid_request", error: "Saisissez les 6 chiffres du code." }, { status: 400 });
   }
-  if (!rateLimit(`2fa:${clientIp(request)}`, 30)) {
+  if (!(await rateLimit(`2fa:${clientIp(request)}`, 30))) {
     return NextResponse.json({ ok: false, code: "rate_limited", error: "Trop de tentatives. Réessayez dans une heure." }, { status: 429 });
   }
   try {

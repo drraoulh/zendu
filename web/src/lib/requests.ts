@@ -280,28 +280,6 @@ export function isUniqueViolation(error: unknown, field?: string): boolean {
   return false;
 }
 
-type Bucket = { count: number; resetAt: number };
-const buckets = new Map<string, Bucket>();
-
-/**
- * Limite anti-spam en mémoire (par instance serveur) : `limit` appels par fenêtre glissante simple.
- * Renvoie true si l'appel est autorisé.
- */
-export function rateLimit(key: string, limit: number, windowMs = 60 * 60 * 1000): boolean {
-  const now = Date.now();
-  if (buckets.size > 5000) {
-    for (const [k, b] of buckets) if (b.resetAt <= now) buckets.delete(k);
-  }
-  const bucket = buckets.get(key);
-  if (!bucket || bucket.resetAt <= now) {
-    buckets.set(key, { count: 1, resetAt: now + windowMs });
-    return true;
-  }
-  if (bucket.count >= limit) return false;
-  bucket.count += 1;
-  return true;
-}
-
 export function clientIp(request: Request): string {
   const fwd = request.headers.get("x-forwarded-for");
   if (fwd) return fwd.split(",")[0].trim() || "unknown";

@@ -6,6 +6,7 @@ import { Button, H1, Header, Notice, P, Screen, Small } from "@/components/ui";
 import { useSession } from "@/lib/session";
 import { colors } from "@/lib/theme";
 import { tr } from "@/lib/i18n";
+import { useSecureScreen } from "@/lib/secure-screen";
 
 /**
  * Étape 2 de la connexion : le code à 6 chiffres est vérifié par le serveur (/api/auth/verify-2fa),
@@ -13,6 +14,7 @@ import { tr } from "@/lib/i18n";
  * courriel configuré), le code est fourni par l'API et prérempli ici.
  */
 export default function TwoFactor() {
+  useSecureScreen();
   const { completeSignIn, resendCode, cancelSignIn, pending } = useSession();
   const [code, setCode] = useState(pending?.demoCode ?? "");
   const [countdown, setCountdown] = useState(pending?.resendAfter ?? 30);

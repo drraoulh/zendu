@@ -1,11 +1,12 @@
 import { useFonts } from "expo-font";
-import { Stack } from "expo-router";
+import { Stack, usePathname, useRouter } from "expo-router";
 import * as SplashScreen from "expo-splash-screen";
 import { StatusBar } from "expo-status-bar";
 import { useEffect } from "react";
 import { KeyboardProvider } from "react-native-keyboard-controller";
 import { SafeAreaProvider } from "react-native-safe-area-context";
 import { configurePush } from "@/lib/push";
+import { enableAppSwitcherPrivacy, warnIfCompromisedDevice } from "@/lib/secure-screen";
 import { SessionProvider, useSession } from "@/lib/session";
 import { StoreProvider } from "@/lib/store";
 import { colors } from "@/lib/theme";
@@ -38,11 +39,21 @@ export default function RootLayout() {
 }
 
 function Navigator({ fontsReady }: { fontsReady: boolean }) {
-  const { ready, settings } = useSession();
+  const { ready, settings, locked } = useSession();
   const show = fontsReady && ready;
+  const router = useRouter();
+  const pathname = usePathname();
+
+  // Appli verrouillée en cours d'utilisation (retour d'arrière-plan) : écran de déverrouillage, où qu'on soit.
+  useEffect(() => {
+    if (show && locked && pathname !== "/lock") router.replace("/lock");
+  }, [show, locked, pathname, router]);
 
   useEffect(() => {
-    if (show) void SplashScreen.hideAsync();
+    if (!show) return;
+    void SplashScreen.hideAsync();
+    void enableAppSwitcherPrivacy();
+    void warnIfCompromisedDevice();
   }, [show]);
 
   if (!show) return null;

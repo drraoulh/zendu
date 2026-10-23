@@ -4,9 +4,11 @@ import { PasswordChecklist } from "@/components/form";
 import { Button, Field, H1, Header, Notice, P, Screen } from "@/components/ui";
 import { passwordScore, useSession } from "@/lib/session";
 import { tr } from "@/lib/i18n";
+import { useSecureScreen } from "@/lib/secure-screen";
 
 /** Après connexion avec un mot de passe temporaire donné par l'équipe : choix d'un nouveau mot de passe. */
 export default function Reset() {
+  useSecureScreen();
   const { replaceTemporaryPassword, knowsTemporaryPassword, signOut } = useSession();
   // Appli relancée depuis la connexion : le mot de passe temporaire n'est plus en mémoire, on le redemande.
   const [askTemp] = useState(() => !knowsTemporaryPassword());

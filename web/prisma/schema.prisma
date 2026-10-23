@@ -286,3 +286,12 @@ model PushToken {
 
   @@index([customerId])
 }
+
+/// Limite anti-abus partagée (src/lib/rate-limit.ts). "key" = empreinte SHA-256, jamais de donnée en clair.
+model RateLimit {
+  key     String   @id
+  count   Int      @default(1)
+  resetAt DateTime
+
+  @@index([resetAt])
+}

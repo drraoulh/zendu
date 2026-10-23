@@ -4,8 +4,10 @@ import { PasswordChecklist } from "@/components/form";
 import { Button, Field, Header, Notice, P, Screen } from "@/components/ui";
 import { passwordScore, useSession } from "@/lib/session";
 import { tr } from "@/lib/i18n";
+import { useSecureScreen } from "@/lib/secure-screen";
 
 export default function ChangePassword() {
+  useSecureScreen();
   const { changePassword } = useSession();
   const [current, setCurrent] = useState("");
   const [next, setNext] = useState("");

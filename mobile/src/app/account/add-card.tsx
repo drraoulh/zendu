@@ -6,8 +6,10 @@ import { payMethodsOf, useCorridors } from "@/lib/corridors";
 import { useSession } from "@/lib/session";
 import { useStore } from "@/lib/store";
 import { tr } from "@/lib/i18n";
+import { useSecureScreen } from "@/lib/secure-screen";
 
 export default function AddCard() {
+  useSecureScreen();
   const { profile } = useSession();
   const { saveCard } = useStore();
   // Carte de débit : démonstration seulement (fermée par le serveur en mode réel).

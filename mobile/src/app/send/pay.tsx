@@ -10,8 +10,10 @@ import { useStore } from "@/lib/store";
 import { colors, fonts } from "@/lib/theme";
 import { cardLogoId, PaymentLogo } from "@/components/payment-logo";
 import { tr } from "@/lib/i18n";
+import { useSecureScreen } from "@/lib/secure-screen";
 
 export default function Pay() {
+  useSecureScreen();
   const { profile } = useSession();
   const { draft, setDraft, cards, saveCard } = useStore();
   const [selected, setSelected] = useState<string | null>(draft.cardId ?? cards.find((c) => c.isDefault)?.id ?? cards[0]?.id ?? null);
