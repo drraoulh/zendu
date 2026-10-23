@@ -68,14 +68,16 @@ export function isSandboxTester(senderEmail?: string | null): boolean {
 export function payoutProviderFor(network: string, country: string, senderEmail?: string | null): string {
   const bank = isBankNetwork(network, country);
   const live = isLiveMode();
-  if (!live && getPayoutMode() !== "momo") return bank ? MOCK_BANK_PROVIDER : "mock_momo";
+  // Démo : jamais de vrai versement. Les fournisseurs ne servent qu'avec leurs clés de TEST (sandbox) ;
+  // des clés de production en mode démo → simulation, sans jamais appeler MTN ni Orange.
   const momoUsable = live
     ? momoLiveReady() || (getPayoutMode() === "momo" && momoIsSandbox() && isSandboxTester(senderEmail))
-    : getPayoutMode() === "momo";
+    : getPayoutMode() === "momo" && momoIsSandbox();
   if (momoUsable && network === "MTN" && country === "CM") return "momo";
   // Orange Money Cameroun (Cashin) : même règle que MTN. En mode réel, clés de production, ou sandbox
   // pour les seuls comptes de test (le sandbox ne verse aucun argent réel).
-  const orangeUsable = orangeConfigured() && (!live || !orangeIsSandbox() || isSandboxTester(senderEmail));
+  const orangeUsable = orangeConfigured() && (live ? !orangeIsSandbox() || isSandboxTester(senderEmail) : orangeIsSandbox());
   if (orangeUsable && network === "ORANGE" && country === "CM") return "orange";
+  if (!live) return bank ? MOCK_BANK_PROVIDER : "mock_momo";
   return bank ? MANUAL_BANK_PROVIDER : MANUAL_PAYOUT_PROVIDER;
 }

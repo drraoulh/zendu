@@ -156,22 +156,35 @@ export function createMomoPayout(): PayoutProvider {
           ? String(Math.round(amountXaf))
           : String(Math.max(1, Math.round(amountXaf / 650)));
 
-      const res = await fetch(`${cfg.baseUrl}/v1_0/transfer`, {
-        method: "POST",
-        headers: authHeaders(cfg, token, payoutRef),
-        body: JSON.stringify({
-          amount,
-          currency: cfg.currency,
-          externalId: reference.replace(/[^a-zA-Z0-9_-]/g, "").slice(0, 64),
-          payee: {
-            partyIdType: "MSISDN",
-            partyId: msisdn,
-          },
-          payerMessage: "PWFINTECH",
-          payeeNote: `PWFINTECH ${fullName}`.slice(0, 50),
-        }),
-      });
+      // Une fois la demande envoyée, une réponse ambiguë (délai dépassé, coupure, erreur 5xx) ne veut pas
+      // dire « échec » : MTN a pu accepter le versement. On garde alors la référence et on laisse le
+      // statut MTN trancher (GET /v1_0/transfer/{referenceId}) : jamais de nouvel essai à l'aveugle,
+      // qui paierait le bénéficiaire deux fois.
+      let res: Response;
+      try {
+        res = await fetch(`${cfg.baseUrl}/v1_0/transfer`, {
+          method: "POST",
+          headers: authHeaders(cfg, token, payoutRef),
+          signal: AbortSignal.timeout(30_000),
+          body: JSON.stringify({
+            amount,
+            currency: cfg.currency,
+            externalId: reference.replace(/[^a-zA-Z0-9_-]/g, "").slice(0, 64),
+            payee: {
+              partyIdType: "MSISDN",
+              partyId: msisdn,
+            },
+            payerMessage: "PWFINTECH",
+            payeeNote: `PWFINTECH ${fullName}`.slice(0, 50),
+          }),
+        });
+      } catch {
+        return { provider: "momo", payoutRef, status: "sent", message: "Réponse MTN non reçue : statut à vérifier avant tout nouvel essai" };
+      }
 
+      if (res.status >= 500 || res.status === 408 || res.status === 409) {
+        return { provider: "momo", payoutRef, status: "sent", message: `MTN HTTP ${res.status} : statut à vérifier avant tout nouvel essai` };
+      }
       if (res.status !== 202) {
         const body = await res.text();
         return {

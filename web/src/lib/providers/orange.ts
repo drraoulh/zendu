@@ -36,8 +36,13 @@ export function orangeConfigured(): boolean {
   );
 }
 
+/**
+ * Sandbox seulement si ORANGE_TARGET_ENV="sandbox" est posé EXPLICITEMENT : ce sont les clés qui
+ * choisissent l'environnement chez Orange, donc sans indication on considère que l'argent est réel
+ * (jamais de message « aucun argent réel » ni de versement de démo avec des clés de production).
+ */
 export function orangeIsSandbox(): boolean {
-  return (process.env.ORANGE_TARGET_ENV?.trim() || "sandbox") === "sandbox";
+  return process.env.ORANGE_TARGET_ENV?.trim() === "sandbox";
 }
 
 function getConfig(): OrangeConfig {
@@ -168,7 +173,11 @@ export function createOrangePayout(): PayoutProvider {
       }
       // orderId unique : la référence du transfert + un suffixe (un nouvel essai ne réutilise jamais l'ancien).
       const orderId = `${reference.replace(/[^A-Za-z0-9-]/g, "")}-${randomBytes(3).toString("hex")}`;
-      const pay = await call("POST", "/cashin/pay", {
+      // Demande envoyée : une coupure ou un délai dépassé n'est pas un échec (Orange a pu verser).
+      // On garde le payToken et le statut Orange tranchera, jamais un nouvel essai à l'aveugle.
+      let pay: HttpResult;
+      try {
+        pay = await call("POST", "/cashin/pay", {
         channelUserMsisdn: cfg.channelMsisdn,
         amount: Math.round(amountXaf),
         subscriberMsisdn: normalizeOrangeMsisdn(phone),
@@ -178,6 +187,9 @@ export function createOrangePayout(): PayoutProvider {
         payToken,
         notifUrl: cfg.notifUrl,
       });
+      } catch {
+        return { provider: "orange", payoutRef: payToken, status: "sent", message: "Réponse Orange non reçue : statut à vérifier avant tout nouvel essai" };
+      }
       const d = dataOf(pay);
       if (pay.status !== 200) {
         // Délai dépassé ou 5xx : le versement a pu passer, on vérifie le statut avant de conclure.

@@ -48,13 +48,7 @@ et `CustomerSession`). À faire une fois dans Supabase › SQL Editor :
 prisma/migrations-manual/2026-10-04-customers.sql
 ```
 
-Le script crée les tables et un **compte de démonstration** (identité déjà vérifiée) :
-
-| Courriel | Mot de passe |
-| --- | --- |
-| `demo@pwfintech.test` | `Demo2026!` |
-
-À supprimer avant l'ouverture au public : `DELETE FROM "Customer" WHERE "email" = 'demo@pwfintech.test';`
+Le script crée les tables des comptes clients. Aucun compte n'est créé par une migration : pour tester en local, créez un compte depuis l'appli (en développement, le code de connexion s'affiche à l'écran).
 
 API de l'appli : `POST /api/auth/signup|login|logout|password-reset`, `GET|PATCH|DELETE /api/me`,
 `POST /api/me/password`, `POST /api/me/kyc`, `GET /api/me/transfers`, `GET|DELETE /api/me/sessions`.

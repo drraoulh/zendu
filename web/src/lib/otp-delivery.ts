@@ -1,3 +1,4 @@
+import { isLiveMode } from "@/lib/mode";
 /**
  * Envoi des codes de vérification (connexion en deux étapes).
  *
@@ -79,9 +80,15 @@ export function resolveChannel(requested: OtpChannel): OtpChannel {
   return requested === "sms" ? "email" : "sms";
 }
 
-/** Mode démo : pas de fournisseur et OTP_DEMO ≠ "false" (le code est alors renvoyé à l'appli). */
+/**
+ * Mode démo du code de connexion (le code est renvoyé à l'appli au lieu d'être envoyé) : jamais en
+ * mode réel ; ailleurs, seulement sans fournisseur et sur demande (OTP_DEMO="true"), ou en
+ * développement local. Sans fournisseur en mode réel, la connexion échoue : la 2FA n'est jamais
+ * contournée en silence.
+ */
 export function otpDemoMode(): boolean {
-  return !otpProviderConfigured() && process.env.OTP_DEMO?.trim().toLowerCase() !== "false";
+  if (otpProviderConfigured() || isLiveMode()) return false;
+  return process.env.OTP_DEMO?.trim().toLowerCase() === "true" || process.env.NODE_ENV !== "production";
 }
 
 const SEND_FAILED = "Envoi du code impossible. Réessayez dans un instant.";

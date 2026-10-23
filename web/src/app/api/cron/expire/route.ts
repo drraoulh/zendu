@@ -1,3 +1,4 @@
+import { timingSafeEqual } from "node:crypto";
 import { NextResponse } from "next/server";
 import { expireStaleTransfers } from "@/lib/transfer-service";
 
@@ -8,7 +9,10 @@ import { expireStaleTransfers } from "@/lib/transfer-service";
  */
 export async function GET(request: Request) {
   const secret = process.env.CRON_SECRET?.trim();
-  if (!secret || request.headers.get("authorization") !== `Bearer ${secret}`) {
+  const given = Buffer.from(request.headers.get("authorization") ?? "");
+  const expected = Buffer.from(`Bearer ${secret ?? ""}`);
+  // Comparaison en temps constant : la durée de la réponse ne révèle rien du secret.
+  if (!secret || given.length !== expected.length || !timingSafeEqual(given, expected)) {
     return NextResponse.json({ error: "Non autorisé" }, { status: 401 });
   }
   const expired = await expireStaleTransfers();

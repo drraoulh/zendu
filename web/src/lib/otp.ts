@@ -22,8 +22,21 @@ const OTP_MAX_LIFETIME_MS = 30 * 60_000;
 /** Défis créés par compte et par heure (protège aussi contre l'envoi massif de SMS). */
 const OTP_MAX_PER_HOUR = 10;
 
+/**
+ * Clé HMAC des codes : OTP_PEPPER ; à défaut, dérivée d'un secret déjà présent sur le serveur
+ * (ADMIN_SESSION_SECRET, séparation de domaine « otp-pepper »). La valeur fixe ne sert qu'en local.
+ */
+function otpPepper(): string {
+  const pepper = process.env.OTP_PEPPER?.trim();
+  if (pepper) return pepper;
+  const base = process.env.ADMIN_SESSION_SECRET?.trim();
+  if (base) return createHmac("sha256", base).update("otp-pepper").digest("hex");
+  if (process.env.NODE_ENV === "production") throw new Error("OTP_PEPPER (ou ADMIN_SESSION_SECRET) manquant");
+  return "pwfintech-otp-dev";
+}
+
 function codeHash(challengeId: string, code: string): string {
-  return createHmac("sha256", process.env.OTP_PEPPER || "pwfintech-otp-v1").update(`${challengeId}:${code}`).digest("hex");
+  return createHmac("sha256", otpPepper()).update(`${challengeId}:${code}`).digest("hex");
 }
 
 function newCode(): string {

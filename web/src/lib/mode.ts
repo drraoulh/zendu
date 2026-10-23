@@ -1,13 +1,21 @@
 /**
- * Mode de fonctionnement : démonstration ou réel.
+ * Mode de fonctionnement : démonstration ou réel. ÉCHOUE FERMÉ : par défaut, un serveur de
+ * production est en mode réel, même si une variable d'environnement manque.
  *
- * Mode réel dès que APP_MODE="live" OU qu'une adresse de dépôt Interac est configurée
- * (INTERAC_DEPOSIT_EMAIL) : à partir de là, plus aucune simulation n'est possible —
- * ni paiement « simulé », ni versement « simulé ». Un transfert n'est marqué payé que par l'équipe
- * (Interac) et livré que par MTN ou par l'équipe (versement manuel).
+ * - Mode réel : APP_MODE="live", OU une adresse de dépôt Interac (INTERAC_DEPOSIT_EMAIL), OU le
+ *   déploiement de production Vercel (VERCEL_ENV="production" : jamais de démo sur le site public),
+ *   OU tout serveur NODE_ENV="production" sans APP_MODE="demo" explicite.
+ * - Démo : seulement en développement local, ou sur un déploiement de prévisualisation qui pose
+ *   APP_MODE="demo" explicitement.
+ * En mode réel, plus aucune simulation n'est possible — ni paiement « simulé », ni versement
+ * « simulé », ni code de connexion affiché, ni identité validée automatiquement.
  */
 export function isLiveMode(): boolean {
-  return process.env.APP_MODE?.trim() === "live" || Boolean(process.env.INTERAC_DEPOSIT_EMAIL?.trim());
+  const mode = process.env.APP_MODE?.trim();
+  if (mode === "live" || process.env.INTERAC_DEPOSIT_EMAIL?.trim()) return true;
+  if (process.env.VERCEL_ENV === "production") return true;
+  if (mode === "demo") return false;
+  return process.env.NODE_ENV === "production";
 }
 
 export type PayMethod = "interac" | "card";

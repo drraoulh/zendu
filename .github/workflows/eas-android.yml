@@ -19,6 +19,10 @@ on:
         type: choice
         options: [preview, production]
 
+# Droits minimaux du jeton GitHub : lecture du dépôt seulement.
+permissions:
+  contents: read
+
 jobs:
   eas:
     runs-on: ubuntu-latest

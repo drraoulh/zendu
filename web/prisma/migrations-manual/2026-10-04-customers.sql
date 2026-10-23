@@ -54,12 +54,5 @@ DO $$ BEGIN
     FOREIGN KEY ("customerId") REFERENCES "Customer"("id") ON DELETE SET NULL ON UPDATE CASCADE;
 EXCEPTION WHEN duplicate_object THEN NULL; END $$;
 
--- Compte de démonstration (identité déjà vérifiée) :
---   courriel : demo@pwfintech.test   mot de passe : Demo2026!
--- À supprimer avant l'ouverture au public : DELETE FROM "Customer" WHERE "email" = 'demo@pwfintech.test';
-INSERT INTO "Customer" ("id", "email", "phone", "firstName", "lastName", "country", "region", "birthDate", "occupation",
-  "address", "passwordHash", "passwordChangedAt", "kycStatus", "kycDocument", "kycSubmittedAt", "kycReviewedAt", "kycNote", "updatedAt")
-VALUES ('cust_demo_pwfintech', 'demo@pwfintech.test', '+1 4165550142', 'Paul', 'Démo', 'CA', 'Ontario', '14/03/1990', 'Salarié(e)',
-  '{"line1": "120, rue King Ouest", "city": "Toronto", "region": "Ontario", "postalCode": "M5H 1A1"}',
-  'scrypt$16384$L1aIrD9roH7eAnm9hJ29fQ==$PBvpFho5RMpR7Bo4C9HUnITbxeqLY3QvBo5qUKGlS/Q=', CURRENT_TIMESTAMP, 'verified', 'Passeport', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP, 'Compte de démonstration', CURRENT_TIMESTAMP)
-ON CONFLICT ("email") DO NOTHING;
+-- (Le compte de démonstration a été retiré de ce fichier le 2026-10-23 et désactivé en production :
+--  aucun compte avec un mot de passe connu ne doit être créé par une migration.)

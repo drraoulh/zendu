@@ -2,6 +2,7 @@ import { NextResponse } from "next/server";
 import { publicCustomer, requireCustomer } from "@/lib/customer-auth";
 import { prisma } from "@/lib/prisma";
 import { diditConfigured } from "@/lib/didit";
+import { isLiveMode } from "@/lib/mode";
 
 export const dynamic = "force-dynamic";
 
@@ -21,7 +22,8 @@ export async function POST(request: Request) {
   const body = (await request.json().catch(() => ({}))) as { document?: unknown };
   const document = typeof body.document === "string" ? body.document.trim().slice(0, 80) : "";
   if (!document) return NextResponse.json({ ok: false, error: "Type de pièce requis" }, { status: 400 });
-  const auto = process.env.KYC_AUTO_APPROVE === "true";
+  // Démo seulement : en mode réel, aucune identité n'est validée sans contrôle.
+  const auto = process.env.KYC_AUTO_APPROVE === "true" && !isLiveMode();
   const now = new Date();
   const customer = await prisma.customer.update({
     where: { id: authed.customer.id },

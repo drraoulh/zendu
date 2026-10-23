@@ -37,7 +37,7 @@ depuis « Nous contacter » arrivent dans l'admin (`/admin/demandes`).
 ## État actuel (à brancher avant la production)
 
 - **Comptes** : sur le serveur (`/api/auth`, `/api/me`), gérés dans le backoffice `/admin/clients`.
-  Compte de démo : `demo@pwfintech.test` / `Demo2026!` (voir `web/README.md`). L'appareil ne garde que
+  Pour tester, créez un compte depuis l'appli. L'appareil ne garde que
   le jeton de session (Keychain / Keystore), les réglages et le code PIN haché.
 - **Codes SMS** (inscription, vérification en deux étapes) : simulés, aucun SMS envoyé.
 - **Mot de passe oublié** : la demande arrive dans `/admin/demandes` ; l'équipe génère un mot de passe
