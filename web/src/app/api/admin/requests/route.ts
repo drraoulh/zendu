@@ -1,5 +1,5 @@
 import { NextResponse } from "next/server";
-import { requireAdmin } from "@/lib/admin-auth";
+import { requireAdmin } from "@/lib/admin-guard";
 import { listRequests, parseRequestFilters } from "@/app/admin/_server/data";
 import { adminError } from "../_respond";
 

@@ -1,5 +1,5 @@
 import { NextResponse } from "next/server";
-import { requireAdmin } from "@/lib/admin-auth";
+import { requireAdmin } from "@/lib/admin-guard";
 import { revokeCustomerSessions } from "@/app/admin/_server/customers";
 import { adminError } from "../../../_respond";
 

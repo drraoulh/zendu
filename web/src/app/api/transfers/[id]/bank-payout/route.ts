@@ -3,7 +3,7 @@ import { z } from "zod";
 import { publicTransfer } from "@/lib/bank";
 import { prisma } from "@/lib/prisma";
 import { completeManualBankPayout } from "@/lib/transfer-service";
-import { requireAdmin } from "@/lib/admin-auth";
+import { requireAdmin } from "@/lib/admin-guard";
 
 type Params = { params: Promise<{ id: string }> };
 

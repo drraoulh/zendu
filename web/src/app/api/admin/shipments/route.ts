@@ -1,5 +1,5 @@
 import { NextResponse } from "next/server";
-import { requireAdmin } from "@/lib/admin-auth";
+import { requireAdmin } from "@/lib/admin-guard";
 import { createShipment, listShipments, parseShipmentFilters, shipmentCreateSchema } from "@/app/admin/_server/data";
 import { adminError, readJson } from "../_respond";
 

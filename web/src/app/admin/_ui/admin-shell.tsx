@@ -10,7 +10,7 @@ import { customersMessages } from "@/i18n/admin-customers";
 import type { ActionCounts } from "../_server/insights";
 import { useAdminT } from "./kit";
 
-type NavKey = "navOverview" | "navRequests" | "navShipments" | "navTransfers" | "navCustomers";
+type NavKey = "navOverview" | "navRequests" | "navShipments" | "navTransfers" | "navCustomers" | "navSecurity";
 
 const NAV: { href: string; key: NavKey; icon: IconName; pending?: (c: ActionCounts) => number }[] = [
   { href: "/admin", key: "navOverview", icon: "chart" },
@@ -19,6 +19,7 @@ const NAV: { href: string; key: NavKey; icon: IconName; pending?: (c: ActionCoun
   { href: "/admin/clients", key: "navCustomers", icon: "users", pending: (c) => c.kycPending ?? 0 },
   { href: "/admin/demandes", key: "navRequests", icon: "mail", pending: (c) => c.newRequests ?? 0 },
   { href: "/admin/colis", key: "navShipments", icon: "box" },
+  { href: "/admin/securite", key: "navSecurity", icon: "shield" },
 ];
 
 /** Cadre de l'espace équipe : bandeau, navigation latérale (onglets sur mobile) avec dossiers en attente, déconnexion. */

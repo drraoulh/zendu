@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { redirect } from "next/navigation";
 import { adminPageAccess, safeNext } from "../_server/session";
 import { adminUsernameRequired } from "@/lib/admin-auth";
+import { adminTotpEnabled } from "@/lib/admin-totp";
 import { LoginView } from "./login-view";
 
 export const dynamic = "force-dynamic";
@@ -19,5 +20,5 @@ export default async function AdminLoginPage({ searchParams }: Props) {
   const next = safeNext(nextRaw);
   const { ok, mode } = await adminPageAccess();
   if (ok && mode === "configured") redirect(next);
-  return <LoginView mode={mode} next={next} loggedOut={sp.logout === "1"} withUsername={adminUsernameRequired()} />;
+  return <LoginView mode={mode} next={next} loggedOut={sp.logout === "1"} withUsername={adminUsernameRequired()} withCode={adminTotpEnabled()} />;
 }

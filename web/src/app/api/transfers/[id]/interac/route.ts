@@ -2,7 +2,7 @@ import { NextResponse } from "next/server";
 import { z } from "zod";
 import { publicTransfer } from "@/lib/bank";
 import { prisma } from "@/lib/prisma";
-import { requireAdmin } from "@/lib/admin-auth";
+import { requireAdmin } from "@/lib/admin-guard";
 import { getCustomer } from "@/lib/customer-auth";
 import { INTERAC_PROVIDER } from "@/lib/providers/interac";
 import { markPaymentDetected } from "@/lib/transfer-service";

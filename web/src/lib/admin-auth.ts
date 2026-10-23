@@ -1,15 +1,13 @@
-import { NextResponse } from "next/server";
-
 /**
- * Authentification de l'administration (/admin/**, /api/admin/**, actions opérateur).
+ * Authentification de l'administration (/admin/**, /api/admin/**, actions opérateur) — partie
+ * utilisable dans le middleware (Edge) : signature du cookie, mot de passe, jeton opérateur.
+ * La vérification complète (session non révoquée, origine, journal d'audit) est dans admin-guard.ts.
  *
- * - ADMIN_PASSWORD : mot de passe unique de l'équipe (page /admin/login).
- * - ADMIN_SESSION_SECRET : secret HMAC du cookie de session (à défaut, dérivé de ADMIN_PASSWORD :
- *   changer le mot de passe déconnecte alors toutes les sessions).
- * - ADMIN_API_TOKEN : jeton opérateur historique, accepté en `Authorization: Bearer …` sur les API.
- *
- * Sans ADMIN_PASSWORD, l'admin reste fermé (message « configurez ADMIN_PASSWORD »), sauf en
- * NODE_ENV=development où il reste ouvert avec un bandeau d'avertissement.
+ * - ADMIN_PASSWORD : mot de passe de l'équipe (page /admin/login), ADMIN_USERNAME facultatif.
+ * - ADMIN_SESSION_SECRET : secret HMAC du cookie de session. OBLIGATOIRE en production (sans lui,
+ *   l'admin reste fermé) ; en développement local seulement, il est dérivé de ADMIN_PASSWORD.
+ * - ADMIN_TOTP_SECRET : facultatif, active le code à 6 chiffres (application d'authentification).
+ * - ADMIN_API_TOKEN : jeton opérateur, accepté en `Authorization: Bearer …` sur les API.
  *
  * Uniquement Web Crypto : utilisable dans le middleware (Edge) comme dans les routes (Node).
  */
@@ -21,7 +19,7 @@ const SESSION_MS = ADMIN_SESSION_HOURS * 60 * 60 * 1000;
 export type AdminMode = "configured" | "dev-open" | "locked";
 
 export function adminMode(): AdminMode {
-  if (process.env.ADMIN_PASSWORD) return "configured";
+  if (process.env.ADMIN_PASSWORD && sessionSecret()) return "configured";
   return process.env.NODE_ENV === "development" ? "dev-open" : "locked";
 }
 
@@ -44,10 +42,19 @@ export function safeEqual(a: string, b: string): boolean {
 }
 
 function sessionSecret(): string | null {
-  const secret = process.env.ADMIN_SESSION_SECRET;
+  const secret = process.env.ADMIN_SESSION_SECRET?.trim();
   if (secret) return secret;
+  // Jamais de secret dérivé du mot de passe en production.
+  if (process.env.NODE_ENV === "production") return null;
   const password = process.env.ADMIN_PASSWORD;
   return password ? `pw-admin-derived:${password}` : null;
+}
+
+/** Longueur minimale conseillée du mot de passe admin (affichée en alerte si plus court). */
+export const ADMIN_PASSWORD_MIN_LENGTH = 14;
+
+export function adminPasswordTooShort(): boolean {
+  return (process.env.ADMIN_PASSWORD ?? "").length < ADMIN_PASSWORD_MIN_LENGTH;
 }
 
 async function sign(message: string, secret: string): Promise<string> {
@@ -61,22 +68,38 @@ async function sign(message: string, secret: string): Promise<string> {
   return base64url(await crypto.subtle.sign("HMAC", key, encoder.encode(message)));
 }
 
-/** Jeton "v1.<expiration ms>.<hmac>" ; null si l'admin n'est pas configuré. */
-export async function createSessionToken(now = Date.now()): Promise<string | null> {
+export type SessionClaims = { sid: string; exp: number };
+
+function newSessionId(): string {
+  const bytes = new Uint8Array(18);
+  crypto.getRandomValues(bytes);
+  return base64url(bytes.buffer);
+}
+
+/** Jeton "v2.<id de session>.<expiration ms>.<hmac>" ; null si l'admin n'est pas configuré. */
+export async function createSessionToken(now = Date.now()): Promise<{ token: string; sid: string; exp: number } | null> {
   const secret = sessionSecret();
   if (!secret) return null;
-  const payload = `v1.${now + SESSION_MS}`;
-  return `${payload}.${await sign(payload, secret)}`;
+  const sid = newSessionId();
+  const exp = now + SESSION_MS;
+  const payload = `v2.${sid}.${exp}`;
+  return { token: `${payload}.${await sign(payload, secret)}`, sid, exp };
+}
+
+/** Signature et expiration seulement (Edge). La révocation est vérifiée côté serveur (admin-guard.ts). */
+export async function readSessionToken(token: string | null | undefined, now = Date.now()): Promise<SessionClaims | null> {
+  const secret = sessionSecret();
+  if (!secret || !token) return null;
+  const parts = token.split(".");
+  if (parts.length !== 4 || parts[0] !== "v2" || !/^[A-Za-z0-9_-]{16,64}$/.test(parts[1])) return null;
+  const exp = Number(parts[2]);
+  if (!Number.isFinite(exp) || exp <= now || exp > now + SESSION_MS + 60_000) return null;
+  const ok = safeEqual(parts[3], await sign(`${parts[0]}.${parts[1]}.${parts[2]}`, secret));
+  return ok ? { sid: parts[1], exp } : null;
 }
 
 export async function verifySessionToken(token: string | null | undefined, now = Date.now()): Promise<boolean> {
-  const secret = sessionSecret();
-  if (!secret || !token) return false;
-  const parts = token.split(".");
-  if (parts.length !== 3 || parts[0] !== "v1") return false;
-  const exp = Number(parts[1]);
-  if (!Number.isFinite(exp) || exp <= now || exp > now + SESSION_MS + 60_000) return false;
-  return safeEqual(parts[2], await sign(`${parts[0]}.${parts[1]}`, secret));
+  return (await readSessionToken(token, now)) !== null;
 }
 
 /** Identifiant de connexion facultatif (ADMIN_USERNAME) : s'il est défini, il est exigé avec le mot de passe. */
@@ -103,7 +126,7 @@ export function sessionCookieOptions() {
   };
 }
 
-function readCookie(header: string | null, name: string): string | null {
+export function readCookie(header: string | null, name: string): string | null {
   if (!header) return null;
   for (const part of header.split(";")) {
     const i = part.indexOf("=");
@@ -126,28 +149,4 @@ export function hasValidApiToken(request: Request): boolean {
   const header = request.headers.get("authorization") ?? "";
   const given = header.startsWith("Bearer ") ? header.slice(7).trim() : (request.headers.get("x-admin-token") ?? "");
   return given !== "" && safeEqual(given, expected);
-}
-
-/** Session admin valide (cookie signé), jeton opérateur, ou mode développement ouvert. */
-export async function isAdminRequest(request: Request): Promise<boolean> {
-  if (hasValidApiToken(request)) return true;
-  const mode = adminMode();
-  if (mode === "dev-open") return true;
-  if (mode === "locked") return false;
-  return verifySessionToken(readCookie(request.headers.get("cookie"), ADMIN_COOKIE));
-}
-
-/**
- * À appeler en tête de chaque route API admin : null si autorisé, sinon la réponse d'erreur
- * (401 non authentifié, 503 admin non configuré).
- */
-export async function requireAdmin(request: Request): Promise<NextResponse | null> {
-  if (await isAdminRequest(request)) return null;
-  if (adminMode() === "locked" && !process.env.ADMIN_API_TOKEN) {
-    return NextResponse.json(
-      { ok: false, code: "admin_not_configured", error: "Administration fermée : définissez ADMIN_PASSWORD" },
-      { status: 503 },
-    );
-  }
-  return NextResponse.json({ ok: false, code: "unauthorized", error: "Authentification administrateur requise" }, { status: 401 });
 }

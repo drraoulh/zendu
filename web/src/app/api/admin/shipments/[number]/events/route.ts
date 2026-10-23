@@ -1,6 +1,6 @@
 import { NextResponse } from "next/server";
 import { z } from "zod";
-import { requireAdmin } from "@/lib/admin-auth";
+import { requireAdmin } from "@/lib/admin-guard";
 import { normalizeShipmentNumber } from "@/lib/requests";
 import { addShipmentEvent, deleteShipmentEvent, shipmentEventSchema } from "@/app/admin/_server/data";
 import { adminError, notFound, readJson } from "../../../_respond";

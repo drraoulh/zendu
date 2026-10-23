@@ -16,11 +16,13 @@ export function LoginView({
   next,
   loggedOut,
   withUsername = false,
+  withCode = false,
 }: {
   mode: AdminMode;
   next: string;
   loggedOut: boolean;
   withUsername?: boolean;
+  withCode?: boolean;
 }) {
   const { t } = useAdminT();
   const [state, formAction, pending] = useActionState(loginAction, initial);
@@ -32,7 +34,9 @@ export function LoginView({
         ? t("errRate")
         : state.error === "locked"
           ? t("errLocked")
-          : null;
+          : state.error === "unavailable"
+            ? t("errUnavailable")
+            : null;
 
   return (
     <div className="bg-navy-gradient relative overflow-hidden">
@@ -107,6 +111,28 @@ export function LoginView({
                     className={`${inputClass} mt-1.5`}
                   />
                 </div>
+                {withCode && (
+                  <div>
+                    <label htmlFor="admin-code" className="block text-sm font-semibold text-ink">
+                      {t("codeLabel")}
+                    </label>
+                    <input
+                      id="admin-code"
+                      name="code"
+                      type="text"
+                      inputMode="numeric"
+                      pattern="[0-9 ]{6,7}"
+                      maxLength={7}
+                      required
+                      autoComplete="one-time-code"
+                      aria-describedby="admin-code-hint"
+                      className={`${inputClass} mt-1.5 font-mono tracking-[0.3em]`}
+                    />
+                    <p id="admin-code-hint" className="mt-1 text-xs text-muted">
+                      {t("codeHint")}
+                    </p>
+                  </div>
+                )}
                 {errorText && (
                   <div id="admin-login-error">
                     <Message ok={false}>{errorText}</Message>

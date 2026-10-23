@@ -1,5 +1,5 @@
 import { NextResponse } from "next/server";
-import { requireAdmin } from "@/lib/admin-auth";
+import { requireAdmin } from "@/lib/admin-guard";
 import { createCustomer, customerCreateSchema, listCustomers, parseCustomerFilters } from "@/app/admin/_server/customers";
 import { adminError, readJson } from "../_respond";
 

@@ -13,7 +13,7 @@ import { getFxRate, rateIsTrustworthy } from "@/lib/fx";
 import { getCorridor, getCountry } from "@/lib/corridors";
 import { isBankNetwork, publicTransfer } from "@/lib/bank";
 import { beneficiaryInputSchema, normalizeBeneficiary } from "@/lib/beneficiary-input";
-import { requireAdmin } from "@/lib/admin-auth";
+import { requireAdmin } from "@/lib/admin-guard";
 import { getCustomer, hasBearer } from "@/lib/customer-auth";
 import { zodIssues } from "@/lib/requests";
 

@@ -1,6 +1,6 @@
 import { NextResponse } from "next/server";
 import { z } from "zod";
-import { requireAdmin } from "@/lib/admin-auth";
+import { requireAdmin } from "@/lib/admin-guard";
 import { publicTransfer } from "@/lib/bank";
 import { cancelTransfer } from "@/lib/transfer-service";
 

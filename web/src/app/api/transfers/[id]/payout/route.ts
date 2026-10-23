@@ -2,7 +2,7 @@ import { NextResponse } from "next/server";
 import { queueAndRunPayout } from "@/lib/transfer-service";
 import { prisma } from "@/lib/prisma";
 import { publicTransfer } from "@/lib/bank";
-import { requireAdmin } from "@/lib/admin-auth";
+import { requireAdmin } from "@/lib/admin-guard";
 
 type Params = { params: Promise<{ id: string }> };
 

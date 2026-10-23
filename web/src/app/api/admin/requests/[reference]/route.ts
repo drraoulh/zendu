@@ -1,5 +1,5 @@
 import { NextResponse } from "next/server";
-import { requireAdmin } from "@/lib/admin-auth";
+import { requireAdmin } from "@/lib/admin-guard";
 import { normalizeReference } from "@/lib/requests";
 import { getRequest, patchRequest, requestPatchSchema } from "@/app/admin/_server/data";
 import { adminError, notFound, readJson } from "../../_respond";

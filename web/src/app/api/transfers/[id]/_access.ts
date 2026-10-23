@@ -1,6 +1,6 @@
 import { NextResponse } from "next/server";
 import type { Beneficiary, Transfer, TransferEvent } from "@prisma/client";
-import { isAdminRequest } from "@/lib/admin-auth";
+import { isAdminRequest } from "@/lib/admin-guard";
 import { getCustomer, hasBearer } from "@/lib/customer-auth";
 
 /**

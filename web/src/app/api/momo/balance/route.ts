@@ -1,7 +1,7 @@
 import { NextResponse } from "next/server";
 import { getPayoutMode } from "@/lib/providers/payout";
 import { momoGetBalance } from "@/lib/providers/momo";
-import { requireAdmin } from "@/lib/admin-auth";
+import { requireAdmin } from "@/lib/admin-guard";
 
 export const dynamic = "force-dynamic";
 

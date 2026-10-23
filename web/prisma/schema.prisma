@@ -295,3 +295,32 @@ model RateLimit {
 
   @@index([resetAt])
 }
+
+/// Session de l'espace équipe (/admin). Le cookie signé porte l'id : une session révoquée ou
+/// expirée est refusée même si sa signature est valide (src/lib/admin-guard.ts).
+model AdminSession {
+  id         String    @id
+  createdAt  DateTime  @default(now())
+  expiresAt  DateTime
+  lastSeenAt DateTime  @default(now())
+  revokedAt  DateTime?
+  ip         String?
+  userAgent  String?
+
+  @@index([expiresAt])
+}
+
+/// Journal des actions de l'équipe (connexions, modifications). Jamais de mot de passe ni de code.
+model AdminAuditLog {
+  id        String   @id @default(cuid())
+  createdAt DateTime @default(now())
+  sessionId String?
+  actor     String
+  action    String
+  target    String?
+  ip        String?
+  ok        Boolean  @default(true)
+  details   Json?
+
+  @@index([createdAt])
+}

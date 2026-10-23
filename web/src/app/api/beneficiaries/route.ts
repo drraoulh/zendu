@@ -4,7 +4,7 @@ import { prisma } from "@/lib/prisma";
 import { publicBeneficiary } from "@/lib/bank";
 import { COUNTRIES } from "@/lib/corridors";
 import { beneficiaryInputSchema, normalizeBeneficiary } from "@/lib/beneficiary-input";
-import { requireAdmin } from "@/lib/admin-auth";
+import { requireAdmin } from "@/lib/admin-guard";
 
 /** Liste de tous les bénéficiaires : réservée à l'admin. */
 export async function GET(request: Request) {
