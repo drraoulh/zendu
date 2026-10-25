@@ -18,7 +18,7 @@ const bodySchema = z.object({
  * DELETE /api/me/push-token { token } — déconnexion : l'appareil cesse de recevoir les notifications.
  */
 export async function POST(request: Request) {
-  const authed = await requireCustomer(request);
+  const authed = await requireCustomer(request, { allowTemporaryPassword: true });
   if (authed instanceof NextResponse) return authed;
   const parsed = bodySchema.safeParse(await request.json().catch(() => null));
   if (!parsed.success || !isExpoPushToken(parsed.data.token)) {
@@ -31,7 +31,7 @@ export async function POST(request: Request) {
 }
 
 export async function DELETE(request: Request) {
-  const authed = await requireCustomer(request);
+  const authed = await requireCustomer(request, { allowTemporaryPassword: true });
   if (authed instanceof NextResponse) return authed;
   const body = (await request.json().catch(() => null)) as { token?: unknown } | null;
   const token = typeof body?.token === "string" ? body.token.slice(0, 200) : null;

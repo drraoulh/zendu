@@ -48,6 +48,8 @@ export const profilePatchSchema = z
     firstName: profileFields.firstName.optional(),
     lastName: profileFields.lastName.optional(),
     birthDate: profileFields.birthDate,
+    // Exigé seulement pour changer le courriel ou le téléphone (voir PATCH /api/me).
+    currentPassword: z.string().max(200).optional(),
   })
   .strict();
 

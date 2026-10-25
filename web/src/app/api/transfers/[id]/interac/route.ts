@@ -1,3 +1,4 @@
+import { publicErrorMessage } from "@/lib/api-error";
 import { NextResponse } from "next/server";
 import { z } from "zod";
 import { publicTransfer } from "@/lib/bank";
@@ -71,6 +72,6 @@ export async function POST(request: Request, { params }: Params) {
     const updated = await prisma.transfer.findUnique({ where: { id }, include: { beneficiary: true } });
     return NextResponse.json(updated ? publicTransfer(updated) : updated);
   } catch (error) {
-    return NextResponse.json({ error: error instanceof Error ? error.message : "Erreur" }, { status: 400 });
+    return NextResponse.json({ error: publicErrorMessage(error) }, { status: 400 });
   }
 }

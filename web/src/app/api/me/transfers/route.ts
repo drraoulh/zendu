@@ -8,7 +8,7 @@ export const dynamic = "force-dynamic";
 
 /** GET /api/me/transfers → transferts du client (100 derniers), avec événements. */
 export async function GET(request: Request) {
-  const authed = await requireCustomer(request);
+  const authed = await requireCustomer(request, { allowTemporaryPassword: true });
   if (authed instanceof NextResponse) return authed;
   await expireStaleTransfers({ customerId: authed.customer.id }).catch(() => 0);
   const transfers = await prisma.transfer.findMany({

@@ -265,7 +265,7 @@ export const api = {
     request<{ ok: true }>("/api/me/push-token", { method: "DELETE", body: JSON.stringify({ token: pushToken }), ...(token ? { token } : {}) }),
   passwordReset: (email: string) => request<{ ok: true }>("/api/auth/password-reset", { method: "POST", body: JSON.stringify({ email }) }),
   me: (token?: string) => request<{ customer: Customer }>("/api/me", token ? { token } : undefined),
-  updateMe: (patch: Partial<Customer>) => request<{ customer: Customer }>("/api/me", { method: "PATCH", body: JSON.stringify(patch) }),
+  updateMe: (patch: Partial<Customer> & { currentPassword?: string }) => request<{ customer: Customer }>("/api/me", { method: "PATCH", body: JSON.stringify(patch) }),
   deleteMe: (password: string) => request<{ ok: true }>("/api/me", { method: "DELETE", body: JSON.stringify({ password }) }),
   changePassword: (current: string, next: string, token?: string) =>
     request<{ customer: Customer }>("/api/me/password", { method: "POST", body: JSON.stringify({ current, next }), ...(token ? { token } : {}) }),

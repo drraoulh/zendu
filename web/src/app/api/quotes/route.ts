@@ -1,3 +1,6 @@
+import { rateLimit } from "@/lib/rate-limit";
+import { clientIp } from "@/lib/requests";
+import { publicErrorMessage } from "@/lib/api-error";
 import { NextResponse } from "next/server";
 import { buildQuote, QuoteLimitError } from "@/lib/quote";
 import { CORRIDORS, getCountry } from "@/lib/corridors";
@@ -10,11 +13,14 @@ function quoteError(error: unknown) {
       { status: 400 },
     );
   }
-  const message = error instanceof Error ? error.message : "Erreur devis";
+  const message = publicErrorMessage(error);
   return NextResponse.json({ error: message }, { status: 400 });
 }
 
 export async function POST(request: Request) {
+  if (!(await rateLimit(`quotes:${clientIp(request)}`, 600, 10 * 60 * 1000))) {
+    return NextResponse.json({ error: "Trop de requêtes. Réessayez dans quelques minutes.", code: "rate_limited" }, { status: 429 });
+  }
   try {
     const body = (await request.json().catch(() => null)) as {
       corridorId?: string;
@@ -46,6 +52,9 @@ export async function POST(request: Request) {
 }
 
 export async function GET(request: Request) {
+  if (!(await rateLimit(`quotes:${clientIp(request)}`, 600, 10 * 60 * 1000))) {
+    return NextResponse.json({ error: "Trop de requêtes. Réessayez dans quelques minutes.", code: "rate_limited" }, { status: 429 });
+  }
   const { searchParams } = new URL(request.url);
   if (searchParams.get("meta") === "corridors") {
     return NextResponse.json(

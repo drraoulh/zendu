@@ -1,3 +1,5 @@
+import { rateLimit } from "@/lib/rate-limit";
+import { clientIp } from "@/lib/requests";
 import { NextResponse } from "next/server";
 import { Prisma } from "@prisma/client";
 import { z } from "zod";
@@ -48,6 +50,9 @@ function isUnavailable(error: unknown): boolean {
 }
 
 export async function POST(request: Request) {
+  if (!(await rateLimit(`waitlist:${clientIp(request)}`, 5, 60 * 60 * 1000))) {
+    return NextResponse.json({ error: "Trop de requêtes. Réessayez dans quelques minutes.", code: "rate_limited" }, { status: 429 });
+  }
   let json: unknown;
   try {
     json = await request.json();

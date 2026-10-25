@@ -1,3 +1,4 @@
+import { publicErrorMessage } from "@/lib/api-error";
 import { NextResponse } from "next/server";
 import { z } from "zod";
 import { prisma } from "@/lib/prisma";
@@ -49,7 +50,7 @@ export async function POST(request: Request) {
     if (error instanceof z.ZodError) {
       return NextResponse.json({ error: error.flatten() }, { status: 400 });
     }
-    const message = error instanceof Error ? error.message : "Erreur création";
+    const message = publicErrorMessage(error);
     return NextResponse.json({ error: message }, { status: 400 });
   }
 }

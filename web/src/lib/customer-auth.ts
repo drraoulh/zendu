@@ -107,10 +107,28 @@ export async function getCustomer(request: Request): Promise<AuthedCustomer | nu
   return { customer, session: rest };
 }
 
-export async function requireCustomer(request: Request): Promise<AuthedCustomer | NextResponse> {
+/**
+ * Client connecté, sinon la réponse d'erreur (401).
+ * Mot de passe temporaire (donné par l'équipe) pas encore remplacé : seules les routes marquées
+ * `allowTemporaryPassword` (profil, changement de mot de passe, sessions) répondent ; les autres
+ * renvoient 403 « password_change_required ». La règle est donc appliquée par le serveur, pas
+ * seulement par l'appli.
+ */
+export async function requireCustomer(
+  request: Request,
+  opts: { allowTemporaryPassword?: boolean } = {},
+): Promise<AuthedCustomer | NextResponse> {
   const authed = await getCustomer(request);
   if (!authed) return NextResponse.json({ ok: false, code: "unauthorized", error: "Session expirée. Reconnectez-vous." }, { status: 401 });
+  if (authed.customer.mustChangePassword && !opts.allowTemporaryPassword) return passwordChangeRequired();
   return authed;
+}
+
+export function passwordChangeRequired() {
+  return NextResponse.json(
+    { ok: false, code: "password_change_required", error: "Choisissez un nouveau mot de passe pour continuer." },
+    { status: 403 },
+  );
 }
 
 /** Données du compte renvoyées à l'appli (sans mot de passe ni note interne). */

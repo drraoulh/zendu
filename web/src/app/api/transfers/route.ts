@@ -1,3 +1,4 @@
+import { publicErrorMessage } from "@/lib/api-error";
 import { NextResponse } from "next/server";
 import { z } from "zod";
 import { prisma } from "@/lib/prisma";
@@ -14,7 +15,7 @@ import { getCorridor, getCountry } from "@/lib/corridors";
 import { isBankNetwork, publicTransfer } from "@/lib/bank";
 import { beneficiaryInputSchema, normalizeBeneficiary } from "@/lib/beneficiary-input";
 import { requireAdmin } from "@/lib/admin-guard";
-import { getCustomer, hasBearer } from "@/lib/customer-auth";
+import { getCustomer, hasBearer, passwordChangeRequired } from "@/lib/customer-auth";
 import { zodIssues } from "@/lib/requests";
 
 const createSchema = z.object({
@@ -97,6 +98,7 @@ export async function POST(request: Request) {
         { status: 401 },
       );
     }
+    if (authed?.customer.mustChangePassword) return passwordChangeRequired();
     if (authed && authed.customer.kycStatus !== "verified") {
       return NextResponse.json(
         { error: "Votre identité doit être vérifiée avant d'envoyer de l'argent.", code: "kyc_required" },
@@ -307,7 +309,7 @@ export async function POST(request: Request) {
         { status: 400 },
       );
     }
-    const message = error instanceof Error ? error.message : "Erreur création";
+    const message = publicErrorMessage(error);
     return NextResponse.json({ error: message }, { status: 400 });
   }
 }

@@ -1,3 +1,4 @@
+import { publicErrorMessage } from "@/lib/api-error";
 import { NextResponse } from "next/server";
 import { z } from "zod";
 import { requireAdmin } from "@/lib/admin-guard";
@@ -21,6 +22,6 @@ export async function POST(request: Request, { params }: Params) {
     const updated = await cancelTransfer(id, parsed.data.note);
     return NextResponse.json(updated ? publicTransfer(updated) : updated);
   } catch (error) {
-    return NextResponse.json({ error: error instanceof Error ? error.message : "Erreur" }, { status: 400 });
+    return NextResponse.json({ error: publicErrorMessage(error) }, { status: 400 });
   }
 }

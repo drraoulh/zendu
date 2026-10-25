@@ -8,7 +8,7 @@ type Params = { params: Promise<{ id: string }> };
 
 /** DELETE /api/me/sessions/[id] → déconnecte cet appareil. */
 export async function DELETE(request: Request, { params }: Params) {
-  const authed = await requireCustomer(request);
+  const authed = await requireCustomer(request, { allowTemporaryPassword: true });
   if (authed instanceof NextResponse) return authed;
   const { id } = await params;
   const { count } = await prisma.customerSession.updateMany({

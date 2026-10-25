@@ -1,3 +1,4 @@
+import { publicErrorMessage } from "@/lib/api-error";
 import { NextResponse } from "next/server";
 import { queueAndRunPayout } from "@/lib/transfer-service";
 import { prisma } from "@/lib/prisma";
@@ -23,7 +24,7 @@ export async function POST(request: Request, { params }: Params) {
     const updated = await queueAndRunPayout(id);
     return NextResponse.json(updated ? publicTransfer(updated) : updated);
   } catch (error) {
-    const message = error instanceof Error ? error.message : "Erreur payout";
+    const message = publicErrorMessage(error);
     return NextResponse.json({ error: message }, { status: 400 });
   }
 }

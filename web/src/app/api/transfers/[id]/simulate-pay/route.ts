@@ -1,3 +1,4 @@
+import { publicErrorMessage } from "@/lib/api-error";
 import { NextResponse } from "next/server";
 import { markPaymentDetected } from "@/lib/transfer-service";
 import { prisma } from "@/lib/prisma";
@@ -47,7 +48,7 @@ export async function POST(request: Request, { params }: Params) {
     // Accès public : le tracker web recharge ensuite la vue masquée via GET.
     return NextResponse.json(access === "full" ? publicTransfer(updated) : { id: updated.id, status: updated.status });
   } catch (error) {
-    const message = error instanceof Error ? error.message : "Erreur paiement";
+    const message = publicErrorMessage(error);
     return NextResponse.json({ error: message }, { status: 400 });
   }
 }

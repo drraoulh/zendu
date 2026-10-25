@@ -1,3 +1,4 @@
+import { publicErrorMessage } from "@/lib/api-error";
 import { NextResponse } from "next/server";
 import { z } from "zod";
 import { publicTransfer } from "@/lib/bank";
@@ -64,7 +65,7 @@ export async function POST(request: Request, { params }: Params) {
     if (error instanceof z.ZodError) {
       return NextResponse.json({ error: error.flatten() }, { status: 400 });
     }
-    const message = error instanceof Error ? error.message : "Erreur virement";
+    const message = publicErrorMessage(error);
     return NextResponse.json({ error: message }, { status: 400 });
   }
 }

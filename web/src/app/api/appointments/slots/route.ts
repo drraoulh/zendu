@@ -1,7 +1,8 @@
+import { rateLimit } from "@/lib/rate-limit";
 import { NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { APPOINTMENT_TIMEZONE, availableSlots, checkAppointmentDate } from "@/lib/appointments";
-import { isDbUnavailable } from "@/lib/requests";
+import { clientIp, isDbUnavailable } from "@/lib/requests";
 
 export const dynamic = "force-dynamic";
 
@@ -11,6 +12,9 @@ export const dynamic = "force-dynamic";
  * 400 { date, slots: [], error: "invalid_date" | "past_date" | "weekend" | "too_far" }.
  */
 export async function GET(request: Request) {
+  if (!(await rateLimit(`slots:${clientIp(request)}`, 120, 10 * 60 * 1000))) {
+    return NextResponse.json({ error: "Trop de requêtes. Réessayez dans quelques minutes.", code: "rate_limited" }, { status: 429 });
+  }
   const date = new URL(request.url).searchParams.get("date")?.trim() ?? "";
   const check = checkAppointmentDate(date);
   if (check !== "ok") {

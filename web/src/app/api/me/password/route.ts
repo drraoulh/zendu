@@ -10,7 +10,7 @@ export const dynamic = "force-dynamic";
  * Les autres sessions du client sont révoquées (« vous serez déconnecté de vos autres appareils »).
  */
 export async function POST(request: Request) {
-  const authed = await requireCustomer(request);
+  const authed = await requireCustomer(request, { allowTemporaryPassword: true });
   if (authed instanceof NextResponse) return authed;
   const body = (await request.json().catch(() => ({}))) as { current?: unknown; next?: unknown };
   if (typeof body.current !== "string" || typeof body.next !== "string") {

@@ -71,7 +71,8 @@ type SessionValue = {
   signOut: () => Promise<void>;
   deleteAccount: (password: string) => Promise<Result>;
   refresh: () => Promise<void>;
-  update: (patch: Partial<Profile>) => Promise<Result>;
+  /** `currentPassword` : exigé par le serveur pour changer le courriel ou le téléphone. */
+  update: (patch: Partial<Profile> & { currentPassword?: string }) => Promise<Result>;
   submitKyc: (document: string) => Promise<Result>;
   /** Vérification Didit : URL de la page à ouvrir, ou erreur (code "didit_unavailable" si non branché). */
   startDidit: () => Promise<{ ok: true; url: string; sessionToken: string | null } | { ok: false; error: string; code?: string }>;
@@ -84,7 +85,8 @@ type SessionValue = {
   /** Vrai si l'appli connaît encore le mot de passe temporaire saisi (perdu après un redémarrage). */
   knowsTemporaryPassword: () => boolean;
   setPin: (pin: string | null) => Promise<void>;
-  checkPin: (pin: string) => Promise<boolean>;
+  /** Vérifie le PIN. `left` = essais restants ; à 0 l'appli doit repasser par le mot de passe. */
+  checkPin: (pin: string) => Promise<{ ok: boolean; left: number }>;
   unlock: () => void;
   finishOnboarding: () => Promise<void>;
 };
@@ -94,11 +96,38 @@ const KEY_PROFILE = "wst.profile";
 const KEY_SETTINGS = "wst.settings";
 const KEY_ONBOARDED = "wst.onboarded";
 const KEY_PIN = "wst.pin";
+const KEY_PIN_FAILS = "wst.pin.fails";
+/** Essais faux de suite avant de repasser par le mot de passe (compteur gardé même si l'appli est fermée). */
+export const PIN_MAX_FAILS = 5;
+const PIN_ROUNDS = 500;
 
 const SessionContext = createContext<SessionValue | null>(null);
 
 function hash(value: string) {
   return Crypto.digestStringAsync(Crypto.CryptoDigestAlgorithm.SHA256, `wst:${value}`);
+}
+
+function toHex(bytes: Uint8Array) {
+  return Array.from(bytes, (b) => b.toString(16).padStart(2, "0")).join("");
+}
+
+/** Empreinte du PIN : sel aléatoire propre à l'appareil + 500 tours de SHA-256 (format "v2$sel$empreinte"). */
+async function pinDigest(pin: string, salt: string) {
+  let h = `${salt}:${pin}`;
+  for (let i = 0; i < PIN_ROUNDS; i++) h = await Crypto.digestStringAsync(Crypto.CryptoDigestAlgorithm.SHA256, h);
+  return h;
+}
+
+async function makePinRecord(pin: string) {
+  const salt = toHex(Crypto.getRandomBytes(16));
+  return `v2$${salt}$${await pinDigest(pin, salt)}`;
+}
+
+/** Comparaison sans arrêt au premier caractère différent. */
+function sameText(a: string, b: string) {
+  let diff = a.length ^ b.length;
+  for (let i = 0; i < Math.max(a.length, b.length); i++) diff |= (a.charCodeAt(i) || 0) ^ (b.charCodeAt(i) || 0);
+  return diff === 0;
 }
 
 export function deviceName() {
@@ -129,6 +158,8 @@ export function SessionProvider({ children }: { children: ReactNode }) {
     setUnlocked(false);
     await storage.remove(KEY_TOKEN);
     await storage.remove(KEY_PROFILE);
+    // Nouvelle connexion par mot de passe : les essais de PIN repartent de zéro.
+    await storage.remove(KEY_PIN_FAILS);
   }, []);
 
   const saveProfile = useCallback(async (c: Customer) => {
@@ -357,15 +388,39 @@ export function SessionProvider({ children }: { children: ReactNode }) {
       },
       knowsTemporaryPassword: () => Boolean(tempPassword.current),
       setPin: async (pin) => {
-        const h = pin ? await hash(`pin:${pin}`) : null;
+        const h = pin ? await makePinRecord(pin) : null;
         setPinHash(h);
+        await storage.remove(KEY_PIN_FAILS);
         if (h) await storage.set(KEY_PIN, h);
         else await storage.remove(KEY_PIN);
         const next = { ...settings, pin: Boolean(pin) };
         setSettings(next);
         await storage.set(KEY_SETTINGS, next);
       },
-      checkPin: async (pin) => Boolean(pinHash && pinHash === (await hash(`pin:${pin}`))),
+      checkPin: async (pin) => {
+        const fails = (await storage.get<number>(KEY_PIN_FAILS)) ?? 0;
+        if (!pinHash || fails >= PIN_MAX_FAILS) return { ok: false, left: 0 };
+        let ok: boolean;
+        if (pinHash.startsWith("v2$")) {
+          const [, salt = "", expected = ""] = pinHash.split("$");
+          ok = sameText(await pinDigest(pin, salt), expected);
+        } else {
+          // Ancien format (sans sel) : vérifié une dernière fois puis remplacé par le nouveau.
+          ok = sameText(await hash(`pin:${pin}`), pinHash);
+          if (ok) {
+            const upgraded = await makePinRecord(pin);
+            setPinHash(upgraded);
+            await storage.set(KEY_PIN, upgraded);
+          }
+        }
+        if (ok) {
+          await storage.remove(KEY_PIN_FAILS);
+          return { ok: true, left: PIN_MAX_FAILS };
+        }
+        const next = fails + 1;
+        await storage.set(KEY_PIN_FAILS, next);
+        return { ok: false, left: Math.max(0, PIN_MAX_FAILS - next) };
+      },
       unlock: () => setUnlocked(true),
       finishOnboarding: async () => {
         setOnboarded(true);

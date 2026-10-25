@@ -24,7 +24,12 @@ export default function EditInfo() {
   const [postal, setPostal] = useState(profile?.address?.postalCode ?? "");
   const [occupation, setOccupation] = useState(profile?.occupation ?? "");
   const [jobTitle, setJobTitle] = useState(profile?.jobTitle ?? "");
+  const [password, setPassword] = useState("");
   const [errors, setErrors] = useState<Record<string, string>>({});
+  // Changer le courriel ou le téléphone exige le mot de passe (protection en cas de téléphone volé).
+  const sensitive =
+    email.trim().toLowerCase() !== (profile?.email ?? "").toLowerCase() ||
+    phone.replace(/\D/g, "") !== (profile?.phone ?? "").replace(/\D/g, "");
   const [busy, setBusy] = useState(false);
 
   async function save() {
@@ -35,6 +40,7 @@ export default function EditInfo() {
     if (city.trim().length < 2) e.city = tr("Ville requise");
     if (country === "CA" && !/^[A-Za-z]\d[A-Za-z]\s?\d[A-Za-z]\d$/.test(postal.trim())) e.postal = tr("Code postal invalide (A1A 1A1)");
     if (country === "CN" && postal.trim() && !/^\d{6}$/.test(postal.trim())) e.postal = tr("Code postal à 6 chiffres");
+    if (sensitive && !password) e.password = tr("Mot de passe requis");
     setErrors(e);
     if (Object.keys(e).length) return;
     setBusy(true);
@@ -45,6 +51,7 @@ export default function EditInfo() {
       occupation,
       jobTitle: jobTitle.trim() || undefined,
       address: { line1: line1.trim(), line2: line2.trim() || undefined, city: city.trim(), region, postalCode: postal.trim().toUpperCase() || undefined },
+      ...(sensitive ? { currentPassword: password } : {}),
     });
     setBusy(false);
     if (!r.ok) return setErrors({ submit: r.error });
@@ -64,6 +71,17 @@ export default function EditInfo() {
       <Header title={tr("Modifier mes informations")} />
       <Field label={tr("Courriel")} value={email} onChangeText={setEmail} keyboardType="email-address" autoCapitalize="none" autoComplete="email" hint={tr("Vos codes de connexion sont envoyés à cette adresse.")} error={errors.email} />
       <Field label={tr("Téléphone")} value={phone} onChangeText={setPhone} keyboardType="phone-pad" error={errors.phone} />
+      {sensitive ? (
+        <Field
+          label={tr("Mot de passe actuel")}
+          value={password}
+          onChangeText={setPassword}
+          secureTextEntry
+          autoComplete="current-password"
+          hint={tr("Requis pour changer votre courriel ou votre téléphone. Vos autres appareils seront déconnectés.")}
+          error={errors.password}
+        />
+      ) : null}
       <Field label={tr("Adresse")} value={line1} onChangeText={setLine1} error={errors.line1} />
       <Field label={tr("Appartement, bureau (facultatif)")} value={line2} onChangeText={setLine2} />
       <Field label={tr("Ville")} value={city} onChangeText={setCity} error={errors.city} />

@@ -6,7 +6,7 @@ export const dynamic = "force-dynamic";
 
 /** GET /api/me/sessions → appareils connectés (sessions actives). DELETE → déconnecte tous les autres. */
 export async function GET(request: Request) {
-  const authed = await requireCustomer(request);
+  const authed = await requireCustomer(request, { allowTemporaryPassword: true });
   if (authed instanceof NextResponse) return authed;
   const sessions = await prisma.customerSession.findMany({
     where: { customerId: authed.customer.id, revokedAt: null, expiresAt: { gt: new Date() } },
@@ -24,7 +24,7 @@ export async function GET(request: Request) {
 }
 
 export async function DELETE(request: Request) {
-  const authed = await requireCustomer(request);
+  const authed = await requireCustomer(request, { allowTemporaryPassword: true });
   if (authed instanceof NextResponse) return authed;
   const { count } = await prisma.customerSession.updateMany({
     where: { customerId: authed.customer.id, revokedAt: null, NOT: { id: authed.session.id } },

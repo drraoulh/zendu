@@ -1,5 +1,5 @@
 import { Redirect, router } from "expo-router";
-import { useCallback, useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { Text, View } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { WstSymbol } from "@/components/brand";
@@ -20,7 +20,6 @@ export default function Lock() {
   const [kind, setKind] = useState<BiometricKind | null>(null);
   const [recognized, setRecognized] = useState(false);
   const usePin = settings.pin;
-  const failures = useRef(0);
   const label = biometricLabel(kind ?? "none");
 
   const done = useCallback(() => {
@@ -48,12 +47,12 @@ export default function Lock() {
     setError(null);
     setPin(v);
     if (v.length < 6) return;
-    if (await checkPin(v)) return done();
-    // 5 codes faux de suite : retour à la connexion par mot de passe (protège contre les essais au hasard).
-    failures.current += 1;
+    const res = await checkPin(v);
+    if (res.ok) return done();
+    // 5 codes faux de suite (compteur gardé même si l'appli est fermée) : retour à la connexion par mot de passe.
     setPin("");
-    if (failures.current >= 5) return withPassword();
-    const left = 5 - failures.current;
+    if (res.left <= 0) return withPassword();
+    const left = res.left;
     setError(tr("Code incorrect · {0} essai{1} restant{2}", left, left > 1 ? "s" : "", left > 1 ? "s" : ""));
   }
 
