@@ -62,7 +62,11 @@ jobs:
 
       - name: Compilation de l'APK
         working-directory: mobile/android
-        run: ./gradlew assembleRelease --no-daemon -PreactNativeArchitectures=arm64-v8a,armeabi-v7a
+        # Mémoire Java relevée : l'assemblage final (dex) manquait parfois de place avec la valeur par défaut.
+        run: |
+          sed -i '/^org.gradle.jvmargs=/d' gradle.properties
+          echo "org.gradle.jvmargs=-Xmx6g -XX:MaxMetaspaceSize=1g -Dfile.encoding=UTF-8" >> gradle.properties
+          ./gradlew assembleRelease --no-daemon -PreactNativeArchitectures=arm64-v8a,armeabi-v7a
 
       - name: Nom du fichier
         run: mv android/app/build/outputs/apk/release/app-release.apk "WorldSoft-Transfer-${GITHUB_SHA::7}.apk"
