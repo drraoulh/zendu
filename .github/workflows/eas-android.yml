@@ -36,13 +36,13 @@ jobs:
       EXPO_PUBLIC_SITE_URL: ${{ vars.EXPO_PUBLIC_SITE_URL || 'https://worldsofttransfer.com' }}
       EXPO_PUBLIC_COMPANY_EMAIL: ${{ vars.EXPO_PUBLIC_COMPANY_EMAIL || 'support@worldsofttransfer.com' }}
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4.4.0
 
       - name: Vérifier le jeton Expo
         run: |
           if [ -z "$EXPO_TOKEN" ]; then echo "::error::Ajoutez le secret EXPO_TOKEN (Settings → Secrets and variables → Actions)."; exit 1; fi
 
-      - uses: actions/setup-node@v4
+      - uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020 # v4.4.0
         with:
           node-version: 22
           cache: npm

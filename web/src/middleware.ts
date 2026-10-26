@@ -50,13 +50,48 @@ function withCors(response: NextResponse, origin: string): NextResponse {
   return response;
 }
 
-/** En-têtes de sécurité communs (pages et API). Pas de CSP stricte : scripts inline de Next / Tailwind. */
+/**
+ * Politique de sécurité du contenu : le navigateur ne charge des scripts, styles, polices et images
+ * que depuis le site lui-même (plus les drapeaux flagcdn.com et Supabase pour la connexion web).
+ * 'unsafe-inline' reste nécessaire pour les scripts d'amorçage de Next.js ; tout script externe,
+ * plugin, formulaire vers un autre site ou affichage dans un cadre est en revanche bloqué.
+ */
+function contentSecurityPolicy(): string {
+  const dev = process.env.NODE_ENV !== "production";
+  let supabase = "";
+  try {
+    const url = process.env.NEXT_PUBLIC_SUPABASE_URL;
+    if (url) {
+      const host = new URL(url).host;
+      supabase = ` https://${host} wss://${host}`;
+    }
+  } catch {
+    /* URL invalide : ignorée */
+  }
+  return [
+    "default-src 'self'",
+    `script-src 'self' 'unsafe-inline'${dev ? " 'unsafe-eval'" : ""}`,
+    "style-src 'self' 'unsafe-inline'",
+    "img-src 'self' data: blob: https://flagcdn.com",
+    "font-src 'self' data:",
+    `connect-src 'self'${supabase}${dev ? " ws: http://localhost:*" : ""}`,
+    "media-src 'self'",
+    "object-src 'none'",
+    "frame-src 'none'",
+    "frame-ancestors 'none'",
+    "base-uri 'self'",
+    "form-action 'self'",
+    ...(dev ? [] : ["upgrade-insecure-requests"]),
+  ].join("; ");
+}
+
+/** En-têtes de sécurité communs (pages et API). */
 function withSecurityHeaders(response: NextResponse, pathname: string): NextResponse {
   const h = response.headers;
   h.set("X-Content-Type-Options", "nosniff");
   h.set("Referrer-Policy", "strict-origin-when-cross-origin");
   h.set("X-Frame-Options", "DENY");
-  h.set("Content-Security-Policy", "frame-ancestors 'none'");
+  h.set("Content-Security-Policy", contentSecurityPolicy());
   h.set("Permissions-Policy", "camera=(), microphone=(), geolocation=(), payment=()");
   if (process.env.NODE_ENV === "production") h.set("Strict-Transport-Security", "max-age=31536000; includeSubDomains");
   // Données de compte, jetons, transferts : jamais en cache (navigateur, proxy, CDN).

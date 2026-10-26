@@ -16,12 +16,14 @@ export function formatMoney(n: number, currency: string, locale = "fr-CA"): stri
   }
 }
 
+/** Référence de transfert "PW-XXXXXX" (tirage cryptographique : imprévisible, 32^6 ≈ 1 milliard de valeurs). */
 export function createReference(prefix = "PW"): string {
   const alphabet = "ABCDEFGHJKLMNPQRSTUVWXYZ23456789";
+  const bytes = new Uint8Array(6);
+  globalThis.crypto.getRandomValues(bytes);
+  // 256 est un multiple de 32 : chaque caractère a exactement la même probabilité.
   let code = "";
-  for (let i = 0; i < 6; i += 1) {
-    code += alphabet[Math.floor(Math.random() * alphabet.length)];
-  }
+  for (const b of bytes) code += alphabet[b % alphabet.length];
   return `${prefix}-${code}`;
 }
 

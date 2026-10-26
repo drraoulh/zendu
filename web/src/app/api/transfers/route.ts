@@ -212,7 +212,11 @@ export async function POST(request: Request) {
     }
 
     const interac = data.payMethod === "interac";
-    const reference = createReference();
+    // Référence unique : nouveau tirage dans le cas (rare) où elle existe déjà.
+    let reference = createReference();
+    for (let i = 0; i < 5 && (await prisma.transfer.findUnique({ where: { reference }, select: { id: true } })); i += 1) {
+      reference = createReference();
+    }
     const appUrl = process.env.NEXT_PUBLIC_APP_URL ?? "http://localhost:3000";
 
     const beneficiary = await prisma.beneficiary.create({
