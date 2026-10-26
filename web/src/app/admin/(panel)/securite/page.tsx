@@ -11,14 +11,16 @@ export const metadata: Metadata = { title: "Sécurité" };
 
 async function load(currentSid: string | null): Promise<SecurityData["db"]> {
   const now = new Date();
-  const [sessions, audit] = await Promise.all([
+  const [sessions, audit, users] = await Promise.all([
     prisma.adminSession.findMany({
       where: { revokedAt: null, expiresAt: { gt: now } },
       orderBy: { lastSeenAt: "desc" },
       take: 50,
     }),
     prisma.adminAuditLog.findMany({ orderBy: { createdAt: "desc" }, take: 100 }),
+    prisma.adminUser.findMany({ orderBy: { createdAt: "asc" } }),
   ]);
+  const names = new Map(users.map((u) => [u.id, u.displayName]));
   return {
     sessions: sessions.map((s) => ({
       id: s.id.slice(0, 6),
@@ -28,6 +30,16 @@ async function load(currentSid: string | null): Promise<SecurityData["db"]> {
       expiresAt: s.expiresAt.toISOString(),
       ip: s.ip,
       userAgent: s.userAgent,
+      who: s.adminUserId ? (names.get(s.adminUserId) ?? "?") : "Compte provisoire",
+    })),
+    users: users.map((u) => ({
+      id: u.id,
+      username: u.username,
+      displayName: u.displayName,
+      active: u.active,
+      mfa: Boolean(u.totpSecretEnc),
+      mustChangePassword: u.mustChangePassword,
+      lastLoginAt: u.lastLoginAt?.toISOString() ?? null,
     })),
     audit: audit.map((a) => ({
       id: a.id,
@@ -41,18 +53,21 @@ async function load(currentSid: string | null): Promise<SecurityData["db"]> {
 }
 
 export default async function AdminSecurityPage() {
-  const { session } = await adminPageAccess();
+  const { session, identity } = await adminPageAccess();
   const db = await load(session?.sid ?? null).catch((err: unknown) => {
     console.error("[admin] sécurité indisponible", err);
     return null;
   });
+  // Comptes individuels : code activé par tous ; sinon (compte provisoire) : variables d'environnement.
+  const personal = db?.users.filter((u) => u.active) ?? [];
   return (
     <SecurityView
       data={{
-        mfa: adminTotpEnabled(),
-        passwordShort: adminPasswordTooShort(),
+        mfa: personal.length ? personal.every((u) => u.mfa) : adminTotpEnabled(),
+        passwordShort: personal.length ? false : adminPasswordTooShort(),
         minLength: ADMIN_PASSWORD_MIN_LENGTH,
         db,
+        meId: identity?.userId ?? null,
       }}
     />
   );

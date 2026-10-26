@@ -1,4 +1,4 @@
-import { createHmac, timingSafeEqual } from "node:crypto";
+import { createCipheriv, createDecipheriv, createHash, createHmac, randomBytes, timingSafeEqual } from "node:crypto";
 
 /**
  * Double authentification de l'admin : code à 6 chiffres d'une application d'authentification
@@ -44,7 +44,11 @@ function hotp(key: Buffer, counter: number): string {
  * L'appelant refuse un pas déjà utilisé (pas de rejeu du même code).
  */
 export function verifyAdminTotp(code: string, now = Date.now()): number | null {
-  const secret = process.env.ADMIN_TOTP_SECRET?.trim();
+  return verifyTotp(process.env.ADMIN_TOTP_SECRET?.trim() ?? "", code, now);
+}
+
+/** Même vérification avec le secret d'un compte (base32). */
+export function verifyTotp(secret: string, code: string, now = Date.now()): number | null {
   const given = code.replace(/\s/g, "");
   if (!secret || !/^\d{6}$/.test(given)) return null;
   const key = base32Decode(secret);
@@ -55,4 +59,57 @@ export function verifyAdminTotp(code: string, now = Date.now()): number | null {
     if (timingSafeEqual(Buffer.from(hotp(key, s)), Buffer.from(given)) && match === null) match = s;
   }
   return match;
+}
+
+const B32 = "ABCDEFGHIJKLMNOPQRSTUVWXYZ234567";
+
+/** Nouveau secret base32 (160 bits) pour une application d'authentification. */
+export function newTotpSecret(): string {
+  let bits = 0;
+  let value = 0;
+  let out = "";
+  for (const b of randomBytes(20)) {
+    value = (value << 8) | b;
+    bits += 8;
+    while (bits >= 5) {
+      out += B32[(value >>> (bits - 5)) & 31];
+      bits -= 5;
+    }
+  }
+  if (bits > 0) out += B32[(value << (5 - bits)) & 31];
+  return out;
+}
+
+export function totpUri(secret: string, account: string): string {
+  const issuer = "WorldSoft Transfer";
+  return `otpauth://totp/${encodeURIComponent(`${issuer}:${account}`)}?secret=${secret}&issuer=${encodeURIComponent(issuer)}&period=30&digits=6`;
+}
+
+function secretKey(): Buffer {
+  const base = process.env.ADMIN_SESSION_SECRET?.trim() || (process.env.NODE_ENV === "production" ? "" : `dev:${process.env.ADMIN_PASSWORD ?? ""}`);
+  if (!base) throw new Error("ADMIN_SESSION_SECRET manquant");
+  return createHash("sha256").update(`admin-totp-key:${base}`).digest();
+}
+
+/**
+ * Chiffre un secret (AES-256-GCM, clé dérivée de ADMIN_SESSION_SECRET) : "v1.<iv>.<tag>.<données>".
+ * Changer ADMIN_SESSION_SECRET rend les codes à 6 chiffres enregistrés illisibles : il faut alors les réactiver.
+ */
+export function sealSecret(plain: string): string {
+  const iv = randomBytes(12);
+  const c = createCipheriv("aes-256-gcm", secretKey(), iv);
+  const data = Buffer.concat([c.update(plain, "utf8"), c.final()]);
+  return ["v1", iv.toString("base64url"), c.getAuthTag().toString("base64url"), data.toString("base64url")].join(".");
+}
+
+export function openSecret(sealed: string): string | null {
+  try {
+    const [v, iv, tag, data] = sealed.split(".");
+    if (v !== "v1" || !iv || !tag || !data) return null;
+    const d = createDecipheriv("aes-256-gcm", secretKey(), Buffer.from(iv, "base64url"));
+    d.setAuthTag(Buffer.from(tag, "base64url"));
+    return Buffer.concat([d.update(Buffer.from(data, "base64url")), d.final()]).toString("utf8");
+  } catch {
+    return null;
+  }
 }

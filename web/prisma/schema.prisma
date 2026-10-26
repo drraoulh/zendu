@@ -72,6 +72,10 @@ model Transfer {
   updatedAt        DateTime        @updatedAt
   paidAt           DateTime?
   deliveredAt      DateTime?
+  /// Double validation Interac (montant ≥ INTERAC_DUAL_APPROVAL_CAD) : qui a fait la 1re validation.
+  interacApprovedBy     String?
+  interacApprovedByName String?
+  interacApprovedAt     DateTime?
 
   @@index([senderEmail])
   @@index([status])
@@ -300,6 +304,8 @@ model RateLimit {
 /// expirée est refusée même si sa signature est valide (src/lib/admin-guard.ts).
 model AdminSession {
   id         String    @id
+  /// Compte individuel (AdminUser). Null = connexion provisoire par ADMIN_USERNAME / ADMIN_PASSWORD.
+  adminUserId String?
   createdAt  DateTime  @default(now())
   expiresAt  DateTime
   lastSeenAt DateTime  @default(now())
@@ -308,6 +314,23 @@ model AdminSession {
   userAgent  String?
 
   @@index([expiresAt])
+}
+
+/// Compte individuel de l'espace équipe (un par personne : qui a fait quoi, double validation).
+model AdminUser {
+  id                 String    @id @default(cuid())
+  username           String    @unique
+  displayName        String
+  passwordHash       String
+  mustChangePassword Boolean   @default(true)
+  /// Secret du code à 6 chiffres, chiffré (AES-256-GCM, clé dérivée de ADMIN_SESSION_SECRET).
+  totpSecretEnc      String?
+  /// Dernier pas de 30 s accepté : un même code ne sert qu'une fois.
+  totpLastStep       Int?
+  active             Boolean   @default(true)
+  createdAt          DateTime  @default(now())
+  createdBy          String?
+  lastLoginAt        DateTime?
 }
 
 /// Journal des actions de l'équipe (connexions, modifications). Jamais de mot de passe ni de code.

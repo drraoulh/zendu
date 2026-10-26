@@ -41,6 +41,10 @@ export type AdminTransferRow = {
   failureReason: string | null;
   /** Virement Interac : moment où le client a indiqué l'avoir envoyé. */
   interacDeclaredAt: string | null;
+  /** Double validation Interac : montant au-dessus du seuil, et 1re validation déjà faite (nom, date). */
+  dualApproval: boolean;
+  interacApprovedByName: string | null;
+  interacApprovedAt: string | null;
   createdAt: string;
 };
 

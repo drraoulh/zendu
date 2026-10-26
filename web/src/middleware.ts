@@ -93,11 +93,64 @@ function legacyRedirect(request: NextRequest): NextResponse | null {
   }
 }
 
+/**
+ * Espace équipe sur son propre sous-domaine (ADMIN_HOST, ex. portailadmin.pwfintec.com) :
+ * - sur ADMIN_HOST : seulement /admin/**, les API et le suivi /transfers/** ; « / » mène à /admin ;
+ * - sur tous les autres domaines : /admin/** et /api/admin/** répondent 404 (l'admin n'y existe pas).
+ * Le cookie de session admin est propre à ce sous-domaine (aucun attribut Domain).
+ * Sans ADMIN_HOST, l'admin reste accessible sur chaque domaine (comportement d'avant).
+ */
+function requestHost(request: NextRequest): string {
+  return (request.headers.get("x-forwarded-host") ?? request.headers.get("host") ?? "").split(",")[0].trim().toLowerCase().replace(/:\d+$/, "");
+}
+
+function adminHost(): string | null {
+  return process.env.ADMIN_HOST?.trim().toLowerCase() || null;
+}
+
+function isAdminArea(pathname: string): boolean {
+  return pathname === "/admin" || pathname.startsWith("/admin/") || pathname === "/api/admin" || pathname.startsWith("/api/admin/");
+}
+
+function notFound(): NextResponse {
+  return new NextResponse("Not found", { status: 404, headers: { "Content-Type": "text/plain; charset=utf-8", "X-Robots-Tag": "noindex" } });
+}
+
 async function route(request: NextRequest): Promise<NextResponse> {
   const { pathname, searchParams } = request.nextUrl;
 
   const legacy = legacyRedirect(request);
   if (legacy) return legacy;
+
+  const adminDomain = adminHost();
+  if (adminDomain) {
+    if (requestHost(request) === adminDomain) {
+      const path = pathname.replace(/\/+$/, "") || "/";
+      if (path === "/") {
+        const target = request.nextUrl.clone();
+        target.pathname = "/admin";
+        target.search = "";
+        return NextResponse.redirect(target, 307);
+      }
+      const allowed = isAdminArea(path) || path.startsWith("/api/") || path.startsWith("/transfers/");
+      if (!allowed) return notFound();
+      if (isProtectedAdminPath(pathname)) {
+        const mode = adminMode();
+        const ok = mode === "dev-open" || (mode === "configured" && (await verifySessionToken(request.cookies.get(ADMIN_COOKIE)?.value)));
+        if (!ok) {
+          const target = request.nextUrl.clone();
+          target.pathname = "/admin/login";
+          target.search = "";
+          if (mode === "configured") target.searchParams.set("next", pathname + request.nextUrl.search);
+          return NextResponse.redirect(target, 307);
+        }
+      }
+      const response = await updateSession(request);
+      response.headers.set("X-Robots-Tag", "noindex, nofollow");
+      return response;
+    }
+    if (isAdminArea(pathname)) return notFound();
+  }
 
   if (PUBLIC_API.test(pathname)) {
     const origin = corsOrigin(request);

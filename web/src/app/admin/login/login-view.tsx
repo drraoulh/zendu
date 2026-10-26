@@ -36,7 +36,9 @@ export function LoginView({
           ? t("errLocked")
           : state.error === "unavailable"
             ? t("errUnavailable")
-            : null;
+            : state.error === "code"
+              ? t("errCode")
+              : null;
 
   return (
     <div className="bg-navy-gradient relative overflow-hidden">
@@ -76,72 +78,108 @@ export function LoginView({
                   <Message ok>{t("loggedOut")}</Message>
                 </div>
               )}
-              <form action={formAction} className="mt-5 space-y-4">
-                <input type="hidden" name="next" value={next} />
-                {withUsername && (
+              {state.pending ? (
+                <form action={formAction} className="mt-5 space-y-4">
+                  <input type="hidden" name="next" value={state.next ?? next} />
+                  <input type="hidden" name="pending" value={state.pending} />
                   <div>
-                    <label htmlFor="admin-username" className="block text-sm font-semibold text-ink">
-                      {t("usernameLabel")}
-                    </label>
-                    <input
-                      id="admin-username"
-                      name="username"
-                      type="text"
-                      required
-                      autoComplete="username"
-                      autoCapitalize="none"
-                      autoFocus
-                      className={`${inputClass} mt-1.5`}
-                    />
-                  </div>
-                )}
-                <div>
-                  <label htmlFor="admin-password" className="block text-sm font-semibold text-ink">
-                    {t("passwordLabel")}
-                  </label>
-                  <input
-                    id="admin-password"
-                    name="password"
-                    type="password"
-                    required
-                    autoComplete="current-password"
-                    autoFocus={!withUsername}
-                    aria-invalid={state.error === "invalid" || undefined}
-                    aria-describedby={errorText ? "admin-login-error" : undefined}
-                    className={`${inputClass} mt-1.5`}
-                  />
-                </div>
-                {withCode && (
-                  <div>
-                    <label htmlFor="admin-code" className="block text-sm font-semibold text-ink">
+                    <label htmlFor="admin-code2" className="block text-sm font-semibold text-ink">
                       {t("codeLabel")}
                     </label>
                     <input
-                      id="admin-code"
+                      id="admin-code2"
                       name="code"
                       type="text"
                       inputMode="numeric"
                       pattern="[0-9 ]{6,7}"
                       maxLength={7}
                       required
+                      autoFocus
                       autoComplete="one-time-code"
-                      aria-describedby="admin-code-hint"
+                      aria-describedby="admin-code2-hint"
                       className={`${inputClass} mt-1.5 font-mono tracking-[0.3em]`}
                     />
-                    <p id="admin-code-hint" className="mt-1 text-xs text-muted">
+                    <p id="admin-code2-hint" className="mt-1 text-xs text-muted">
                       {t("codeHint")}
                     </p>
                   </div>
-                )}
-                {errorText && (
-                  <div id="admin-login-error">
-                    <Message ok={false}>{errorText}</Message>
+                  {errorText && (
+                    <div id="admin-login-error">
+                      <Message ok={false}>{errorText}</Message>
+                    </div>
+                  )}
+                  <Button type="submit" className="w-full" disabled={pending}>
+                    {pending ? t("loggingIn") : t("codeSubmit")}
+                  </Button>
+                </form>
+              ) : (
+                <form action={formAction} className="mt-5 space-y-4">
+                  <input type="hidden" name="next" value={next} />
+                  {withUsername && (
+                    <div>
+                      <label htmlFor="admin-username" className="block text-sm font-semibold text-ink">
+                        {t("usernameLabel")}
+                      </label>
+                      <input
+                        id="admin-username"
+                        name="username"
+                        type="text"
+                        required
+                        autoComplete="username"
+                        autoCapitalize="none"
+                        autoFocus
+                        className={`${inputClass} mt-1.5`}
+                      />
+                    </div>
+                  )}
+                  <div>
+                    <label htmlFor="admin-password" className="block text-sm font-semibold text-ink">
+                      {t("passwordLabel")}
+                    </label>
+                    <input
+                      id="admin-password"
+                      name="password"
+                      type="password"
+                      required
+                      autoComplete="current-password"
+                      autoFocus={!withUsername}
+                      aria-invalid={state.error === "invalid" || undefined}
+                      aria-describedby={errorText ? "admin-login-error" : undefined}
+                      className={`${inputClass} mt-1.5`}
+                    />
                   </div>
-                )}
-                <Button type="submit" className="w-full" disabled={pending}>
-                  {pending ? t("loggingIn") : t("loginSubmit")}
-                </Button>
-              </form>
+                  {withCode && (
+                    <div>
+                      <label htmlFor="admin-code" className="block text-sm font-semibold text-ink">
+                        {t("codeLabel")}
+                      </label>
+                      <input
+                        id="admin-code"
+                        name="code"
+                        type="text"
+                        inputMode="numeric"
+                        pattern="[0-9 ]{6,7}"
+                        maxLength={7}
+                        required
+                        autoComplete="one-time-code"
+                        aria-describedby="admin-code-hint"
+                        className={`${inputClass} mt-1.5 font-mono tracking-[0.3em]`}
+                      />
+                      <p id="admin-code-hint" className="mt-1 text-xs text-muted">
+                        {t("codeHint")}
+                      </p>
+                    </div>
+                  )}
+                  {errorText && (
+                    <div id="admin-login-error">
+                      <Message ok={false}>{errorText}</Message>
+                    </div>
+                  )}
+                  <Button type="submit" className="w-full" disabled={pending}>
+                    {pending ? t("loggingIn") : t("loginSubmit")}
+                  </Button>
+                </form>
+              )}
             </>
           )}
 

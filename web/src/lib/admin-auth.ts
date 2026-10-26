@@ -70,6 +70,26 @@ async function sign(message: string, secret: string): Promise<string> {
 
 export type SessionClaims = { sid: string; exp: number };
 
+/**
+ * Jeton court et signé « étape 2 de connexion » (mot de passe déjà vérifié, code à 6 chiffres attendu) :
+ * "p1.<id du compte>.<expiration ms>.<hmac>", valable 5 minutes.
+ */
+export async function createPendingLogin(userId: string, now = Date.now()): Promise<string | null> {
+  const secret = sessionSecret();
+  if (!secret) return null;
+  const payload = `p1.${userId}.${now + 5 * 60_000}`;
+  return `${payload}.${await sign(payload, secret)}`;
+}
+
+export async function readPendingLogin(token: string, now = Date.now()): Promise<string | null> {
+  const secret = sessionSecret();
+  const parts = token.split(".");
+  if (!secret || parts.length !== 4 || parts[0] !== "p1") return null;
+  const exp = Number(parts[2]);
+  if (!Number.isFinite(exp) || exp <= now || exp > now + 5 * 60_000 + 10_000) return null;
+  return safeEqual(parts[3], await sign(`${parts[0]}.${parts[1]}.${parts[2]}`, secret)) ? parts[1] : null;
+}
+
 function newSessionId(): string {
   const bytes = new Uint8Array(18);
   crypto.getRandomValues(bytes);

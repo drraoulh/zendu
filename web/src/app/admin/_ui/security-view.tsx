@@ -7,12 +7,15 @@ import { Icon } from "@/components/ui/icon";
 import { useT } from "@/i18n/define";
 import { securityMessages } from "@/i18n/admin-security";
 import { adminFetch, Message, PageTitle, Panel, useAdminT } from "./kit";
+import { TeamPanel, type TeamUser } from "./team-panel";
 
 export type SecurityData = {
   mfa: boolean;
   passwordShort: boolean;
   minLength: number;
+  meId: string | null;
   db: {
+    users: TeamUser[];
     sessions: {
       id: string;
       current: boolean;
@@ -21,6 +24,7 @@ export type SecurityData = {
       expiresAt: string;
       ip: string | null;
       userAgent: string | null;
+      who: string;
     }[];
     audit: { id: string; createdAt: string; action: string; actor: string; ip: string | null; ok: boolean }[];
   } | null;
@@ -79,6 +83,8 @@ export function SecurityView({ data }: { data: SecurityData }) {
         <Message ok={false}>{t("dbError")}</Message>
       ) : (
         <>
+          <TeamPanel users={data.db.users} meId={data.meId} />
+
           <Panel
             title={t("sessions")}
             id="sec-sessions"
@@ -106,7 +112,8 @@ export function SecurityView({ data }: { data: SecurityData }) {
                   <li key={s.id} className="py-3 text-sm">
                     <div className="flex flex-wrap items-center gap-2">
                       <span className="font-mono text-xs text-muted">#{s.id}</span>
-                      <span className="font-semibold text-ink">{s.ip ?? "?"}</span>
+                      <span className="font-semibold text-ink">{s.who}</span>
+                      <span className="text-muted">{s.ip ?? "?"}</span>
                       {s.current && <span className="rounded-full bg-brand-soft px-2 py-0.5 text-xs font-semibold text-brand">{t("current")}</span>}
                     </div>
                     <p className="mt-1 break-words text-xs text-muted">{s.userAgent ?? ""}</p>

@@ -60,7 +60,7 @@ function InteracItem({ row, nl, date }: { row: AdminTransferRow; nl: string; dat
     setBusy(true);
     setMessage(null);
     try {
-      await adminAction(
+      const res = (await adminAction(
         `/api/transfers/${row.id}/interac`,
         {
           body:
@@ -69,9 +69,9 @@ function InteracItem({ row, nl, date }: { row: AdminTransferRow; nl: string; dat
               : { action, reason: reason.trim() || undefined },
         },
         t,
-      );
+      )) as { pendingSecondApproval?: boolean } | null;
       setDone(true);
-      setMessage({ ok: true, text: t("actionDone", { ref: row.reference }) });
+      setMessage({ ok: true, text: res?.pendingSecondApproval ? t("firstApprovalDone", { ref: row.reference }) : t("actionDone", { ref: row.reference }) });
       router.refresh();
     } catch (err) {
       setMessage({ ok: false, text: t("actionError", { error: err instanceof Error ? err.message : "?" }) });
@@ -113,6 +113,14 @@ function InteracItem({ row, nl, date }: { row: AdminTransferRow; nl: string; dat
         {row.interacDeclaredAt ? t("interacDeclared", { date: date(row.interacDeclaredAt) }) : t("interacNotDeclared")}
       </p>
 
+      {row.dualApproval && (
+        <p className="mt-2 rounded-xl bg-brand/[0.06] px-3 py-2 text-xs font-semibold text-brand-strong">
+          {row.interacApprovedByName && row.interacApprovedAt
+            ? t("interacFirstBy", { name: row.interacApprovedByName, date: date(row.interacApprovedAt) })
+            : t("interacDual")}
+        </p>
+      )}
+
       {!done && (
         <>
           <div className="mt-3 grid gap-3 sm:grid-cols-2">
@@ -146,7 +154,7 @@ function InteracItem({ row, nl, date }: { row: AdminTransferRow; nl: string; dat
           <div className="mt-3 flex flex-col gap-2 sm:flex-row sm:flex-wrap">
             <Button size="md" disabled={busy} aria-busy={busy} onClick={() => void act("received")}>
               <Icon name="check" className="h-4 w-4" />
-              {t("interacReceived")}
+              {row.interacApprovedByName ? t("interacApproveSecond") : t("interacReceived")}
             </Button>
             <Button size="md" variant="danger" disabled={busy} onClick={() => void act("mismatch")}>
               {t("interacMismatch")}

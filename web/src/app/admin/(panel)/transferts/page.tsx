@@ -1,3 +1,4 @@
+import { needsDualApproval } from "@/lib/interac-approval";
 import type { Metadata } from "next";
 import type { Prisma } from "@prisma/client";
 import { prisma } from "@/lib/prisma";
@@ -75,6 +76,9 @@ async function loadTransfers(where: Prisma.TransferWhereInput = {}, take = 30): 
         senderEmail: t.senderEmail,
         failureReason: t.failureReason,
         interacDeclaredAt: t.events[0]?.createdAt.toISOString() ?? null,
+        dualApproval: needsDualApproval(t.totalCad),
+        interacApprovedByName: t.interacApprovedByName,
+        interacApprovedAt: t.interacApprovedAt?.toISOString() ?? null,
         createdAt: t.createdAt.toISOString(),
       })),
     )

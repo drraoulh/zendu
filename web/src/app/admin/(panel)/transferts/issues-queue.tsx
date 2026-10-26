@@ -57,13 +57,13 @@ function IssueItem({ row, nl, date }: { row: AdminTransferRow; nl: string; date:
     setBusy(true);
     setMessage(null);
     try {
-      await adminAction(
+      const res = (await adminAction(
         mismatch ? `/api/transfers/${row.id}/interac` : `/api/transfers/${row.id}/payout`,
         mismatch ? { body: { action: "received" } } : {},
         t,
-      );
+      )) as { pendingSecondApproval?: boolean } | null;
       setDone(true);
-      setMessage({ ok: true, text: t("actionDone", { ref: row.reference }) });
+      setMessage({ ok: true, text: res?.pendingSecondApproval ? t("firstApprovalDone", { ref: row.reference }) : t("actionDone", { ref: row.reference }) });
       router.refresh();
     } catch (err) {
       setMessage({ ok: false, text: t("actionError", { error: err instanceof Error ? err.message : "?" }) });

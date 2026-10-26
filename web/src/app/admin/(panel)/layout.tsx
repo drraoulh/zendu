@@ -12,13 +12,13 @@ export const metadata: Metadata = {
 };
 
 export default async function AdminPanelLayout({ children }: { children: ReactNode }) {
-  const mode = await requireAdminPage();
+  const { mode, identity } = await requireAdminPage();
   const counts = await actionCounts().catch((err: unknown) => {
     console.error("[admin] compteurs indisponibles", err);
     return null;
   });
   return (
-    <AdminShell devOpen={mode === "dev-open"} counts={counts}>
+    <AdminShell devOpen={mode === "dev-open"} counts={counts} userName={identity?.displayName ?? null}>
       {children}
     </AdminShell>
   );

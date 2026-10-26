@@ -23,7 +23,17 @@ const NAV: { href: string; key: NavKey; icon: IconName; pending?: (c: ActionCoun
 ];
 
 /** Cadre de l'espace équipe : bandeau, navigation latérale (onglets sur mobile) avec dossiers en attente, déconnexion. */
-export function AdminShell({ devOpen, counts, children }: { devOpen: boolean; counts: ActionCounts | null; children: ReactNode }) {
+export function AdminShell({
+  devOpen,
+  counts,
+  userName = null,
+  children,
+}: {
+  devOpen: boolean;
+  counts: ActionCounts | null;
+  userName?: string | null;
+  children: ReactNode;
+}) {
   const { t: tAdmin } = useAdminT();
   const tc = useT(customersMessages);
   const t = (key: NavKey | Parameters<typeof tAdmin>[0]) =>
@@ -62,6 +72,15 @@ export function AdminShell({ devOpen, counts, children }: { devOpen: boolean; co
               <Icon name="globe" className="h-4 w-4" />
               {t("viewSite")}
             </Link>
+            {!devOpen && userName && (
+              <Link
+                href="/admin/compte"
+                className="inline-flex min-h-10 items-center gap-2 rounded-full border border-white/25 bg-white/5 px-4 py-2 text-sm font-semibold text-white transition hover:bg-white/15"
+              >
+                <Icon name="users" className="h-4 w-4" />
+                {userName}
+              </Link>
+            )}
             {!devOpen && (
               <form action="/admin/logout" method="post">
                 <button

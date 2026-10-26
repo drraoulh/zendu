@@ -3,6 +3,7 @@ import { redirect } from "next/navigation";
 import { adminPageAccess, safeNext } from "../_server/session";
 import { adminUsernameRequired } from "@/lib/admin-auth";
 import { adminTotpEnabled } from "@/lib/admin-totp";
+import { activeAdminUserCount } from "@/lib/admin-users";
 import { LoginView } from "./login-view";
 
 export const dynamic = "force-dynamic";
@@ -20,5 +21,15 @@ export default async function AdminLoginPage({ searchParams }: Props) {
   const next = safeNext(nextRaw);
   const { ok, mode } = await adminPageAccess();
   if (ok && mode === "configured") redirect(next);
-  return <LoginView mode={mode} next={next} loggedOut={sp.logout === "1"} withUsername={adminUsernameRequired()} withCode={adminTotpEnabled()} />;
+  // Comptes individuels : identifiant toujours demandé ; le code à 6 chiffres vient en 2e étape.
+  const users = mode === "configured" ? await activeAdminUserCount().catch(() => 0) : 0;
+  return (
+    <LoginView
+      mode={mode}
+      next={next}
+      loggedOut={sp.logout === "1"}
+      withUsername={users > 0 || adminUsernameRequired()}
+      withCode={users === 0 && adminTotpEnabled()}
+    />
+  );
 }
