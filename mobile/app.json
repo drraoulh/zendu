@@ -41,7 +41,8 @@
         {
           "cameraPermission": "WorldSoft Transfer utilise l'appareil photo pour scanner votre carte bancaire. Les photos restent sur votre téléphone.",
           "recordAudioAndroid": false,
-          "microphonePermission": false
+          "microphonePermission": false,
+          "barcodeScannerEnabled": false
         }
       ],
       [
