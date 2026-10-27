@@ -5,6 +5,7 @@ import { Icon, type IconName } from "@/components/icons";
 import { Button, Card, Choice, H1, Header, ListItem, Notice, P, Screen, Small, Steps } from "@/components/ui";
 import { authenticate, biometricKind, biometricLabel } from "@/lib/biometrics";
 import { runDiditVerification } from "@/lib/didit";
+import { ensureCameraPermission } from "@/lib/camera-permission";
 import type { CountryCode } from "@/lib/corridors";
 import { KYC_DOCUMENTS } from "@/lib/geo";
 import { useSession } from "@/lib/session";
@@ -41,8 +42,12 @@ export default function Kyc() {
   }, [refreshKyc]);
 
   async function verifyWithDidit() {
-    setBusy(true);
     setError(null);
+    // Sans l'appareil photo, Didit ne peut ni photographier la pièce ni faire le selfie.
+    if (!(await ensureCameraPermission(tr("WorldSoft Transfer a besoin de l'appareil photo pour photographier votre pièce d'identité et faire le selfie.")))) {
+      return setError(tr("Autorisez l'appareil photo pour vérifier votre identité."));
+    }
+    setBusy(true);
     const r = await startDidit();
     if (!r.ok) {
       setBusy(false);

@@ -8,6 +8,7 @@ import { useT } from "@/i18n/define";
 import { securityMessages } from "@/i18n/admin-security";
 import { adminFetch, Message, PageTitle, Panel, useAdminT } from "./kit";
 import { TeamPanel, type TeamUser } from "./team-panel";
+import { EmailTestPanel } from "./email-test-panel";
 
 export type SecurityData = {
   mfa: boolean;
@@ -84,6 +85,8 @@ export function SecurityView({ data }: { data: SecurityData }) {
       ) : (
         <>
           <TeamPanel users={data.db.users} meId={data.meId} />
+
+          <EmailTestPanel />
 
           <Panel
             title={t("sessions")}

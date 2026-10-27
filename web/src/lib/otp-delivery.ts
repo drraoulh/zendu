@@ -191,3 +191,31 @@ export async function deliverOtp(message: OtpMessage): Promise<OtpDelivery> {
   if (otpDemoMode()) return { delivered: false, demoCode: message.code };
   throw new OtpDeliveryError("otp_unavailable", "La vérification par code est momentanément indisponible. Contactez le support.");
 }
+
+/**
+ * Diagnostic (espace équipe) : envoie un courriel de test par Brevo et renvoie la réponse brute de Brevo
+ * (statut + message d'erreur), sans jamais exposer la clé.
+ */
+export async function brevoTestEmail(to: string): Promise<{ ok: boolean; status: number | null; detail: string; sender: string | null }> {
+  const b = brevo();
+  if (!b) return { ok: false, status: null, detail: "BREVO_API_KEY absent dans Vercel.", sender: null };
+  if (!b.senderEmail) return { ok: false, status: null, detail: "BREVO_SENDER_EMAIL absent dans Vercel.", sender: null };
+  try {
+    const res = await fetch(`${b.base}/smtp/email`, {
+      method: "POST",
+      headers: { "api-key": b.key, "Content-Type": "application/json", Accept: "application/json" },
+      body: JSON.stringify({
+        sender: { email: b.senderEmail, name: b.senderName },
+        to: [{ email: to }],
+        subject: "Test d'envoi WorldSoft Transfer",
+        textContent: "Ceci est un courriel de test envoyé depuis l'espace équipe. Si vous le recevez, l'envoi des codes fonctionne.",
+        tags: ["admin-test"],
+      }),
+      signal: AbortSignal.timeout(10000),
+    });
+    const detail = (await res.text().catch(() => "")).slice(0, 500);
+    return { ok: res.ok, status: res.status, detail, sender: b.senderEmail };
+  } catch (err) {
+    return { ok: false, status: null, detail: `Brevo injoignable : ${err instanceof Error ? err.message : "erreur réseau"}`, sender: b.senderEmail };
+  }
+}
