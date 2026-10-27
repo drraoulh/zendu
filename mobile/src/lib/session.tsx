@@ -73,11 +73,12 @@ type SessionValue = {
   refresh: () => Promise<void>;
   /** `currentPassword` : exigé par le serveur pour changer le courriel ou le téléphone. */
   update: (patch: Partial<Profile> & { currentPassword?: string }) => Promise<Result>;
-  submitKyc: (document: string) => Promise<Result>;
+  submitKyc: (document: string) => Promise<Result & { code?: string }>;
   /** Vérification Didit : URL de la page à ouvrir, ou erreur (code "didit_unavailable" si non branché). */
   startDidit: () => Promise<{ ok: true; url: string; sessionToken: string | null } | { ok: false; error: string; code?: string }>;
   /** Relit le statut d'identité ; `available` = vérification Didit branchée. */
-  refreshKyc: () => Promise<{ available: boolean }>;
+  /** `available` : Didit branché ? null = serveur injoignable (on ne sait pas : ne pas choisir de parcours). */
+  refreshKyc: () => Promise<{ available: boolean | null }>;
   updateSettings: (patch: Partial<Settings>) => Promise<void>;
   changePassword: (current: string, next: string) => Promise<Result>;
   /** Mot de passe temporaire donné par l'équipe : à remplacer juste après la connexion. */
@@ -347,7 +348,7 @@ export function SessionProvider({ children }: { children: ReactNode }) {
           await saveProfile(r.customer);
           return { available: r.available === true };
         } catch {
-          return { available: false };
+          return { available: null };
         }
       },
       submitKyc: async (document) => {
@@ -356,7 +357,7 @@ export function SessionProvider({ children }: { children: ReactNode }) {
           await saveProfile(r.customer);
           return { ok: true };
         } catch (e) {
-          return { ok: false, error: message(e) };
+          return { ok: false, error: message(e), code: e instanceof ApiError ? e.code : undefined };
         }
       },
       updateSettings: async (patch) => {

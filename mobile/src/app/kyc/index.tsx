@@ -1,6 +1,6 @@
 import { router } from "expo-router";
 import { useEffect, useState } from "react";
-import { Platform, StyleSheet, Text, View } from "react-native";
+import { ActivityIndicator, Platform, StyleSheet, Text, View } from "react-native";
 import { Icon, type IconName } from "@/components/icons";
 import { Button, Card, Choice, H1, Header, ListItem, Notice, P, Screen, Small, Steps } from "@/components/ui";
 import { authenticate, biometricKind, biometricLabel } from "@/lib/biometrics";
@@ -33,13 +33,21 @@ export default function Kyc() {
   const [bioMessage, setBioMessage] = useState<string | null>(null);
   const doc = docs.find((d) => d.id === docId) ?? docs[0];
 
+  // Le parcours (Didit ou déclaration manuelle) n'est choisi qu'avec la réponse du serveur :
+  // pendant le chargement ou si le serveur est injoignable, on attend au lieu d'afficher le mauvais parcours.
+  const [checkFailed, setCheckFailed] = useState(false);
+  const [checkTry, setCheckTry] = useState(0);
   useEffect(() => {
     let alive = true;
-    void refreshKyc().then((r) => alive && setDidit(r.available));
+    void refreshKyc().then((r) => {
+      if (!alive) return;
+      if (r.available === null) setCheckFailed(true);
+      else setDidit(r.available);
+    });
     return () => {
       alive = false;
     };
-  }, [refreshKyc]);
+  }, [refreshKyc, checkTry]);
 
   async function verifyWithDidit() {
     setError(null);
@@ -72,7 +80,14 @@ export default function Kyc() {
     setError(null);
     const r = await submitKyc(doc.label);
     setBusy(false);
-    if (!r.ok) return setError(r.error);
+    if (!r.ok) {
+      // Le serveur exige la vérification en ligne : on bascule sur Didit.
+      if (r.code === "use_didit") {
+        setDidit(true);
+        return setStep(6);
+      }
+      return setError(r.error);
+    }
     setStep(9);
   }
 
@@ -86,6 +101,39 @@ export default function Kyc() {
   }
 
   const exit = () => router.dismissTo("/(tabs)");
+
+  if (step >= 6 && step <= 8 && didit === null) {
+    return (
+      <Screen
+        footer={
+          checkFailed ? (
+            <View style={{ gap: 6 }}>
+              <Button
+                title={tr("Réessayer")}
+                onPress={() => {
+                  setCheckFailed(false);
+                  setCheckTry((n) => n + 1);
+                }}
+              />
+              <Button title={tr("Plus tard")} variant="ghost" onPress={exit} />
+            </View>
+          ) : undefined
+        }
+      >
+        <Header title={tr("Vérification d'identité")} back={false} />
+        <View style={{ alignItems: "center", gap: 14, paddingVertical: 48 }}>
+          {checkFailed ? (
+            <Notice tone="danger" icon="alert" text={tr("Connexion au serveur impossible. Vérifiez votre connexion internet puis réessayez.")} />
+          ) : (
+            <>
+              <ActivityIndicator size="large" color={colors.brand} />
+              <P>{tr("Préparation de la vérification…")}</P>
+            </>
+          )}
+        </View>
+      </Screen>
+    );
+  }
 
   if (step === 6 && didit) {
     return (
