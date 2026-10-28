@@ -8,7 +8,7 @@ Aucun secret ni jeton n'est écrit dans le cahier.
    la souscrire à **OrangeMoneyCoreAPIS** et générer les clés **Sandbox**.
 2. Renseigner les variables d'environnement (jamais dans le code) :
    `OM_CONSUMER_KEY`, `OM_CONSUMER_SECRET`, `OM_X_AUTH_TOKEN`, `OM_CHANNEL_MSISDN`, `OM_PIN`
-   (et facultativement `OM_TEST_SUBSCRIBER`, `OM_FAIL_WAIT`).
+   (et facultativement `OM_TEST_SUBSCRIBER` — par défaut 691441952, le numéro client des exemples du guide Orange —, `OM_FAIL_WAIT`).
 3. Lancer : `python3 scripts/orange/orange_sandbox_test.py`
 
 Le serveur du jeton (`apistore.orange.cm`) n'envoie pas son certificat intermédiaire : le fichier

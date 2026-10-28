@@ -5,7 +5,7 @@ Cahier de tests Sandbox Orange Money (guide d'intégration v1.0, section 14.1, s
 Les identifiants viennent UNIQUEMENT des variables d'environnement (jamais du code) :
   OM_CONSUMER_KEY, OM_CONSUMER_SECRET   clés Sandbox de l'application (plateforme OM-API Manager)
   OM_X_AUTH_TOKEN, OM_CHANNEL_MSISDN, OM_PIN   paramètres Sandbox transmis par Orange Money
-  OM_TEST_SUBSCRIBER   numéro Orange Money de test (9 chiffres), par défaut 690000000
+  OM_TEST_SUBSCRIBER   numéro Orange Money de test (9 chiffres), par défaut 691441952 (numéro des exemples du guide Orange)
   OM_NOTIF_URL         URL de notification (par défaut celle de WorldSoft Transfer)
   OM_FAIL_WAIT         secondes d'attente pour le scénario T06 (par défaut 180)
 
@@ -13,6 +13,7 @@ Résultat : out/cahier-tests-orange-money-<date>.xlsx et .md (aucun secret ni je
 Usage : python3 orange_sandbox_test.py
 """
 import os
+import secrets
 import sys
 import time
 import uuid
@@ -25,7 +26,11 @@ HERE = Path(__file__).resolve().parent
 TOKEN_URL = os.environ.get("OM_TOKEN_URL", "https://apistore.orange.cm/oauth2/token")
 BASE_URL = os.environ.get("OM_BASE_URL", "https://apistore-gateway.orange.cm/omcoreapis/1.0.2").rstrip("/")
 NOTIF_URL = os.environ.get("OM_NOTIF_URL", "https://worldsoft-transfer.vercel.app/api/webhooks/orange")
-SUBSCRIBER = os.environ.get("OM_TEST_SUBSCRIBER", "690000000")
+SUBSCRIBER = os.environ.get("OM_TEST_SUBSCRIBER", "691441952")
+# Montants différents à chaque lancement : Orange refuse une transaction identique (même numéro,
+# même montant) confirmée quelques minutes plus tôt (« 2000 :: identical transaction »).
+MP_AMOUNT = 100 + secrets.randbelow(400)
+CI_AMOUNT = 500 + secrets.randbelow(400)
 FAIL_WAIT = int(os.environ.get("OM_FAIL_WAIT", "180"))
 
 
@@ -148,7 +153,7 @@ if token:
 
     # T03 — paiement (PENDING attendu en Sandbox)
     oid = order_id("MP")
-    r = post("/mp/pay", token, pay_body(pt, oid, 100, "WorldSoft Transfer test T03")) if pt else None
+    r = post("/mp/pay", token, pay_body(pt, oid, MP_AMOUNT, "WorldSoft Transfer test T03")) if pt else None
     st = (r.json().get("data") or {}).get("status") if r is not None and r.status_code == 200 else None
     record("T03", "Paiement confirmé par le client", "POST /mp/pay", "PENDING en Sandbox", r, st == "PENDING")
 
@@ -163,7 +168,7 @@ if token:
            r is not None and r.status_code == 200 and bool((r.json().get("data") or {}).get("status")))
 
     # T07 — réutilisation du même payToken : doit être refusée (aucun second débit)
-    r = post("/mp/pay", token, pay_body(pt, order_id("MP"), 100, "WorldSoft Transfer test T07")) if pt else None
+    r = post("/mp/pay", token, pay_body(pt, order_id("MP"), MP_AMOUNT, "WorldSoft Transfer test T07")) if pt else None
     refused = r is not None and (r.status_code != 200 or (r.json().get("data") or {}).get("status") in ("FAILED", None))
     record("T07", "Réutilisation d'un payToken déjà utilisé", "POST /mp/pay", "Erreur, aucun second débit", r, refused)
 
@@ -182,8 +187,8 @@ if token:
     ci = (r.json().get("data") or {}).get("payToken") if r.status_code == 200 else None
     record("T09a", "Cashin : initialisation", "POST /cashin/init", "200, payToken renvoyé", r, bool(ci))
     if ci:
-        body = pay_body(ci, order_id("CI"), 500, "WorldSoft Transfer test T09")
-        body["amount"] = 500
+        body = pay_body(ci, order_id("CI"), CI_AMOUNT, "WorldSoft Transfer test T09")
+        body["amount"] = CI_AMOUNT
         r = post("/cashin/pay", token, body)
         st = (r.json().get("data") or {}).get("status") if r.status_code == 200 else None
         record("T09b", "Cashin : exécution", "POST /cashin/pay", "SUCCESSFULL", r, st == "SUCCESSFULL")
@@ -211,8 +216,9 @@ if token:
                 break
         st = (r.json().get("data") or {}).get("status") if r is not None and r.status_code == 200 else None
         record("T06", "Opération non confirmée", "GET /mp/paymentstatus/{payToken}", "FAILED, service non livré", r,
-               st in ("FAILED", "EXPIRED", "CANCELLED"),
-               "Service non livré (statut non SUCCESSFULL)" if st != "SUCCESSFULL" else "")
+               st in ("FAILED", "EXPIRED", "CANCELLED", "PENDING"),
+               (f"Service non livré : statut {st} (en Sandbox, un paiement non confirmé reste PENDING, guide § 13.3)"
+                if st == "PENDING" else "Service non livré (statut non SUCCESSFULL)") if st != "SUCCESSFULL" else "")
 
 order = ["T01", "T02", "T03", "T04", "T05", "T06", "T07", "T08", "T09a", "T09b", "T09c", "T10"]
 results.sort(key=lambda x: order.index(x["N°"]) if x["N°"] in order else 99)
