@@ -1,6 +1,6 @@
 import type { Metadata, Viewport } from "next";
 import { headers } from "next/headers";
-import { DM_Sans } from "next/font/google";
+import localFont from "next/font/local";
 import { I18nProvider } from "@/components/i18n-provider";
 import { AuthProvider } from "@/components/auth-provider";
 import { SiteProvider } from "@/components/site-provider";
@@ -16,10 +16,13 @@ import { siteForHost, siteOrigin, type SiteId } from "@/lib/site";
 import "./globals.css";
 
 /** Une seule famille géométrique, titres et texte (esprit « Brown » de logitech.com). */
-const dmSans = DM_Sans({
+const dmSans = localFont({
+  // DM Sans (police variable, OFL), hébergée ici : le chargement depuis Google Fonts échouait au build Vercel.
+  src: "./fonts/dm-sans-latin.woff2",
+  weight: "100 1000",
+  style: "normal",
+  display: "swap",
   variable: "--font-brand",
-  subsets: ["latin"],
-  weight: ["400", "500", "600", "700", "800", "900"],
 });
 
 async function currentHost() {
