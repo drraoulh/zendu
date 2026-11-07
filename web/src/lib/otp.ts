@@ -43,6 +43,20 @@ function newCode(): string {
   return String(randomInt(0, 1_000_000)).padStart(6, "0");
 }
 
+/**
+ * Compte d'examen des stores (Google Play, App Store) : les examinateurs ne peuvent pas lire la boîte
+ * du compte. Si REVIEW_ACCOUNT_EMAIL et REVIEW_ACCOUNT_CODE (6 chiffres) sont tous deux définis, ce seul
+ * compte reçoit ce code fixe à la place d'un code aléatoire (aucun envoi). Le mot de passe reste exigé,
+ * et les limites d'essais et de connexions restent les mêmes. Supprimer l'une des deux variables
+ * désactive le dispositif.
+ */
+function reviewCode(customer: Customer): string | null {
+  const email = process.env.REVIEW_ACCOUNT_EMAIL?.trim().toLowerCase();
+  const code = process.env.REVIEW_ACCOUNT_CODE?.trim();
+  if (!email || !code || !/^\d{6}$/.test(code)) return null;
+  return customer.email.toLowerCase() === email ? code : null;
+}
+
 export function maskPhone(phone: string): string {
   const digits = phone.replace(/\D/g, "");
   const prefix = phone.trim().startsWith("+") ? phone.trim().split(/\s/)[0] : "";
@@ -74,6 +88,7 @@ export class OtpRateLimitError extends Error {}
 
 async function send(customer: Customer, channel: OtpChannel, code: string) {
   const dest = destination(customer, channel);
+  if (reviewCode(customer)) return { masked: dest.masked, demoCode: undefined };
   const delivery = await deliverOtp({
     channel,
     to: dest.to,
@@ -97,7 +112,7 @@ export async function createLoginChallenge(
 
   const channel = resolveChannel(opts.channel ?? "sms");
   const id = randomBytes(24).toString("base64url");
-  const code = newCode();
+  const code = reviewCode(customer) ?? newCode();
   const expiresAt = new Date(Date.now() + OTP_TTL_MINUTES * 60_000);
   // Un seul défi actif par compte : les précédents (non utilisés) sont clos.
   await prisma.otpChallenge.updateMany({
@@ -150,7 +165,7 @@ export async function resendLoginChallenge(challengeId: string, channel?: OtpCha
   if (ch.sends >= OTP_MAX_SENDS) return { ok: false, code: "resend_limit" };
 
   const nextChannel = resolveChannel(channel ?? (ch.channel === "email" ? "email" : "sms"));
-  const code = newCode();
+  const code = reviewCode(ch.customer) ?? newCode();
   const expiresAt = new Date(Math.min(now + OTP_TTL_MINUTES * 60_000, ch.createdAt.getTime() + OTP_MAX_LIFETIME_MS));
   // Mise à jour conditionnelle : deux renvois simultanés ne peuvent pas dépasser la limite.
   const { count } = await prisma.otpChallenge.updateMany({
