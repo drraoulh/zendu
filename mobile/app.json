@@ -26,7 +26,15 @@
         "foregroundImage": "./assets/brand/android-adaptive-foreground-432.png",
         "backgroundImage": "./assets/brand/android-adaptive-background-432.png"
       },
-      "predictiveBackGestureEnabled": false
+      "predictiveBackGestureEnabled": false,
+      "blockedPermissions": [
+        "android.permission.READ_MEDIA_IMAGES",
+        "android.permission.READ_MEDIA_VIDEO",
+        "android.permission.READ_EXTERNAL_STORAGE",
+        "android.permission.WRITE_EXTERNAL_STORAGE",
+        "android.permission.SYSTEM_ALERT_WINDOW",
+        "android.permission.WRITE_CONTACTS"
+      ]
     },
     "web": {
       "output": "single",
