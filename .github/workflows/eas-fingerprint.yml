@@ -43,3 +43,8 @@ jobs:
           if [ -z "$URL" ]; then echo "::error::Aucun build Android terminé trouvé."; exit 1; fi
           curl -sSL -o app.aab "$URL"
           keytool -printcert -jarfile app.aab | grep -E "Owner|SHA1|SHA256|Valid"
+
+      - name: Lien de téléchargement du dernier APK (profil preview) terminé
+        run: |
+          npx --yes eas-cli@latest build:list --platform android --build-profile preview --status finished --limit 1 --json --non-interactive > apk.json
+          node -e 'const b=JSON.parse(require("fs").readFileSync("apk.json","utf8"))[0];console.log("APK_BUILD", b&&b.id, b&&b.createdAt);console.log("APK_URL", b&&b.artifacts&&b.artifacts.buildUrl)'
