@@ -4,6 +4,11 @@
 name: Empreinte Android (EAS)
 
 on:
+  # Lancé par une modification de ce fichier sur la branche de travail (le bouton « Run workflow »
+  # n'apparaît que pour la branche par défaut).
+  push:
+    branches: [claude/loving-meitner-akjeks]
+    paths: [".github/workflows/eas-fingerprint.yml"]
   workflow_dispatch:
 
 permissions:
