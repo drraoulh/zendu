@@ -1,0 +1,35 @@
+# Affiche l'empreinte SHA-256 du certificat qui signe le dernier AAB Android construit sur EAS.
+# Cette empreinte est publique (elle sert à enregistrer l'appli auprès de Google Play), pas un secret.
+# Prérequis : secret de dépôt EXPO_TOKEN. Lancement : onglet Actions → « Empreinte Android (EAS) ».
+name: Empreinte Android (EAS)
+
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  fingerprint:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    defaults:
+      run:
+        working-directory: mobile
+    env:
+      EXPO_TOKEN: ${{ secrets.EXPO_TOKEN }}
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4.4.0
+
+      - uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020 # v4.4.0
+        with:
+          node-version: 22
+
+      - name: Télécharger le dernier AAB terminé et afficher l'empreinte
+        run: |
+          set -e
+          npx --yes eas-cli@latest build:list --platform android --status finished --limit 1 --json --non-interactive > builds.json
+          URL=$(node -e 'const b=JSON.parse(require("fs").readFileSync("builds.json","utf8"));console.log((b[0]&&b[0].artifacts&&b[0].artifacts.buildUrl)||"")')
+          if [ -z "$URL" ]; then echo "::error::Aucun build Android terminé trouvé."; exit 1; fi
+          curl -sSL -o app.aab "$URL"
+          keytool -printcert -jarfile app.aab | grep -E "Owner|SHA1|SHA256|Valid"
