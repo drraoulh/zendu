@@ -58,3 +58,4 @@ jobs:
           npx --yes eas-cli@latest build:list --platform android --build-profile production --limit 3 --json --non-interactive > recent.json
           node -e 'for (const b of JSON.parse(require("fs").readFileSync("recent.json","utf8"))) console.log("BUILD", b.id, b.status, b.appBuildVersion, b.createdAt, (b.error&&b.error.message)||"")'
 # Vérification 19:02
+# Vérification 15:07:09
