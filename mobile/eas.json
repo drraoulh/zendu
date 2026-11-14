@@ -11,10 +11,24 @@
       "distribution": "internal",
       "android": {
         "buildType": "apk"
+      },
+      "env": {
+        "EXPO_PUBLIC_API_URL": "https://worldsofttransfer.com",
+        "EXPO_PUBLIC_SITE_URL": "https://worldsofttransfer.com",
+        "EXPO_PUBLIC_COMPANY_EMAIL": "support@worldsofttransfer.com",
+        "EXPO_PUBLIC_COMPANY_PHONE": "+1 416 830 3459",
+        "EXPO_PUBLIC_COMPANY_LEGAL_NAME": "Paul World Finances and Technologies Ltd."
       }
     },
     "production": {
-      "autoIncrement": true
+      "autoIncrement": true,
+      "env": {
+        "EXPO_PUBLIC_API_URL": "https://worldsofttransfer.com",
+        "EXPO_PUBLIC_SITE_URL": "https://worldsofttransfer.com",
+        "EXPO_PUBLIC_COMPANY_EMAIL": "support@worldsofttransfer.com",
+        "EXPO_PUBLIC_COMPANY_PHONE": "+1 416 830 3459",
+        "EXPO_PUBLIC_COMPANY_LEGAL_NAME": "Paul World Finances and Technologies Ltd."
+      }
     }
   },
   "submit": {
