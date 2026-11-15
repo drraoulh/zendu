@@ -14,6 +14,7 @@ export default function Review() {
   const { draft, setDraft } = useStore();
   const [quote, setQuote] = useState<Quote | null>(draft.quote);
   const [error, setError] = useState<string | null>(null);
+  const [tryN, setTryN] = useState(0);
   const recipient = draft.recipient;
   // Moyens ouverts par le serveur pour ce trajet (Interac : envois en dollars canadiens ; carte :
   // seulement en démonstration tant qu'aucun prestataire de carte n'est branché).
@@ -52,8 +53,13 @@ export default function Review() {
         // Le paiement et le reçu reprennent ce devis à jour.
         setDraft({ quote: q });
       })
-      .catch((e: Error) => setError(e.message));
-  }, [draft.corridorId, draft.sendAmount, draft.receiveAmount, recipient?.network, setDraft]);
+      .then(() => setError(null))
+      .catch((e: Error) => {
+        // Devis impossible à rafraîchir : on ne laisse pas payer sur un ancien montant.
+        setQuote(null);
+        setError(e.message);
+      });
+  }, [draft.corridorId, draft.sendAmount, draft.receiveAmount, recipient?.network, setDraft, tryN]);
 
   if (!recipient) return <Redirect href="/(tabs)" />;
 
@@ -133,7 +139,12 @@ export default function Review() {
       {!method ? (
         <Notice tone="warn" icon="info" text={tr("Aucun moyen de paiement n'est encore ouvert pour ce trajet. Les envois partent pour l'instant du Canada, par virement Interac.")} />
       ) : null}
-      {error ? <Notice tone="danger" icon="alert" text={error} /> : null}
+      {error ? (
+        <View style={{ gap: 8 }}>
+          <Notice tone="danger" icon="alert" text={error} />
+          <Button title={tr("Réessayer")} variant="secondary" onPress={() => setTryN((n) => n + 1)} />
+        </View>
+      ) : null}
       <View style={{ marginTop: 14 }}>
         <Notice
           tone="brand"

@@ -13,7 +13,7 @@
       "supportsTablet": false,
       "infoPlist": {
         "ITSAppUsesNonExemptEncryption": false,
-        "NSCameraUsageDescription": "WorldSoft Transfer utilise l'appareil photo pour scanner votre carte et vérifier votre identité (pièce d'identité et selfie).",
+        "NSCameraUsageDescription": "WorldSoft Transfer utilise l'appareil photo pour vérifier votre identité (photo de votre pièce d'identité et selfie) et pour scanner votre carte bancaire. Le scan de carte reste sur votre téléphone.",
         "NSMicrophoneUsageDescription": "Le micro peut être utilisé pendant la vérification d'identité (contrôle de vivacité).",
         "NSPhotoLibraryUsageDescription": "Vous pouvez choisir une photo de votre pièce d'identité dans vos photos.",
         "NSLocationWhenInUseUsageDescription": "Votre position aide à prévenir la fraude pendant la vérification d'identité."
@@ -48,7 +48,7 @@
       [
         "expo-camera",
         {
-          "cameraPermission": "WorldSoft Transfer utilise l'appareil photo pour scanner votre carte bancaire. Les photos restent sur votre téléphone.",
+          "cameraPermission": "WorldSoft Transfer utilise l'appareil photo pour vérifier votre identité (photo de votre pièce d'identité et selfie) et pour scanner votre carte bancaire. Le scan de carte reste sur votre téléphone.",
           "recordAudioAndroid": false,
           "microphonePermission": false,
           "barcodeScannerEnabled": false

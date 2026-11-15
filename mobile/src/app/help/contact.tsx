@@ -62,19 +62,19 @@ export default function Contact() {
           icon="mail"
           title={tr("Courriel")}
           subtitle={company.email ?? PLACEHOLDER}
-          onPress={company.email ? () => Linking.openURL(`mailto:${company.email}`) : undefined}
+          onPress={company.email ? () => void Linking.openURL(`mailto:${company.email}`).catch(() => undefined) : undefined}
         />
         <ListItem
           icon="phone"
           title="WhatsApp"
           subtitle={company.whatsapp ?? PLACEHOLDER}
-          onPress={company.whatsapp ? () => Linking.openURL(`https://wa.me/${company.whatsapp?.replace(/\D/g, "")}`) : undefined}
+          onPress={company.whatsapp ? () => void Linking.openURL(`https://wa.me/${company.whatsapp?.replace(/\D/g, "")}`).catch(() => undefined) : undefined}
         />
         <ListItem
           icon="phone"
           title={tr("Téléphone")}
           subtitle={company.phone ?? PLACEHOLDER}
-          onPress={company.phone ? () => Linking.openURL(`tel:${company.phone?.replace(/\s/g, "")}`) : undefined}
+          onPress={company.phone ? () => void Linking.openURL(`tel:${company.phone?.replace(/\s/g, "")}`).catch(() => undefined) : undefined}
         />
       </Card>
 

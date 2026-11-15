@@ -21,8 +21,6 @@ jobs:
     defaults:
       run:
         working-directory: mobile
-    env:
-      EXPO_TOKEN: ${{ secrets.EXPO_TOKEN }}
     steps:
       - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4.4.0
 
@@ -37,6 +35,8 @@ jobs:
 
       - name: Télécharger le dernier AAB terminé et afficher l'empreinte
         continue-on-error: true
+        env:
+          EXPO_TOKEN: ${{ secrets.EXPO_TOKEN }}
         run: |
           set -e
           npx --yes eas-cli@latest build:list --platform android --build-profile production --status finished --limit 1 --json --non-interactive > builds.json
@@ -47,6 +47,8 @@ jobs:
           keytool -printcert -jarfile app.aab | grep -E "Owner|SHA1|SHA256|Valid"
 
       - name: Lien de téléchargement du dernier APK (profil preview) terminé
+        env:
+          EXPO_TOKEN: ${{ secrets.EXPO_TOKEN }}
         run: |
           npx --yes eas-cli@latest build:list --platform android --build-profile preview --status finished --limit 1 --json --non-interactive > apk.json
           node -e 'const b=JSON.parse(require("fs").readFileSync("apk.json","utf8"))[0];console.log("APK_BUILD", b&&b.id, b&&b.createdAt);console.log("APK_URL", b&&b.artifacts&&b.artifacts.buildUrl)'
@@ -54,6 +56,8 @@ jobs:
 # Relancé pour lire le lien du dernier AAB de production.
 
       - name: État des derniers builds de production
+        env:
+          EXPO_TOKEN: ${{ secrets.EXPO_TOKEN }}
         run: |
           npx --yes eas-cli@latest build:list --platform android --build-profile production --limit 3 --json --non-interactive > recent.json
           node -e 'for (const b of JSON.parse(require("fs").readFileSync("recent.json","utf8"))) console.log("BUILD", b.id, b.status, b.appBuildVersion, b.createdAt, (b.error&&b.error.message)||"")'

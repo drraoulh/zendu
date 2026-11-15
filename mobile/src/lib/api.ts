@@ -1,4 +1,4 @@
-import { tr } from "./i18n";
+import { getLang, intlLocale, tr } from "./i18n";
 /**
  * Client de l'API PWFINTECH (Next.js, dossier web/).
  * L'URL se règle avec EXPO_PUBLIC_API_URL (ex. https://worldsofttransfer.com).
@@ -194,7 +194,7 @@ function errorMessage(data: unknown): string | null {
   const { code, limit, currency } = data as { code?: unknown; limit?: unknown; currency?: unknown };
   if ((code === "amount_too_low" || code === "amount_too_high") && typeof limit === "number" && typeof currency === "string") {
     const unit = currency === "XAF" ? "FCFA" : currency;
-    return `Montant ${code === "amount_too_low" ? "minimum" : "maximum"} : ${limit.toLocaleString("fr-FR")} ${unit}.`;
+    return tr(code === "amount_too_low" ? "Montant minimum : {0} {1}." : "Montant maximum : {0} {1}.", limit.toLocaleString(intlLocale()), unit);
   }
   const err = (data as { error?: unknown }).error;
   if (typeof err === "string") return err;
@@ -329,7 +329,7 @@ export const api = {
     }),
   transfer: (id: string) => request<Transfer>(`/api/transfers/${encodeURIComponent(id)}`),
   submitRequest: (input: { kind: ServiceKind; name: string; email: string; phone?: string; payload: Record<string, unknown> }) =>
-    request<{ ok: true; reference: string }>("/api/requests", { method: "POST", body: JSON.stringify({ ...input, locale: "fr" }) }),
+    request<{ ok: true; reference: string }>("/api/requests", { method: "POST", body: JSON.stringify({ ...input, locale: getLang() }) }),
   slots: (date: string) => request<{ date: string; slots: string[]; timezone: string }>(`/api/appointments/slots?date=${date}`),
   trackShipment: (number: string) => request<{ shipment: Shipment }>(`/api/shipments/track?number=${encodeURIComponent(number)}`),
   interacDeclare: (id: string) =>

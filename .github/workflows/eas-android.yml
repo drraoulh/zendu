@@ -31,7 +31,6 @@ jobs:
       run:
         working-directory: mobile
     env:
-      EXPO_TOKEN: ${{ secrets.EXPO_TOKEN }}
       EXPO_PUBLIC_API_URL: ${{ vars.EXPO_PUBLIC_API_URL || 'https://worldsofttransfer.com' }}
       EXPO_PUBLIC_SITE_URL: ${{ vars.EXPO_PUBLIC_SITE_URL || 'https://worldsofttransfer.com' }}
       EXPO_PUBLIC_COMPANY_EMAIL: ${{ vars.EXPO_PUBLIC_COMPANY_EMAIL || 'support@worldsofttransfer.com' }}
@@ -39,6 +38,8 @@ jobs:
       - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4.4.0
 
       - name: Vérifier le jeton Expo
+        env:
+          EXPO_TOKEN: ${{ secrets.EXPO_TOKEN }}
         run: |
           if [ -z "$EXPO_TOKEN" ]; then echo "::error::Ajoutez le secret EXPO_TOKEN (Settings → Secrets and variables → Actions)."; exit 1; fi
 
@@ -57,4 +58,7 @@ jobs:
           if [ -n "$GOOGLE_SERVICES_JSON" ]; then printf '%s' "$GOOGLE_SERVICES_JSON" > google-services.json; fi
 
       - name: Construction sur EAS (la clé de signature est créée au premier lancement)
+        # Le jeton n'est donné qu'à cette étape (pas aux scripts d'installation des dépendances).
+        env:
+          EXPO_TOKEN: ${{ secrets.EXPO_TOKEN }}
         run: npx --yes eas-cli@latest build --platform android --profile "${{ inputs.profile || 'preview' }}" --non-interactive --no-wait

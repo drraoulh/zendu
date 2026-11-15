@@ -38,7 +38,18 @@ export function rate(value: number) {
 }
 
 export function parseAmount(text: string) {
-  const n = Number(text.replace(/\s| /g, "").replace(",", "."));
+  // Espaces (y compris insécables) retirés.
+  let t = text.replace(/[\s\u00a0\u202f]/g, "");
+  const comma = t.lastIndexOf(",");
+  const dot = t.lastIndexOf(".");
+  if (comma >= 0 && dot >= 0) {
+    // « 1,234.56 » ou « 1.234,56 » : le dernier séparateur est la décimale, l'autre sépare les milliers.
+    const dec = Math.max(comma, dot);
+    t = `${t.slice(0, dec).replace(/[.,]/g, "")}.${t.slice(dec + 1)}`;
+  } else {
+    t = t.replace(",", ".");
+  }
+  const n = Number(t);
   return Number.isFinite(n) ? n : NaN;
 }
 
