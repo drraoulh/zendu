@@ -60,13 +60,13 @@ export default function Profile() {
             kyc === "verified"
               ? profile.kycVerifiedAt ? tr("Vérifiée le {0}", dateTime(profile.kycVerifiedAt).split(" · ")[0]) : tr("Vérifiée")
               : kyc === "pending"
-                ? tr("En cours d'examen · nous vous prévenons dès qu'elle est terminée")
+                ? tr("En cours d'examen · touchez pour reprendre ou vérifier le statut")
                 : kyc === "rejected"
                   ? profile.kycNote ?? tr("Refusée · recommencez avec un document valide")
                   : tr("À faire avant votre premier envoi · 2 min")
           }
           subtitleLines={3}
-          onPress={kyc === "none" || kyc === "rejected" ? go("/kyc") : undefined}
+          onPress={kyc === "verified" ? undefined : go("/kyc")}
         />
         <ListItem icon="send" tone="neutral" title={tr("Limites d'envoi")} subtitle={tr("Minimum et maximum par envoi")} onPress={go("/account/limits")} />
       </Card>

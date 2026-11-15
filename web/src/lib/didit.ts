@@ -91,6 +91,10 @@ export async function syncDiditDecision(customer: Customer): Promise<Customer> {
   const { status, vendorData } = await getDiditStatus(customer.kycSessionId);
   // Une identité validée ne change plus, sauf expiration de la vérification (politique Didit).
   if (customer.kycStatus === "verified" && status !== "Kyc Expired" && status !== "KYC Expired") return customer;
+  // Un refus décidé par l'équipe (ou un blocage) n'est pas annulé par une ancienne session Didit « Approved » :
+  // seuls les refus venus de Didit lui-même (notes posées plus bas) peuvent être levés par une nouvelle décision.
+  const refusalFromDidit = /^(Vérification refusée|Certaines étapes)/.test(customer.kycNote ?? "");
+  if (customer.kycStatus === "rejected" && !refusalFromDidit && status === "Approved") return customer;
   // La session doit bien appartenir à ce client.
   if (vendorData && vendorData !== customer.id) {
     console.error("[didit] session d'un autre client ignorée");

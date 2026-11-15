@@ -1,6 +1,6 @@
 import { router } from "expo-router";
 import { useEffect, useState } from "react";
-import { ActivityIndicator, Platform, StyleSheet, Text, View } from "react-native";
+import { ActivityIndicator, BackHandler, Platform, StyleSheet, Text, View } from "react-native";
 import { Icon, type IconName } from "@/components/icons";
 import { Button, Card, Choice, H1, Header, ListItem, Notice, P, Screen, Small, Steps } from "@/components/ui";
 import { authenticate, biometricKind, biometricLabel } from "@/lib/biometrics";
@@ -23,7 +23,7 @@ export default function Kyc() {
   const [didit, setDidit] = useState<boolean | null>(null);
   const country = (profile?.country ?? "CA") as CountryCode;
   const docs = KYC_DOCUMENTS[country] ?? KYC_DOCUMENTS.CA;
-  const [step, setStep] = useState(profile?.kyc === "none" || profile?.kyc === "rejected" ? 6 : 9);
+  const [stepState, setStep] = useState(profile?.kyc === "none" || profile?.kyc === "rejected" ? 6 : 9);
   const [error, setError] = useState<string | null>(null);
   const [busy, setBusy] = useState(false);
   const [docId, setDocId] = useState(docs[0].id);
@@ -32,6 +32,10 @@ export default function Kyc() {
   const [selfie, setSelfie] = useState(false);
   const [bioMessage, setBioMessage] = useState<string | null>(null);
   const doc = docs.find((d) => d.id === docId) ?? docs[0];
+  const kycStatus = profile?.kyc;
+  // L'écran suit le profil : dès que l'identité est vérifiée (décision reçue, retour au premier plan), on affiche
+  // le résultat au lieu de rester sur l'étape choisie à l'ouverture.
+  const step = kycStatus === "verified" ? 9 : stepState;
 
   // Le parcours (Didit ou déclaration manuelle) n'est choisi qu'avec la réponse du serveur :
   // pendant le chargement ou si le serveur est injoignable, on attend au lieu d'afficher le mauvais parcours.
@@ -59,6 +63,8 @@ export default function Kyc() {
     const r = await startDidit();
     if (!r.ok) {
       setBusy(false);
+      // Identité déjà vérifiée entre-temps : on affiche simplement le résultat.
+      if (r.code === "already_verified") return setStep(9);
       // Didit pas (ou plus) branché : parcours de démonstration.
       if (r.code === "didit_unavailable") {
         setDidit(false);
@@ -68,10 +74,15 @@ export default function Kyc() {
     }
     // Didit (SDK natif sur téléphone, page sécurisée sur le web) ; ensuite, on relit la décision.
     const outcome = await runDiditVerification(r);
-    await refreshKyc();
+    const { status } = await refreshKyc();
     setBusy(false);
     if (outcome.kind === "failed") return setError(outcome.message);
-    if (outcome.kind === "cancelled") return setError(tr("Vérification interrompue. Vous pouvez la reprendre quand vous voulez."));
+    // Refus déjà rendu : on reste sur cet écran, avec le motif, pour recommencer.
+    if (status === "rejected") return setStep(6);
+    if (outcome.kind === "cancelled") {
+      setError(tr("Vérification interrompue. Vous pouvez la reprendre quand vous voulez."));
+      return setStep(9);
+    }
     setStep(9);
   }
 
@@ -101,6 +112,16 @@ export default function Kyc() {
   }
 
   const exit = () => router.dismissTo("/(tabs)");
+
+  useEffect(() => {
+    const sub = BackHandler.addEventListener("hardwareBackPress", () => {
+      if (step === 8) setStep(7);
+      else if (step === 7) setStep(6);
+      else router.dismissTo("/(tabs)");
+      return true;
+    });
+    return () => sub.remove();
+  }, [step]);
 
   if (step >= 6 && step <= 8 && didit === null) {
     return (
@@ -265,6 +286,7 @@ export default function Kyc() {
   }
 
   const verified = profile?.kyc === "verified";
+  const refused = profile?.kyc === "rejected";
   return (
     <Screen
       footer={
@@ -286,10 +308,16 @@ export default function Kyc() {
       </View>
       <View style={{ marginTop: 18 }}>
         <Notice
-          tone={verified ? "success" : "warn"}
-          icon={verified ? "shield" : "clock"}
-          title={verified ? tr("Identité vérifiée") : tr("Identité en cours de vérification")}
-          text={verified ? tr("Vous pouvez envoyer de l'argent dès maintenant.") : tr("Généralement quelques minutes. Vous serez prévenu dans l'appli dès qu'elle sera terminée.")}
+          tone={verified ? "success" : refused ? "danger" : "warn"}
+          icon={verified ? "shield" : refused ? "alert" : "clock"}
+          title={verified ? tr("Identité vérifiée") : refused ? tr("Votre précédente vérification a été refusée") : tr("Identité en cours de vérification")}
+          text={
+            verified
+              ? tr("Vous pouvez envoyer de l'argent dès maintenant.")
+              : refused
+                ? profile?.kycNote ?? tr("Recommencez avec un document valide et lisible.")
+                : tr("Généralement quelques minutes. Vous serez prévenu dans l'appli dès qu'elle sera terminée.")
+          }
         />
         {error ? (
           <View style={{ marginTop: 12 }}>

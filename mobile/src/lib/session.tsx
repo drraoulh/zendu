@@ -78,7 +78,8 @@ type SessionValue = {
   startDidit: () => Promise<{ ok: true; url: string; sessionToken: string | null } | { ok: false; error: string; code?: string }>;
   /** Relit le statut d'identité ; `available` = vérification Didit branchée. */
   /** `available` : Didit branché ? null = serveur injoignable (on ne sait pas : ne pas choisir de parcours). */
-  refreshKyc: () => Promise<{ available: boolean | null }>;
+  /** `available` : Didit branché (null = serveur injoignable) ; `status` : statut d'identité à jour. */
+  refreshKyc: () => Promise<{ available: boolean | null; status: Customer["kyc"] | null }>;
   updateSettings: (patch: Partial<Settings>) => Promise<void>;
   changePassword: (current: string, next: string) => Promise<Result>;
   /** Mot de passe temporaire donné par l'équipe : à remplacer juste après la connexion. */
@@ -217,14 +218,37 @@ export function SessionProvider({ children }: { children: ReactNode }) {
   const kycPending = profile?.kyc === "pending";
   useEffect(() => {
     if (!kycPending) return;
+    let inFlight = false;
     const t = setInterval(() => {
+      // Pas de requête en arrière-plan (batterie, données) ni de requêtes qui se chevauchent.
+      if (inFlight || AppState.currentState !== "active") return;
+      inFlight = true;
+      api
+        .me()
+        .then((r) => saveProfile(r.customer))
+        .catch(() => undefined)
+        .finally(() => {
+          inFlight = false;
+        });
+    }, 15000);
+    return () => clearInterval(t);
+  }, [kycPending, saveProfile]);
+
+  // Retour au premier plan : tant que l'identité n'est pas vérifiée, on relit le statut (la décision a pu
+  // arriver pendant que l'appli était fermée ou que la vérification Didit était ouverte).
+  const kycStatus = profile?.kyc ?? null;
+  const signedIn = Boolean(token);
+  useEffect(() => {
+    if (!signedIn || kycStatus === null || kycStatus === "verified") return;
+    const sub = AppState.addEventListener("change", (state) => {
+      if (state !== "active") return;
       api
         .me()
         .then((r) => saveProfile(r.customer))
         .catch(() => undefined);
-    }, 15000);
-    return () => clearInterval(t);
-  }, [kycPending, saveProfile]);
+    });
+    return () => sub.remove();
+  }, [signedIn, kycStatus, saveProfile]);
 
   // Verrouillage automatique : de retour au premier plan après AUTO_LOCK_MS en arrière-plan,
   // l'appli redemande le code PIN ou la biométrie (seulement si l'un des deux est activé).
@@ -337,6 +361,8 @@ export function SessionProvider({ children }: { children: ReactNode }) {
         try {
           const r = await api.startDidit();
           await saveProfile(r.customer);
+          // Le serveur ne renvoie pas d'adresse quand l'identité est déjà vérifiée : rien à relancer.
+          if (!r.url) return { ok: false, error: "", code: "already_verified" };
           return { ok: true, url: r.url, sessionToken: r.sessionToken ?? null };
         } catch (e) {
           return { ok: false, error: message(e), code: e instanceof ApiError ? e.code : undefined };
@@ -346,9 +372,9 @@ export function SessionProvider({ children }: { children: ReactNode }) {
         try {
           const r = await api.kycStatus();
           await saveProfile(r.customer);
-          return { available: r.available === true };
+          return { available: r.available === true, status: r.customer.kyc };
         } catch {
-          return { available: null };
+          return { available: null, status: null };
         }
       },
       submitKyc: async (document) => {

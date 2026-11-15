@@ -59,8 +59,7 @@ export default function Home() {
   const closedText = tr("L'envoi depuis {0} arrive bientôt. Pour l'instant, les envois partent du Canada, par virement Interac.", countryName(corridor.source));
 
   function startSend() {
-    if (todo) return router.push("/kyc");
-    if (kyc === "pending") return;
+    if (todo || kyc === "pending") return router.push("/kyc");
     if (closed) return Alert.alert(tr("Bientôt disponible"), closedText);
     router.push(selected ? "/send/review" : "/send/recipient");
   }
@@ -89,7 +88,7 @@ export default function Home() {
 
       {kyc !== "verified" ? (
         <Card
-          onPress={todo ? () => router.push("/kyc") : undefined}
+          onPress={() => router.push("/kyc")}
           style={[st.kyc, { backgroundColor: kyc === "rejected" ? colors.dangerSoft : colors.warnSoft, borderColor: kyc === "rejected" ? colors.dangerSoft : colors.warnSoft }]}
         >
           <Icon name={kyc === "pending" ? "clock" : kyc === "rejected" ? "alert" : "shield"} color={kyc === "rejected" ? colors.danger : colors.warn} size={20} />
@@ -100,10 +99,10 @@ export default function Home() {
                 ? tr("Obligatoire avant votre premier envoi · 2 min")
                 : kyc === "rejected"
                   ? profile?.kycNote ?? tr("Recommencez avec un document valide.")
-                  : tr("Vous pourrez envoyer dès qu'elle sera confirmée.")}
+                  : tr("Touchez pour reprendre ou vérifier le statut. Vous pourrez envoyer dès qu'elle sera confirmée.")}
             </Small>
           </View>
-          {todo ? <Icon name="chev" color={kyc === "rejected" ? colors.danger : colors.warn} size={18} /> : null}
+          <Icon name="chev" color={kyc === "rejected" ? colors.danger : colors.warn} size={18} />
         </Card>
       ) : null}
 
@@ -113,8 +112,8 @@ export default function Home() {
         amount={draft.sendAmount}
         receiveAmount={draft.receiveAmount}
         onChange={(n) => setDraft(selected && !n.corridorId.endsWith(`-${selected.country}`) ? { ...n, recipient: null } : n)}
-        onContinue={kyc === "pending" ? undefined : startSend}
-        ctaLabel={todo ? tr("Vérifier mon identité") : closed ? tr("Bientôt disponible") : selected ? tr("Envoyer à {0}", selected.fullName.split(" ")[0]) : tr("Envoyer")}
+        onContinue={startSend}
+        ctaLabel={todo ? tr("Vérifier mon identité") : kyc === "pending" ? tr("Reprendre la vérification") : closed ? tr("Bientôt disponible") : selected ? tr("Envoyer à {0}", selected.fullName.split(" ")[0]) : tr("Envoyer")}
       />
       {/* Alert.alert ne s'affiche pas sur le web : le message reste visible sous le simulateur. */}
       {closed && !todo ? (
