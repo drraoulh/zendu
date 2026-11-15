@@ -376,6 +376,7 @@
  "La réglementation sur les transferts d'argent impose de vérifier l'identité de chaque client avant son premier envoi.": "Money transfer regulations require verifying each customer's identity before their first transfer.",
  "La réglementation sur les transferts d'argent nous oblige à vérifier l'identité de nos clients et à connaître leur occupation. Ces données restent confidentielles.": "Money transfer regulations require us to verify our customers' identity and know their occupation. This data remains confidential.",
  "La suppression est définitive. Les transferts déjà effectués restent archivés par PWFINTECH, sans lien avec votre compte.": "Deletion is permanent. Transfers already made remain archived by PWFINTECH, unlinked from your account.",
+ "La vérification d'identité est momentanément indisponible. Réessayez plus tard ou contactez le support.": "Identity verification is temporarily unavailable. Please try again later or contact support.",
  "La vérification d'identité est obligatoire avant votre premier envoi.": "Identity verification is required before your first transfer.",
  "La vérification en deux étapes est active : un code vous est demandé à chaque connexion.": "Two-step verification is on: a code is requested at every sign-in.",
  "La vérification en deux étapes est active. Ajoutez un verrouillage de l'appli (PIN ou biométrie).": "Two-step verification is on. Add an app lock (PIN or biometrics).",

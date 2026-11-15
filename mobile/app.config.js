@@ -7,6 +7,7 @@ const path = require("path");
 module.exports = ({ config }) => {
   const projectId = process.env.EXPO_PUBLIC_EAS_PROJECT_ID?.trim();
   const googleServices = process.env.GOOGLE_SERVICES_FILE || "./google-services.json";
+  // eslint-disable-next-line no-undef
   const hasGoogleServices = fs.existsSync(path.resolve(__dirname, googleServices));
   return {
     ...config,

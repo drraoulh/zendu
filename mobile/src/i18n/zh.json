@@ -376,6 +376,7 @@
  "La réglementation sur les transferts d'argent impose de vérifier l'identité de chaque client avant son premier envoi.": "汇款监管规定要求在客户首次汇款前核实其身份。",
  "La réglementation sur les transferts d'argent nous oblige à vérifier l'identité de nos clients et à connaître leur occupation. Ces données restent confidentielles.": "汇款监管规定要求我们核实客户身份并了解其职业。这些信息将严格保密。",
  "La suppression est définitive. Les transferts déjà effectués restent archivés par PWFINTECH, sans lien avec votre compte.": "删除后无法恢复。已完成的汇款记录由 PWFINTECH 存档，与您的账户不再关联。",
+ "La vérification d'identité est momentanément indisponible. Réessayez plus tard ou contactez le support.": "身份验证暂时不可用。请稍后再试或联系客服。",
  "La vérification d'identité est obligatoire avant votre premier envoi.": "首次汇款前必须完成身份验证。",
  "La vérification en deux étapes est active : un code vous est demandé à chaque connexion.": "两步验证已开启：每次登录都需要输入验证码。",
  "La vérification en deux étapes est active. Ajoutez un verrouillage de l'appli (PIN ou biométrie).": "两步验证已开启。请添加应用锁（PIN 码或生物识别）。",

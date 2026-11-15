@@ -6,7 +6,9 @@ import { tr } from "./i18n";
 /** Adresse normalisée : guillemets et espaces retirés, https:// ajouté si absent, sans « / » ni « /api » final. */
 export function normalizeApiUrl(raw: string | undefined) {
   let url = (raw ?? "").trim().replace(/^["']|["']$/g, "").trim();
-  if (!url) return "http://localhost:3000";
+  // Sans variable (ex. construction cloud sans EXPO_PUBLIC_API_URL) : serveur de production dans l'appli
+  // installée, localhost seulement en développement. Évite « Connexion impossible » chez tous les clients.
+  if (!url) return __DEV__ ? "http://localhost:3000" : "https://worldsofttransfer.com";
   if (!/^https?:\/\//i.test(url)) url = `https://${url}`;
   return url.replace(/\/+$/, "").replace(/\/api$/i, "");
 }
@@ -219,12 +221,21 @@ export function setUnauthorizedHandler(fn: (() => void) | null) {
   onUnauthorized = fn;
 }
 
+const REQUEST_TIMEOUT_MS = 30_000;
+
 async function request<T>(path: string, init?: RequestInit & { token?: string | null }): Promise<T> {
   let res: Response;
   const token = init?.token !== undefined ? init.token : authToken;
+  // Délai maximal : sans lui, un réseau mobile qui ne répond pas laisse l'écran bloqué sur le chargement.
+  const controller = new AbortController();
+  // Pas de délai pour la création d'un transfert : couper une requête que le serveur a déjà traitée
+  // pourrait pousser à la renvoyer et créer un doublon.
+  const noTimeout = init?.method === "POST" && /^\/api\/transfers\/?$/.test(path);
+  const timer = noTimeout ? null : setTimeout(() => controller.abort(), REQUEST_TIMEOUT_MS);
   try {
     res = await fetch(`${API_URL}${path}`, {
       ...init,
+      signal: controller.signal,
       headers: {
         Accept: "application/json",
         ...(init?.body ? { "Content-Type": "application/json" } : {}),
@@ -237,6 +248,8 @@ async function request<T>(path: string, init?: RequestInit & { token?: string | 
       __DEV__ ? `Serveur injoignable (${API_URL}). Vérifiez EXPO_PUBLIC_API_URL et votre réseau.` : tr("Connexion impossible. Vérifiez votre réseau."),
       0,
     );
+  } finally {
+    if (timer) clearTimeout(timer);
   }
   const data = await res.json().catch(() => null);
   if (res.status === 401 && token && path.startsWith("/api/me")) onUnauthorized?.();

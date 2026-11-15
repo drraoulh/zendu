@@ -52,8 +52,15 @@ export async function createDiditSession(customer: Pick<Customer, "id">): Promis
   } catch {
     throw new DiditError("Service de vérification injoignable. Réessayez dans un instant.");
   }
-  const data = (await res.json().catch(() => null)) as { session_id?: string; url?: string; session_token?: string } | null;
+  const data = (await res.json().catch(() => null)) as { session_id?: string; url?: string; session_token?: string; detail?: string; message?: string } | null;
   if (!res.ok || !data?.session_id || !data.url) {
+    // Solde Didit épuisé : tous les clients sont bloqués, et « réessayez » ne sert à rien. On le dit dans
+    // les journaux (à recharger dans la console Didit) et on donne au client un message honnête.
+    const reason = `${data?.detail ?? ""} ${data?.message ?? ""}`.toLowerCase();
+    if (res.status === 400 && reason.includes("credits")) {
+      console.error("[didit] CRÉDITS ÉPUISÉS : recharger le compte Didit (business.didit.me › Billing)");
+      throw new DiditError("La vérification d'identité est momentanément indisponible. Réessayez plus tard ou contactez le support.");
+    }
     console.error("[didit] création de session refusée", res.status);
     throw new DiditError("La vérification n'a pas pu démarrer. Réessayez dans un instant.");
   }
