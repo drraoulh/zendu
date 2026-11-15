@@ -84,6 +84,18 @@ export function publicTransfer<T extends { beneficiary: { accountNumber?: string
   return { ...transfer, beneficiary: publicBeneficiary(transfer.beneficiary) };
 }
 
+type CustomerHidden = "interacApprovedBy" | "interacApprovedByName" | "interacApprovedAt" | "customerId";
+
+/**
+ * Transfert renvoyé à un client (appli, site) : comme `publicTransfer`, sans l'identité de l'employé qui a validé
+ * le virement Interac ni l'identifiant interne du client.
+ */
+export function customerTransfer<T extends { beneficiary: { accountNumber?: string | null } }>(transfer: T): Omit<ReturnType<typeof publicTransfer<T>>, CustomerHidden> {
+  const view: Record<string, unknown> = { ...publicTransfer(transfer) };
+  for (const k of ["interacApprovedBy", "interacApprovedByName", "interacApprovedAt", "customerId"]) delete view[k];
+  return view as Omit<ReturnType<typeof publicTransfer<T>>, CustomerHidden>;
+}
+
 /**
  * Banques courantes par pays de destination — simples suggestions (datalist),
  * le champ reste libre.

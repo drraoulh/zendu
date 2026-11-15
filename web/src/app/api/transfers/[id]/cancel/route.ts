@@ -2,7 +2,7 @@ import { publicErrorMessage } from "@/lib/api-error";
 import { NextResponse } from "next/server";
 import { z } from "zod";
 import { requireAdmin } from "@/lib/admin-guard";
-import { publicTransfer } from "@/lib/bank";
+import { customerTransfer } from "@/lib/bank";
 import { cancelTransfer } from "@/lib/transfer-service";
 
 type Params = { params: Promise<{ id: string }> };
@@ -20,7 +20,7 @@ export async function POST(request: Request, { params }: Params) {
   }
   try {
     const updated = await cancelTransfer(id, parsed.data.note);
-    return NextResponse.json(updated ? publicTransfer(updated) : updated);
+    return NextResponse.json(updated ? customerTransfer(updated) : updated);
   } catch (error) {
     return NextResponse.json({ error: publicErrorMessage(error) }, { status: 400 });
   }

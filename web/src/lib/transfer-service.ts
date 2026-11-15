@@ -153,8 +153,16 @@ export async function queueAndRunPayout(transferId: string) {
 
   const provider = route === "momo" ? createMomoPayout() : route === "orange" ? createOrangePayout() : bank ? mockBank : mockMomo;
 
+  const refetch = () =>
+    prisma.transfer.findUnique({
+      where: { id: transferId },
+      include: { beneficiary: true, events: { orderBy: { createdAt: "asc" } } },
+    });
+
+  // 1) Appel du prestataire : seul un échec de cet appel peut faire passer le versement en « échoué ».
+  let result: Awaited<ReturnType<typeof provider.disburse>>;
   try {
-    const result = await provider.disburse({
+    result = await provider.disburse({
       transferId,
       reference: current.reference,
       amountXaf: current.receiveAmountXaf,
@@ -165,7 +173,19 @@ export async function queueAndRunPayout(transferId: string) {
           ? { bankName: b.bankName ?? "", accountNumber: b.accountNumber, bankCode: b.bankCode }
           : undefined,
     });
+  } catch (error) {
+    const message = error instanceof Error ? error.message : "Erreur payout";
+    await prisma.transfer.update({
+      where: { id: transferId },
+      data: { status: "payout_failed", failureReason: message },
+    });
+    await addEvent(transferId, "payout_failed", message);
+    return refetch();
+  }
 
+  // 2) Enregistrement du résultat. Si une écriture échoue ici, l'argent est peut-être déjà parti : on ne marque
+  // surtout pas le versement « échoué » (l'équipe pourrait le relancer et payer deux fois) ; on le journalise.
+  try {
     if (result.status === "failed") {
       assertTransition("payout_sent", "payout_failed");
       await prisma.transfer.update({
@@ -196,18 +216,10 @@ export async function queueAndRunPayout(transferId: string) {
       await addEvent(transferId, "payout_accepted", route === "orange" ? "Accepté par Orange Money, en attente de confirmation" : "Accepté par MoMo, en attente webhook");
     }
   } catch (error) {
-    const message = error instanceof Error ? error.message : "Erreur payout";
-    await prisma.transfer.update({
-      where: { id: transferId },
-      data: { status: "payout_failed", failureReason: message },
-    });
-    await addEvent(transferId, "payout_failed", message);
+    console.error("[payout] versement transmis mais enregistrement impossible : à vérifier chez le prestataire", transferId, result.payoutRef, error instanceof Error ? error.message : error);
   }
 
-  return prisma.transfer.findUnique({
-    where: { id: transferId },
-    include: { beneficiary: true, events: { orderBy: { createdAt: "asc" } } },
-  });
+  return refetch();
 }
 
 /**

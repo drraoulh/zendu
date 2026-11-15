@@ -5,7 +5,10 @@ import { prisma } from "@/lib/prisma";
 import { publicBeneficiary } from "@/lib/bank";
 import { COUNTRIES } from "@/lib/corridors";
 import { beneficiaryInputSchema, normalizeBeneficiary } from "@/lib/beneficiary-input";
-import { requireAdmin } from "@/lib/admin-guard";
+import { isAdminRequest, requireAdmin } from "@/lib/admin-guard";
+import { getCustomer } from "@/lib/customer-auth";
+import { rateLimit } from "@/lib/rate-limit";
+import { clientIp } from "@/lib/requests";
 
 /** Liste de tous les bénéficiaires : réservée à l'admin. */
 export async function GET(request: Request) {
@@ -34,6 +37,14 @@ const createSchema = beneficiaryInputSchema.extend({
 });
 
 export async function POST(request: Request) {
+  // Réservé aux clients connectés et à l'équipe : sans cela, n'importe qui pouvait remplir la base.
+  const authed = await getCustomer(request);
+  if (!authed && !(await isAdminRequest(request))) {
+    return NextResponse.json({ ok: false, code: "unauthorized", error: "Connexion requise." }, { status: 401 });
+  }
+  if (!(await rateLimit(`beneficiary:${authed?.customer.id ?? clientIp(request)}`, 60))) {
+    return NextResponse.json({ ok: false, code: "rate_limited", error: "Trop de demandes. Réessayez plus tard." }, { status: 429 });
+  }
   try {
     const input = createSchema.parse(await request.json());
     const country = COUNTRIES[input.country];
@@ -48,7 +59,7 @@ export async function POST(request: Request) {
     return NextResponse.json(publicBeneficiary(beneficiary), { status: 201 });
   } catch (error) {
     if (error instanceof z.ZodError) {
-      return NextResponse.json({ error: error.flatten() }, { status: 400 });
+      return NextResponse.json({ error: "Coordonnées du bénéficiaire invalides." }, { status: 400 });
     }
     const message = publicErrorMessage(error);
     return NextResponse.json({ error: message }, { status: 400 });

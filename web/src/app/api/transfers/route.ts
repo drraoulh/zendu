@@ -12,7 +12,7 @@ import { payoutProviderFor } from "@/lib/providers/payout";
 import { isLiveMode, payMethodsFor, transferLimits } from "@/lib/mode";
 import { getFxRate, rateIsTrustworthy } from "@/lib/fx";
 import { getCorridor, getCountry } from "@/lib/corridors";
-import { isBankNetwork, publicTransfer } from "@/lib/bank";
+import { customerTransfer, isBankNetwork, publicTransfer } from "@/lib/bank";
 import { beneficiaryInputSchema, normalizeBeneficiary } from "@/lib/beneficiary-input";
 import { requireAdmin } from "@/lib/admin-guard";
 import { getCustomer, hasBearer, passwordChangeRequired } from "@/lib/customer-auth";
@@ -53,7 +53,7 @@ function findExisting(customerId: string, key: string) {
 function replayExisting(existing: NonNullable<ExistingTransfer>) {
   if (existing.payInProvider === INTERAC_PROVIDER && existing.payInRef) {
     return NextResponse.json({
-      transfer: publicTransfer(existing),
+      transfer: customerTransfer(existing),
       payIn: { provider: "interac", sessionId: existing.payInRef, interac: interacInstructions(existing) },
     });
   }
@@ -330,7 +330,7 @@ export async function POST(request: Request) {
       const payInRef = `interac_${transfer.reference}`;
       await prisma.transfer.update({ where: { id: transfer.id }, data: { payInRef } });
       return NextResponse.json({
-        transfer: publicTransfer(transfer),
+        transfer: customerTransfer(transfer),
         payIn: { provider: "interac", sessionId: payInRef, interac: interacInstructions(transfer) },
       });
     }
@@ -355,7 +355,7 @@ export async function POST(request: Request) {
     });
 
     return NextResponse.json({
-      transfer: publicTransfer(transfer),
+      transfer: customerTransfer(transfer),
       payIn: session,
     });
   } catch (error) {

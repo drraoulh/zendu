@@ -3,7 +3,7 @@ import { expireStaleTransfers } from "@/lib/transfer-service";
 import { syncOrangePayout } from "@/lib/orange-sync";
 import { syncMomoPayout } from "@/lib/momo-sync";
 import { prisma } from "@/lib/prisma";
-import { publicTransfer } from "@/lib/bank";
+import { customerTransfer } from "@/lib/bank";
 import { INTERAC_PROVIDER, interacInstructions } from "@/lib/providers/interac";
 import { notFound, publicTransferView, transferAccess } from "./_access";
 
@@ -18,24 +18,22 @@ type Params = { params: Promise<{ id: string }> };
  */
 export async function GET(request: Request, { params }: Params) {
   const { id } = await params;
+  const include = { beneficiary: true, events: { orderBy: { createdAt: "asc" as const } } };
+  let transfer = await prisma.transfer.findUnique({ where: { id }, include });
+  if (!transfer) return notFound();
+
+  // Contrôle d'accès d'abord : un inconnu qui devine un identifiant ne déclenche aucun appel vers MTN / Orange.
+  const access = await transferAccess(request, transfer);
+  if (access instanceof NextResponse) return access;
+
   await expireStaleTransfers({ id }).catch(() => 0);
   // Versement Orange Money en attente : statut relu chez Orange (les notifications n'existent pas en sandbox).
   await syncOrangePayout(id, "lecture").catch(() => undefined);
   await syncMomoPayout(id).catch(() => undefined);
-  const transfer = await prisma.transfer.findUnique({
-    where: { id },
-    include: {
-      beneficiary: true,
-      events: { orderBy: { createdAt: "asc" } },
-    },
-  });
-  if (!transfer) return notFound();
-
-  const access = await transferAccess(request, transfer);
-  if (access instanceof NextResponse) return access;
+  transfer = (await prisma.transfer.findUnique({ where: { id }, include })) ?? transfer;
 
   // Virement Interac : instructions de paiement pour pouvoir les réafficher (l'expéditeur en a besoin).
   const interac = transfer.payInProvider === INTERAC_PROVIDER ? { interac: interacInstructions(transfer) } : {};
   if (access === "public") return NextResponse.json({ ...publicTransferView(transfer), ...interac });
-  return NextResponse.json({ ...publicTransfer(transfer), ...interac });
+  return NextResponse.json({ ...customerTransfer(transfer), ...interac });
 }
