@@ -12,6 +12,7 @@ export default function Forgot() {
   const [busy, setBusy] = useState(false);
 
   async function send() {
+    if (busy) return;
     if (!EMAIL.test(email.trim())) return setError(tr("Adresse courriel invalide"));
     setBusy(true);
     try {

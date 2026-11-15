@@ -49,7 +49,7 @@ export const DEFAULT_SETTINGS: Settings = {
 /** Connexion en cours : mot de passe validé par le serveur, code à 6 chiffres à saisir. */
 type Pending = { challenge: LoginChallenge; email: string; password: string };
 
-type Result = { ok: true } | { ok: false; error: string };
+type Result = { ok: true } | { ok: false; error: string; code?: string };
 
 type SessionValue = {
   ready: boolean;
@@ -66,7 +66,7 @@ type SessionValue = {
   /** Étape 2 : code vérifié par le serveur → session active. restart = défi expiré, revenir à la connexion. */
   completeSignIn: (code: string) => Promise<({ ok: true; mustChangePassword: boolean } | { ok: false; error: string; restart?: boolean })>;
   /** Nouveau code, éventuellement sur l'autre canal (SMS / courriel). */
-  resendCode: (channel?: "sms" | "email") => Promise<Result & { demoCode?: string; channel?: "sms" | "email"; resendAfter?: number }>;
+  resendCode: (channel?: "sms" | "email") => Promise<Result & { demoCode?: string; channel?: "sms" | "email"; resendAfter?: number; restart?: boolean }>;
   cancelSignIn: () => void;
   signOut: () => Promise<void>;
   deleteAccount: (password: string) => Promise<Result>;
@@ -162,6 +162,16 @@ export function SessionProvider({ children }: { children: ReactNode }) {
     await storage.remove(KEY_PROFILE);
     // Nouvelle connexion par mot de passe : les essais de PIN repartent de zéro.
     await storage.remove(KEY_PIN_FAILS);
+    // Le code PIN et la biométrie appartiennent au compte qui s'en va : un autre compte ouvert sur le même
+    // téléphone ne doit pas en hériter (ni, après une suppression de compte, en garder la trace).
+    await storage.remove(KEY_PIN);
+    setPinHash(null);
+    const saved = await storage.get<Settings>(KEY_SETTINGS);
+    if (saved) {
+      const cleared = { ...saved, pin: false, biometric: false };
+      await storage.set(KEY_SETTINGS, cleared);
+      setSettings(cleared);
+    }
   }, []);
 
   const saveProfile = useCallback(async (c: Customer) => {
@@ -290,7 +300,7 @@ export function SessionProvider({ children }: { children: ReactNode }) {
           await commit(r.token, r.customer);
           return { ok: true };
         } catch (e) {
-          return { ok: false, error: message(e) };
+          return { ok: false, error: message(e), code: e instanceof ApiError ? e.code : undefined };
         }
       },
       startSignIn: async (email, password) => {
@@ -324,7 +334,10 @@ export function SessionProvider({ children }: { children: ReactNode }) {
           setPending({ ...pending, challenge });
           return { ok: true, demoCode: challenge.demoCode, channel: challenge.channel, resendAfter: challenge.resendAfter };
         } catch (e) {
-          return { ok: false, error: message(e) };
+          // Code expiré (410) ou nombre d'envois atteint : cet écran ne peut plus aboutir, il faut se reconnecter.
+          const restart = e instanceof ApiError && (e.status === 410 || (e.status === 429 && e.code !== "resend_too_soon"));
+          if (restart) setPending(null);
+          return { ok: false, error: message(e), restart };
         }
       },
       cancelSignIn: () => setPending(null),

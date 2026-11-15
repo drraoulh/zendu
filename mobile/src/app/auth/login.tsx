@@ -17,6 +17,7 @@ export default function Login() {
   const passwordRef = useRef<TextInput>(null);
 
   async function submit() {
+    if (busy) return;
     setError(null);
     if (!email.trim() || !password) return setError(tr("Saisissez votre courriel et votre mot de passe."));
     setBusy(true);

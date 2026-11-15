@@ -82,13 +82,15 @@ export function resolveChannel(requested: OtpChannel): OtpChannel {
 
 /**
  * Mode démo du code de connexion (le code est renvoyé à l'appli au lieu d'être envoyé) : jamais en
- * mode réel ; ailleurs, seulement sans fournisseur et sur demande (OTP_DEMO="true"), ou en
- * développement local. Sans fournisseur en mode réel, la connexion échoue : la 2FA n'est jamais
- * contournée en silence.
+ * mode réel ni sur un serveur déployé en production ; seulement en développement local sans fournisseur.
+ * Sans fournisseur, la connexion échoue : la 2FA n'est jamais contournée en silence.
  */
 export function otpDemoMode(): boolean {
   if (otpProviderConfigured() || isLiveMode()) return false;
-  return process.env.OTP_DEMO?.trim().toLowerCase() === "true" || process.env.NODE_ENV !== "production";
+  // Déployé en production : jamais de code renvoyé à l'appli, même avec OTP_DEMO (une erreur de réglage ne doit
+  // pas contourner la double vérification : sans fournisseur d'envoi, la connexion échoue).
+  if (process.env.NODE_ENV === "production") return false;
+  return true; // développement local, sans fournisseur
 }
 
 const SEND_FAILED = "Envoi du code impossible. Réessayez dans un instant.";

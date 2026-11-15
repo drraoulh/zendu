@@ -16,7 +16,8 @@ import { useSecureScreen } from "@/lib/secure-screen";
 export default function TwoFactor() {
   useSecureScreen();
   const { completeSignIn, resendCode, cancelSignIn, pending } = useSession();
-  const [code, setCode] = useState(pending?.demoCode ?? "");
+  // Le code de démonstration n'est jamais prérempli dans l'appli installée (même si un serveur mal réglé l'envoyait).
+  const [code, setCode] = useState(__DEV__ ? pending?.demoCode ?? "" : "");
   const [countdown, setCountdown] = useState(pending?.resendAfter ?? 30);
   const [error, setError] = useState<string | null>(null);
   const [busy, setBusy] = useState(false);
@@ -25,7 +26,7 @@ export default function TwoFactor() {
   const [sending, setSending] = useState(false);
   const done = useRef(false);
 
-  const demoCode = pending?.demoCode;
+  const demoCode = __DEV__ ? pending?.demoCode : undefined;
   useEffect(() => {
     if (countdown <= 0) return;
     const t = setTimeout(() => setCountdown((n) => n - 1), 1000);
@@ -61,9 +62,13 @@ export default function TwoFactor() {
     setSending(true);
     const r = await resendCode(wanted);
     setSending(false);
-    if (!r.ok) return setError(r.error);
+    if (!r.ok) {
+      setError(r.error);
+      if (r.restart) setRestart(true);
+      return;
+    }
     // Mode démo : le nouveau code est prérempli aussi.
-    if (r.demoCode) setCode(r.demoCode);
+    if (__DEV__ && r.demoCode) setCode(r.demoCode);
     // Le serveur bascule sur le courriel si le SMS n'est pas disponible : on le dit au lieu de laisser croire à un SMS.
     if (wanted && r.channel && r.channel !== wanted) setInfo(wanted === "sms" ? tr("L'envoi par SMS n'est pas disponible : un nouveau code vous a été envoyé par courriel.") : tr("Un nouveau code vous a été envoyé par SMS."));
     else setInfo(tr("Nouveau code envoyé."));

@@ -17,6 +17,8 @@ import { beneficiaryInputSchema, normalizeBeneficiary } from "@/lib/beneficiary-
 import { requireAdmin } from "@/lib/admin-guard";
 import { getCustomer, hasBearer, passwordChangeRequired } from "@/lib/customer-auth";
 import { zodIssues } from "@/lib/requests";
+import { rateLimit } from "@/lib/rate-limit";
+import { Prisma } from "@prisma/client";
 
 const createSchema = z.object({
   corridorId: z.string().default("CA-CM"),
@@ -30,7 +32,33 @@ const createSchema = z.object({
   beneficiary: beneficiaryInputSchema,
   /** "interac" : virement Interac (envois depuis le Canada en CAD) ; "card" : carte de débit. */
   payMethod: z.enum(["card", "interac"]).default("card"),
+  /** Total et montant reçu que le client a vus : refusé (409) si le taux a changé depuis. */
+  expectedTotal: z.number().positive().optional(),
+  expectedReceive: z.number().positive().optional(),
 });
+
+/** Clé d'idempotence valide (UUID ou équivalent) envoyée par l'appli. */
+function idempotencyKeyOf(request: Request): string | null {
+  const v = request.headers.get("idempotency-key")?.trim();
+  return v && /^[A-Za-z0-9_-]{8,80}$/.test(v) ? v : null;
+}
+
+type ExistingTransfer = Awaited<ReturnType<typeof findExisting>>;
+
+function findExisting(customerId: string, key: string) {
+  return prisma.transfer.findFirst({ where: { customerId, idempotencyKey: key }, include: { beneficiary: true } });
+}
+
+/** Même demande renvoyée (réessai après coupure) : on rend le transfert déjà créé, sans en créer un autre. */
+function replayExisting(existing: NonNullable<ExistingTransfer>) {
+  if (existing.payInProvider === INTERAC_PROVIDER && existing.payInRef) {
+    return NextResponse.json({
+      transfer: publicTransfer(existing),
+      payIn: { provider: "interac", sessionId: existing.payInRef, interac: interacInstructions(existing) },
+    });
+  }
+  return NextResponse.json({ error: "Ce transfert a déjà été créé. Consultez-le dans votre historique.", code: "duplicate_request", transferId: existing.id }, { status: 409 });
+}
 
 /** Libellés lisibles des erreurs de validation (le premier est renvoyé dans `error`). */
 const FIELD_ERRORS: Record<string, string> = {
@@ -69,6 +97,8 @@ export async function GET(request: Request) {
 }
 
 export async function POST(request: Request) {
+  // Renseigné une fois le client identifié : sert à rejouer la réponse si deux demandes identiques se croisent.
+  let replayKey: { customerId: string; key: string } | null = null;
   try {
     const json = await request.json().catch(() => null);
     if (!json || typeof json !== "object") {
@@ -99,6 +129,15 @@ export async function POST(request: Request) {
       );
     }
     if (authed?.customer.mustChangePassword) return passwordChangeRequired();
+    if (authed && !(await rateLimit(`transfer:${authed.customer.id}`, 30))) {
+      return NextResponse.json({ ok: false, code: "rate_limited", error: "Trop de demandes. Réessayez dans une heure." }, { status: 429 });
+    }
+    const idemKey = authed ? idempotencyKeyOf(request) : null;
+    if (authed && idemKey) {
+      replayKey = { customerId: authed.customer.id, key: idemKey };
+      const existing = await findExisting(authed.customer.id, idemKey);
+      if (existing) return replayExisting(existing);
+    }
     if (authed && authed.customer.kycStatus !== "verified") {
       return NextResponse.json(
         { error: "Votre identité doit être vérifiée avant d'envoyer de l'argent.", code: "kyc_required" },
@@ -168,6 +207,21 @@ export async function POST(request: Request) {
       return NextResponse.json(
         { error: "Le taux de change est momentanément indisponible. Réessayez dans quelques minutes.", code: "rate_unavailable" },
         { status: 503 },
+      );
+    }
+
+    // Le client confirme ce qu'il a vu : si le taux ou le total ont changé depuis le récapitulatif, il revalide.
+    const totalChanged = data.expectedTotal != null && Math.abs(quoteData.total - data.expectedTotal) > 0.01;
+    const receiveChanged = data.expectedReceive != null && Math.abs(quoteData.receiveAmount - data.expectedReceive) > Math.max(1, data.expectedReceive * 0.005);
+    if (totalChanged || receiveChanged) {
+      return NextResponse.json(
+        {
+          error: "Le taux a changé depuis le récapitulatif. Vérifiez le nouveau montant avant de continuer.",
+          code: "quote_changed",
+          total: quoteData.total,
+          receiveAmount: quoteData.receiveAmount,
+        },
+        { status: 409 },
       );
     }
 
@@ -249,6 +303,7 @@ export async function POST(request: Request) {
         senderName,
         senderEmail,
         customerId: authed?.customer.id ?? null,
+        idempotencyKey: idemKey,
         sendAmountCad: quoteData.sendAmount,
         receiveAmountXaf: quoteData.receiveAmount,
         rate: quoteData.rate,
@@ -306,6 +361,11 @@ export async function POST(request: Request) {
   } catch (error) {
     if (error instanceof z.ZodError) {
       return validationError(error);
+    }
+    // Deux demandes identiques arrivées en même temps : la seconde rejoue le transfert de la première.
+    if (error instanceof Prisma.PrismaClientKnownRequestError && error.code === "P2002" && replayKey) {
+      const existing = await findExisting(replayKey.customerId, replayKey.key).catch(() => null);
+      if (existing) return replayExisting(existing);
     }
     if (error instanceof QuoteLimitError) {
       return NextResponse.json(

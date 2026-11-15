@@ -41,16 +41,25 @@ export default function SignUp() {
   const [busy, setBusy] = useState(false);
   const c = COUNTRIES[country];
 
+  /** Numéro sans indicatif ni zéro de tête, même s'il a été collé ou rempli automatiquement avec « +1 », « 237 »… */
+  function localPhone(): string {
+    let d = phone.replace(/\D/g, "");
+    if (phone.trim().startsWith("+") || d.length > 10) {
+      if (d.startsWith(c.dialCode)) d = d.slice(c.dialCode.length);
+    } else if (c.dialCode === "1" && d.length === 11 && d.startsWith("1")) d = d.slice(1);
+    return d.replace(/^0+/, "");
+  }
+
   function validate(): Record<string, string> {
     const e: Record<string, string> = {};
     if (step === 1) {
       if (!region) e.region = `${REGION_LABEL[country]} requis(e)`;
       if (!EMAIL.test(email.trim())) e.email = tr("Adresse courriel invalide");
-      if (phone.replace(/\D/g, "").length < 8) e.phone = tr("Numéro de téléphone invalide");
+      if (localPhone().length < (country === "CA" ? 10 : 8)) e.phone = tr("Numéro de téléphone invalide");
     }
     if (step === 2) {
-      if (firstName.trim().length < 2) e.firstName = tr("Prénom requis");
-      if (lastName.trim().length < 2) e.lastName = tr("Nom requis");
+      if (firstName.trim().length < 1) e.firstName = tr("Prénom requis");
+      if (lastName.trim().length < 1) e.lastName = tr("Nom requis");
       const d = parseBirthDate(birth);
       if (!d) e.birth = tr("Date invalide (JJ/MM/AAAA)");
       else if (ageFrom(d) < 18) e.birth = tr("Vous devez avoir au moins 18 ans");
@@ -81,7 +90,7 @@ export default function SignUp() {
         firstName: firstName.trim(),
         lastName: lastName.trim(),
         email: email.trim().toLowerCase(),
-        phone: `+${c.dialCode} ${phone.trim()}`,
+        phone: `+${c.dialCode} ${localPhone()}`,
         country,
         region,
         birthDate: birth,
@@ -93,7 +102,14 @@ export default function SignUp() {
       password,
     );
     setBusy(false);
-    if (!r.ok) return setErrors({ submit: r.error });
+    if (!r.ok) {
+      // Courriel déjà utilisé : on revient à l'étape du courriel pour le corriger (ou se connecter).
+      if (r.code === "email_taken") {
+        setStep(1);
+        return setErrors({ email: r.error });
+      }
+      return setErrors({ submit: r.error });
+    }
     router.replace("/kyc");
   }
 

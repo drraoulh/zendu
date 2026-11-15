@@ -1,10 +1,11 @@
 import { Redirect, router } from "expo-router";
 import * as WebBrowser from "expo-web-browser";
+import * as Crypto from "expo-crypto";
 import { useEffect, useRef, useState } from "react";
 import { ActivityIndicator, Text, View } from "react-native";
 import { Icon } from "@/components/icons";
 import { Button, Card, H1, Notice, P, Screen, Small } from "@/components/ui";
-import { api } from "@/lib/api";
+import { api, ApiError } from "@/lib/api";
 import { cardLabel } from "@/lib/cards";
 import { money, networkLabel } from "@/lib/format";
 import { useSession } from "@/lib/session";
@@ -16,11 +17,14 @@ type Phase = 0 | 1 | 2 | 3;
 
 export default function Processing() {
   const { profile } = useSession();
-  const { draft, cards, addTransfer, saveRecipient } = useStore();
+  const { draft, setDraft, cards, addTransfer, saveRecipient } = useStore();
   const [phase, setPhase] = useState<Phase>(0);
   const [reference, setReference] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
   const started = useRef(false);
+  // Id du transfert dès qu'il existe : une erreur après la création ne doit jamais pousser à en créer un second.
+  const createdId = useRef<string | null>(null);
+  const [changed, setChanged] = useState(false);
   const card = cards.find((c) => c.id === draft.cardId);
   const recipient = draft.recipient;
   const quote = draft.quote;
@@ -33,6 +37,14 @@ export default function Processing() {
       try {
         // Pas d'attente artificielle : le transfert est créé immédiatement.
         setPhase(1);
+        // Même clé tant que le contenu de l'envoi est identique (réessai après coupure réseau) : le serveur
+        // renvoie alors le transfert déjà créé au lieu d'en créer un autre.
+        const sig = JSON.stringify([draft.corridorId, draft.sendAmount, draft.receiveAmount, recipient.fullName, recipient.phone, recipient.network, recipient.accountNumber, recipient.savedId, interac]);
+        let idem = draft.idem;
+        if (!idem || idem.sig !== sig) {
+          idem = { sig, key: Crypto.randomUUID() };
+          setDraft({ idem });
+        }
         const { transfer, payIn } = await api.createTransfer({
           corridorId: draft.corridorId,
           // Montant reçu demandé : le serveur recalcule le montant envoyé au taux du moment.
@@ -49,7 +61,10 @@ export default function Processing() {
             bankCode: recipient.bankCode,
           },
           payMethod: interac ? "interac" : "card",
-        });
+          expectedTotal: quote.total,
+          expectedReceive: quote.receiveAmount,
+        }, idem.key);
+        createdId.current = transfer.id;
         setReference(transfer.reference);
         addTransfer({ id: transfer.id, reference: transfer.reference, createdAt: transfer.createdAt });
         if (draft.saveRecipient && recipient.id === "draft") {
@@ -74,10 +89,17 @@ export default function Processing() {
         router.dismissAll();
         router.replace({ pathname: "/send/success", params: { id: transfer.id, card: card ? cardLabel(card) : "" } });
       } catch (e) {
+        // Le transfert existe déjà : on ouvre son suivi plutôt que de proposer de payer une seconde fois.
+        if (createdId.current) {
+          router.dismissAll();
+          router.replace({ pathname: "/transfer/[id]", params: { id: createdId.current, created: "1" } });
+          return;
+        }
+        if (e instanceof ApiError && e.code === "quote_changed") setChanged(true);
         setError(e instanceof Error ? e.message : tr("Paiement impossible"));
       }
     })();
-  }, [recipient, profile, quote, interac, draft.corridorId, draft.sendAmount, draft.receiveAmount, draft.saveRecipient, addTransfer, saveRecipient, card]);
+  }, [recipient, profile, quote, interac, draft.corridorId, draft.sendAmount, draft.receiveAmount, draft.saveRecipient, draft.idem, setDraft, addTransfer, saveRecipient, card]);
 
   if (!recipient || !quote) return <Redirect href="/(tabs)" />;
 
@@ -98,7 +120,7 @@ export default function Processing() {
       <View style={{ alignItems: "center", paddingTop: 50, gap: 10 }}>
         {error ? <Icon name="alert" size={48} color={colors.danger} /> : <ActivityIndicator size="large" color={colors.brand} />}
         <H1 style={{ textAlign: "center" }}>{error ? tr("Paiement interrompu") : interac ? tr("Préparation du virement") : tr("Traitement du paiement")}</H1>
-        <P style={{ textAlign: "center" }}>{error ? tr("Aucun montant n'a été débité.") : tr("Ne fermez pas l'application. Cela prend généralement quelques secondes.")}</P>
+        <P style={{ textAlign: "center" }}>{error ? (changed ? tr("Le taux a changé depuis le récapitulatif. Vérifiez le nouveau montant avant de continuer.") : tr("Aucun montant n'a été débité.")) : tr("Ne fermez pas l'application. Cela prend généralement quelques secondes.")}</P>
       </View>
       <Card style={{ marginTop: 24 }}>
         {steps.map((s, i) => {
@@ -130,7 +152,7 @@ export default function Processing() {
       {error ? (
         <View style={{ marginTop: 16, gap: 10 }}>
           <Notice tone="danger" icon="alert" text={error} />
-          <Button title={tr("Revenir au récapitulatif")} onPress={() => router.back()} />
+          <Button title={changed ? tr("Voir le nouveau montant") : tr("Revenir au récapitulatif")} onPress={() => router.back()} />
         </View>
       ) : null}
     </Screen>

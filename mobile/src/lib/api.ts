@@ -10,6 +10,8 @@ export function normalizeApiUrl(raw: string | undefined) {
   // installée, localhost seulement en développement. Évite « Connexion impossible » chez tous les clients.
   if (!url) return __DEV__ ? "http://localhost:3000" : "https://worldsofttransfer.com";
   if (!/^https?:\/\//i.test(url)) url = `https://${url}`;
+  // Appli installée : jamais de http en clair (le jeton de session et les mots de passe y transitent).
+  if (!__DEV__) url = url.replace(/^http:/i, "https:");
   return url.replace(/\/+$/, "").replace(/\/api$/i, "");
 }
 
@@ -225,6 +227,7 @@ const REQUEST_TIMEOUT_MS = 30_000;
 
 async function request<T>(path: string, init?: RequestInit & { token?: string | null }): Promise<T> {
   let res: Response;
+  let data: unknown = null;
   const token = init?.token !== undefined ? init.token : authToken;
   // Délai maximal : sans lui, un réseau mobile qui ne répond pas laisse l'écran bloqué sur le chargement.
   const controller = new AbortController();
@@ -243,6 +246,9 @@ async function request<T>(path: string, init?: RequestInit & { token?: string | 
         ...init?.headers,
       },
     });
+    // Le délai court jusqu'à la fin de la lecture : une connexion qui s'arrête après les en-têtes ne bloque plus l'écran.
+    data = await res.json().catch(() => null);
+    if (controller.signal.aborted) throw new Error("timeout");
   } catch {
     throw new ApiError(
       __DEV__ ? `Serveur injoignable (${API_URL}). Vérifiez EXPO_PUBLIC_API_URL et votre réseau.` : tr("Connexion impossible. Vérifiez votre réseau."),
@@ -251,13 +257,15 @@ async function request<T>(path: string, init?: RequestInit & { token?: string | 
   } finally {
     if (timer) clearTimeout(timer);
   }
-  const data = await res.json().catch(() => null);
-  if (res.status === 401 && token && path.startsWith("/api/me")) onUnauthorized?.();
+  // Session révoquée ou expirée : toute route authentifiée (pas seulement /api/me) ramène à la connexion.
+  if (res.status === 401 && token && !path.startsWith("/api/auth/")) onUnauthorized?.();
   if (!res.ok) {
     const code = data && typeof data === "object" && typeof (data as { code?: unknown }).code === "string" ? (data as { code: string }).code : undefined;
     // Messages du serveur (en français) : traduits quand la phrase est connue du dictionnaire.
     throw new ApiError(tr(errorMessage(data) ?? "Une erreur est survenue."), res.status, code);
   }
+  // Réponse « réussie » sans contenu exploitable (hors 204) : mieux vaut une erreur claire qu'un plantage plus loin.
+  if (data === null && res.status !== 204) throw new ApiError(tr("Réponse inattendue du serveur. Réessayez."), res.status);
   return data as T;
 }
 
@@ -298,16 +306,27 @@ export const api = {
       method: "POST",
       body: JSON.stringify({ corridorId, network, ...(mode === "send" ? { sendAmount: amount } : { receiveAmount: amount }) }),
     }),
-  createTransfer: (input: {
-    corridorId: string;
-    sendAmount?: number;
-    /** Montant exact à recevoir : le serveur calcule alors le montant envoyé. */
-    receiveAmount?: number;
-    senderName: string;
-    senderEmail: string;
-    beneficiary: BeneficiaryInput;
-    payMethod: PayMethod;
-  }) => request<{ transfer: Transfer; payIn: PayInSession }>("/api/transfers", { method: "POST", body: JSON.stringify(input) }),
+  createTransfer: (
+    input: {
+      corridorId: string;
+      sendAmount?: number;
+      /** Montant exact à recevoir : le serveur calcule alors le montant envoyé. */
+      receiveAmount?: number;
+      senderName: string;
+      senderEmail: string;
+      beneficiary: BeneficiaryInput;
+      payMethod: PayMethod;
+      /** Total et montant reçu affichés au client : le serveur refuse (409) si le taux a changé entre-temps. */
+      expectedTotal?: number;
+      expectedReceive?: number;
+    },
+    idempotencyKey?: string,
+  ) =>
+    request<{ transfer: Transfer; payIn: PayInSession }>("/api/transfers", {
+      method: "POST",
+      body: JSON.stringify(input),
+      ...(idempotencyKey ? { headers: { "Idempotency-Key": idempotencyKey } } : {}),
+    }),
   transfer: (id: string) => request<Transfer>(`/api/transfers/${encodeURIComponent(id)}`),
   submitRequest: (input: { kind: ServiceKind; name: string; email: string; phone?: string; payload: Record<string, unknown> }) =>
     request<{ ok: true; reference: string }>("/api/requests", { method: "POST", body: JSON.stringify({ ...input, locale: "fr" }) }),

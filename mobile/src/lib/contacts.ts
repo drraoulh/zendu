@@ -8,21 +8,25 @@ export type PickedContact = { fullName: string; phones: string[] };
  */
 export async function pickContact(): Promise<PickedContact | null> {
   if (Platform.OS === "web") return null;
-  // Chargé à la demande : une ancienne version de l'appli sans le module natif ne plante pas.
-  // eslint-disable-next-line @typescript-eslint/no-require-imports
-  const { Contact, requestPermissionsAsync } = require("expo-contacts") as typeof import("expo-contacts");
-  const read = async () => {
-    const c = await Contact.presentPicker();
-    if (!c) return null;
-    const [fullName, phones] = await Promise.all([c.getFullName().catch(() => ""), c.getPhones().catch(() => [])]);
-    return { fullName: fullName.trim(), phones: phones.map((p) => p.number ?? "").filter(Boolean) };
-  };
   try {
-    return await read();
+    // Chargé à la demande : une ancienne version de l'appli sans le module natif ne plante pas.
+    // eslint-disable-next-line @typescript-eslint/no-require-imports
+    const { Contact, requestPermissionsAsync } = require("expo-contacts") as typeof import("expo-contacts");
+    const read = async () => {
+      const c = await Contact.presentPicker();
+      if (!c) return null;
+      const [fullName, phones] = await Promise.all([c.getFullName().catch(() => ""), c.getPhones().catch(() => [])]);
+      return { fullName: fullName.trim(), phones: phones.map((p) => p.number ?? "").filter(Boolean) };
+    };
+    try {
+      return await read();
+    } catch {
+      // Android : la lecture du contact choisi peut demander l'autorisation d'accès aux contacts.
+      const { granted } = await requestPermissionsAsync();
+      return granted ? await read() : null;
+    }
   } catch {
-    // Android : la lecture du contact choisi peut demander l'autorisation d'accès aux contacts.
-    const { granted } = await requestPermissionsAsync();
-    return granted ? read() : null;
+    return null;
   }
 }
 

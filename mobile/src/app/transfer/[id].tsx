@@ -1,14 +1,14 @@
 import * as Clipboard from "expo-clipboard";
-import { router, useLocalSearchParams } from "expo-router";
-import { useCallback, useEffect, useRef, useState } from "react";
-import { ActivityIndicator, Pressable, StyleSheet, Text, View, useWindowDimensions } from "react-native";
+import { router, useFocusEffect, useLocalSearchParams } from "expo-router";
+import { useCallback, useRef, useState } from "react";
+import { ActivityIndicator, AppState, Pressable, StyleSheet, Text, View, useWindowDimensions } from "react-native";
 import { WstWordmark } from "@/components/brand";
 import { Flag } from "@/components/flag";
 import { Icon } from "@/components/icons";
 import { Badge, Button, Card, Divider, Header, IconButton, Notice, Screen, Small, SummaryRow } from "@/components/ui";
 import { api, type Transfer } from "@/lib/api";
 import { findCorridor, useCorridors } from "@/lib/corridors";
-import { countryName, dateAt, dateTime, deliveryEstimate, etaLabel, eventTitle, feeLabel, money, networkLabel, phone, rateLine, statusInfo, TERMINAL_STATUSES } from "@/lib/format";
+import { countryName, dateAt, dateTime, deliveryEstimate, etaLabel, eventTitle, feeLabel, money, networkLabel, phone, rateLine, POLL_STOP_STATUSES, statusInfo, TERMINAL_STATUSES } from "@/lib/format";
 import { colors, fonts } from "@/lib/theme";
 import { useResend } from "@/lib/use-resend";
 import { PaymentLogo } from "@/components/payment-logo";
@@ -97,17 +97,29 @@ export default function TransferScreen() {
     }
   }, [id]);
 
-  useEffect(() => {
-    const first = setTimeout(() => void load(), 0);
-    const timer = setInterval(() => {
-      if (statusRef.current && TERMINAL_STATUSES.includes(statusRef.current)) return;
-      void load();
-    }, POLL_MS);
-    return () => {
-      clearTimeout(first);
-      clearInterval(timer);
-    };
-  }, [load]);
+  // Relecture seulement quand l'écran est visible et l'appli au premier plan, une requête à la fois.
+  useFocusEffect(
+    useCallback(() => {
+      let inFlight = false;
+      const run = () => {
+        if (inFlight) return;
+        inFlight = true;
+        void load().finally(() => {
+          inFlight = false;
+        });
+      };
+      const first = setTimeout(run, 0);
+      const timer = setInterval(() => {
+        if (AppState.currentState !== "active") return;
+        if (statusRef.current && POLL_STOP_STATUSES.includes(statusRef.current)) return;
+        run();
+      }, POLL_MS);
+      return () => {
+        clearTimeout(first);
+        clearInterval(timer);
+      };
+    }, [load]),
+  );
 
   async function simulatePay() {
     setBusy(true);

@@ -116,6 +116,8 @@ function statusRaw(status: string): StatusInfo {
 }
 
 export const TERMINAL_STATUSES = ["delivered", "payout_failed", "payment_mismatch", "expired", "cancelled"];
+/** On arrête de relire le statut seulement quand plus rien ne peut changer (l'équipe peut relancer un versement échoué ou valider un virement). */
+export const POLL_STOP_STATUSES = ["delivered", "expired", "cancelled"];
 
 const EVENT_TITLES: Record<string, string> = {
   created: "Transfert créé",

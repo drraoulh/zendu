@@ -63,6 +63,8 @@ model Transfer {
   /// Client WorldSoft Transfer connecté (null pour un envoi sans compte depuis le site).
   customerId       String?
   customer         Customer?       @relation(fields: [customerId], references: [id], onDelete: SetNull)
+  /// Clé envoyée par l'appli (en-tête Idempotency-Key) : un même envoi ne crée jamais deux transferts.
+  idempotencyKey   String?
   quoteId          String?         @unique
   quote            Quote?          @relation(fields: [quoteId], references: [id])
   beneficiaryId    String
@@ -81,6 +83,7 @@ model Transfer {
   @@index([status])
   @@index([createdAt])
   @@index([customerId])
+  @@unique([customerId, idempotencyKey])
 }
 
 model TransferEvent {

@@ -32,6 +32,8 @@ export type Draft = {
   cardId: string | null;
   /** Interac (envois en CAD, le moins cher) ou carte de débit. */
   payMethod: PayMethod;
+  /** Clé d'idempotence du transfert en cours : même clé tant que le contenu est identique, pour ne jamais créer deux transferts. */
+  idem: { sig: string; key: string } | null;
 };
 
 type StoreValue = {
@@ -63,7 +65,7 @@ const KEY_REQUESTS = "wst.requests";
 const KEY_READ = "wst.read";
 
 export const DEFAULT_CORRIDOR = "CA-CM";
-const EMPTY_DRAFT: Draft = { corridorId: DEFAULT_CORRIDOR, sendAmount: 200, receiveAmount: null, quote: null, recipient: null, recipientFromHome: false, saveRecipient: false, cardId: null, payMethod: "interac" };
+const EMPTY_DRAFT: Draft = { corridorId: DEFAULT_CORRIDOR, sendAmount: 200, receiveAmount: null, quote: null, recipient: null, recipientFromHome: false, saveRecipient: false, cardId: null, payMethod: "interac", idem: null };
 
 const StoreContext = createContext<StoreValue | null>(null);
 

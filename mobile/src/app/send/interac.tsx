@@ -1,7 +1,7 @@
 import * as Clipboard from "expo-clipboard";
-import { router, useLocalSearchParams } from "expo-router";
-import { useCallback, useEffect, useRef, useState } from "react";
-import { ActivityIndicator, Pressable, StyleSheet, Text, View } from "react-native";
+import { router, useFocusEffect, useLocalSearchParams } from "expo-router";
+import { useCallback, useRef, useState } from "react";
+import { ActivityIndicator, AppState, Pressable, StyleSheet, Text, View } from "react-native";
 import { Icon } from "@/components/icons";
 import { PaymentLogo } from "@/components/payment-logo";
 import { Button, Card, Header, Notice, Screen, Small } from "@/components/ui";
@@ -50,14 +50,28 @@ export default function InteracPayment() {
     }
   }, [id, finish]);
 
-  useEffect(() => {
-    const first = setTimeout(() => void load(), 0);
-    const timer = setInterval(() => void load(), POLL_MS);
-    return () => {
-      clearTimeout(first);
-      clearInterval(timer);
-    };
-  }, [load]);
+  // Relecture seulement quand l'écran est visible et l'appli au premier plan, une requête à la fois : sinon un
+  // virement reçu pendant que l'on consulte l'aide ou un reçu remplacerait l'écran affiché.
+  useFocusEffect(
+    useCallback(() => {
+      let inFlight = false;
+      const run = () => {
+        if (inFlight) return;
+        inFlight = true;
+        void load().finally(() => {
+          inFlight = false;
+        });
+      };
+      const first = setTimeout(run, 0);
+      const timer = setInterval(() => {
+        if (AppState.currentState === "active") run();
+      }, POLL_MS);
+      return () => {
+        clearTimeout(first);
+        clearInterval(timer);
+      };
+    }, [load]),
+  );
 
   async function copy(key: string, value: string) {
     await Clipboard.setStringAsync(value);
