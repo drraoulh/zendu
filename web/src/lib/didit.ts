@@ -99,7 +99,10 @@ export async function syncDiditDecision(customer: Customer): Promise<Customer> {
   const now = new Date();
   let data: (Prisma.CustomerUpdateInput & { kycStatus: string; kycNote: string | null }) | null = null;
   if (status === "Approved") {
-    data = { kycStatus: "verified", kycReviewedAt: now, kycNote: "Identité vérifiée par Didit" };
+    // DIDIT_SANDBOX=1 : l'application Didit est en mode test (identités simulées). On le note sur le dossier
+    // pour pouvoir refaire la vérification de ces clients avant le lancement réel.
+    const note = process.env.DIDIT_SANDBOX === "1" ? "MODE TEST Didit : identité simulée, non vérifiée réellement" : "Identité vérifiée par Didit";
+    data = { kycStatus: "verified", kycReviewedAt: now, kycNote: note };
   } else if (status === "Declined") {
     data = {
       kycStatus: "rejected",
