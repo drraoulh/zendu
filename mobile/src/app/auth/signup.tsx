@@ -1,6 +1,6 @@
-import { Link, router } from "expo-router";
-import { useState } from "react";
-import { Text, View } from "react-native";
+import { Link, router, Stack, useFocusEffect } from "expo-router";
+import { useCallback, useState } from "react";
+import { BackHandler, Text, View } from "react-native";
 import { Flag } from "@/components/flag";
 import { Checkbox, PasswordChecklist, SelectField } from "@/components/form";
 import { Button, Field, H1, Header, Notice, P, Screen, Small, Steps } from "@/components/ui";
@@ -105,6 +105,21 @@ export default function SignUp() {
 
   const cta = step === LAST ? tr("Créer mon compte") : tr("Continuer");
 
+  // Le bouton « retour » du téléphone (Android) revient à l'étape précédente au lieu de quitter l'écran,
+  // ce qui effaçait tout ce qui avait été saisi.
+  useFocusEffect(
+    useCallback(() => {
+      const sub = BackHandler.addEventListener("hardwareBackPress", () => {
+        if (step > 1) {
+          setStep(step - 1);
+          return true;
+        }
+        return false;
+      });
+      return () => sub.remove();
+    }, [step]),
+  );
+
   return (
     <Screen
       footer={
@@ -123,6 +138,8 @@ export default function SignUp() {
         </View>
       }
     >
+      {/* iOS : le geste « glisser pour revenir » ne doit pas quitter le formulaire après la 1re étape. */}
+      <Stack.Screen options={{ gestureEnabled: step === 1 }} />
       <Header title={tr("Créer un compte")} onBack={back} />
       <Steps current={step} total={SIGNUP_TOTAL_STEPS} label={tr(TITLES[step - 1])} />
 
