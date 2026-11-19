@@ -66,3 +66,11 @@ jobs:
 # Vérification 15:12:56
 # Vérification 14:13:41
 # Vérification 12:17:15
+
+      - name: État des derniers builds de test (APK)
+        env:
+          EXPO_TOKEN: ${{ secrets.EXPO_TOKEN }}
+        run: |
+          npx --yes eas-cli@latest build:list --platform android --build-profile preview --limit 3 --json --non-interactive > recent-preview.json
+          node -e 'for (const b of JSON.parse(require("fs").readFileSync("recent-preview.json","utf8"))) console.log("PREVIEW", b.id, b.status, b.createdAt, (b.artifacts&&b.artifacts.buildUrl)||"", (b.error&&b.error.message)||"")'
+# Vérification 12:21:16
