@@ -74,3 +74,4 @@ jobs:
           npx --yes eas-cli@latest build:list --platform android --build-profile preview --limit 3 --json --non-interactive > recent-preview.json
           node -e 'for (const b of JSON.parse(require("fs").readFileSync("recent-preview.json","utf8"))) console.log("PREVIEW", b.id, b.status, b.createdAt, (b.artifacts&&b.artifacts.buildUrl)||"", (b.error&&b.error.message)||"")'
 # Vérification 12:21:16
+# Vérification 12:25:43
