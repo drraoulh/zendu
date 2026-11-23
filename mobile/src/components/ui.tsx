@@ -22,11 +22,11 @@ import { tr } from "@/lib/i18n";
 type Tone = "brand" | "success" | "warn" | "danger" | "neutral";
 
 const TONE_COLORS: Record<Tone, { fg: string; bg: string }> = {
-  brand: { fg: colors.brand, bg: colors.brandSoft },
+  brand: { fg: colors.ink, bg: colors.soft },
   success: { fg: colors.success, bg: colors.successSoft },
   warn: { fg: colors.warn, bg: colors.warnSoft },
   danger: { fg: colors.danger, bg: colors.dangerSoft },
-  neutral: { fg: colors.muted, bg: "#eef1f8" },
+  neutral: { fg: colors.muted, bg: colors.soft },
 };
 
 /* ---------- Mise en page ---------- */
@@ -124,9 +124,9 @@ export const SEND_STEPS = [tr("Montant"), tr("Destinataire"), tr("Paiement")];
 export function Steps({ current, total, label, names }: { current: number; total: number; label?: string; names?: string[] }) {
   return (
     <View style={{ marginBottom: 18 }} accessibilityLabel={tr("Étape {0} sur {1}{2}", current, total, label ? ` : ${label}` : "")}>
-      <View style={{ flexDirection: "row", gap: 6 }}>
+      <View style={{ flexDirection: "row", gap: 4 }}>
         {Array.from({ length: total }, (_, i) => (
-          <View key={i} style={{ flex: 1, height: 4, borderRadius: 2, backgroundColor: i < current ? colors.brand : colors.line }} />
+          <View key={i} style={{ flex: 1, height: 3, borderRadius: 2, backgroundColor: i < current ? colors.ink : colors.line }} />
         ))}
       </View>
       {names ? (
@@ -136,14 +136,14 @@ export function Steps({ current, total, label, names }: { current: number; total
             <Text
               key={n}
               numberOfLines={1}
-              style={[styles.small, { flex: 1, fontFamily: i === current - 1 ? fonts.semibold : undefined, color: i < current ? colors.brand : colors.muted }]}
+              style={[styles.small, { flex: 1, fontFamily: i === current - 1 ? fonts.semibold : undefined, color: i < current ? colors.ink : colors.muted }]}
             >
               {i < current - 1 ? `✓ ${n}` : n}
             </Text>
           ))}
         </View>
       ) : label ? (
-        <Text style={[styles.small, { marginTop: 8, fontFamily: fonts.semibold, color: colors.brand }]}>
+        <Text style={[styles.small, { marginTop: 8, fontFamily: fonts.semibold, color: colors.ink }]}>
           {tr("Étape {0} sur {1} · {2}", current, total, tr(label))}
         </Text>
       ) : null}
@@ -340,7 +340,7 @@ export function ListItem({
   // Sans action : simple ligne (un Pressable désactivé bloquerait aussi les boutons placés à droite).
   if (!onPress) return <View style={styles.listItem}>{content}</View>;
   return (
-    <Pressable accessibilityRole="button" onPress={onPress} style={({ pressed }) => [styles.listItem, pressed && { backgroundColor: colors.bg }]}>
+    <Pressable accessibilityRole="button" onPress={onPress} style={({ pressed }) => [styles.listItem, pressed && { backgroundColor: colors.soft }]}>
       {content}
     </Pressable>
   );
@@ -364,11 +364,11 @@ export function Field({
   return (
     <View style={{ marginBottom: 14 }}>
       <Label>{tr(label)}</Label>
-      <View style={[styles.input, focused && { borderColor: colors.brand }, error ? { borderColor: colors.danger } : null]}>
+      <View style={[styles.input, focused && { borderColor: colors.ink }, error ? { borderColor: colors.danger } : null]}>
         {left}
         <TextInput
           ref={ref}
-          placeholderTextColor="#8a94ad"
+          placeholderTextColor="#a1a1aa"
           accessibilityLabel={tr(label)}
           style={[styles.inputText, style]}
           onFocus={(e) => {
@@ -409,14 +409,14 @@ export function Choice({
       accessibilityRole="radio"
       accessibilityState={{ selected }}
       onPress={onPress}
-      style={[styles.choice, selected && { borderColor: colors.brand, backgroundColor: colors.brandSoft }]}
+      style={[styles.choice, selected && { borderColor: colors.ink, backgroundColor: colors.soft }]}
     >
-      {leading ?? (icon ? <Icon name={icon} color={selected ? colors.brand : colors.muted} size={20} /> : null)}
+      {leading ?? (icon ? <Icon name={icon} color={selected ? colors.ink : colors.muted} size={20} /> : null)}
       <View style={{ flex: 1 }}>
         <Text style={[styles.listTitle, { fontSize: 15 }]}>{tr(label)}</Text>
         {description ? <Small>{tr(description)}</Small> : null}
       </View>
-      <View style={[styles.radio, selected && { borderColor: colors.brand }]}>
+      <View style={[styles.radio, selected && { borderColor: colors.ink }]}>
         {selected ? <View style={styles.radioDot} /> : null}
       </View>
     </Pressable>
@@ -426,8 +426,8 @@ export function Choice({
 export function Empty({ icon, title, text, action }: { icon: IconName; title: string; text: string; action?: ReactNode }) {
   return (
     <View style={{ alignItems: "center", paddingVertical: 36, paddingHorizontal: 12, gap: 8 }}>
-      <View style={[styles.listIcon, { width: 56, height: 56, borderRadius: 18, backgroundColor: colors.brandSoft }]}>
-        <Icon name={icon} color={colors.brand} size={26} />
+      <View style={[styles.listIcon, { width: 56, height: 56, borderRadius: 28, backgroundColor: colors.soft }]}>
+        <Icon name={icon} color={colors.ink} size={26} />
       </View>
       <Text style={[styles.h2, { fontSize: 18, textAlign: "center" }]}>{tr(title)}</Text>
       <P style={{ textAlign: "center" }}>{tr(text)}</P>
@@ -442,18 +442,18 @@ export const styles = StyleSheet.create({
   footer: { paddingHorizontal: 20, paddingTop: 10, paddingBottom: 12, backgroundColor: "transparent", width: "100%", maxWidth: 640, alignSelf: "center" },
   header: { flexDirection: "row", alignItems: "center", paddingVertical: 8, marginBottom: 8 },
   headerSide: { minWidth: 44, flexShrink: 0 },
-  headerTitle: { fontFamily: fonts.heading, fontSize: 17, lineHeight: 21, color: colors.ink, textAlign: "center" },
-  iconBtn: { width: 44, height: 44, borderRadius: 14, alignItems: "center", justifyContent: "center", backgroundColor: colors.white, borderWidth: 1, borderColor: colors.line },
+  headerTitle: { fontFamily: fonts.heading, fontSize: 16, lineHeight: 21, color: colors.ink, textAlign: "center" },
+  iconBtn: { width: 44, height: 44, borderRadius: 22, alignItems: "center", justifyContent: "center", backgroundColor: "transparent" },
   // Titres serrés et francs (-3 %), comme sur le site.
-  h1: { fontFamily: fonts.display, fontSize: 28, lineHeight: 34, color: colors.ink, letterSpacing: -0.85 },
-  h2: { fontFamily: fonts.heading, fontSize: 20, lineHeight: 26, color: colors.ink, letterSpacing: -0.6 },
+  h1: { fontFamily: fonts.display, fontSize: 26, lineHeight: 32, color: colors.ink, letterSpacing: -0.5 },
+  h2: { fontFamily: fonts.heading, fontSize: 18, lineHeight: 24, color: colors.ink, letterSpacing: -0.3 },
   p: { fontFamily: fonts.regular, fontSize: 15, lineHeight: 22, color: colors.muted },
   small: { fontFamily: fonts.regular, fontSize: 13, lineHeight: 18, color: colors.muted },
-  label: { fontFamily: fonts.semibold, fontSize: 13, color: colors.ink, marginBottom: 6 },
-  btn: { minHeight: 54, borderRadius: radius.pill, borderWidth: 1, flexDirection: "row", alignItems: "center", justifyContent: "center", gap: 8, paddingHorizontal: 18 },
+  label: { fontFamily: fonts.semibold, fontSize: 13, color: colors.muted, marginBottom: 6 },
+  btn: { minHeight: 52, borderRadius: radius.pill, borderWidth: 1, flexDirection: "row", alignItems: "center", justifyContent: "center", gap: 8, paddingHorizontal: 18 },
   btnSm: { minHeight: 44, borderRadius: radius.pill, paddingHorizontal: 16 },
-  btnText: { fontFamily: fonts.heading, fontSize: 16, textAlign: "center", flexShrink: 1 },
-  card: { backgroundColor: colors.white, borderRadius: radius.lg, padding: 18, borderWidth: 1, borderColor: colors.line, shadowColor: "#000", shadowOpacity: 0.04, shadowRadius: 2, shadowOffset: { width: 0, height: 1 }, elevation: 1 },
+  btnText: { fontFamily: fonts.heading, fontSize: 15, textAlign: "center", flexShrink: 1 },
+  card: { backgroundColor: colors.white, borderRadius: radius.lg, padding: 16, borderWidth: 1, borderColor: colors.line },
   badge: { flexDirection: "row", alignItems: "center", gap: 6, paddingHorizontal: 10, paddingVertical: 5, borderRadius: radius.pill, alignSelf: "flex-start" },
   dot: { width: 6, height: 6, borderRadius: 3 },
   badgeText: { fontFamily: fonts.semibold, fontSize: 12 },
@@ -464,13 +464,13 @@ export const styles = StyleSheet.create({
   rowLabel: { fontFamily: fonts.regular, fontSize: 14, color: colors.muted, flexShrink: 0, maxWidth: "50%" },
   rowValue: { fontFamily: fonts.semibold, fontSize: 14, color: colors.ink, textAlign: "right", flexShrink: 1 },
   listItem: { flexDirection: "row", alignItems: "center", gap: 12, paddingVertical: 12, paddingHorizontal: 4, borderRadius: radius.sm },
-  listIcon: { width: 42, height: 42, borderRadius: 14, alignItems: "center", justifyContent: "center" },
+  listIcon: { width: 40, height: 40, borderRadius: 20, alignItems: "center", justifyContent: "center" },
   listTitle: { fontFamily: fonts.semibold, fontSize: 15, color: colors.ink },
-  input: { flexDirection: "row", alignItems: "center", gap: 8, minHeight: 52, borderRadius: radius.sm, borderWidth: 1, borderColor: colors.line, backgroundColor: colors.white, paddingHorizontal: 14 },
+  input: { flexDirection: "row", alignItems: "center", gap: 8, minHeight: 52, borderRadius: radius.md, borderWidth: 1, borderColor: colors.line, backgroundColor: colors.white, paddingHorizontal: 14 },
   // minWidth 0 : sinon, sur le web, la largeur par défaut d'un <input> déborde de la ligne.
   inputText: { flex: 1, minWidth: 0, fontFamily: fonts.regular, fontSize: 16, color: colors.ink, paddingVertical: 12, ...(Platform.OS === "web" ? { outlineStyle: "none" as never } : null) },
   error: { fontFamily: fonts.regular, color: colors.danger, fontSize: 13, marginTop: 4 },
-  choice: { flexDirection: "row", alignItems: "center", gap: 12, padding: 14, borderRadius: radius.md, borderWidth: 1.5, borderColor: colors.line, backgroundColor: colors.white, marginBottom: 10 },
+  choice: { flexDirection: "row", alignItems: "center", gap: 12, padding: 14, borderRadius: radius.md, borderWidth: 1, borderColor: colors.line, backgroundColor: colors.white, marginBottom: 10 },
   radio: { width: 22, height: 22, borderRadius: 11, borderWidth: 2, borderColor: colors.line, alignItems: "center", justifyContent: "center" },
-  radioDot: { width: 10, height: 10, borderRadius: 5, backgroundColor: colors.brand },
+  radioDot: { width: 10, height: 10, borderRadius: 5, backgroundColor: colors.ink },
 });

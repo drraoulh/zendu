@@ -34,9 +34,9 @@ export default function TabsLayout() {
     <Tabs
       screenOptions={{
         headerShown: false,
-        tabBarActiveTintColor: colors.brand,
+        tabBarActiveTintColor: colors.ink,
         tabBarInactiveTintColor: colors.muted,
-        tabBarLabelStyle: { fontFamily: fonts.semibold, fontSize: narrow ? 10 : 11, lineHeight: 15 },
+        tabBarLabelStyle: { fontFamily: fonts.medium, fontSize: narrow ? 10 : 11, lineHeight: 15 },
         tabBarItemStyle: narrow ? { paddingHorizontal: 0 } : undefined,
         tabBarStyle: { borderTopColor: colors.line, backgroundColor: colors.white, ...(Platform.OS === "web" ? { height: 62, paddingBottom: 6 } : null) },
         sceneStyle: { backgroundColor: colors.bg },
@@ -48,7 +48,7 @@ export default function TabsLayout() {
           name={t.name}
           options={{
             title: t.title,
-            tabBarIcon: ({ color, focused }) => <Icon name={t.icon} color={String(color)} strokeWidth={focused ? 2.3 : 1.9} />,
+            tabBarIcon: ({ color, focused }) => <Icon name={t.icon} color={String(color)} strokeWidth={focused ? 2.1 : 1.7} />,
           }}
         />
       ))}

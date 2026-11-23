@@ -77,11 +77,9 @@
         "expo-font",
         {
           "fonts": [
-            "./assets/fonts/DMSans-400.ttf",
-            "./assets/fonts/DMSans-500.ttf",
-            "./assets/fonts/DMSans-600.ttf",
-            "./assets/fonts/DMSans-700.ttf",
-            "./assets/fonts/DMSans-800.ttf"
+            "./assets/fonts/Inter-400.ttf",
+            "./assets/fonts/Inter-500.ttf",
+            "./assets/fonts/Inter-600.ttf"
           ]
         }
       ],

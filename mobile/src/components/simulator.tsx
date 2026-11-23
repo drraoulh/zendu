@@ -297,7 +297,7 @@ function CountryPicker({
 export type { CorridorMeta };
 
 const s = StyleSheet.create({
-  card: { backgroundColor: colors.white, borderRadius: radius.xl, padding: 14, borderWidth: 1, borderColor: colors.line, shadowColor: "#000", shadowOpacity: 0.05, shadowRadius: 6, shadowOffset: { width: 0, height: 2 }, elevation: 2 },
+  card: { backgroundColor: colors.white, borderRadius: radius.xl, padding: 14, borderWidth: 1, borderColor: colors.line },
   row: { flexDirection: "row", alignItems: "center", gap: 10, backgroundColor: colors.bg, borderRadius: radius.lg, paddingHorizontal: 14, paddingVertical: 10 },
   rowReceive: { backgroundColor: colors.brandSoft },
   amountCol: { flex: 1, minWidth: 0 },

@@ -80,15 +80,15 @@ export default function Review() {
       <Header title={tr("Vérification")} />
       <Steps current={3} total={3} label={tr("Paiement")} names={SEND_STEPS} />
 
-      <Card style={{ alignItems: "center", marginBottom: 14, backgroundColor: colors.navy, borderColor: colors.navy }}>
-        <Text style={{ color: colors.silver, fontFamily: fonts.heading, fontSize: 12, letterSpacing: 0.8 }}>{tr("{0} REÇOIT", recipient.fullName.toUpperCase())}</Text>
-        <Text style={{ color: colors.white, fontFamily: fonts.display, fontSize: 30, marginTop: 6 }}>
+      <Card style={{ alignItems: "center", marginBottom: 14, backgroundColor: colors.soft, borderColor: colors.line }}>
+        <Text style={{ color: colors.muted, fontFamily: fonts.medium, fontSize: 12, letterSpacing: 0.6 }}>{tr("{0} REÇOIT", recipient.fullName.toUpperCase())}</Text>
+        <Text style={{ color: colors.ink, fontFamily: fonts.display, fontSize: 30, marginTop: 6 }}>
           {quote ? money(quote.receiveAmount, quote.receiveCurrency) : "…"}
         </Text>
         <View style={{ marginTop: 10 }}>
           <PaymentLogo id={recipient.network} size={26} />
         </View>
-        <Small style={{ color: "rgba(255,255,255,0.75)", marginTop: 6, textAlign: "center" }}>
+        <Small style={{ marginTop: 6, textAlign: "center" }}>
           {networkLabel(recipient.network)}
           {recipient.phone ? ` · ${phone(recipient.phone)}` : recipient.bankName ? ` · ${recipient.bankName}` : ""} · {countryName(recipient.country)}
         </Small>

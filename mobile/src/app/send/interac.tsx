@@ -142,7 +142,7 @@ export default function InteracPayment() {
         <Text style={s.heroAmount} numberOfLines={1} adjustsFontSizeToFit>
           {amount}
         </Text>
-        <Small style={{ color: "rgba(255,255,255,0.75)", textAlign: "center" }}>
+        <Small style={{ textAlign: "center" }}>
           {tr("{0} reçoit {1}", transfer.beneficiary.fullName, money(transfer.receiveAmountXaf, transfer.receiveCurrency))}
         </Small>
       </Card>
@@ -240,9 +240,9 @@ function Step({
 }
 
 const s = StyleSheet.create({
-  hero: { alignItems: "center", gap: 6, marginBottom: 18, backgroundColor: colors.navy, borderColor: colors.navy, paddingVertical: 20 },
-  heroLabel: { color: colors.silver, fontFamily: fonts.heading, fontSize: 12, letterSpacing: 0.8, marginTop: 6 },
-  heroAmount: { color: colors.white, fontFamily: fonts.display, fontSize: 34 },
+  hero: { alignItems: "center", gap: 6, marginBottom: 18, backgroundColor: colors.soft, borderColor: colors.line, paddingVertical: 20 },
+  heroLabel: { color: colors.muted, fontFamily: fonts.medium, fontSize: 12, letterSpacing: 0.6, marginTop: 6 },
+  heroAmount: { color: colors.ink, fontFamily: fonts.display, fontSize: 34 },
   section: { fontFamily: fonts.heading, fontSize: 16, color: colors.ink, marginBottom: 10 },
   step: { flexDirection: "row", alignItems: "center", gap: 12, paddingVertical: 12 },
   stepBorder: { borderBottomWidth: 1, borderBottomColor: colors.line },

@@ -126,7 +126,7 @@ export default function Home() {
       <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={st.people}>
         <Pressable accessibilityRole="button" accessibilityLabel={tr("Nouveau destinataire")} onPress={() => router.push(todo ? "/kyc" : "/send/recipient")} style={st.person}>
           <View style={st.add}>
-            <Icon name="plus" color={colors.brand} size={22} />
+            <Icon name="plus" color={colors.muted} size={22} />
           </View>
           <Text style={st.personName} numberOfLines={1}>{tr("Nouveau")}</Text>
         </Pressable>
@@ -141,13 +141,13 @@ export default function Home() {
               onPress={() => pickRecipient(r)}
               style={st.person}
             >
-              <View style={[st.avatarRing, on && { borderColor: colors.brand }]}>
+              <View style={[st.avatarRing, on && { borderColor: colors.ink }]}>
                 <Avatar name={r.fullName} size={52} tone={on ? "brand" : "soft"} />
                 <View style={st.flagDot}>
                   <Flag code={r.country} size={16} />
                 </View>
               </View>
-              <Text style={[st.personName, on && { color: colors.brand }]} numberOfLines={1}>
+              <Text style={[st.personName, on && { fontFamily: fonts.heading }]} numberOfLines={1}>
                 {r.fullName.split(" ")[0]}
               </Text>
             </Pressable>
@@ -187,19 +187,19 @@ export default function Home() {
 
 const st = StyleSheet.create({
   top: { flexDirection: "row", alignItems: "center", justifyContent: "space-between", gap: 10, marginTop: 4, marginBottom: 16 },
-  hello: { flex: 1, fontFamily: fonts.display, fontSize: 24, color: colors.navy },
-  bell: { width: 44, height: 44, borderRadius: 14, backgroundColor: colors.white, borderWidth: 1, borderColor: colors.line, alignItems: "center", justifyContent: "center" },
+  hello: { flex: 1, fontFamily: fonts.display, fontSize: 22, letterSpacing: -0.4, color: colors.ink },
+  bell: { width: 44, height: 44, borderRadius: 22, backgroundColor: colors.soft, alignItems: "center", justifyContent: "center" },
   badge: { position: "absolute", top: -4, right: -4, minWidth: 18, height: 18, borderRadius: 9, backgroundColor: colors.maple, alignItems: "center", justifyContent: "center", paddingHorizontal: 4 },
   badgeText: { color: colors.white, fontSize: 10, fontFamily: fonts.heading },
   kyc: { marginBottom: 14, flexDirection: "row", alignItems: "center", gap: 12, paddingVertical: 12 },
   kycTitle: { fontFamily: fonts.heading, color: colors.ink, fontSize: 14 },
-  section: { fontFamily: fonts.heading, fontSize: 17, color: colors.ink, marginTop: 24, marginBottom: 12 },
-  sectionRow: { flexDirection: "row", alignItems: "center", justifyContent: "space-between", marginTop: 24, marginBottom: 12 },
-  link: { color: colors.brand, fontFamily: fonts.semibold, fontSize: 14 },
+  section: { fontFamily: fonts.medium, fontSize: 14, color: colors.muted, marginTop: 28, marginBottom: 12 },
+  sectionRow: { flexDirection: "row", alignItems: "center", justifyContent: "space-between", marginTop: 28, marginBottom: 12 },
+  link: { color: colors.ink, fontFamily: fonts.medium, fontSize: 14, textDecorationLine: "underline" },
   people: { gap: 14, paddingRight: 8 },
   person: { width: 64, alignItems: "center", gap: 6 },
-  add: { width: 56, height: 56, borderRadius: 28, borderWidth: 1.5, borderStyle: "dashed", borderColor: colors.brand, alignItems: "center", justifyContent: "center", backgroundColor: colors.white },
+  add: { width: 56, height: 56, borderRadius: 28, borderWidth: 1.5, borderStyle: "dashed", borderColor: colors.line, alignItems: "center", justifyContent: "center", backgroundColor: colors.white },
   avatarRing: { width: 60, height: 60, borderRadius: 30, borderWidth: 2, borderColor: "transparent", alignItems: "center", justifyContent: "center" },
   flagDot: { position: "absolute", right: -2, bottom: -2, borderRadius: 4, borderWidth: 2, borderColor: colors.bg },
-  personName: { fontFamily: fonts.semibold, fontSize: 12, color: colors.ink, maxWidth: 64 },
+  personName: { fontFamily: fonts.medium, fontSize: 12, color: colors.ink, maxWidth: 64 },
 });

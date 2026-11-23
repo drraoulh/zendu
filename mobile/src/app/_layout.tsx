@@ -16,12 +16,10 @@ configurePush();
 
 export default function RootLayout() {
   const [fontsLoaded, fontError] = useFonts({
-    // DM Sans, la typographie du site (une seule famille pour les titres et le texte).
-    "DMSans-400": require("@/assets/fonts/DMSans-400.ttf"),
-    "DMSans-500": require("@/assets/fonts/DMSans-500.ttf"),
-    "DMSans-600": require("@/assets/fonts/DMSans-600.ttf"),
-    "DMSans-700": require("@/assets/fonts/DMSans-700.ttf"),
-    "DMSans-800": require("@/assets/fonts/DMSans-800.ttf"),
+    // Inter : sans empattement neutre et lisible, proche de la typographie de ChatGPT (police libre).
+    "Inter-400": require("@/assets/fonts/Inter-400.ttf"),
+    "Inter-500": require("@/assets/fonts/Inter-500.ttf"),
+    "Inter-600": require("@/assets/fonts/Inter-600.ttf"),
   });
 
   return (

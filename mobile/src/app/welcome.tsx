@@ -47,9 +47,9 @@ export default function Welcome() {
   }
 
   return (
-    <SafeAreaView style={{ flex: 1, backgroundColor: colors.navy }}>
+    <SafeAreaView style={{ flex: 1, backgroundColor: colors.white }}>
       <View style={st.top}>
-        <WstWordmark size={28} negative />
+        <WstWordmark size={28} />
         {!last ? (
           <Pressable accessibilityRole="button" onPress={() => setIndex(SLIDES.length - 1)} hitSlop={10}>
             <Text style={st.skip}>{tr("Passer")}</Text>
@@ -60,7 +60,7 @@ export default function Welcome() {
       <View style={[st.hero, compact ? { minHeight: 0, paddingVertical: 12 } : short ? { minHeight: 0, gap: 14 } : { minHeight: Math.min(320, height * 0.36) }]}>
         {compact ? null : (
           <View style={[st.halo, short && { width: 120, height: 120, borderRadius: 60 }]}>
-            <WstSymbol size={short ? 72 : 110} negative />
+            <WstSymbol size={short ? 72 : 110} />
           </View>
         )}
         <View style={st.flags}>
@@ -77,7 +77,7 @@ export default function Welcome() {
         <View style={st.sheetInner}>
           {short ? null : (
             <View style={st.iconWrap}>
-              <Icon name={slide.icon} color={colors.brand} size={24} />
+              <Icon name={slide.icon} color={colors.ink} size={22} />
             </View>
           )}
           <Text style={[st.title, compact && { fontSize: 21, lineHeight: 26 }]} accessibilityRole="header">{tr(slide.title)}</Text>
@@ -108,17 +108,17 @@ export default function Welcome() {
 
 const st = StyleSheet.create({
   top: { flexDirection: "row", justifyContent: "space-between", alignItems: "center", paddingHorizontal: 20, paddingTop: 8 },
-  skip: { color: "rgba(255,255,255,0.8)", fontFamily: fonts.semibold, fontSize: 14 },
+  skip: { color: colors.muted, fontFamily: fonts.semibold, fontSize: 14 },
   hero: { flex: 1, alignItems: "center", justifyContent: "center", gap: 22 },
-  halo: { width: 180, height: 180, borderRadius: 90, backgroundColor: "rgba(63,160,255,0.14)", alignItems: "center", justifyContent: "center" },
+  halo: { width: 180, height: 180, borderRadius: 90, backgroundColor: colors.soft, alignItems: "center", justifyContent: "center" },
   flags: { flexDirection: "row", gap: 10 },
-  flagPill: { padding: 6, borderRadius: 12, backgroundColor: "rgba(255,255,255,0.1)" },
-  sheet: { backgroundColor: colors.white, borderTopLeftRadius: 32, borderTopRightRadius: 32, padding: 24, paddingBottom: 20 },
+  flagPill: { padding: 6, borderRadius: 12, backgroundColor: colors.soft },
+  sheet: { backgroundColor: colors.white, padding: 24, paddingBottom: 20 },
   sheetInner: { width: "100%", maxWidth: 640, alignSelf: "center" },
-  iconWrap: { width: 48, height: 48, borderRadius: 16, backgroundColor: colors.brandSoft, alignItems: "center", justifyContent: "center", marginBottom: 14 },
-  title: { fontFamily: fonts.display, fontSize: 24, lineHeight: 30, color: colors.navy, letterSpacing: -0.4 },
+  iconWrap: { width: 44, height: 44, borderRadius: 22, backgroundColor: colors.soft, alignItems: "center", justifyContent: "center", marginBottom: 14 },
+  title: { fontFamily: fonts.display, fontSize: 24, lineHeight: 30, color: colors.ink, letterSpacing: -0.4 },
   text: { fontFamily: fonts.regular, fontSize: 15, lineHeight: 22, color: colors.muted, marginTop: 8 },
   dots: { flexDirection: "row", gap: 6, marginVertical: 20 },
   dot: { width: 8, height: 8, borderRadius: 4, backgroundColor: colors.line },
-  dotOn: { width: 24, backgroundColor: colors.brand },
+  dotOn: { width: 20, backgroundColor: colors.ink },
 });
