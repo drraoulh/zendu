@@ -21,7 +21,9 @@ export default function Review() {
   const methods = payMethodsOf(findCorridor(useCorridors(), draft.corridorId));
   const interacOk = methods.includes("interac") && (quote ? quote.sendCurrency === "CAD" : draft.corridorId.startsWith("CA-"));
   const cardOk = methods.includes("card");
-  const method = draft.payMethod === "card" && cardOk ? "card" : interacOk ? "interac" : cardOk ? "card" : null;
+  const manualOk = methods.includes("manual");
+  const method =
+    draft.payMethod === "manual" && manualOk ? "manual" : draft.payMethod === "card" && cardOk ? "card" : interacOk ? "interac" : manualOk ? "manual" : cardOk ? "card" : null;
 
   // Double appui sur « Payer » : un seul écran de traitement (donc un seul transfert créé).
   const going = useRef(false);
@@ -34,8 +36,8 @@ export default function Review() {
   function next() {
     if (!method || going.current) return;
     going.current = true;
-    if (method === "interac") {
-      setDraft({ payMethod: "interac", cardId: null });
+    if (method === "interac" || method === "manual") {
+      setDraft({ payMethod: method, cardId: null });
       router.push("/send/processing");
     } else {
       setDraft({ payMethod: "card" });
@@ -68,7 +70,7 @@ export default function Review() {
       footer={
         <View style={{ gap: 6 }}>
           <Button
-            title={quote ? `${method === "interac" ? tr("Payer par Interac") : tr("Payer")} ${money(quote.total, quote.sendCurrency)}` : tr("Payer")}
+            title={quote ? `${method === "interac" ? tr("Payer par Interac") : method === "manual" ? tr("Continuer") : tr("Payer")} ${money(quote.total, quote.sendCurrency)}` : tr("Payer")}
             icon="lock"
             onPress={next}
             disabled={!quote || !method}
@@ -120,6 +122,14 @@ export default function Review() {
           description={tr("Le moins cher · depuis votre appli bancaire")}
           selected={method === "interac"}
           onPress={() => setDraft({ payMethod: "interac" })}
+        />
+      ) : null}
+      {manualOk ? (
+        <Choice
+          label={tr("Paiement manuel")}
+          description={tr("Vous envoyez l'argent vous-même · confirmé par notre équipe")}
+          selected={method === "manual"}
+          onPress={() => setDraft({ payMethod: "manual" })}
         />
       ) : null}
       {cardOk ? (

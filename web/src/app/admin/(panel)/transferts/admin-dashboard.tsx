@@ -13,6 +13,7 @@ import { BankQueue } from "./bank-queue";
 import { InteracQueue } from "./interac-queue";
 import { IssuesQueue } from "./issues-queue";
 import { INTERAC_PROVIDER } from "@/lib/providers/interac";
+import { MANUAL_PAYIN_PROVIDER } from "@/lib/providers/manual-payin";
 import { Field, inputClass } from "../../_ui/kit";
 import { filterMessages } from "./filter-messages";
 import { STATUS_GROUPS, type TransferFilters } from "./filters";
@@ -115,7 +116,7 @@ export function AdminDashboard({
   const list = results ?? (filtering ? [] : rows);
   const work = queue ?? rows;
   const interacQueue = work.filter(
-    (r) => r.payInProvider === INTERAC_PROVIDER && (r.status === "awaiting_payment" || (r.status === "expired" && r.interacDeclaredAt)),
+    (r) => (r.payInProvider === INTERAC_PROVIDER || r.payInProvider === MANUAL_PAYIN_PROVIDER) && (r.status === "awaiting_payment" || (r.status === "expired" && r.interacDeclaredAt)),
   );
   const bankQueue = work.filter(
     (r) =>

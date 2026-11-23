@@ -12,6 +12,7 @@ import { adminMessages } from "@/i18n/admin";
 import { formatMoney } from "@/lib/money";
 import type { AdminTransferRow } from "./admin-dashboard";
 import { adminAction, AlertBadges, CopyRow, rawAmount } from "./queue-kit";
+import { isManualPayIn } from "@/lib/providers/manual-payin";
 
 /**
  * Virements Interac en attente (payInProvider "interac_manual") : l'équipe vérifie la réception sur le
@@ -89,6 +90,11 @@ function InteracItem({ row, nl, date }: { row: AdminTransferRow; nl: string; dat
             {row.reference}
           </Link>
           <p className="mt-0.5 text-xs text-muted">{date(row.createdAt)}</p>
+          {isManualPayIn(row.payInProvider) && (
+            <p className="mt-1">
+              <Badge tone="brand">Encaissement manuel · {row.sendCurrency}</Badge>
+            </p>
+          )}
           <p className="mt-2 font-medium text-ink">{row.senderName}</p>
           <p className="break-all text-sm text-muted">{row.senderEmail}</p>
         </div>

@@ -6,6 +6,7 @@ import { deliveryEstimateFor, publicTransfer } from "@/lib/bank";
 import { isLiveMode } from "@/lib/mode";
 import { expireStaleTransfers } from "@/lib/transfer-service";
 import { INTERAC_PROVIDER, interacInstructions } from "@/lib/providers/interac";
+import { MANUAL_PAYIN_PROVIDER, manualPayInInstructions } from "@/lib/providers/manual-payin";
 import { publicTransferView } from "@/app/api/transfers/[id]/_access";
 import { adminPageAccess } from "@/app/admin/_server/session";
 import type { TransferDTO } from "@/components/transfer-app/types";
@@ -40,7 +41,12 @@ export default async function TransferPage({ params, searchParams }: Props) {
     // lien, ne montre que la vue masquée ; le transfert d'un client de l'appli n'est pas affiché ici.
     if (transfer && (admin || transfer.customerId === null)) {
       const view = admin ? publicTransfer(transfer) : publicTransferView(transfer);
-      const interac = transfer.payInProvider === INTERAC_PROVIDER ? { interac: interacInstructions(transfer) } : {};
+      const interac =
+        transfer.payInProvider === INTERAC_PROVIDER
+          ? { interac: interacInstructions(transfer) }
+          : transfer.payInProvider === MANUAL_PAYIN_PROVIDER
+            ? { manual: manualPayInInstructions(transfer, !isLiveMode()) }
+            : {};
       initial = JSON.parse(JSON.stringify({ ...view, ...interac })) as TransferDTO;
     }
   } catch (error) {

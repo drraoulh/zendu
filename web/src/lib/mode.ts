@@ -1,3 +1,5 @@
+import { manualPayInOpen } from "@/lib/providers/manual-payin";
+
 /**
  * Mode de fonctionnement : démonstration ou réel. ÉCHOUE FERMÉ : par défaut, un serveur de
  * production est en mode réel, même si une variable d'environnement manque.
@@ -18,7 +20,7 @@ export function isLiveMode(): boolean {
   return process.env.NODE_ENV === "production";
 }
 
-export type PayMethod = "interac" | "card";
+export type PayMethod = "interac" | "card" | "manual";
 
 /**
  * Moyens de paiement réellement disponibles selon le pays d'envoi.
@@ -33,6 +35,8 @@ export function payMethodsFor(sourceCountry: string): PayMethod[] {
   // En réel, Interac exige une adresse de dépôt (sinon le client ne saurait pas où payer).
   if (sourceCountry === "CA" && (!live || process.env.INTERAC_DEPOSIT_EMAIL?.trim())) methods.push("interac");
   if (!live) methods.push("card");
+  // Cameroun / Chine : encaissement manuel, seulement si activé explicitement (voir manual-payin.ts).
+  if (manualPayInOpen(sourceCountry, live)) methods.push("manual");
   return methods;
 }
 

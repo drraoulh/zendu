@@ -180,10 +180,12 @@ export default function TransferScreen() {
   const declared = events.some((e) => e.type === "interac_declared");
   const pendingHint = (i: number) =>
     i === 1
-      ? transfer.interac
+      ? transfer.interac || transfer.manual
         ? declared
           ? tr("Virement signalé · réception en cours de vérification")
-          : tr("En attente de votre virement Interac")
+          : transfer.manual
+            ? tr("En attente de votre paiement")
+            : tr("En attente de votre virement Interac")
         : tr("En attente de votre paiement")
       : i === 2
         ? tr("Préparation du versement…")
@@ -306,6 +308,29 @@ export default function TransferScreen() {
                 icon="bank"
                 variant={declared ? "secondary" : "primary"}
                 onPress={() => router.push({ pathname: "/send/interac", params: { id: transfer.id, from: "transfer" } })}
+              />
+            </>
+          ) : transfer.manual ? (
+            <>
+              {declared ? (
+                <Notice
+                  tone="brand"
+                  icon="clock"
+                  title={tr("Paiement signalé")}
+                  text={tr("Merci ! Nous vérifions la réception de votre paiement de {0}. Le versement part dès qu'elle est confirmée ; cet écran se met à jour automatiquement.", money(transfer.manual.amount, transfer.manual.currency))}
+                />
+              ) : (
+                <Notice
+                  tone="warn"
+                  icon="clock"
+                  text={tr("En attente de votre paiement de {0}, à envoyer avant le {1}. Le versement part dès sa réception ; cet écran se met à jour automatiquement.", money(transfer.manual.amount, transfer.manual.currency), dateAt(transfer.manual.expiresAt))}
+                />
+              )}
+              <Button
+                title={tr("Instructions du paiement")}
+                icon="bank"
+                variant={declared ? "secondary" : "primary"}
+                onPress={() => router.push({ pathname: "/send/manual", params: { id: transfer.id, from: "transfer" } })}
               />
             </>
           ) : mock ? (

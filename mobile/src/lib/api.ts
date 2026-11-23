@@ -75,6 +75,8 @@ export type Transfer = {
   createdAt: string;
   /** Virement Interac en attente : où et comment envoyer l'argent. */
   interac?: InteracInstructions;
+  /** Paiement manuel en attente (envois depuis le Cameroun ou la Chine). */
+  manual?: ManualPayInInstructions;
   beneficiary: {
     id?: string;
     fullName: string;
@@ -102,9 +104,24 @@ export type InteracInstructions = {
   simulate: boolean;
 };
 
-export type PayMethod = "interac" | "card";
+/** Encaissement manuel depuis le Cameroun ou la Chine : le client envoie l'argent, l'équipe confirme. */
+export type ManualPayInInstructions = {
+  country: string;
+  /** Moyen à utiliser : « MTN MoMo », « WeChat Pay »… */
+  method: string;
+  /** Numéro, identifiant et nom du compte qui reçoit. */
+  lines: string[];
+  amount: number;
+  currency: string;
+  /** Référence à mettre en message du paiement. */
+  message: string;
+  expiresAt: string;
+  simulate: boolean;
+};
 
-export type PayInSession = { provider: "stripe" | "mock" | "interac"; checkoutUrl?: string; sessionId: string; interac?: InteracInstructions };
+export type PayMethod = "interac" | "card" | "manual";
+
+export type PayInSession = { provider: "stripe" | "mock" | "interac" | "manual"; checkoutUrl?: string; sessionId: string; interac?: InteracInstructions; manual?: ManualPayInInstructions };
 
 export type BeneficiaryInput = {
   fullName: string;

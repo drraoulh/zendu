@@ -29,6 +29,7 @@ export default function Processing() {
   const recipient = draft.recipient;
   const quote = draft.quote;
   const interac = draft.payMethod === "interac";
+  const manual = draft.payMethod === "manual";
 
   useEffect(() => {
     if (started.current || !recipient || !profile || !quote) return;
@@ -39,7 +40,7 @@ export default function Processing() {
         setPhase(1);
         // Même clé tant que le contenu de l'envoi est identique (réessai après coupure réseau) : le serveur
         // renvoie alors le transfert déjà créé au lieu d'en créer un autre.
-        const sig = JSON.stringify([draft.corridorId, draft.sendAmount, draft.receiveAmount, recipient.fullName, recipient.phone, recipient.network, recipient.accountNumber, recipient.savedId, interac]);
+        const sig = JSON.stringify([draft.corridorId, draft.sendAmount, draft.receiveAmount, recipient.fullName, recipient.phone, recipient.network, recipient.accountNumber, recipient.savedId, draft.payMethod]);
         let idem = draft.idem;
         if (!idem || idem.sig !== sig) {
           idem = { sig, key: Crypto.randomUUID() };
@@ -60,7 +61,7 @@ export default function Processing() {
             savedId: recipient.accountNumber ? undefined : recipient.savedId,
             bankCode: recipient.bankCode,
           },
-          payMethod: interac ? "interac" : "card",
+          payMethod: interac ? "interac" : manual ? "manual" : "card",
           expectedTotal: quote.total,
           expectedReceive: quote.receiveAmount,
         }, idem.key);
@@ -76,6 +77,12 @@ export default function Processing() {
         if (payIn.provider === "interac") {
           router.dismissAll();
           router.replace({ pathname: "/send/interac", params: { id: transfer.id } });
+          return;
+        }
+        // Paiement manuel (Cameroun, Chine) : même principe, écran dédié.
+        if (payIn.provider === "manual") {
+          router.dismissAll();
+          router.replace({ pathname: "/send/manual", params: { id: transfer.id } });
           return;
         }
         if (payIn.provider === "stripe" && payIn.checkoutUrl) {
@@ -99,15 +106,15 @@ export default function Processing() {
         setError(e instanceof Error ? e.message : tr("Paiement impossible"));
       }
     })();
-  }, [recipient, profile, quote, interac, draft.corridorId, draft.sendAmount, draft.receiveAmount, draft.saveRecipient, draft.idem, setDraft, addTransfer, saveRecipient, card]);
+  }, [recipient, profile, quote, interac, manual, draft.payMethod, draft.corridorId, draft.sendAmount, draft.receiveAmount, draft.saveRecipient, draft.idem, setDraft, addTransfer, saveRecipient, card]);
 
   if (!recipient || !quote) return <Redirect href="/(tabs)" />;
 
-  const steps = interac
+  const steps = interac || manual
     ? [
         { title: tr("Vérification du montant"), sub: money(quote.total, quote.sendCurrency) },
         { title: tr("Création du transfert"), sub: phase > 1 ? tr("Créé") : phase === 1 ? tr("En cours…") : tr("À venir") },
-        { title: tr("Instructions du virement Interac"), sub: phase > 1 ? tr("Prêtes") : tr("À venir") },
+        { title: manual ? tr("Instructions du paiement") : tr("Instructions du virement Interac"), sub: phase > 1 ? tr("Prêtes") : tr("À venir") },
       ]
     : [
         { title: tr("Autorisation de la carte"), sub: `${card ? cardLabel(card) : tr("Carte")} · ${money(quote.total, quote.sendCurrency)}` },

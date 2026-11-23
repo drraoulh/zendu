@@ -5,6 +5,8 @@ import { syncMomoPayout } from "@/lib/momo-sync";
 import { prisma } from "@/lib/prisma";
 import { customerTransfer } from "@/lib/bank";
 import { INTERAC_PROVIDER, interacInstructions } from "@/lib/providers/interac";
+import { MANUAL_PAYIN_PROVIDER, manualPayInInstructions } from "@/lib/providers/manual-payin";
+import { isLiveMode } from "@/lib/mode";
 import { notFound, publicTransferView, transferAccess } from "./_access";
 
 export const dynamic = "force-dynamic";
@@ -33,7 +35,12 @@ export async function GET(request: Request, { params }: Params) {
   transfer = (await prisma.transfer.findUnique({ where: { id }, include })) ?? transfer;
 
   // Virement Interac : instructions de paiement pour pouvoir les réafficher (l'expéditeur en a besoin).
-  const interac = transfer.payInProvider === INTERAC_PROVIDER ? { interac: interacInstructions(transfer) } : {};
+  const interac =
+    transfer.payInProvider === INTERAC_PROVIDER
+      ? { interac: interacInstructions(transfer) }
+      : transfer.payInProvider === MANUAL_PAYIN_PROVIDER
+        ? { manual: manualPayInInstructions(transfer, !isLiveMode()) }
+        : {};
   if (access === "public") return NextResponse.json({ ...publicTransferView(transfer), ...interac });
   return NextResponse.json({ ...customerTransfer(transfer), ...interac });
 }

@@ -10,6 +10,7 @@ import { useT } from "@/i18n/define";
 import { adminMessages } from "@/i18n/admin";
 import { formatMoney } from "@/lib/money";
 import { INTERAC_PROVIDER } from "@/lib/providers/interac";
+import { MANUAL_PAYIN_PROVIDER } from "@/lib/providers/manual-payin";
 import type { AdminTransferRow } from "./admin-dashboard";
 import { adminAction, CopyButton } from "./queue-kit";
 
@@ -45,7 +46,7 @@ function IssueItem({ row, nl, date }: { row: AdminTransferRow; nl: string; date:
   const [done, setDone] = useState(false);
   const [message, setMessage] = useState<{ ok: boolean; text: string } | null>(null);
   const mismatch = row.status === "payment_mismatch";
-  const canConfirm = mismatch && row.payInProvider === INTERAC_PROVIDER;
+  const canConfirm = mismatch && (row.payInProvider === INTERAC_PROVIDER || row.payInProvider === MANUAL_PAYIN_PROVIDER);
   const paid = formatMoney(row.totalCad, row.sendCurrency, nl);
   const receive = formatMoney(row.receiveAmountXaf, row.receiveCurrency, nl);
 

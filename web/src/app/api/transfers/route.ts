@@ -8,6 +8,7 @@ import { getPayInMode } from "@/lib/providers/payin";
 import { mockPayIn } from "@/lib/providers/mock-payin";
 import { createStripePayIn } from "@/lib/providers/stripe";
 import { INTERAC_PROVIDER, interacInstructions } from "@/lib/providers/interac";
+import { MANUAL_PAYIN_PROVIDER, manualPayInInstructions, manualPayInMax } from "@/lib/providers/manual-payin";
 import { payoutProviderFor } from "@/lib/providers/payout";
 import { isLiveMode, payMethodsFor, transferLimits } from "@/lib/mode";
 import { getFxRate, rateIsTrustworthy } from "@/lib/fx";
@@ -31,7 +32,7 @@ const createSchema = z.object({
   senderEmail: z.string().trim().toLowerCase().pipe(z.email().max(254)).optional(),
   beneficiary: beneficiaryInputSchema,
   /** "interac" : virement Interac (envois depuis le Canada en CAD) ; "card" : carte de débit. */
-  payMethod: z.enum(["card", "interac"]).default("card"),
+  payMethod: z.enum(["card", "interac", "manual"]).default("card"),
   /** Total et montant reçu que le client a vus : refusé (409) si le taux a changé depuis. */
   expectedTotal: z.number().positive().optional(),
   expectedReceive: z.number().positive().optional(),
@@ -55,6 +56,12 @@ function replayExisting(existing: NonNullable<ExistingTransfer>) {
     return NextResponse.json({
       transfer: customerTransfer(existing),
       payIn: { provider: "interac", sessionId: existing.payInRef, interac: interacInstructions(existing) },
+    });
+  }
+  if (existing.payInProvider === MANUAL_PAYIN_PROVIDER && existing.payInRef) {
+    return NextResponse.json({
+      transfer: customerTransfer(existing),
+      payIn: { provider: "manual", sessionId: existing.payInRef, manual: manualPayInInstructions(existing, !isLiveMode()) },
     });
   }
   return NextResponse.json({ error: "Ce transfert a déjà été créé. Consultez-le dans votre historique.", code: "duplicate_request", transferId: existing.id }, { status: 409 });
@@ -97,7 +104,7 @@ export async function GET(request: Request) {
 }
 
 class CustomerLimitError extends Error {
-  constructor(readonly left: number, readonly period: string, readonly max: number) {
+  constructor(readonly left: number, readonly period: string, readonly max: number, readonly currency = "$") {
     super("customer_limit");
   }
 }
@@ -197,6 +204,9 @@ export async function POST(request: Request) {
     if (data.payMethod === "interac" && quoteData.sendCurrency !== "CAD") {
       return NextResponse.json({ error: "Le virement Interac n'est possible que pour les envois depuis le Canada (CAD)." }, { status: 400 });
     }
+    if (data.payMethod === "manual" && !["XAF", "CNY"].includes(quoteData.sendCurrency)) {
+      return NextResponse.json({ error: "L'encaissement manuel n'est possible que pour les envois depuis le Cameroun ou la Chine." }, { status: 400 });
+    }
     if (!payMethodsFor(quoteData.sourceCountry).includes(data.payMethod)) {
       return NextResponse.json(
         {
@@ -244,6 +254,17 @@ export async function POST(request: Request) {
     }
 
     const interac = data.payMethod === "interac";
+    const manual = data.payMethod === "manual";
+    const manualMax = manual ? manualPayInMax(quoteData.sendCurrency) : null;
+    if (manualMax != null && quoteData.total > manualMax) {
+      return NextResponse.json(
+        {
+          error: `Pendant le lancement, le maximum est de ${manualMax.toLocaleString("fr-FR")} ${quoteData.sendCurrency} par envoi depuis ce pays. Réduisez le montant.`,
+          code: "manual_limit",
+        },
+        { status: 400 },
+      );
+    }
     const appUrl = process.env.NEXT_PUBLIC_APP_URL ?? "http://localhost:3000";
     const transfer = await prisma.$transaction(
       async (tx) => {
@@ -266,6 +287,25 @@ export async function POST(request: Request) {
           const [day, month] = await Promise.all([sumSince(86_400_000), sumSince(30 * 86_400_000)]);
           const over = day + quoteData.total > limits.dailyCad ? { left: limits.dailyCad - day, period: "24 heures", max: limits.dailyCad } : month + quoteData.total > limits.monthlyCad ? { left: limits.monthlyCad - month, period: "30 jours", max: limits.monthlyCad } : null;
           if (over) throw new CustomerLimitError(over.left, over.period, over.max);
+        }
+        // Encaissement manuel : au plus 3 fois le plafond par envoi sur 24 h, par client (même verrou).
+        if (live && manual && authed && manualMax != null) {
+          await tx.$executeRaw`SELECT pg_advisory_xact_lock(hashtext(${authed.customer.id}))`;
+          const day =
+            (
+              await tx.transfer.aggregate({
+                _sum: { totalCad: true },
+                where: {
+                  customerId: authed.customer.id,
+                  sendCurrency: quoteData.sendCurrency,
+                  status: { notIn: ["expired", "cancelled"] },
+                  createdAt: { gte: new Date(Date.now() - 86_400_000) },
+                },
+              })
+            )._sum.totalCad ?? 0;
+          if (day + quoteData.total > manualMax * 3) {
+            throw new CustomerLimitError(Math.max(0, manualMax * 3 - day), "24 heures", manualMax * 3, quoteData.sendCurrency);
+          }
         }
         // Référence unique : nouveau tirage dans le cas (rare) où elle existe déjà.
         let reference = createReference();
@@ -308,7 +348,7 @@ export async function POST(request: Request) {
             rate: quoteData.rate,
             feeCad: quoteData.fee,
             totalCad: quoteData.total,
-            payInProvider: interac ? INTERAC_PROVIDER : getPayInMode(),
+            payInProvider: interac ? INTERAC_PROVIDER : manual ? MANUAL_PAYIN_PROVIDER : getPayInMode(),
             // MTN MoMo seulement pour MTN au Cameroun ; le reste est simulé en démo, versé par l'équipe sinon.
             payoutProvider: payoutProviderFor(normalized.data.network, corridor.destination, senderEmail),
             quoteId: quote.id,
@@ -318,6 +358,8 @@ export async function POST(request: Request) {
                 type: "created",
                 message: interac
                   ? `Transfert ${quoteData.corridorId} créé, en attente du virement Interac`
+                  : manual
+                    ? `Transfert ${quoteData.corridorId} créé, en attente du paiement manuel du client`
                   : `Transfert ${quoteData.corridorId} créé, en attente de paiement`,
               },
             },
@@ -334,6 +376,15 @@ export async function POST(request: Request) {
       return NextResponse.json({
         transfer: customerTransfer(transfer),
         payIn: { provider: "interac", sessionId: payInRef, interac: interacInstructions(transfer) },
+      });
+    }
+
+    if (manual) {
+      const payInRef = `manual_${transfer.reference}`;
+      await prisma.transfer.update({ where: { id: transfer.id }, data: { payInRef } });
+      return NextResponse.json({
+        transfer: customerTransfer(transfer),
+        payIn: { provider: "manual", sessionId: payInRef, manual: manualPayInInstructions(transfer, !live) },
       });
     }
 
@@ -373,7 +424,7 @@ export async function POST(request: Request) {
       const left = Math.max(0, Math.floor(error.left * 100) / 100);
       return NextResponse.json(
         {
-          error: `Plafond atteint : ${error.max.toLocaleString("fr-FR")} $ par ${error.period}. Vous pouvez encore envoyer ${left.toLocaleString("fr-FR")} $ sur cette période.`,
+          error: `Plafond atteint : ${error.max.toLocaleString("fr-FR")} ${error.currency} par ${error.period}. Vous pouvez encore envoyer ${left.toLocaleString("fr-FR")} ${error.currency} sur cette période.`,
           code: "customer_limit",
         },
         { status: 400 },

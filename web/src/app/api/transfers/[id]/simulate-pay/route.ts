@@ -4,6 +4,7 @@ import { markPaymentDetected } from "@/lib/transfer-service";
 import { prisma } from "@/lib/prisma";
 import { publicTransfer } from "@/lib/bank";
 import { INTERAC_PROVIDER } from "@/lib/providers/interac";
+import { MANUAL_PAYIN_PROVIDER } from "@/lib/providers/manual-payin";
 import { isLiveMode } from "@/lib/mode";
 import { transferAccess } from "../_access";
 
@@ -27,7 +28,7 @@ export async function POST(request: Request, { params }: Params) {
   // Réservé au mode démo : un vrai paiement n'est confirmé que par son webhook (carte) ou par l'équipe
   // (Interac, dès qu'une vraie adresse de dépôt est configurée).
   // Jamais en mode réel, même pour un ancien transfert « mock » créé avant le passage en réel.
-  const demoProvider = transfer.payInProvider === "mock" || transfer.payInProvider === INTERAC_PROVIDER;
+  const demoProvider = transfer.payInProvider === "mock" || transfer.payInProvider === INTERAC_PROVIDER || transfer.payInProvider === MANUAL_PAYIN_PROVIDER;
   if (isLiveMode() || !demoProvider) {
     return NextResponse.json({ error: "Simulation indisponible" }, { status: 403 });
   }

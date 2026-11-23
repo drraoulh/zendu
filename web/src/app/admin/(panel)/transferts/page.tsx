@@ -78,7 +78,7 @@ async function loadTransfers(where: Prisma.TransferWhereInput = {}, take = 30): 
         senderEmail: t.senderEmail,
         failureReason: t.failureReason,
         interacDeclaredAt: t.events[0]?.createdAt.toISOString() ?? null,
-        dualApproval: needsDualApproval(t.totalCad),
+        dualApproval: needsDualApproval(t.totalCad, t.sendCurrency),
         interacApprovedByName: t.interacApprovedByName,
         interacApprovedAt: t.interacApprovedAt?.toISOString() ?? null,
         createdAt: t.createdAt.toISOString(),

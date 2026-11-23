@@ -3,6 +3,7 @@ import type { Prisma } from "@prisma/client";
 import { prisma } from "@/lib/prisma";
 import { MANUAL_BANK_PROVIDER, MANUAL_PAYOUT_PROVIDER, maskAccount } from "@/lib/bank";
 import { INTERAC_PROVIDER } from "@/lib/providers/interac";
+import { MANUAL_PAYIN_PROVIDER } from "@/lib/providers/manual-payin";
 import { expireStaleTransfers } from "@/lib/transfer-service";
 
 /* ------------------------------------------------------------------ Files de travail */
@@ -11,9 +12,9 @@ import { expireStaleTransfers } from "@/lib/transfer-service";
 function interacWhere(): Prisma.TransferWhereInput {
   return {
     OR: [
-      { payInProvider: INTERAC_PROVIDER, status: "awaiting_payment" },
+      { payInProvider: { in: [INTERAC_PROVIDER, MANUAL_PAYIN_PROVIDER] }, status: "awaiting_payment" },
       {
-        payInProvider: INTERAC_PROVIDER,
+        payInProvider: { in: [INTERAC_PROVIDER, MANUAL_PAYIN_PROVIDER] },
         status: "expired",
         createdAt: { gte: new Date(Date.now() - 7 * 86400_000) },
         events: { some: { type: "interac_declared" } },

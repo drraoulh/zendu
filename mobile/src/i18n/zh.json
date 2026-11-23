@@ -1072,5 +1072,19 @@
  "Étudiant(e)": "学生",
  "Île-du-Prince-Édouard": "爱德华王子岛",
  "à l'instant": "刚刚",
- "à venir": "待处理"
+ "à venir": "待处理",
+ "Paiement manuel": "手动付款",
+ "Vous envoyez l'argent vous-même · confirmé par notre équipe": "由您自行转账 · 经我们团队确认",
+ "Instructions du paiement": "付款说明",
+ "J'ai envoyé le paiement": "我已付款",
+ "Comment payer": "付款方式",
+ "Moyen de paiement": "付款渠道",
+ "Envoyez à": "收款账户",
+ "Coordonnées indisponibles : contactez le support": "暂无收款信息：请联系客服",
+ "C'est ce qui relie votre paiement à ce transfert.": "这样才能把您的付款与本次转账对应起来。",
+ "À envoyer avant le {0}. Dès que votre paiement est reçu, l'argent part vers {1} et vous êtes notifié.": "请在 {0} 前付款。收到您的付款后，款项将立即发给 {1}，并通知您。",
+ "Mode démonstration : aucun paiement réel n'est attendu. Touchez « Simuler la réception ».": "演示模式：无需真实付款。请点击“模拟收款”。",
+ "Paiement signalé": "已通知付款",
+ "Merci ! Nous vérifions la réception de votre paiement de {0}. Le versement part dès qu'elle est confirmée ; cet écran se met à jour automatiquement.": "谢谢！我们正在核实您 {0} 的付款是否到账。确认后立即付款；本页面会自动更新。",
+ "En attente de votre paiement de {0}, à envoyer avant le {1}. Le versement part dès sa réception ; cet écran se met à jour automatiquement.": "正在等待您 {0} 的付款，请在 {1} 前完成。收到后立即付款；本页面会自动更新。"
 }

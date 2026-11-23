@@ -4,9 +4,10 @@ import { z } from "zod";
 import { publicTransfer } from "@/lib/bank";
 import { prisma } from "@/lib/prisma";
 import { requireAdminIdentity } from "@/lib/admin-guard";
-import { interacDualApprovalThreshold, needsDualApproval } from "@/lib/interac-approval";
+import { needsDualApproval } from "@/lib/interac-approval";
 import { getCustomer } from "@/lib/customer-auth";
 import { INTERAC_PROVIDER } from "@/lib/providers/interac";
+import { MANUAL_PAYIN_PROVIDER } from "@/lib/providers/manual-payin";
 import { markPaymentDetected } from "@/lib/transfer-service";
 import { assertTransition } from "@/lib/transfer-machine";
 import { notifyCustomer } from "@/lib/transfer-notify";
@@ -31,7 +32,9 @@ export async function POST(request: Request, { params }: Params) {
   const body = parsed.data;
 
   const transfer = await prisma.transfer.findUnique({ where: { id } });
-  if (!transfer || transfer.payInProvider !== INTERAC_PROVIDER) {
+  const manual = transfer?.payInProvider === MANUAL_PAYIN_PROVIDER;
+  const what = manual ? "paiement manuel" : "virement Interac";
+  if (!transfer || ![INTERAC_PROVIDER, MANUAL_PAYIN_PROVIDER].includes(transfer.payInProvider)) {
     return NextResponse.json({ error: "Introuvable" }, { status: 404 });
   }
 
@@ -44,7 +47,7 @@ export async function POST(request: Request, { params }: Params) {
     const already = await prisma.transferEvent.findFirst({ where: { transferId: id, type: DECLARED } });
     if (!already) {
       await prisma.transferEvent.create({
-        data: { transferId: id, type: DECLARED, message: "Le client indique avoir envoyé le virement Interac" },
+        data: { transferId: id, type: DECLARED, message: `Le client indique avoir envoyé le ${what}` },
       });
     }
     return NextResponse.json({ ok: true, status: transfer.status });
@@ -55,8 +58,9 @@ export async function POST(request: Request, { params }: Params) {
 
   try {
     if (body.action === "received") {
-      const ref = body.interacReference ? `interac:${body.interacReference}` : `interac:${transfer.reference}`;
-      if (needsDualApproval(transfer.totalCad)) {
+      const prefix = manual ? "manual" : "interac";
+      const ref = body.interacReference ? `${prefix}:${body.interacReference}` : `${prefix}:${transfer.reference}`;
+      if (needsDualApproval(transfer.totalCad, transfer.sendCurrency)) {
         if (!["awaiting_payment", "expired", "payment_mismatch"].includes(transfer.status)) {
           throw new Error("Ce transfert vient d'être traité par ailleurs. Rechargez la page.");
         }
@@ -71,7 +75,7 @@ export async function POST(request: Request, { params }: Params) {
             data: {
               transferId: id,
               type: "interac_first_approval",
-              message: `Virement Interac reçu — 1re validation par ${me.displayName} (${me.username})${body.interacReference ? `, réf. ${body.interacReference}` : ""}. Montant ≥ ${interacDualApprovalThreshold()} : une 2e personne doit approuver.`,
+              message: `${manual ? "Paiement manuel reçu" : "Virement Interac reçu"} — 1re validation par ${me.displayName} (${me.username})${body.interacReference ? `, réf. ${body.interacReference}` : ""}. Montant élevé : une 2e personne doit approuver.`,
             },
           });
           return NextResponse.json({ ok: true, pendingSecondApproval: true });
@@ -98,7 +102,7 @@ export async function POST(request: Request, { params }: Params) {
     }
 
     assertTransition(transfer.status, "payment_mismatch");
-    const reason = body.reason || "Montant ou message du virement Interac incorrect";
+    const reason = body.reason || `Montant ou message du ${what} incorrect`;
     // Conditionnel : un double clic n'enregistre (et ne notifie) qu'une fois.
     const { count } = await prisma.transfer.updateMany({
       where: { id, status: transfer.status },

@@ -1072,5 +1072,19 @@
  "Étudiant(e)": "Student",
  "Île-du-Prince-Édouard": "Prince Edward Island",
  "à l'instant": "just now",
- "à venir": "upcoming"
+ "à venir": "upcoming",
+ "Paiement manuel": "Manual payment",
+ "Vous envoyez l'argent vous-même · confirmé par notre équipe": "You send the money yourself · confirmed by our team",
+ "Instructions du paiement": "Payment instructions",
+ "J'ai envoyé le paiement": "I've sent the payment",
+ "Comment payer": "How to pay",
+ "Moyen de paiement": "Payment method",
+ "Envoyez à": "Send to",
+ "Coordonnées indisponibles : contactez le support": "Details unavailable: contact support",
+ "C'est ce qui relie votre paiement à ce transfert.": "This links your payment to this transfer.",
+ "À envoyer avant le {0}. Dès que votre paiement est reçu, l'argent part vers {1} et vous êtes notifié.": "Send before {0}. As soon as your payment is received, the money goes to {1} and you are notified.",
+ "Mode démonstration : aucun paiement réel n'est attendu. Touchez « Simuler la réception ».": "Demo mode: no real payment is expected. Tap “Simulate receipt”.",
+ "Paiement signalé": "Payment reported",
+ "Merci ! Nous vérifions la réception de votre paiement de {0}. Le versement part dès qu'elle est confirmée ; cet écran se met à jour automatiquement.": "Thank you! We are checking that your payment of {0} arrived. The payout goes out as soon as it is confirmed; this screen updates automatically.",
+ "En attente de votre paiement de {0}, à envoyer avant le {1}. Le versement part dès sa réception ; cet écran se met à jour automatiquement.": "Waiting for your payment of {0}, to send before {1}. The payout goes out as soon as it is received; this screen updates automatically."
 }

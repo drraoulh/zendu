@@ -7,6 +7,14 @@ export function interacDualApprovalThreshold(): number {
   return process.env.INTERAC_DUAL_APPROVAL_CAD && Number.isFinite(n) && n > 0 ? n : 1000;
 }
 
-export function needsDualApproval(totalCad: number): boolean {
-  return totalCad >= interacDualApprovalThreshold();
+/** Seuil dans une autre devise que le CAD (encaissement manuel Cameroun / Chine) ; plus haut que les plafonds par défaut. */
+function thresholdFor(currency: string): number {
+  if (currency === "CAD") return interacDualApprovalThreshold();
+  const defaults: Record<string, number> = { XAF: 450_000, CNY: 5_000 };
+  const n = Number(process.env[`MANUAL_DUAL_APPROVAL_${currency}`]);
+  return process.env[`MANUAL_DUAL_APPROVAL_${currency}`] && Number.isFinite(n) && n > 0 ? n : (defaults[currency] ?? interacDualApprovalThreshold());
+}
+
+export function needsDualApproval(total: number, currency = "CAD"): boolean {
+  return total >= thresholdFor(currency);
 }

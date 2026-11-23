@@ -1072,5 +1072,19 @@
  "Étudiant(e)": "Estudiante",
  "Île-du-Prince-Édouard": "Isla del Príncipe Eduardo",
  "à l'instant": "ahora mismo",
- "à venir": "pendiente"
+ "à venir": "pendiente",
+ "Paiement manuel": "Pago manual",
+ "Vous envoyez l'argent vous-même · confirmé par notre équipe": "Usted envía el dinero · confirmado por nuestro equipo",
+ "Instructions du paiement": "Instrucciones de pago",
+ "J'ai envoyé le paiement": "He enviado el pago",
+ "Comment payer": "Cómo pagar",
+ "Moyen de paiement": "Medio de pago",
+ "Envoyez à": "Enviar a",
+ "Coordonnées indisponibles : contactez le support": "Datos no disponibles: contacte con soporte",
+ "C'est ce qui relie votre paiement à ce transfert.": "Así se vincula su pago a esta transferencia.",
+ "À envoyer avant le {0}. Dès que votre paiement est reçu, l'argent part vers {1} et vous êtes notifié.": "Envíelo antes del {0}. En cuanto recibamos su pago, el dinero sale hacia {1} y se le notifica.",
+ "Mode démonstration : aucun paiement réel n'est attendu. Touchez « Simuler la réception ».": "Modo de demostración: no se espera ningún pago real. Toque «Simular la recepción».",
+ "Paiement signalé": "Pago comunicado",
+ "Merci ! Nous vérifions la réception de votre paiement de {0}. Le versement part dès qu'elle est confirmée ; cet écran se met à jour automatiquement.": "¡Gracias! Estamos verificando la recepción de su pago de {0}. El envío sale en cuanto se confirme; esta pantalla se actualiza sola.",
+ "En attente de votre paiement de {0}, à envoyer avant le {1}. Le versement part dès sa réception ; cet écran se met à jour automatiquement.": "Esperando su pago de {0}, que debe enviar antes del {1}. El envío sale en cuanto se reciba; esta pantalla se actualiza sola."
 }

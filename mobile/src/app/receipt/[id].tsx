@@ -55,7 +55,7 @@ export default function Receipt() {
   const first = ben.fullName.split(" ")[0];
   const deliveredAt = t.events?.find((e) => e.type === "delivered")?.createdAt;
   // Moyen de paiement : celui choisi pendant l'envoi (carte précise) ou, à défaut, celui du transfert.
-  const paidWith = params.card || ({ interac_manual: tr("Virement Interac"), interac: tr("Virement Interac"), stripe: tr("Carte de débit") } as Record<string, string>)[t.payInProvider];
+  const paidWith = params.card || ({ interac_manual: tr("Virement Interac"), interac: tr("Virement Interac"), manual_payin: tr("Paiement manuel"), stripe: tr("Carte de débit") } as Record<string, string>)[t.payInProvider];
   // Espaces insécables : le numéro ne se coupe pas en fin de ligne (« +237 670 000 / 000 »).
   const benLine = [networkLabel(ben.network), ben.accountMasked ?? (ben.phone ? phone(ben.phone).replace(/ /g, "\u00a0") : null)].filter(Boolean).join(" · ");
 
