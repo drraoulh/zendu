@@ -8,6 +8,7 @@ import { isBankNetwork, maskAccount } from "@/lib/bank";
 import { expireStaleTransfers } from "@/lib/transfer-service";
 import { workQueueWhere } from "../../_server/insights";
 import { isLiveMode } from "@/lib/mode";
+import { transferFlags } from "@/lib/compliance";
 import { COUNTRIES } from "@/lib/corridors";
 import { AdminDashboard, type AdminTransferRow } from "./admin-dashboard";
 import { parseTransferFilters, STATUS_GROUPS, type TransferFilters } from "./filters";
@@ -51,8 +52,9 @@ async function loadTransfers(where: Prisma.TransferWhereInput = {}, take = 30): 
       orderBy: { createdAt: "desc" },
       take,
     })
-    .then((transfers) =>
-      transfers.map((t) => ({
+    .then(async (transfers) => {
+      const flags = await transferFlags(transfers).catch(() => new Map<string, string[]>());
+      return transfers.map((t) => ({
         id: t.id,
         reference: t.reference,
         status: t.status,
@@ -70,7 +72,7 @@ async function loadTransfers(where: Prisma.TransferWhereInput = {}, take = 30): 
         isBank: isBankNetwork(t.beneficiary.network, t.beneficiary.country),
         recipientBankName: t.beneficiary.bankName,
         // Numéro masqué dans la liste ; le complet s'affiche à la demande (GET bank-payout, session admin).
-        recipientAccountMasked: maskAccount(t.beneficiary.accountNumber),
+        recipientAccountMasked: isBankNetwork(t.beneficiary.network, t.beneficiary.country) ? maskAccount(t.beneficiary.accountNumber) : t.beneficiary.accountNumber,
         payoutProvider: t.payoutProvider,
         payInProvider: t.payInProvider,
         senderEmail: t.senderEmail,
@@ -80,8 +82,10 @@ async function loadTransfers(where: Prisma.TransferWhereInput = {}, take = 30): 
         interacApprovedByName: t.interacApprovedByName,
         interacApprovedAt: t.interacApprovedAt?.toISOString() ?? null,
         createdAt: t.createdAt.toISOString(),
-      })),
-    )
+        paidAt: t.paidAt?.toISOString() ?? null,
+        flags: flags.get(t.id) ?? [],
+      }));
+    })
     .catch((err: unknown) => {
       console.error("[admin] impossible de charger les transferts", err);
       return null;

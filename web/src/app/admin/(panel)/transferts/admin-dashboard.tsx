@@ -46,6 +46,9 @@ export type AdminTransferRow = {
   interacApprovedByName: string | null;
   interacApprovedAt: string | null;
   createdAt: string;
+  /** Argent reçu le (ISO) et signes d'alerte automatiques à examiner. */
+  paidAt: string | null;
+  flags: string[];
 };
 
 type Key = keyof typeof adminMessages.fr;

@@ -350,3 +350,15 @@ model AdminAuditLog {
 
   @@index([createdAt])
 }
+
+/// Journal des décisions de conformité sur un transfert (libéré, bloqué, signalé…). Jamais visible du client.
+model ComplianceNote {
+  id         String   @id @default(cuid())
+  createdAt  DateTime @default(now())
+  transferId String
+  author     String
+  decision   String   @default("note")
+  note       String
+
+  @@index([transferId])
+}

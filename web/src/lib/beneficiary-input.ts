@@ -28,6 +28,9 @@ export const beneficiaryInputSchema = z.object({
 
 export type BeneficiaryInput = z.infer<typeof beneficiaryInputSchema>;
 
+/** Réseaux où le client peut donner un identifiant de compte en plus du téléphone. */
+const WALLET_ID_NETWORKS = new Set(["ALIPAY", "WECHAT"]);
+
 export type NormalizedBeneficiary = {
   fullName: string;
   phone: string;
@@ -85,6 +88,11 @@ export async function normalizeBeneficiary(
     if (!input.phone || phoneError) {
       return { ok: false, error: phoneError ?? `Numéro requis pour ${country.name}` };
     }
+    // Alipay / WeChat Pay : identifiant du compte (facultatif), gardé dans accountNumber pour retrouver le bon compte.
+    const wallet = WALLET_ID_NETWORKS.has(input.network) ? (input.accountNumber ?? "").trim() : "";
+    if (wallet && !/^[\p{L}\p{N}_.@+\- ]{3,64}$/u.test(wallet)) {
+      return { ok: false, error: "Identifiant Alipay / WeChat invalide (3 à 64 caractères : lettres, chiffres, @ . _ -)" };
+    }
     return {
       ok: true,
       data: {
@@ -93,7 +101,7 @@ export async function normalizeBeneficiary(
         network: input.network,
         country: countryCode,
         bankName: null,
-        accountNumber: null,
+        accountNumber: wallet || null,
         bankCode: null,
       },
     };

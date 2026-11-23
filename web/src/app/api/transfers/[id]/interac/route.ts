@@ -86,6 +86,13 @@ export async function POST(request: Request, { params }: Params) {
           data: { transferId: id, type: "interac_second_approval", message: `2e validation par ${me.displayName} (${me.username}) : versement autorisé.` },
         });
       }
+      // On garde la trace de qui a confirmé la réception (sert à la règle « une autre personne verse »).
+      if (!transfer.interacApprovedBy) {
+        await prisma.transfer.updateMany({
+          where: { id, interacApprovedBy: null },
+          data: { interacApprovedBy: me.key, interacApprovedByName: me.displayName, interacApprovedAt: new Date() },
+        });
+      }
       const updated = await markPaymentDetected(id, ref);
       return NextResponse.json(updated ? publicTransfer(updated) : updated);
     }

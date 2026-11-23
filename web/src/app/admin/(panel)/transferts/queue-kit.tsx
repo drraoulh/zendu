@@ -78,3 +78,39 @@ export async function adminAction(
   if (!res.ok) throw new Error(typeof data.error === "string" ? data.error : `HTTP ${res.status}`);
   return data;
 }
+
+/**
+ * Pastilles d'alerte d'un dossier de la file : retard (virement déclaré depuis plus de 30 min, ou argent reçu depuis plus
+ * de 2 h sans versement) et signes à examiner (fractionnement, même bénéficiaire pour plusieurs clients…).
+ */
+export function AlertBadges({
+  kind,
+  since,
+  flags,
+}: {
+  kind: "interac" | "payout";
+  /** Interac : moment où le client a déclaré son virement. Versement : moment où l'argent a été reçu. */
+  since: string | null;
+  flags: string[];
+}) {
+  // Âge calculé au rendu (la page se rafraîchit à chaque action de l'équipe).
+  const minutes = since ? Math.max(0, Math.round((Date.now() - new Date(since).getTime()) / 60_000)) : 0;
+  const limit = kind === "interac" ? 30 : 120;
+  const late = since !== null && minutes >= limit;
+  if (!late && !flags.length) return null;
+  const age = minutes >= 120 ? `${Math.round(minutes / 60)} h` : `${minutes} min`;
+  return (
+    <div className="mb-3 flex flex-wrap gap-2">
+      {late ? (
+        <span className="rounded-full bg-danger/10 px-3 py-1 text-xs font-semibold text-danger">
+          {kind === "interac" ? `En retard : virement déclaré il y a ${age}` : `En retard : argent reçu il y a ${age}, versement à faire`}
+        </span>
+      ) : null}
+      {flags.map((f) => (
+        <span key={f} className="rounded-full bg-warn/15 px-3 py-1 text-xs font-semibold text-[#7a5308]">
+          À examiner : {f}
+        </span>
+      ))}
+    </div>
+  );
+}

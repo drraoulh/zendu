@@ -187,7 +187,7 @@ export function Simulator({
 
       <View style={[s.row, s.rowReceive]}>
         <View style={s.amountCol}>
-          <Text style={s.fieldLabel}>{tr("Ils reçoivent")}</Text>
+          <Text style={s.fieldLabel}>{tr("Ils reçoivent · modifiable")}</Text>
           <View style={{ flexDirection: "row", alignItems: "center", gap: 8 }}>
             <TextInput
               value={receiveText}

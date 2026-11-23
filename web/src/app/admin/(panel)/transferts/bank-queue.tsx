@@ -10,7 +10,7 @@ import { useT } from "@/i18n/define";
 import { adminMessages } from "@/i18n/admin";
 import { formatMoney } from "@/lib/money";
 import type { AdminTransferRow } from "./admin-dashboard";
-import { adminAction, CopyRow, rawAmount } from "./queue-kit";
+import { adminAction, CopyRow, rawAmount, AlertBadges } from "./queue-kit";
 
 type BankDetails = {
   fullName: string;
@@ -135,6 +135,7 @@ function BankQueueItem({
 
   return (
     <li className="rounded-2xl border border-line p-4">
+      <AlertBadges kind="payout" since={row.paidAt} flags={row.flags} />
       <div className="flex flex-wrap items-start justify-between gap-3">
         <div className="min-w-0">
           <Link href={`/admin/transferts/${row.reference}`} className="font-mono text-xs font-semibold text-brand hover:underline">
@@ -169,11 +170,16 @@ function BankQueueItem({
                 {row.recipientPhone && <CopyRow label={t("phoneLabel")} value={row.recipientNational} display={phoneDisplay} />}
               </>
             ) : (
-              <CopyRow
-                label={t("payoutNumber", { network: row.recipientNetwork })}
-                value={row.recipientNational}
-                display={phoneDisplay}
-              />
+              <>
+                <CopyRow
+                  label={t("payoutNumber", { network: row.recipientNetwork })}
+                  value={row.recipientNational}
+                  display={phoneDisplay}
+                />
+                {row.recipientAccountMasked ? (
+                  <CopyRow label={`Identifiant ${row.recipientNetwork}`} value={row.recipientAccountMasked} display={row.recipientAccountMasked} />
+                ) : null}
+              </>
             )}
             <CopyRow label={t("payoutReference")} value={row.reference} />
           </dl>

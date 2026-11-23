@@ -4,7 +4,7 @@ import { z } from "zod";
 import { publicTransfer } from "@/lib/bank";
 import { prisma } from "@/lib/prisma";
 import { completeManualBankPayout } from "@/lib/transfer-service";
-import { requireAdmin } from "@/lib/admin-guard";
+import { requireAdmin, requireAdminIdentity } from "@/lib/admin-guard";
 
 type Params = { params: Promise<{ id: string }> };
 
@@ -53,11 +53,21 @@ export async function GET(request: Request, { params }: Params) {
  * POST { outcome: "delivered" | "failed", bankReference?, reason? }
  */
 export async function POST(request: Request, { params }: Params) {
-  const denied = await guard(request);
-  if (denied) return denied;
+  const me = await requireAdminIdentity(request);
+  if (me instanceof NextResponse) return me;
 
   const { id } = await params;
   try {
+    // Double contrôle (PAYOUT_FOUR_EYES=1) : la personne qui a confirmé la réception de l'argent ne clôture pas le versement.
+    if (process.env.PAYOUT_FOUR_EYES === "1" && me.userId) {
+      const t = await prisma.transfer.findUnique({ where: { id }, select: { interacApprovedBy: true } });
+      if (t?.interacApprovedBy && t.interacApprovedBy === me.key) {
+        return NextResponse.json(
+          { error: "Une autre personne de l'équipe doit confirmer le versement (vous avez confirmé la réception de l'argent).", code: "same_approver" },
+          { status: 409 },
+        );
+      }
+    }
     const body = bodySchema.parse(await request.json().catch(() => ({})));
     const updated = await completeManualBankPayout(id, body);
     return NextResponse.json(updated ? publicTransfer(updated) : updated);

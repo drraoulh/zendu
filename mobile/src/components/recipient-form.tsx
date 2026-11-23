@@ -43,6 +43,8 @@ export function RecipientForm({
   const [errors, setErrors] = useState<Record<string, string>>({});
   const type = networks.find((n) => n.id === network)?.type ?? "mobile_money";
   const bank = type === "bank";
+  // Alipay / WeChat Pay : l'identifiant du compte aide à retrouver le bon bénéficiaire (facultatif).
+  const wallet = network === "ALIPAY" || network === "WECHAT";
   const c = COUNTRIES[country];
 
   async function fromContacts() {
@@ -74,6 +76,7 @@ export function RecipientForm({
       if (!/^[A-Za-z0-9]{6,34}$/.test(accountNumber.replace(/[\s-]/g, ""))) e.accountNumber = tr("IBAN, RIB ou numéro de compte (6 à 34 caractères)");
       if (bankCode && !/^[A-Za-z0-9]{3,11}$/.test(bankCode.replace(/\s/g, ""))) e.bankCode = tr("Code SWIFT/BIC invalide");
     }
+    if (wallet && accountNumber.trim() && !/^[\p{L}\p{N}_.@+\- ]{3,64}$/u.test(accountNumber.trim())) e.accountNumber = tr("Identifiant invalide (3 à 64 caractères)");
     setErrors(e);
     if (Object.keys(e).length) return;
     onSubmit(
@@ -87,7 +90,7 @@ export function RecipientForm({
         relation: relation || undefined,
         ...(bank
           ? { bankName: bankName.trim(), accountNumber: accountNumber.replace(/[\s-]/g, "").toUpperCase(), bankCode: bankCode.replace(/\s/g, "").toUpperCase() || undefined }
-          : { bankName: undefined, accountNumber: undefined, bankCode: undefined }),
+          : { bankName: undefined, accountNumber: wallet ? accountNumber.trim() || undefined : undefined, bankCode: undefined }),
       },
       save,
     );
@@ -127,6 +130,17 @@ export function RecipientForm({
           </View>
         }
       />
+
+      {wallet ? (
+        <Field
+          label={tr("Identifiant {0} (facultatif)", networkLabel(network))}
+          value={accountNumber}
+          onChangeText={setAccountNumber}
+          autoCapitalize="none"
+          hint={tr("Le nom d'utilisateur ou l'identifiant du compte, si vous le connaissez. Il aide à retrouver le bon compte.")}
+          error={errors.accountNumber}
+        />
+      ) : null}
 
       {withRelation ? (
         <>
