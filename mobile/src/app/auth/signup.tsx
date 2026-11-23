@@ -141,7 +141,8 @@ export default function SignUp() {
       return setErrors({ submit: r.error });
     }
     void storage.remove(KEY_DRAFT);
-    router.replace("/kyc");
+    // Compte créé : on ouvre l'appli ; le bandeau « Vérifiez votre identité » de l'accueil mène à la vérification.
+    router.replace("/(tabs)");
   }
 
   function back() {

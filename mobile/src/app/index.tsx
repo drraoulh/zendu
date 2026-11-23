@@ -6,6 +6,5 @@ export default function Index() {
   if (!profile) return <Redirect href={onboarded ? "/auth/login" : "/welcome"} />;
   if (locked) return <Redirect href="/lock" />;
   if (profile.mustChangePassword) return <Redirect href="/auth/reset" />;
-  if (profile.kyc === "none" || profile.kyc === "rejected") return <Redirect href="/kyc" />;
   return <Redirect href="/(tabs)" />;
 }
