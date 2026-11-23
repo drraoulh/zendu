@@ -30,6 +30,7 @@ export default function Home() {
   const corridors = useCorridors();
   const kyc = profile?.kyc ?? "none";
   const todo = kyc === "none" || kyc === "rejected";
+  const profileDone = Boolean(profile?.birthDate && profile?.address?.line1);
   const home = profile?.country ?? "CA";
   const selected = draft.recipient && draft.corridorId.endsWith(`-${draft.recipient.country}`) ? draft.recipient : null;
 
@@ -92,10 +93,12 @@ export default function Home() {
           style={[st.kyc, { backgroundColor: kyc === "rejected" ? colors.dangerSoft : colors.warnSoft, borderColor: kyc === "rejected" ? colors.dangerSoft : colors.warnSoft }]}
         >
           <View style={{ flex: 1 }}>
-            <Text style={st.kycTitle}>{kyc === "none" ? tr("Vérifiez votre identité") : kyc === "rejected" ? tr("Vérification refusée") : tr("Vérification en cours")}</Text>
+            <Text style={st.kycTitle}>{kyc === "none" ? (profileDone ? tr("Vérifiez votre identité") : tr("Terminez votre inscription")) : kyc === "rejected" ? tr("Vérification refusée") : tr("Vérification en cours")}</Text>
             <Small>
               {kyc === "none"
-                ? tr("Obligatoire avant votre premier envoi · 2 min")
+                ? profileDone
+                  ? tr("Obligatoire avant votre premier envoi · 2 min")
+                  : tr("Adresse puis vérification d'identité · 3 min")
                 : kyc === "rejected"
                   ? profile?.kycNote ?? tr("Recommencez avec un document valide.")
                   : tr("Touchez pour reprendre ou vérifier le statut. Vous pourrez envoyer dès qu'elle sera confirmée.")}

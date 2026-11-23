@@ -2,12 +2,13 @@ import { router } from "expo-router";
 import { useEffect, useRef, useState } from "react";
 import { ActivityIndicator, BackHandler, Platform, StyleSheet, Text, View } from "react-native";
 import { Icon, type IconName } from "@/components/icons";
-import { Button, Card, Choice, H1, Header, ListItem, Notice, P, Screen, Small, Steps } from "@/components/ui";
+import { Button, Card, Choice, Field, H1, Header, ListItem, Notice, P, Screen, Small, Steps } from "@/components/ui";
+import { SelectField } from "@/components/form";
 import { authenticate, biometricKind, biometricLabel } from "@/lib/biometrics";
 import { runDiditVerification } from "@/lib/didit";
 import { ensureCameraPermission } from "@/lib/camera-permission";
 import type { CountryCode } from "@/lib/corridors";
-import { KYC_DOCUMENTS } from "@/lib/geo";
+import { ageFrom, KYC_DOCUMENTS, maskDate, OCCUPATIONS, parseBirthDate, POSTAL_LABEL, REGION_LABEL, REGIONS } from "@/lib/geo";
 import { useSession } from "@/lib/session";
 import { colors, fonts, radius } from "@/lib/theme";
 import { tr } from "@/lib/i18n";
@@ -18,12 +19,22 @@ import { tr } from "@/lib/i18n";
  * automatique (l'appli relit le statut au retour puis toutes les 15 s). Sinon (démo) : capture simulée.
  */
 export default function Kyc() {
-  const { profile, submitKyc, updateSettings, startDidit, refreshKyc } = useSession();
+  const { profile, submitKyc, updateSettings, startDidit, refreshKyc, update } = useSession();
   // null = on ne sait pas encore si la vérification Didit est branchée.
   const [didit, setDidit] = useState<boolean | null>(null);
   const country = (profile?.country ?? "CA") as CountryCode;
   const docs = KYC_DOCUMENTS[country] ?? KYC_DOCUMENTS.CA;
-  const [stepState, setStep] = useState(profile?.kyc === "none" || profile?.kyc === "rejected" ? 6 : 9);
+  // Profil à compléter (naissance, adresse) : demandé ici, après la création du compte, avant la vérification.
+  const profileDone = Boolean(profile?.birthDate && profile?.address?.line1);
+  const [stepState, setStep] = useState(profile?.kyc === "none" || profile?.kyc === "rejected" ? (profileDone ? 6 : 5) : 9);
+  const [birth, setBirth] = useState(profile?.birthDate ?? "");
+  const [occupation, setOccupation] = useState(profile?.occupation ?? "");
+  const [line1, setLine1] = useState(profile?.address?.line1 ?? "");
+  const [line2, setLine2] = useState(profile?.address?.line2 ?? "");
+  const [city, setCity] = useState(profile?.address?.city ?? "");
+  const [region, setRegion] = useState(profile?.region ?? profile?.address?.region ?? "");
+  const [postal, setPostal] = useState(profile?.address?.postalCode ?? "");
+  const [fieldErrors, setFieldErrors] = useState<Record<string, string>>({});
   const [error, setError] = useState<string | null>(null);
   const [busy, setBusy] = useState(false);
   const [docId, setDocId] = useState(docs[0].id);
@@ -63,6 +74,33 @@ export default function Kyc() {
     const t = setTimeout(() => setCheckFailed(true), 15_000);
     return () => clearTimeout(t);
   }, [didit, checkFailed, checkTry]);
+
+  async function saveProfileStep() {
+    const e: Record<string, string> = {};
+    const d = parseBirthDate(birth);
+    if (!d) e.birth = tr("Date invalide (JJ/MM/AAAA)");
+    else if (ageFrom(d) < 18) e.birth = tr("Vous devez avoir au moins 18 ans");
+    else if (ageFrom(d) > 120) e.birth = tr("Date invalide");
+    if (!occupation) e.occupation = tr("Choisissez une occupation");
+    if (line1.trim().length < 4) e.line1 = tr("Adresse requise");
+    if (city.trim().length < 2) e.city = tr("Ville requise");
+    if (!region) e.region = tr("{0} requis(e)", tr(REGION_LABEL[country]));
+    if (country === "CA" && !/^[A-Za-z]\d[A-Za-z]\s?\d[A-Za-z]\d$/.test(postal.trim())) e.postal = tr("Code postal invalide (A1A 1A1)");
+    if (country === "CN" && postal && !/^\d{6}$/.test(postal.trim())) e.postal = tr("Code postal à 6 chiffres");
+    setFieldErrors(e);
+    setError(null);
+    if (Object.keys(e).length) return;
+    setBusy(true);
+    const r = await update({
+      birthDate: birth,
+      occupation,
+      region,
+      address: { line1: line1.trim(), line2: line2.trim() || undefined, city: city.trim(), region, postalCode: postal.trim().toUpperCase() || undefined },
+    });
+    setBusy(false);
+    if (!r.ok) return setError(r.error);
+    setStep(6);
+  }
 
   async function verifyWithDidit() {
     setError(null);
@@ -134,6 +172,42 @@ export default function Kyc() {
     return () => sub.remove();
   }, [step]);
 
+  if (step === 5) {
+    return (
+      <Screen
+        footer={
+          <View style={{ gap: 6 }}>
+            {error ? <Notice tone="danger" icon="alert" text={error} /> : null}
+            <Button title={tr("Continuer")} onPress={saveProfileStep} loading={busy} />
+            <Button title={tr("Plus tard")} variant="ghost" onPress={exit} disabled={busy} />
+          </View>
+        }
+      >
+        <Header title={tr("Terminer mon inscription")} back={false} />
+        <Steps current={1} total={2} label={tr("Votre profil")} />
+        <H1>{tr("Votre profil et votre adresse")}</H1>
+        <P style={{ marginTop: 6, marginBottom: 18 }}>{tr("La réglementation sur les transferts d'argent nous oblige à vérifier l'identité de nos clients. Ces données restent confidentielles.")}</P>
+        <Field label={tr("Date de naissance")} value={birth} onChangeText={(v) => setBirth(maskDate(v))} placeholder="JJ/MM/AAAA" keyboardType="number-pad" maxLength={10} error={fieldErrors.birth} />
+        <SelectField label={tr("Profession ou occupation")} value={occupation} options={OCCUPATIONS.map((o) => ({ value: o, label: tr(o) }))} onChange={setOccupation} error={fieldErrors.occupation} />
+        <Field label={tr("Adresse résidentielle")} value={line1} onChangeText={setLine1} autoComplete="street-address" error={fieldErrors.line1} />
+        <Field label={tr("Appartement, bureau (facultatif)")} value={line2} onChangeText={setLine2} placeholder={tr("Ex. app. 804")} />
+        <Field label={tr("Ville")} value={city} onChangeText={setCity} autoComplete="postal-address-locality" error={fieldErrors.city} />
+        <SelectField label={tr(REGION_LABEL[country])} value={region} options={REGIONS[country].map((r) => ({ value: r, label: tr(r) }))} onChange={setRegion} error={fieldErrors.region} />
+        {POSTAL_LABEL[country] ? (
+          <Field
+            label={country === "CN" ? tr("Code postal (facultatif)") : tr("Code postal")}
+            value={postal}
+            onChangeText={setPostal}
+            placeholder={country === "CA" ? "A1A 1A1" : "100000"}
+            autoCapitalize="characters"
+            autoComplete="postal-code"
+            error={fieldErrors.postal}
+          />
+        ) : null}
+      </Screen>
+    );
+  }
+
   if (step >= 6 && step <= 8 && didit === null) {
     return (
       <Screen
@@ -178,7 +252,7 @@ export default function Kyc() {
         }
       >
         <Header title={tr("Vérification d'identité")} back={false} />
-        <Steps current={4} total={6} label={tr("Pièce d'identité")} />
+        <Steps current={2} total={2} label={tr("Pièce d'identité")} />
         <H1>{tr("Vérifions votre identité")}</H1>
         <P style={{ marginTop: 6, marginBottom: 18 }}>{tr("Exigée par la réglementation sur les transferts d'argent. Cela prend environ 2 minutes.")}</P>
         {profile?.kyc === "rejected" ? (

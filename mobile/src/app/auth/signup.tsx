@@ -5,7 +5,6 @@ import { Flag } from "@/components/flag";
 import { Checkbox, PasswordChecklist, SelectField } from "@/components/form";
 import { Button, Field, H1, Header, Notice, P, Screen, Small, Steps } from "@/components/ui";
 import { COUNTRIES, COUNTRY_CODES, type CountryCode } from "@/lib/corridors";
-import { ageFrom, maskDate, OCCUPATIONS, parseBirthDate, POSTAL_LABEL, REGION_LABEL, REGIONS } from "@/lib/geo";
 import { company } from "@/lib/company";
 import { openSite } from "@/lib/links";
 import { storage } from "@/lib/storage";
@@ -14,11 +13,11 @@ import { colors, fonts } from "@/lib/theme";
 import { tr } from "@/lib/i18n";
 
 const EMAIL = /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/;
-// Pas d'étape « code par SMS » : aucun envoi réel de SMS à l'inscription (la connexion, elle, est
-// protégée par un code envoyé par courriel). Étapes 4 à 6 : vérification d'identité (écran /kyc).
-const TITLES = [tr("Vous"), tr("Profil et adresse"), tr("Sécurité")];
+// Inscription volontairement courte (2 étapes) : le profil (naissance, adresse) et la vérification d'identité
+// se terminent ensuite depuis le bandeau de l'accueil (écran /kyc). Pas de code par SMS à l'inscription.
+const TITLES = [tr("Vous"), tr("Sécurité")];
 const LAST = TITLES.length;
-const SIGNUP_TOTAL_STEPS = LAST + 3;
+const SIGNUP_TOTAL_STEPS = LAST;
 // Brouillon (sans le mot de passe) gardé sur le téléphone : une appli fermée en pleine inscription ne perd rien.
 const KEY_DRAFT = "wst.signup.draft";
 
@@ -26,17 +25,10 @@ export default function SignUp() {
   const { signUp } = useSession();
   const [step, setStep] = useState(1);
   const [country, setCountry] = useState<CountryCode>("CA");
-  const [region, setRegion] = useState("");
   const [email, setEmail] = useState("");
   const [phone, setPhone] = useState("");
   const [firstName, setFirstName] = useState("");
   const [lastName, setLastName] = useState("");
-  const [birth, setBirth] = useState("");
-  const [occupation, setOccupation] = useState("");
-  const [line1, setLine1] = useState("");
-  const [line2, setLine2] = useState("");
-  const [city, setCity] = useState("");
-  const [postal, setPostal] = useState("");
   const [password, setPassword] = useState("");
   const [accepted, setAccepted] = useState(false);
   const [marketing, setMarketing] = useState(false);
@@ -53,25 +45,18 @@ export default function SignUp() {
       const d = await storage.get<Record<string, string>>(KEY_DRAFT);
       if (d) {
         if (d.country && d.country in COUNTRIES) setCountry(d.country as CountryCode);
-        setRegion(d.region ?? "");
         setEmail(d.email ?? "");
         setPhone(d.phone ?? "");
         setFirstName(d.firstName ?? "");
         setLastName(d.lastName ?? "");
-        setBirth(d.birth ?? "");
-        setOccupation(d.occupation ?? "");
-        setLine1(d.line1 ?? "");
-        setLine2(d.line2 ?? "");
-        setCity(d.city ?? "");
-        setPostal(d.postal ?? "");
       }
       restored.current = true;
     })();
   }, []);
   useEffect(() => {
     if (!restored.current) return;
-    void storage.set(KEY_DRAFT, { country, region, email, phone, firstName, lastName, birth, occupation, line1, line2, city, postal });
-  }, [country, region, email, phone, firstName, lastName, birth, occupation, line1, line2, city, postal]);
+    void storage.set(KEY_DRAFT, { country, email, phone, firstName, lastName });
+  }, [country, email, phone, firstName, lastName]);
 
   /** Numéro sans indicatif ni zéro de tête, même s'il a été collé ou rempli automatiquement avec « +1 », « 237 »… */
   function localPhone(): string {
@@ -91,18 +76,6 @@ export default function SignUp() {
       if (localPhone().length < (country === "CA" ? 10 : 8)) e.phone = tr("Numéro de téléphone invalide");
     }
     if (step === 2) {
-      const d = parseBirthDate(birth);
-      if (!d) e.birth = tr("Date invalide (JJ/MM/AAAA)");
-      else if (ageFrom(d) < 18) e.birth = tr("Vous devez avoir au moins 18 ans");
-      else if (ageFrom(d) > 120) e.birth = tr("Date invalide");
-      if (!occupation) e.occupation = tr("Choisissez une occupation");
-      if (line1.trim().length < 4) e.line1 = tr("Adresse requise");
-      if (city.trim().length < 2) e.city = tr("Ville requise");
-      if (!region) e.region = `${REGION_LABEL[country]} requis(e)`;
-      if (country === "CA" && !/^[A-Za-z]\d[A-Za-z]\s?\d[A-Za-z]\d$/.test(postal.trim())) e.postal = tr("Code postal invalide (A1A 1A1)");
-      if (country === "CN" && postal && !/^\d{6}$/.test(postal.trim())) e.postal = tr("Code postal à 6 chiffres");
-    }
-    if (step === 3) {
       if (passwordScore(password) < 4) e.password = tr("Le mot de passe ne respecte pas toutes les règles");
       if (!accepted) e.accepted = tr("Vous devez accepter les conditions");
     }
@@ -122,10 +95,6 @@ export default function SignUp() {
         email: email.trim().toLowerCase(),
         phone: `+${c.dialCode} ${localPhone()}`,
         country,
-        region,
-        birthDate: birth,
-        occupation,
-        address: { line1: line1.trim(), line2: line2.trim() || undefined, city: city.trim(), region, postalCode: postal.trim().toUpperCase() || undefined },
         marketing,
       },
       password,
@@ -194,15 +163,12 @@ export default function SignUp() {
       {step === 1 ? (
         <>
           <H1>{tr("Commençons par vous")}</H1>
-          <P style={{ marginTop: 6, marginBottom: 18 }}>{tr("Indiquez vos nom et prénom tels qu'ils figurent sur votre pièce d'identité.")}</P>
+          <P style={{ marginTop: 6, marginBottom: 18 }}>{tr("Quelques informations pour créer votre compte. Le reste se complète ensuite dans l'appli.")}</P>
           <SelectField
             label={tr("Pays de résidence")}
             value={country}
             options={COUNTRY_CODES.map((code) => ({ value: code, label: COUNTRIES[code].name }))}
-            onChange={(v) => {
-              setCountry(v as CountryCode);
-              setRegion("");
-            }}
+            onChange={(v) => setCountry(v as CountryCode)}
           />
           <Field label={tr("Prénom")} value={firstName} onChangeText={setFirstName} autoComplete="given-name" textContentType="givenName" error={errors.firstName} />
           <Field label={tr("Nom")} value={lastName} onChangeText={setLastName} placeholder={tr("Nom de famille")} autoComplete="family-name" textContentType="familyName" error={errors.lastName} />
@@ -250,38 +216,6 @@ export default function SignUp() {
       ) : null}
 
       {step === 2 ? (
-        <>
-          <H1>{tr("Votre profil et votre adresse")}</H1>
-          <P style={{ marginTop: 6, marginBottom: 18 }}>{tr("La réglementation sur les transferts d'argent nous oblige à vérifier l'identité de nos clients. Ces données restent confidentielles.")}</P>
-          <Field
-            label={tr("Date de naissance")}
-            value={birth}
-            onChangeText={(v) => setBirth(maskDate(v))}
-            placeholder="JJ/MM/AAAA"
-            keyboardType="number-pad"
-            maxLength={10}
-            error={errors.birth}
-          />
-          <SelectField label={tr("Profession ou occupation")} value={occupation} options={OCCUPATIONS.map((o) => ({ value: o, label: tr(o) }))} onChange={setOccupation} error={errors.occupation} />
-          <Field label={tr("Adresse résidentielle")} value={line1} onChangeText={setLine1} autoComplete="street-address" error={errors.line1} />
-          <Field label={tr("Appartement, bureau (facultatif)")} value={line2} onChangeText={setLine2} placeholder={tr("Ex. app. 804")} />
-          <Field label={tr("Ville")} value={city} onChangeText={setCity} autoComplete="postal-address-locality" error={errors.city} />
-          <SelectField label={tr(REGION_LABEL[country])} value={region} options={REGIONS[country].map((r) => ({ value: r, label: tr(r) }))} onChange={setRegion} error={errors.region} />
-          {POSTAL_LABEL[country] ? (
-            <Field
-              label={country === "CN" ? tr("Code postal (facultatif)") : tr("Code postal")}
-              value={postal}
-              onChangeText={setPostal}
-              placeholder={country === "CA" ? "A1A 1A1" : "100000"}
-              autoCapitalize="characters"
-              autoComplete="postal-code"
-              error={errors.postal}
-            />
-          ) : null}
-        </>
-      ) : null}
-
-      {step === 3 ? (
         <>
           <H1>{tr("Choisissez un mot de passe")}</H1>
           <P style={{ marginTop: 6, marginBottom: 18 }}>{tr("Il protège votre argent : évitez de réutiliser celui d'un autre service.")}</P>

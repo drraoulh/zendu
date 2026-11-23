@@ -1086,5 +1086,11 @@
  "Mode démonstration : aucun paiement réel n'est attendu. Touchez « Simuler la réception ».": "演示模式：无需真实付款。请点击“模拟收款”。",
  "Paiement signalé": "已通知付款",
  "Merci ! Nous vérifions la réception de votre paiement de {0}. Le versement part dès qu'elle est confirmée ; cet écran se met à jour automatiquement.": "谢谢！我们正在核实您 {0} 的付款是否到账。确认后立即付款；本页面会自动更新。",
- "En attente de votre paiement de {0}, à envoyer avant le {1}. Le versement part dès sa réception ; cet écran se met à jour automatiquement.": "正在等待您 {0} 的付款，请在 {1} 前完成。收到后立即付款；本页面会自动更新。"
+ "En attente de votre paiement de {0}, à envoyer avant le {1}. Le versement part dès sa réception ; cet écran se met à jour automatiquement.": "正在等待您 {0} 的付款，请在 {1} 前完成。收到后立即付款；本页面会自动更新。",
+ "Terminer mon inscription": "完成注册",
+ "Votre profil": "您的资料",
+ "Terminez votre inscription": "请完成注册",
+ "Adresse puis vérification d'identité · 3 min": "填写地址并验证身份 · 3 分钟",
+ "Quelques informations pour créer votre compte. Le reste se complète ensuite dans l'appli.": "填写几项信息即可创建账户，其余信息稍后在应用内补充。",
+ "{0} requis(e)": "请填写{0}"
 }

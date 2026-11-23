@@ -1086,5 +1086,11 @@
  "Mode démonstration : aucun paiement réel n'est attendu. Touchez « Simuler la réception ».": "Modo de demostración: no se espera ningún pago real. Toque «Simular la recepción».",
  "Paiement signalé": "Pago comunicado",
  "Merci ! Nous vérifions la réception de votre paiement de {0}. Le versement part dès qu'elle est confirmée ; cet écran se met à jour automatiquement.": "¡Gracias! Estamos verificando la recepción de su pago de {0}. El envío sale en cuanto se confirme; esta pantalla se actualiza sola.",
- "En attente de votre paiement de {0}, à envoyer avant le {1}. Le versement part dès sa réception ; cet écran se met à jour automatiquement.": "Esperando su pago de {0}, que debe enviar antes del {1}. El envío sale en cuanto se reciba; esta pantalla se actualiza sola."
+ "En attente de votre paiement de {0}, à envoyer avant le {1}. Le versement part dès sa réception ; cet écran se met à jour automatiquement.": "Esperando su pago de {0}, que debe enviar antes del {1}. El envío sale en cuanto se reciba; esta pantalla se actualiza sola.",
+ "Terminer mon inscription": "Terminar mi registro",
+ "Votre profil": "Su perfil",
+ "Terminez votre inscription": "Termine su registro",
+ "Adresse puis vérification d'identité · 3 min": "Dirección y verificación de identidad · 3 min",
+ "Quelques informations pour créer votre compte. Le reste se complète ensuite dans l'appli.": "Algunos datos para crear su cuenta. El resto se completa después en la app.",
+ "{0} requis(e)": "{0} obligatorio"
 }
