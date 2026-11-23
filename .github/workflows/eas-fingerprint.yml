@@ -67,6 +67,15 @@ jobs:
 # Vérification 14:13:41
 # Vérification 12:17:15
 
+      - name: Annuler deux builds de test en file (demande de l'utilisateur)
+        continue-on-error: true
+        env:
+          EXPO_TOKEN: ${{ secrets.EXPO_TOKEN }}
+        run: |
+          for id in a682da38-453f-4251-97c0-2b7bb30cb29d fa5e9b5d-457d-4a10-bbb7-eed408552ef2; do
+            npx --yes eas-cli@latest build:cancel "$id" --non-interactive && echo "ANNULÉ $id" || echo "ÉCHEC annulation $id"
+          done
+
       - name: État des derniers builds de test (APK)
         env:
           EXPO_TOKEN: ${{ secrets.EXPO_TOKEN }}
@@ -79,3 +88,4 @@ jobs:
 # Vérification 12:24:14
 # Vérification 12:35:39
 # Vérification 18:38:31
+# Vérification 18:42:40
