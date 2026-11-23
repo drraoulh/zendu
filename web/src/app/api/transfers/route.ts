@@ -96,6 +96,12 @@ export async function GET(request: Request) {
   return NextResponse.json(transfers.map(publicTransfer));
 }
 
+class CustomerLimitError extends Error {
+  constructor(readonly left: number, readonly period: string, readonly max: number) {
+    super("customer_limit");
+  }
+}
+
 export async function POST(request: Request) {
   // Renseigné une fois le client identifié : sert à rejouer la réponse si deux demandes identiques se croisent.
   let replayKey: { customerId: string; key: string } | null = null;
@@ -237,94 +243,90 @@ export async function POST(request: Request) {
       );
     }
 
-    // Plafonds par client (24 h et 30 jours), sur les envois payés en dollars canadiens.
-    if (live && authed && quoteData.sendCurrency === "CAD") {
-      const sumSince = async (ms: number) =>
-        (
-          await prisma.transfer.aggregate({
-            _sum: { totalCad: true },
-            where: {
-              customerId: authed.customer.id,
-              sendCurrency: "CAD",
-              status: { notIn: ["expired", "cancelled"] },
-              createdAt: { gte: new Date(Date.now() - ms) },
-            },
-          })
-        )._sum.totalCad ?? 0;
-      const [day, month] = await Promise.all([sumSince(86_400_000), sumSince(30 * 86_400_000)]);
-      const over = day + quoteData.total > limits.dailyCad ? { left: limits.dailyCad - day, period: "24 heures", max: limits.dailyCad } : month + quoteData.total > limits.monthlyCad ? { left: limits.monthlyCad - month, period: "30 jours", max: limits.monthlyCad } : null;
-      if (over) {
-        const left = Math.max(0, Math.floor(over.left * 100) / 100);
-        return NextResponse.json(
-          {
-            error: `Plafond atteint : ${over.max.toLocaleString("fr-FR")} $ par ${over.period}. Vous pouvez encore envoyer ${left.toLocaleString("fr-FR")} $ sur cette période.`,
-            code: "customer_limit",
-          },
-          { status: 400 },
-        );
-      }
-    }
-
     const interac = data.payMethod === "interac";
-    // Référence unique : nouveau tirage dans le cas (rare) où elle existe déjà.
-    let reference = createReference();
-    for (let i = 0; i < 5 && (await prisma.transfer.findUnique({ where: { reference }, select: { id: true } })); i += 1) {
-      reference = createReference();
-    }
     const appUrl = process.env.NEXT_PUBLIC_APP_URL ?? "http://localhost:3000";
+    const transfer = await prisma.$transaction(
+      async (tx) => {
+        // Plafonds par client (24 h et 30 jours), sur les envois payés en dollars canadiens. Un verrou par client
+        // fait attendre une 2e demande simultanée : deux envois lancés en même temps ne peuvent pas dépasser le plafond.
+        if (live && authed && quoteData.sendCurrency === "CAD") {
+          await tx.$executeRaw`SELECT pg_advisory_xact_lock(hashtext(${authed.customer.id}))`;
+          const sumSince = async (ms: number) =>
+            (
+              await tx.transfer.aggregate({
+                _sum: { totalCad: true },
+                where: {
+                  customerId: authed.customer.id,
+                  sendCurrency: "CAD",
+                  status: { notIn: ["expired", "cancelled"] },
+                  createdAt: { gte: new Date(Date.now() - ms) },
+                },
+              })
+            )._sum.totalCad ?? 0;
+          const [day, month] = await Promise.all([sumSince(86_400_000), sumSince(30 * 86_400_000)]);
+          const over = day + quoteData.total > limits.dailyCad ? { left: limits.dailyCad - day, period: "24 heures", max: limits.dailyCad } : month + quoteData.total > limits.monthlyCad ? { left: limits.monthlyCad - month, period: "30 jours", max: limits.monthlyCad } : null;
+          if (over) throw new CustomerLimitError(over.left, over.period, over.max);
+        }
+        // Référence unique : nouveau tirage dans le cas (rare) où elle existe déjà.
+        let reference = createReference();
+        for (let i = 0; i < 5 && (await tx.transfer.findUnique({ where: { reference }, select: { id: true } })); i += 1) {
+          reference = createReference();
+        }
+        const beneficiary = await tx.beneficiary.create({
+          data: normalized.data,
+        });
 
-    const beneficiary = await prisma.beneficiary.create({
-      data: normalized.data,
-    });
-
-    const quote = await prisma.quote.create({
-      data: {
-        corridorId: quoteData.corridorId,
-        sendCurrency: quoteData.sendCurrency,
-        receiveCurrency: quoteData.receiveCurrency,
-        sendAmountCad: quoteData.sendAmount,
-        receiveAmountXaf: quoteData.receiveAmount,
-        rate: quoteData.rate,
-        feeCad: quoteData.fee,
-        totalCad: quoteData.total,
-        expiresAt: quoteData.expiresAt,
-      },
-    });
-
-    const transfer = await prisma.transfer.create({
-      data: {
-        reference,
-        status: "awaiting_payment",
-        corridorId: quoteData.corridorId,
-        sourceCountry: quoteData.sourceCountry,
-        destCountry: quoteData.destCountry,
-        sendCurrency: quoteData.sendCurrency,
-        receiveCurrency: quoteData.receiveCurrency,
-        senderName,
-        senderEmail,
-        customerId: authed?.customer.id ?? null,
-        idempotencyKey: idemKey,
-        sendAmountCad: quoteData.sendAmount,
-        receiveAmountXaf: quoteData.receiveAmount,
-        rate: quoteData.rate,
-        feeCad: quoteData.fee,
-        totalCad: quoteData.total,
-        payInProvider: interac ? INTERAC_PROVIDER : getPayInMode(),
-        // MTN MoMo seulement pour MTN au Cameroun ; le reste est simulé en démo, versé par l'équipe sinon.
-        payoutProvider: payoutProviderFor(normalized.data.network, corridor.destination, senderEmail),
-        quoteId: quote.id,
-        beneficiaryId: beneficiary.id,
-        events: {
-          create: {
-            type: "created",
-            message: interac
-              ? `Transfert ${quoteData.corridorId} créé, en attente du virement Interac`
-              : `Transfert ${quoteData.corridorId} créé, en attente de paiement`,
+        const quote = await tx.quote.create({
+          data: {
+            corridorId: quoteData.corridorId,
+            sendCurrency: quoteData.sendCurrency,
+            receiveCurrency: quoteData.receiveCurrency,
+            sendAmountCad: quoteData.sendAmount,
+            receiveAmountXaf: quoteData.receiveAmount,
+            rate: quoteData.rate,
+            feeCad: quoteData.fee,
+            totalCad: quoteData.total,
+            expiresAt: quoteData.expiresAt,
           },
-        },
+        });
+
+        return tx.transfer.create({
+          data: {
+            reference,
+            status: "awaiting_payment",
+            corridorId: quoteData.corridorId,
+            sourceCountry: quoteData.sourceCountry,
+            destCountry: quoteData.destCountry,
+            sendCurrency: quoteData.sendCurrency,
+            receiveCurrency: quoteData.receiveCurrency,
+            senderName,
+            senderEmail,
+            customerId: authed?.customer.id ?? null,
+            idempotencyKey: idemKey,
+            sendAmountCad: quoteData.sendAmount,
+            receiveAmountXaf: quoteData.receiveAmount,
+            rate: quoteData.rate,
+            feeCad: quoteData.fee,
+            totalCad: quoteData.total,
+            payInProvider: interac ? INTERAC_PROVIDER : getPayInMode(),
+            // MTN MoMo seulement pour MTN au Cameroun ; le reste est simulé en démo, versé par l'équipe sinon.
+            payoutProvider: payoutProviderFor(normalized.data.network, corridor.destination, senderEmail),
+            quoteId: quote.id,
+            beneficiaryId: beneficiary.id,
+            events: {
+              create: {
+                type: "created",
+                message: interac
+                  ? `Transfert ${quoteData.corridorId} créé, en attente du virement Interac`
+                  : `Transfert ${quoteData.corridorId} créé, en attente de paiement`,
+              },
+            },
+          },
+          include: { beneficiary: true },
+        });
       },
-      include: { beneficiary: true },
-    });
+      { timeout: 15_000 },
+    );
 
     if (interac) {
       const payInRef = `interac_${transfer.reference}`;
@@ -366,6 +368,16 @@ export async function POST(request: Request) {
     if (error instanceof Prisma.PrismaClientKnownRequestError && error.code === "P2002" && replayKey) {
       const existing = await findExisting(replayKey.customerId, replayKey.key).catch(() => null);
       if (existing) return replayExisting(existing);
+    }
+    if (error instanceof CustomerLimitError) {
+      const left = Math.max(0, Math.floor(error.left * 100) / 100);
+      return NextResponse.json(
+        {
+          error: `Plafond atteint : ${error.max.toLocaleString("fr-FR")} $ par ${error.period}. Vous pouvez encore envoyer ${left.toLocaleString("fr-FR")} $ sur cette période.`,
+          code: "customer_limit",
+        },
+        { status: 400 },
+      );
     }
     if (error instanceof QuoteLimitError) {
       return NextResponse.json(

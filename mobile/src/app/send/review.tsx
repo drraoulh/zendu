@@ -1,9 +1,9 @@
 import { Redirect, router, useFocusEffect } from "expo-router";
 import { useCallback, useEffect, useRef, useState } from "react";
 import { Text, View } from "react-native";
-import { Button, Card, Choice, Divider, H1, Header, Notice, Screen, Small, SEND_STEPS, Steps, SummaryRow } from "@/components/ui";
+import { Button, Card, Choice, H1, Header, Notice, Screen, Small, SEND_STEPS, Steps, SummaryRow } from "@/components/ui";
 import { api, type Quote } from "@/lib/api";
-import { countryName, deliveryEstimate, etaLabel, feeLabel, money, networkLabel, phone, rateLine } from "@/lib/format";
+import { deliveryEstimate, etaLabel, feeLabel, money, networkLabel, phone, rateLine } from "@/lib/format";
 import { findCorridor, payMethodsOf, useCorridors } from "@/lib/corridors";
 import { useStore } from "@/lib/store";
 import { colors, fonts } from "@/lib/theme";
@@ -80,35 +80,35 @@ export default function Review() {
       <Header title={tr("Vérification")} />
       <Steps current={3} total={3} label={tr("Paiement")} names={SEND_STEPS} />
 
-      <Card style={{ alignItems: "center", marginBottom: 14, backgroundColor: colors.soft, borderColor: colors.line }}>
-        <Text style={{ color: colors.muted, fontFamily: fonts.medium, fontSize: 12, letterSpacing: 0.6 }}>{tr("{0} REÇOIT", recipient.fullName.toUpperCase())}</Text>
-        <Text style={{ color: colors.ink, fontFamily: fonts.display, fontSize: 30, marginTop: 6 }}>
-          {quote ? money(quote.receiveAmount, quote.receiveCurrency) : "…"}
+      {/* Ce qui compte : combien je paie, combien il reçoit, puis les détails. */}
+      <Card style={{ alignItems: "center", marginBottom: 14, backgroundColor: colors.soft, borderColor: colors.line, paddingVertical: 22 }}>
+        <Text style={{ color: colors.muted, fontFamily: fonts.medium, fontSize: 12, letterSpacing: 0.6 }}>{tr("VOUS PAYEZ")}</Text>
+        <Text style={{ color: colors.ink, fontFamily: fonts.display, fontSize: 36, letterSpacing: -0.8, marginTop: 4 }} numberOfLines={1} adjustsFontSizeToFit>
+          {quote ? money(quote.total, quote.sendCurrency) : "…"}
         </Text>
-        <View style={{ marginTop: 10 }}>
-          <PaymentLogo id={recipient.network} size={26} />
-        </View>
-        <Small style={{ marginTop: 6, textAlign: "center" }}>
-          {networkLabel(recipient.network)}
-          {recipient.phone ? ` · ${phone(recipient.phone)}` : recipient.bankName ? ` · ${recipient.bankName}` : ""} · {countryName(recipient.country)}
-        </Small>
+        <Text style={{ color: colors.ink, fontFamily: fonts.medium, fontSize: 15, marginTop: 8, textAlign: "center" }}>
+          {tr("{0} reçoit {1}", recipient.fullName, quote ? money(quote.receiveAmount, quote.receiveCurrency) : "…")}
+        </Text>
       </Card>
 
       <Card style={{ marginBottom: 14 }}>
+        <SummaryRow
+          label={tr("Destinataire")}
+          value={`${networkLabel(recipient.network)}${recipient.phone ? ` · ${phone(recipient.phone)}` : recipient.bankName ? ` · ${recipient.bankName}` : ""}`}
+          valueIcon={<PaymentLogo id={recipient.network} size={20} />}
+        />
         {quote ? (
           <>
-            <SummaryRow label={tr("Vous envoyez")} value={money(quote.sendAmount, quote.sendCurrency)} />
+            {quote.fee > 0 ? <SummaryRow label={tr("Vous envoyez")} value={money(quote.sendAmount, quote.sendCurrency)} /> : null}
             <SummaryRow label={tr("Taux de change")} value={rateLine(quote.rate, quote.sendCurrency, quote.receiveCurrency)} />
             <SummaryRow label={tr("Frais")} value={feeLabel(quote.fee, quote.sendCurrency)} />
-            <Divider />
-            <SummaryRow label={tr("Total à payer")} value={money(quote.total, quote.sendCurrency)} strong />
             <SummaryRow label={tr("Délai estimé")} value={etaLabel(deliveryEstimate(quote.deliveryEstimate, recipient.network))} />
             {quote.fee === 0 ? (
               <Small style={{ marginTop: 8 }}>{tr("Sans frais d'envoi : notre rémunération est déjà comprise dans le taux de change affiché.")}</Small>
             ) : null}
           </>
         ) : (
-          <Small>{tr("Calcul du devis…")}</Small>
+          <Small style={{ marginTop: 6 }}>{tr("Calcul du devis…")}</Small>
         )}
       </Card>
 

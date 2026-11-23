@@ -1,4 +1,4 @@
-import { Link, router } from "expo-router";
+import { Link, router, useLocalSearchParams } from "expo-router";
 import { useRef, useState } from "react";
 import { Text, TextInput, View } from "react-native";
 import { WstWordmark } from "@/components/brand";
@@ -10,7 +10,9 @@ import { tr } from "@/lib/i18n";
 
 export default function Login() {
   const { startSignIn } = useSession();
-  const [email, setEmail] = useState("");
+  // Arrivée depuis « Un compte existe déjà » à l'inscription : le courriel est déjà rempli.
+  const params = useLocalSearchParams<{ email?: string }>();
+  const [email, setEmail] = useState(typeof params.email === "string" ? params.email : "");
   const [password, setPassword] = useState("");
   const [error, setError] = useState<string | null>(null);
   const [busy, setBusy] = useState(false);

@@ -167,7 +167,7 @@ export default function Kyc() {
         }
       >
         <Header title={tr("Vérification d'identité")} back={false} />
-        <Steps current={5} total={7} label={tr("Pièce d'identité")} />
+        <Steps current={4} total={6} label={tr("Pièce d'identité")} />
         <H1>{tr("Vérifions votre identité")}</H1>
         <P style={{ marginTop: 6, marginBottom: 18 }}>{tr("Exigée par la réglementation sur les transferts d'argent. Cela prend environ 2 minutes.")}</P>
         {profile?.kyc === "rejected" ? (
@@ -181,9 +181,10 @@ export default function Kyc() {
           </View>
         ) : null}
         <Card style={{ paddingVertical: 6, marginBottom: 14 }}>
-          <Tip icon="id" text={tr("Photographiez votre pièce : passeport, carte d'identité ou permis de conduire")} />
-          <Tip icon="face" text={tr("Prenez un selfie : il est comparé à la photo de la pièce")} />
-          <Tip icon="check" text={tr("Réponse en général en quelques minutes")} />
+          <Tip icon="id" text={tr("Ayez votre pièce originale sous la main : passeport, carte d'identité ou permis de conduire")} />
+          <Tip icon="camera" text={tr("Choisissez un endroit bien éclairé, sans reflet sur la pièce")} />
+          <Tip icon="face" text={tr("Pour le selfie : visage découvert, sans lunettes ni casquette")} />
+          <Tip icon="clock" text={tr("Environ 2 minutes, réponse en général en quelques minutes")} />
         </Card>
         <Notice
           tone="brand"
@@ -211,7 +212,7 @@ export default function Kyc() {
         }
       >
         <Header title={tr("Vérification d'identité")} back={false} />
-        <Steps current={5} total={7} label={tr("Pièce d'identité")} />
+        <Steps current={4} total={6} label={tr("Pièce d'identité")} />
         <H1>{tr("Vérifions votre identité")}</H1>
         <P style={{ marginTop: 6, marginBottom: 18 }}>{tr("Exigée par la réglementation sur les transferts d'argent. Cela prend environ 2 minutes.")}</P>
         {profile?.kyc === "rejected" ? (
@@ -243,7 +244,7 @@ export default function Kyc() {
     return (
       <Screen footer={<Button title={tr("Continuer")} onPress={() => setStep(8)} disabled={!ready} />}>
         <Header title={tr("Photo de la pièce")} onBack={() => setStep(6)} />
-        <Steps current={6} total={7} label={tr("Photo de la pièce")} />
+        <Steps current={5} total={6} label={tr("Photo de la pièce")} />
         <H1>{tr(doc.label)}</H1>
         <P style={{ marginTop: 6, marginBottom: 18 }}>{tr("Placez la pièce dans le cadre, posée sur une surface sombre.")}</P>
         <Capture label={doc.twoSided ? tr("Recto") : tr("Page photo")} done={front} onPress={() => setFront(true)} />
@@ -262,7 +263,7 @@ export default function Kyc() {
     return (
       <Screen footer={<Button title={tr("Envoyer pour vérification")} onPress={submit} disabled={!selfie} loading={busy} />}>
         <Header title={tr("Vérification du visage")} onBack={() => setStep(7)} />
-        <Steps current={7} total={7} label={tr("Selfie")} />
+        <Steps current={6} total={6} label={tr("Selfie")} />
         <H1>{tr("Prenez un selfie")}</H1>
         <P style={{ marginTop: 6 }}>{tr("Nous comparons votre visage à la photo de votre pièce d'identité.")}</P>
         <View style={st.selfie}>

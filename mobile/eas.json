@@ -13,6 +13,7 @@
         "buildType": "apk"
       },
       "env": {
+        "APK_ARM64_ONLY": "1",
         "EXPO_PUBLIC_API_URL": "https://worldsofttransfer.com",
         "EXPO_PUBLIC_SITE_URL": "https://worldsofttransfer.com",
         "EXPO_PUBLIC_COMPANY_EMAIL": "support@worldsofttransfer.com",

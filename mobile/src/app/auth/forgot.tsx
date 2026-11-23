@@ -1,4 +1,4 @@
-import { router } from "expo-router";
+import { router, useLocalSearchParams } from "expo-router";
 import { useState } from "react";
 import { Button, Field, H1, Header, Notice, P, Screen } from "@/components/ui";
 import { api } from "@/lib/api";
@@ -7,7 +7,8 @@ import { tr } from "@/lib/i18n";
 const EMAIL = /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/;
 
 export default function Forgot() {
-  const [email, setEmail] = useState("");
+  const params = useLocalSearchParams<{ email?: string }>();
+  const [email, setEmail] = useState(typeof params.email === "string" ? params.email : "");
   const [error, setError] = useState<string | null>(null);
   const [busy, setBusy] = useState(false);
 

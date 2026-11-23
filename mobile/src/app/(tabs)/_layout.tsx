@@ -10,13 +10,12 @@ import { tr } from "@/lib/i18n";
 const TABS: { name: string; title: string; icon: IconName }[] = [
   { name: "index", title: tr("Accueil"), icon: "home" },
   { name: "history", title: tr("Historique"), icon: "history" },
-  { name: "parcels", title: tr("Colis"), icon: "ship" },
   { name: "profile", title: tr("Profil"), icon: "user" },
 ];
 
 export default function TabsLayout() {
   const { profile, locked } = useSession();
-  // 5 onglets sur 320 px : « Historique » et « Découvrir » étaient tronqués en 11 px.
+  // 4 onglets sur 320 px : « Historique » et « Découvrir » étaient tronqués en 11 px.
   const narrow = useWindowDimensions().width < 360;
 
   // Sans session (lien direct, rechargement) : retour à l'accueil. Différé pour laisser l'écran
@@ -52,6 +51,8 @@ export default function TabsLayout() {
           }}
         />
       ))}
+      {/* Le suivi de colis n'est plus un onglet : il reste joignable depuis le profil (« Suivre un colis »). */}
+      <Tabs.Screen name="parcels" options={{ href: null, title: tr("Colis") }} />
     </Tabs>
   );
 }
