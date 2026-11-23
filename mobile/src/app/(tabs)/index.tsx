@@ -91,7 +91,6 @@ export default function Home() {
           onPress={() => router.push("/kyc")}
           style={[st.kyc, { backgroundColor: kyc === "rejected" ? colors.dangerSoft : colors.warnSoft, borderColor: kyc === "rejected" ? colors.dangerSoft : colors.warnSoft }]}
         >
-          <Icon name={kyc === "pending" ? "clock" : kyc === "rejected" ? "alert" : "shield"} color={kyc === "rejected" ? colors.danger : colors.warn} size={20} />
           <View style={{ flex: 1 }}>
             <Text style={st.kycTitle}>{kyc === "none" ? tr("Vérifiez votre identité") : kyc === "rejected" ? tr("Vérification refusée") : tr("Vérification en cours")}</Text>
             <Small>

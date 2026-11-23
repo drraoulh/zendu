@@ -2,7 +2,6 @@ import { useLocalSearchParams } from "expo-router";
 import { useCallback, useEffect, useRef, useState } from "react";
 import { ActivityIndicator, Pressable, StyleSheet, Text, View } from "react-native";
 import { PoweredBy, WstWordmark } from "@/components/brand";
-import { Icon } from "@/components/icons";
 import { RecipientNotice, recipientMessage } from "@/components/recipient-notice";
 import { Button, Header, Notice, Screen, Small } from "@/components/ui";
 import { api, type Transfer } from "@/lib/api";
@@ -181,7 +180,6 @@ export default function Receipt() {
             {deliveredAt ? <Line label={tr("Livré le")} value={dateTime(deliveredAt)} /> : null}
           </View>
           <View style={r.foot}>
-            <Icon name="shield" color={colors.muted} size={14} />
             <PoweredBy />
           </View>
         </View>

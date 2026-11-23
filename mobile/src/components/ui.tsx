@@ -215,7 +215,7 @@ export function Button({
         <ActivityIndicator color={v.fg} />
       ) : (
         <>
-          {icon ? <Icon name={icon} color={v.fg} size={size === "sm" ? 18 : 20} /> : null}
+          {icon === "send" ? <Icon name={icon} color={v.fg} size={size === "sm" ? 18 : 20} /> : null}
           <Text style={[styles.btnText, size === "sm" && { fontSize: 14 }, { color: v.fg }]} numberOfLines={2}>{tr(title)}</Text>
         </>
       )}
@@ -255,8 +255,7 @@ export function Badge({ label, tone = "neutral" }: { label: string; tone?: Tone 
 
 export function Notice({ text, tone = "brand", icon = "info", title }: { text: string; tone?: Tone; icon?: IconName; title?: string }) {
   return (
-    <View style={[styles.notice, { backgroundColor: TONE_COLORS[tone].bg }]} accessibilityRole="alert">
-      <Icon name={icon} color={TONE_COLORS[tone].fg} size={20} />
+    <View style={[styles.notice, { backgroundColor: TONE_COLORS[tone].bg, borderLeftColor: TONE_COLORS[tone].fg }]} accessibilityRole="alert">
       <View style={{ flex: 1 }}>
         {title ? <Text style={[styles.noticeTitle, { color: TONE_COLORS[tone].fg }]}>{tr(title)}</Text> : null}
         <Text style={[styles.small, { color: colors.ink }]}>{tr(text)}</Text>
@@ -323,12 +322,7 @@ export function ListItem({
 }) {
   const content = (
     <>
-      {leading ??
-        (icon ? (
-          <View style={[styles.listIcon, { backgroundColor: TONE_COLORS[tone].bg }]}>
-            <Icon name={icon} color={TONE_COLORS[tone].fg} size={20} />
-          </View>
-        ) : null)}
+      {leading ?? null}
       <View style={{ flex: 1 }}>
         <Text style={styles.listTitle} numberOfLines={2}>{tr(title)}</Text>
         {subtitle ? <Text style={styles.small} numberOfLines={subtitleLines}>{tr(subtitle)}</Text> : null}
@@ -426,9 +420,6 @@ export function Choice({
 export function Empty({ icon, title, text, action }: { icon: IconName; title: string; text: string; action?: ReactNode }) {
   return (
     <View style={{ alignItems: "center", paddingVertical: 36, paddingHorizontal: 12, gap: 8 }}>
-      <View style={[styles.listIcon, { width: 56, height: 56, borderRadius: 28, backgroundColor: colors.soft }]}>
-        <Icon name={icon} color={colors.ink} size={26} />
-      </View>
       <Text style={[styles.h2, { fontSize: 18, textAlign: "center" }]}>{tr(title)}</Text>
       <P style={{ textAlign: "center" }}>{tr(text)}</P>
       {action ? <View style={{ marginTop: 8, alignSelf: "stretch" }}>{action}</View> : null}
@@ -457,7 +448,7 @@ export const styles = StyleSheet.create({
   badge: { flexDirection: "row", alignItems: "center", gap: 6, paddingHorizontal: 10, paddingVertical: 5, borderRadius: radius.pill, alignSelf: "flex-start" },
   dot: { width: 6, height: 6, borderRadius: 3 },
   badgeText: { fontFamily: fonts.semibold, fontSize: 12 },
-  notice: { flexDirection: "row", gap: 10, padding: 14, borderRadius: radius.md, alignItems: "flex-start" },
+  notice: { flexDirection: "row", gap: 10, padding: 14, borderRadius: radius.md, alignItems: "flex-start", borderLeftWidth: 3 },
   noticeTitle: { fontFamily: fonts.heading, fontSize: 14, marginBottom: 2 },
   row: { flexDirection: "row", justifyContent: "space-between", alignItems: "center", paddingVertical: 7, gap: 12 },
   // Libellé court (« Délai estimé ») sur une ligne : c'est la valeur qui passe à la ligne si besoin (320 px).

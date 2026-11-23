@@ -99,7 +99,6 @@ export default function Parcels() {
 
       {!shipment && !recent.length ? (
         <Card style={{ marginTop: 16, flexDirection: "row", gap: 12, alignItems: "center" }} onPress={() => router.push({ pathname: "/help/[slug]", params: { slug: "suivi-colis" } })}>
-          <Icon name="help" color={colors.brand} size={20} />
           <View style={{ flex: 1 }}>
             <Text style={{ fontFamily: fonts.heading, color: colors.ink }}>{tr("Où trouver mon numéro ?")}</Text>
             <Small>{tr("Il commence par PWS- et figure sur votre reçu d'expédition. Il peut apparaître quelques heures après le dépôt.")}</Small>

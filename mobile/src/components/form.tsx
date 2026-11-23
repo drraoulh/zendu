@@ -173,11 +173,6 @@ export function ToggleRow({
     <View style={f.toggle}>
       {/* Toute la ligne bascule l'interrupteur (zone tactile plus grande que le seul Switch). */}
       <Pressable onPress={disabled ? undefined : () => onChange(!value)} accessible={false} style={f.toggleText}>
-        {icon ? (
-          <View style={f.toggleIcon}>
-            <Icon name={icon} color={colors.brand} size={20} />
-          </View>
-        ) : null}
         <View style={{ flex: 1 }}>
           <Text style={f.toggleLabel}>{tr(label)}</Text>
           {sub ? <Small>{tr(sub)}</Small> : null}

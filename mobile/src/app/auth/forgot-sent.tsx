@@ -1,8 +1,6 @@
 import { router, useLocalSearchParams } from "expo-router";
 import { View } from "react-native";
-import { Icon } from "@/components/icons";
 import { Button, H1, Header, Notice, P, Screen } from "@/components/ui";
-import { colors } from "@/lib/theme";
 import { tr } from "@/lib/i18n";
 
 export default function ForgotSent() {
@@ -18,9 +16,6 @@ export default function ForgotSent() {
     >
       <Header title={tr("Demande envoyée")} />
       <View style={{ alignItems: "center", paddingTop: 30, gap: 12 }}>
-        <View style={{ width: 84, height: 84, borderRadius: 28, backgroundColor: colors.brandSoft, alignItems: "center", justifyContent: "center" }}>
-          <Icon name="mail" size={40} color={colors.brand} />
-        </View>
         <H1 style={{ textAlign: "center" }}>{tr("Vérifiez votre boîte de réception")}</H1>
         <P style={{ textAlign: "center" }}>
           {email
