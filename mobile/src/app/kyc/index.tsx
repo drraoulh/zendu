@@ -57,6 +57,13 @@ export default function Kyc() {
     };
   }, [checkTry]);
 
+  // Jamais bloqué sur « Préparation… » : sans réponse du serveur au bout de 15 s, on propose de réessayer ou de quitter.
+  useEffect(() => {
+    if (didit !== null || checkFailed) return;
+    const t = setTimeout(() => setCheckFailed(true), 15_000);
+    return () => clearTimeout(t);
+  }, [didit, checkFailed, checkTry]);
+
   async function verifyWithDidit() {
     setError(null);
     // Sans l'appareil photo, Didit ne peut ni photographier la pièce ni faire le selfie.
@@ -131,8 +138,8 @@ export default function Kyc() {
     return (
       <Screen
         footer={
-          checkFailed ? (
-            <View style={{ gap: 6 }}>
+          <View style={{ gap: 6 }}>
+            {checkFailed ? (
               <Button
                 title={tr("Réessayer")}
                 onPress={() => {
@@ -140,9 +147,9 @@ export default function Kyc() {
                   setCheckTry((n) => n + 1);
                 }}
               />
-              <Button title={tr("Plus tard")} variant="ghost" onPress={exit} />
-            </View>
-          ) : undefined
+            ) : null}
+            <Button title={tr("Plus tard")} variant="ghost" onPress={exit} />
+          </View>
         }
       >
         <Header title={tr("Vérification d'identité")} back={false} />
