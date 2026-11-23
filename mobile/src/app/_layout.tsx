@@ -1,3 +1,4 @@
+import { NetworkBanner } from "@/components/network-banner";
 import { useFonts } from "expo-font";
 import { Stack, usePathname, useRouter } from "expo-router";
 import * as SplashScreen from "expo-splash-screen";
@@ -29,6 +30,7 @@ export default function RootLayout() {
           <StoreProvider>
             <StatusBar style="dark" />
             <Navigator fontsReady={fontsLoaded || Boolean(fontError)} />
+            <NetworkBanner />
           </StoreProvider>
         </SessionProvider>
       </KeyboardProvider>

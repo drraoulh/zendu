@@ -4,6 +4,7 @@ import {
   ActivityIndicator,
   Platform,
   Pressable,
+  RefreshControl,
   StyleSheet,
   Text,
   TextInput,
@@ -38,6 +39,7 @@ export function Screen({
   background = colors.bg,
   contentStyle,
   footer,
+  onRefresh,
 }: {
   children: ReactNode;
   scroll?: boolean;
@@ -45,11 +47,14 @@ export function Screen({
   background?: string;
   contentStyle?: StyleProp<ViewStyle>;
   footer?: ReactNode;
+  /** Tirer vers le bas pour actualiser (écrans qui affichent des données du serveur). */
+  onRefresh?: () => Promise<unknown> | void;
 }) {
   // Clavier (iOS et Android bord à bord) : le champ actif défile au-dessus du clavier et le pied de page
   // (bouton principal) reste collé juste au-dessus, au lieu d'être recouvert.
   const insets = useSafeAreaInsets();
   const [footerHeight, setFooterHeight] = useState(0);
+  const [refreshing, setRefreshing] = useState(false);
   const bottomInset = edges.includes("bottom") ? insets.bottom : 0;
   const footerView = footer ? (
     <KeyboardStickyView offset={{ closed: 0, opened: bottomInset }} onLayout={(e) => setFooterHeight(e.nativeEvent.layout.height)} style={[styles.footer, { backgroundColor: background }]}>
@@ -64,6 +69,18 @@ export function Screen({
             contentContainerStyle={[styles.content, contentStyle]}
             keyboardShouldPersistTaps="handled"
             showsVerticalScrollIndicator={false}
+            refreshControl={
+              onRefresh ? (
+                <RefreshControl
+                  refreshing={refreshing}
+                  tintColor={colors.ink}
+                  onRefresh={() => {
+                    setRefreshing(true);
+                    void Promise.resolve(onRefresh()).finally(() => setRefreshing(false));
+                  }}
+                />
+              ) : undefined
+            }
             bottomOffset={footerHeight + 16}
             extraKeyboardSpace={footer ? footerHeight - bottomInset : 0}
           >

@@ -225,6 +225,27 @@ export function setUnauthorizedHandler(fn: (() => void) | null) {
 
 const REQUEST_TIMEOUT_MS = 30_000;
 
+/**
+ * Dernier échange avec le serveur : « hors ligne » après un échec réseau, rétabli dès qu'une réponse arrive.
+ * Alimente le bandeau « Pas de connexion » (aucun module natif nécessaire).
+ */
+let offline = false;
+const offlineListeners = new Set<() => void>();
+function setOffline(value: boolean) {
+  if (offline === value) return;
+  offline = value;
+  offlineListeners.forEach((l) => l());
+}
+export const networkState = {
+  subscribe(listener: () => void) {
+    offlineListeners.add(listener);
+    return () => {
+      offlineListeners.delete(listener);
+    };
+  },
+  isOffline: () => offline,
+};
+
 async function request<T>(path: string, init?: RequestInit & { token?: string | null }): Promise<T> {
   let res: Response;
   let data: unknown = null;
@@ -249,7 +270,9 @@ async function request<T>(path: string, init?: RequestInit & { token?: string | 
     // Le délai court jusqu'à la fin de la lecture : une connexion qui s'arrête après les en-têtes ne bloque plus l'écran.
     data = await res.json().catch(() => null);
     if (controller.signal.aborted) throw new Error("timeout");
+    setOffline(false);
   } catch {
+    setOffline(true);
     throw new ApiError(
       __DEV__ ? `Serveur injoignable (${API_URL}). Vérifiez EXPO_PUBLIC_API_URL et votre réseau.` : tr("Connexion impossible. Vérifiez votre réseau."),
       0,

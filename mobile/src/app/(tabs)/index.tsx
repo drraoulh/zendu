@@ -23,7 +23,7 @@ import { tr } from "@/lib/i18n";
  * les proches à qui renvoyer en un geste et l'activité récente. Rien d'autre.
  */
 export default function Home() {
-  const { profile } = useSession();
+  const { profile, refreshKyc } = useSession();
   const { draft, setDraft, recipients } = useStore();
   const { items, loading, failed, reload } = useMyTransfers(3);
   const { unread } = useNotifications();
@@ -72,7 +72,7 @@ export default function Home() {
   }
 
   return (
-    <Screen edges={["top"]}>
+    <Screen edges={["top"]} onRefresh={() => Promise.all([reload(), refreshKyc()])}>
       <View style={st.top}>
         <WstSymbol size={34} />
         <Text style={st.hello} numberOfLines={1}>{tr("Bonjour {0}", profile?.firstName)}</Text>
