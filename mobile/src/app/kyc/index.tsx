@@ -1,5 +1,5 @@
 import { router } from "expo-router";
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { ActivityIndicator, BackHandler, Platform, StyleSheet, Text, View } from "react-native";
 import { Icon, type IconName } from "@/components/icons";
 import { Button, Card, Choice, H1, Header, ListItem, Notice, P, Screen, Small, Steps } from "@/components/ui";
@@ -41,9 +41,13 @@ export default function Kyc() {
   // pendant le chargement ou si le serveur est injoignable, on attend au lieu d'afficher le mauvais parcours.
   const [checkFailed, setCheckFailed] = useState(false);
   const [checkTry, setCheckTry] = useState(0);
+  // `refreshKyc` change d'identité à chaque mise à jour du profil : s'en servir comme dépendance relançait la
+  // requête en boucle (et ignorait chaque réponse), d'où l'écran bloqué sur « Préparation… ». On la garde dans
+  // une référence (celle du premier affichage suffit) et on ne relance que sur « Réessayer ».
+  const refreshKycRef = useRef(refreshKyc);
   useEffect(() => {
     let alive = true;
-    void refreshKyc().then((r) => {
+    void refreshKycRef.current().then((r) => {
       if (!alive) return;
       if (r.available === null) setCheckFailed(true);
       else setDidit(r.available);
@@ -51,7 +55,7 @@ export default function Kyc() {
     return () => {
       alive = false;
     };
-  }, [refreshKyc, checkTry]);
+  }, [checkTry]);
 
   async function verifyWithDidit() {
     setError(null);
