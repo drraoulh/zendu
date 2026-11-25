@@ -47,6 +47,7 @@ jobs:
         working-directory: mobile
     steps:
       - name: Numéro de version valide
+        working-directory: ${{ github.workspace }}
         env:
           VERSION_CODE: ${{ inputs.version_code || '8' }}
         run: |
