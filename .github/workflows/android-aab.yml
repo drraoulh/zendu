@@ -13,11 +13,16 @@
 name: AAB Android
 
 on:
+  # Se lance aussi quand ce fichier est modifié sur la branche de travail (le numéro de version par défaut est
+  # alors « 8 » (valeur après « inputs.version_code || », 5 endroits) : à augmenter à chaque nouvel envoi sur Google Play).
+  push:
+    branches: [claude/loving-meitner-akjeks]
+    paths: [".github/workflows/android-aab.yml"]
   workflow_dispatch:
     inputs:
       version_code:
         description: "Numéro de version (versionCode), supérieur au dernier envoyé sur Google Play"
-        required: true
+        required: false
         type: string
 
 permissions:
@@ -43,7 +48,7 @@ jobs:
     steps:
       - name: Numéro de version valide
         env:
-          VERSION_CODE: ${{ inputs.version_code }}
+          VERSION_CODE: ${{ inputs.version_code || '8' }}
         run: |
           case "$VERSION_CODE" in ''|*[!0-9]*) echo "::error::Le numéro de version doit être un entier."; exit 1;; esac
 
@@ -90,7 +95,7 @@ jobs:
       - name: Numéro de version et mémoire
         working-directory: mobile/android
         env:
-          VERSION_CODE: ${{ inputs.version_code }}
+          VERSION_CODE: ${{ inputs.version_code || '8' }}
         run: |
           sed -i -E "s/versionCode [0-9]+/versionCode ${VERSION_CODE}/" app/build.gradle
           grep -n "versionCode" app/build.gradle
@@ -114,10 +119,10 @@ jobs:
         run: |
           AAB=android/app/build/outputs/bundle/release/app-release.aab
           keytool -printcert -jarfile "$AAB" | grep -E "Owner|SHA1|SHA256|Valid"
-          mv "$AAB" "WorldSoft-Transfer-v${{ inputs.version_code }}.aab"
+          mv "$AAB" "WorldSoft-Transfer-v${{ inputs.version_code || '8' }}.aab"
 
       - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4.6.2
         with:
-          name: WorldSoft-Transfer-AAB-v${{ inputs.version_code }}
-          path: mobile/WorldSoft-Transfer-v${{ inputs.version_code }}.aab
+          name: WorldSoft-Transfer-AAB-v${{ inputs.version_code || '8' }}
+          path: mobile/WorldSoft-Transfer-v${{ inputs.version_code || '8' }}.aab
           retention-days: 30
