@@ -169,7 +169,7 @@ export function TrackingContent({ initialNumber = "" }: { initialNumber?: string
             <button
               type="submit"
               disabled={state.kind === "loading"}
-              className="inline-flex items-center justify-center gap-2 rounded-full bg-brand px-6 py-3 text-sm font-semibold text-white shadow-[0_8px_20px_-8px_rgba(11,77,255,0.7)] transition hover:bg-brand-strong disabled:opacity-60"
+              className="inline-flex items-center justify-center gap-2 rounded-full bg-brand px-6 py-3 text-sm font-semibold text-white transition hover:bg-brand-strong disabled:opacity-60"
             >
               {state.kind === "loading" ? (
                 <span aria-hidden className="h-4 w-4 animate-spin rounded-full border-2 border-white/40 border-t-white" />
@@ -361,7 +361,7 @@ function ShipmentCard({ shipment, tag }: { shipment: Shipment; tag: string }) {
           className="h-2 overflow-hidden rounded-full bg-surface-soft"
         >
           <div
-            className={`h-full rounded-full transition-all duration-700 ${exception ? "bg-warn" : "bg-brand-gradient"}`}
+            className={`h-full rounded-full transition-all duration-700 ${exception ? "bg-warn" : "bg-brand"}`}
             style={{ width: `${pct}%` }}
           />
         </div>

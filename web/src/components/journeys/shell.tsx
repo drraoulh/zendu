@@ -38,7 +38,7 @@ export function JourneyShell({
             {back.label}
           </Link>
           <div className="mt-6 flex items-start gap-4">
-            <span className="bg-brand-gradient hidden h-14 w-14 shrink-0 place-items-center rounded-2xl shadow-float ring-1 ring-white/30 sm:grid">
+            <span className="bg-brand hidden h-14 w-14 shrink-0 place-items-center rounded-2xl shadow-float ring-1 ring-white/30 sm:grid">
               <Icon name={icon} className="h-7 w-7 text-white" strokeWidth={1.7} />
             </span>
             <div className="min-w-0">

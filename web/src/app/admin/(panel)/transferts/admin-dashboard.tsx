@@ -220,7 +220,7 @@ export function AdminDashboard({
                   <p className="mt-1 font-display text-3xl font-semibold tracking-tight text-ink">{k.value}</p>
                 </li>
               ))}
-              <li className="bg-brand-gradient col-span-2 rounded-3xl p-4 text-white shadow-card sm:p-5 xl:col-span-5 sm:flex sm:items-center sm:justify-between">
+              <li className="bg-brand col-span-2 rounded-3xl p-4 text-white shadow-card sm:p-5 xl:col-span-5 sm:flex sm:items-center sm:justify-between">
                 <p className="text-xs font-semibold text-white/70">{t("kpiVolume")}</p>
                 {/* Un montant par devise, jamais coupé au milieu ; les devises passent à la ligne sur mobile. */}
                 <p className="mt-1 flex flex-wrap gap-x-3 gap-y-0.5 font-display text-xl font-semibold tracking-tight min-[375px]:text-2xl sm:mt-0 sm:justify-end">

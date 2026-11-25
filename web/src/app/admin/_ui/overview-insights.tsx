@@ -149,7 +149,7 @@ export function ActivitySection({ insights, period }: { insights: TransferInsigh
           <p className="mt-1 font-display text-3xl font-semibold tracking-tight text-ink">{success}</p>
           <p className="mt-1 text-xs text-muted">{t("kpiSuccessHint")}</p>
         </li>
-        <li className="bg-brand-gradient col-span-2 rounded-3xl p-4 text-white shadow-card sm:p-5 xl:col-span-1">
+        <li className="bg-brand col-span-2 rounded-3xl p-4 text-white shadow-card sm:p-5 xl:col-span-1">
           <p className="text-xs font-semibold text-white/70">{t("kpiVolume")}</p>
           <p className="mt-1.5 font-display text-xl font-semibold tracking-tight sm:text-2xl">
             <MoneyLines amounts={insights.volume} nl={nl} />

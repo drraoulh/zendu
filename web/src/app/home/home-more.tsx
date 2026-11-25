@@ -95,7 +95,7 @@ export function FinalCta() {
   return (
     <section className="pb-16 sm:pb-24">
       <Container>
-      <div className="bg-brand-gradient relative overflow-hidden rounded-3xl px-6 py-12 text-white sm:px-12 sm:py-16">
+      <div className="bg-brand relative overflow-hidden rounded-3xl px-6 py-12 text-white sm:px-12 sm:py-16">
         <div className="relative flex flex-col gap-8 lg:flex-row lg:items-center lg:justify-between">
           <div className="max-w-2xl">
             <h2 className="font-display text-4xl font-semibold leading-[1.05] sm:text-5xl">{t("ctaTitle")}</h2>

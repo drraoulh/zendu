@@ -316,7 +316,7 @@ export function SendFlow({ live = false }: { live?: boolean }) {
           <nav aria-label={t("stepOf", { n: step + 1, total: steps.length })} className="mt-7">
             <div className="h-1.5 overflow-hidden rounded-full bg-surface-soft">
               <div
-                className="bg-brand-gradient h-full rounded-full transition-all duration-500"
+                className="bg-brand h-full rounded-full transition-all duration-500"
                 style={{ width: `${((step + 1) / steps.length) * 100}%` }}
               />
             </div>

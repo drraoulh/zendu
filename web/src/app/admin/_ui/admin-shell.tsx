@@ -109,7 +109,7 @@ export function AdminShell({
                     aria-current={active ? "page" : undefined}
                     className={`flex items-center gap-2.5 rounded-2xl px-4 py-2.5 text-sm font-semibold transition focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand ${
                       active
-                        ? "bg-brand text-white shadow-[0_8px_20px_-10px_rgba(11,77,255,0.8)]"
+                        ? "bg-brand text-white"
                         : "border border-line bg-white text-ink hover:border-brand/40 hover:text-brand-strong lg:border-transparent lg:hover:bg-surface-soft"
                     }`}
                   >

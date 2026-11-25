@@ -116,7 +116,7 @@ export function Stepper({
         aria-valuenow={current + 1}
         aria-valuetext={t("stepOf", { n: current + 1, total })}
       >
-        <div className="bg-brand-gradient h-full rounded-full transition-all duration-500" style={{ width: `${pct}%` }} />
+        <div className="bg-brand h-full rounded-full transition-all duration-500" style={{ width: `${pct}%` }} />
       </div>
 
       {/* Tablette et plus : liste des étapes */}
@@ -130,7 +130,7 @@ export function Stepper({
               <span
                 className={`grid h-8 w-8 shrink-0 place-items-center rounded-full text-xs font-semibold transition ${
                   active
-                    ? "bg-brand-gradient text-white shadow-[0_6px_16px_-6px_rgba(11,77,255,0.8)]"
+                    ? "bg-brand text-white"
                     : done
                       ? "bg-brand text-white"
                       : "border border-line bg-white text-muted"

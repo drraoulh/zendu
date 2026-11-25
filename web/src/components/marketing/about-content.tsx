@@ -69,7 +69,7 @@ export function AboutContent() {
             <figure className="mx-auto w-full max-w-md">
               {/* Badge ancré sur l'image (et non sur la légende, qu'il recouvrait). */}
               <div className="relative">
-                <div aria-hidden className="bg-brand-gradient absolute -inset-3 rotate-2 rounded-[2.25rem] opacity-15 blur-sm" />
+                <div aria-hidden className="bg-brand absolute -inset-3 rotate-2 rounded-[2.25rem] opacity-15 blur-sm" />
                 <div className="relative overflow-hidden rounded-[2rem] border border-line bg-white p-4 shadow-float sm:p-6">
                   <LogoFull className="h-auto w-full rounded-2xl" priority />
                 </div>
@@ -147,7 +147,7 @@ export function AboutContent() {
                     href={link(pole.href)}
                     className="group flex h-full flex-col rounded-3xl border border-white/10 bg-white/5 p-6 backdrop-blur transition hover:-translate-y-1 hover:border-sky/50 hover:bg-white/10"
                   >
-                    <span className="bg-brand-gradient grid h-12 w-12 place-items-center rounded-2xl text-white ring-1 ring-white/20">
+                    <span className="bg-brand grid h-12 w-12 place-items-center rounded-2xl text-white ring-1 ring-white/20">
                       <Icon name={pole.icon} className="h-6 w-6" />
                     </span>
                     <h3 className="mt-5 font-display text-lg font-semibold">{k(`pole${i}Title`)}</h3>

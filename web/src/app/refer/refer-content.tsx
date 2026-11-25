@@ -59,7 +59,7 @@ export function ReferContent() {
 
       <Container className="relative -mt-20">
         <div className="animate-rise mx-auto max-w-xl rounded-3xl border border-line bg-white p-6 text-center shadow-float sm:p-8">
-          <span className="mx-auto grid h-14 w-14 place-items-center rounded-2xl bg-brand-gradient text-white">
+          <span className="mx-auto grid h-14 w-14 place-items-center rounded-2xl bg-brand text-white">
             <Icon name="gift" className="h-7 w-7" />
           </span>
           <p className="mt-4 text-sm font-semibold text-muted">{t("yourCode")}</p>

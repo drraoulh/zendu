@@ -192,7 +192,7 @@ function DateSlotPicker({
                         }}
                         className={`flex min-h-14 flex-col items-center justify-center rounded-xl border px-1 py-2 text-center transition focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-brand/20 ${
                           selected
-                            ? "bg-brand-gradient border-transparent text-white shadow-[0_8px_18px_-8px_rgba(11,77,255,0.8)]"
+                            ? "bg-brand border-transparent text-white"
                             : dateError
                               ? "border-danger/40 bg-white text-ink hover:border-brand/50"
                               : "border-line bg-white text-ink hover:border-brand/50 hover:bg-brand-soft/50"

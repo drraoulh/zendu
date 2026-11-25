@@ -115,7 +115,7 @@ export function ThankYouContent({ reference: rawRef, kind: rawKind }: { referenc
     <>
       <section className="bg-navy-gradient relative overflow-hidden text-white">
         <Container className="relative pb-28 pt-12 text-center sm:pb-32 sm:pt-16">
-          <span className="bg-brand-gradient animate-rise mx-auto grid h-16 w-16 place-items-center rounded-full shadow-float ring-4 ring-white/15">
+          <span className="bg-brand animate-rise mx-auto grid h-16 w-16 place-items-center rounded-full shadow-float ring-4 ring-white/15">
             <Icon name="check" className="h-8 w-8 text-white" strokeWidth={2.6} />
           </span>
           <p className="mt-6 font-display text-xs font-semibold text-sky">

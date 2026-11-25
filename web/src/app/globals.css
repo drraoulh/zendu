@@ -90,10 +90,6 @@
   }
 }
 
-.bg-brand-gradient {
-  background: linear-gradient(135deg, var(--brand) 0%, var(--brand-strong) 55%, var(--navy) 100%);
-}
-
 /* Fond sombre : simple dégradé de ton dans un seul neutre, sans halo de couleur. */
 .bg-navy-gradient {
   background: linear-gradient(180deg, var(--navy) 0%, var(--navy-deep) 100%);

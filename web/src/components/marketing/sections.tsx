@@ -82,7 +82,7 @@ export function ServiceHero({
           <div className="relative grid h-56 w-56 place-items-center">
             <div className="animate-orbit absolute inset-0 rounded-full border border-dashed border-white/20" />
             <div className="absolute inset-6 rounded-full border border-white/10 bg-white/5 backdrop-blur" />
-            <div className="bg-brand-gradient relative grid h-24 w-24 place-items-center rounded-3xl shadow-float ring-1 ring-white/30">
+            <div className="bg-brand relative grid h-24 w-24 place-items-center rounded-3xl shadow-float ring-1 ring-white/30">
               <Icon name={icon} className="h-11 w-11 text-white" strokeWidth={1.6} />
             </div>
           </div>
@@ -187,7 +187,7 @@ export function Steps({
         <ol className={`relative mt-10 grid gap-5 sm:grid-cols-2 ${cols}`}>
           {steps.map((step, i) => (
             <li key={step.title} className="relative rounded-3xl border border-line bg-white p-6 shadow-card">
-              <span className="bg-brand-gradient inline-grid h-11 w-11 place-items-center rounded-2xl font-display text-base font-semibold text-white shadow-[0_8px_20px_-8px_rgba(11,77,255,0.7)]">
+              <span className="bg-brand inline-grid h-11 w-11 place-items-center rounded-2xl font-display text-base font-semibold text-white">
                 {String(i + 1).padStart(2, "0")}
               </span>
               <h3 className="mt-5 font-display text-lg font-semibold text-ink">{step.title}</h3>
@@ -329,7 +329,7 @@ export function CtaBand({
   return (
     <Section className="pt-4 sm:pt-6">
       <Container>
-        <div className="bg-brand-gradient relative overflow-hidden rounded-3xl px-6 py-12 text-white sm:px-12 sm:py-16">
+        <div className="bg-brand relative overflow-hidden rounded-3xl px-6 py-12 text-white sm:px-12 sm:py-16">
           <div className="relative flex flex-col gap-8 lg:flex-row lg:items-center lg:justify-between">
             <div className="max-w-2xl">
               <h2 className="font-display text-4xl font-semibold leading-[1.05] sm:text-5xl">{title}</h2>
