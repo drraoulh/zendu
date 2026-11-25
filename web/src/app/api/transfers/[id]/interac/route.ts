@@ -1,5 +1,5 @@
 import { publicErrorMessage } from "@/lib/api-error";
-import { NextResponse } from "next/server";
+import { after, NextResponse } from "next/server";
 import { z } from "zod";
 import { publicTransfer } from "@/lib/bank";
 import { prisma } from "@/lib/prisma";
@@ -11,6 +11,7 @@ import { MANUAL_PAYIN_PROVIDER } from "@/lib/providers/manual-payin";
 import { markPaymentDetected } from "@/lib/transfer-service";
 import { assertTransition } from "@/lib/transfer-machine";
 import { notifyCustomer } from "@/lib/transfer-notify";
+import { alertTeam } from "@/lib/team-alert";
 
 type Params = { params: Promise<{ id: string }> };
 
@@ -49,6 +50,8 @@ export async function POST(request: Request, { params }: Params) {
       await prisma.transferEvent.create({
         data: { transferId: id, type: DECLARED, message: `Le client indique avoir envoyé le ${what}` },
       });
+      // Première déclaration seulement : l'équipe est prévenue qu'il y a un paiement à vérifier.
+      after(() => alertTeam(id, "payment_declared"));
     }
     return NextResponse.json({ ok: true, status: transfer.status });
   }

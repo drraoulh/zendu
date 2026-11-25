@@ -125,6 +125,17 @@ export async function pushTransfer(
   }
 }
 
+/** Notification pour l'équipe : tous les appareils des comptes clients dont le courriel est dans la liste. */
+export async function pushToStaff(emails: string[], message: PushMessage): Promise<void> {
+  if (!emails.length) return;
+  try {
+    const staff = await prisma.customer.findMany({ where: { email: { in: emails } }, select: { id: true }, take: 10 });
+    for (const c of staff) await sendToCustomer(c.id, () => message);
+  } catch (error) {
+    console.error("[push] notification d'équipe impossible", error instanceof Error ? error.message : "erreur");
+  }
+}
+
 export async function pushKyc(customerId: string, kind: KycKind): Promise<void> {
   try {
     await sendToCustomer(customerId, (lang) => ({ title: KYC[lang][kind][0], body: KYC[lang][kind][1], data: { kind: `kyc_${kind}` } }));

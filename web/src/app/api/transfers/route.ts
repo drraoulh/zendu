@@ -1,5 +1,5 @@
 import { publicErrorMessage } from "@/lib/api-error";
-import { NextResponse } from "next/server";
+import { after, NextResponse } from "next/server";
 import { z } from "zod";
 import { prisma } from "@/lib/prisma";
 import { buildQuote, QuoteLimitError } from "@/lib/quote";
@@ -16,6 +16,7 @@ import { getCorridor, getCountry } from "@/lib/corridors";
 import { customerTransfer, isBankNetwork, publicTransfer } from "@/lib/bank";
 import { beneficiaryInputSchema, normalizeBeneficiary } from "@/lib/beneficiary-input";
 import { requireAdmin } from "@/lib/admin-guard";
+import { alertTeam } from "@/lib/team-alert";
 import { getCustomer, hasBearer, passwordChangeRequired } from "@/lib/customer-auth";
 import { zodIssues } from "@/lib/requests";
 import { rateLimit } from "@/lib/rate-limit";
@@ -369,6 +370,9 @@ export async function POST(request: Request) {
       },
       { timeout: 15_000 },
     );
+
+    // Commande reçue : courriel et notification pour l'équipe (après la réponse au client).
+    after(() => alertTeam(transfer.id, "new_order"));
 
     if (interac) {
       const payInRef = `interac_${transfer.reference}`;
