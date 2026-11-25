@@ -7,6 +7,7 @@ import { Button, ButtonLink } from "@/components/ui/button";
 import { Icon } from "@/components/ui/icon";
 import type { AdminMode } from "@/lib/admin-auth";
 import { inputClass, Message, useAdminT } from "../_ui/kit";
+import { PasswordInput } from "../_ui/password-input";
 import { loginAction, type LoginState } from "./actions";
 
 const initial: LoginState = { error: null };
@@ -135,16 +136,16 @@ export function LoginView({
                     <label htmlFor="admin-password" className="block text-sm font-semibold text-ink">
                       {t("passwordLabel")}
                     </label>
-                    <input
+                    <PasswordInput
                       id="admin-password"
                       name="password"
-                      type="password"
                       required
                       autoComplete="current-password"
                       autoFocus={!withUsername}
                       aria-invalid={state.error === "invalid" || undefined}
                       aria-describedby={errorText ? "admin-login-error" : undefined}
-                      className={`${inputClass} mt-1.5`}
+                      className={inputClass}
+                      wrapperClassName="mt-1.5"
                     />
                   </div>
                   {withCode && (

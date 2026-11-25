@@ -8,6 +8,7 @@ import { Container } from "@/components/ui/layout";
 import { useT } from "@/i18n/define";
 import { accountMessages } from "@/i18n/admin-account";
 import { adminFetch, Field, inputClass, Message, PageTitle, Panel } from "./kit";
+import { PasswordInput } from "./password-input";
 
 type Me = { username: string; displayName: string; mfa: boolean; mustChangePassword: boolean } | null;
 type Feedback = { ok: boolean; text: string } | null;
@@ -44,13 +45,13 @@ function PasswordForm({ me, minLength }: { me: NonNullable<Me>; minLength: numbe
     <form onSubmit={submit} className="space-y-4">
       <input type="text" name="username" value={me.username} autoComplete="username" readOnly hidden />
       <Field id="pw-current" label={t("pwdCurrent")}>
-        <input id="pw-current" name="current" type="password" required autoComplete="current-password" className={inputClass} />
+        <PasswordInput id="pw-current" name="current" required autoComplete="current-password" className={inputClass} />
       </Field>
       <Field id="pw-next" label={t("pwdNew")}>
-        <input id="pw-next" name="next" type="password" required minLength={minLength} autoComplete="new-password" className={inputClass} />
+        <PasswordInput id="pw-next" name="next" required minLength={minLength} autoComplete="new-password" className={inputClass} />
       </Field>
       <Field id="pw-confirm" label={t("pwdConfirm")}>
-        <input id="pw-confirm" name="confirm" type="password" required minLength={minLength} autoComplete="new-password" className={inputClass} />
+        <PasswordInput id="pw-confirm" name="confirm" required minLength={minLength} autoComplete="new-password" className={inputClass} />
       </Field>
       <p className="text-xs text-muted">{t("pwdHint", { n: minLength })}</p>
       {msg && <Message ok={msg.ok}>{msg.text}</Message>}
@@ -129,7 +130,7 @@ function MfaSection({ me }: { me: NonNullable<Me> }) {
           }}
         >
           <Field id="mfa-off-pwd" label={t("mfaDisablePwd")}>
-            <input id="mfa-off-pwd" name="password" type="password" autoComplete="current-password" required className={inputClass} />
+            <PasswordInput id="mfa-off-pwd" name="password" autoComplete="current-password" required className={inputClass} />
           </Field>
           <Field id="mfa-off-code" label={t("mfaCode")}>
             <input id="mfa-off-code" name="code" inputMode="numeric" autoComplete="one-time-code" maxLength={7} required className={`${inputClass} font-mono`} />

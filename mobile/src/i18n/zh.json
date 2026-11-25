@@ -1091,5 +1091,7 @@
  "Terminez votre inscription": "请完成注册",
  "Adresse puis vérification d'identité · 3 min": "填写地址并验证身份 · 3 分钟",
  "Quelques informations pour créer votre compte. Le reste se complète ensuite dans l'appli.": "填写几项信息即可创建账户，其余信息稍后在应用内补充。",
- "{0} requis(e)": "请填写{0}"
+ "{0} requis(e)": "请填写{0}",
+ "Afficher le mot de passe": "显示密码",
+ "Masquer le mot de passe": "隐藏密码"
 }

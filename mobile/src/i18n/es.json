@@ -1091,5 +1091,7 @@
  "Terminez votre inscription": "Termine su registro",
  "Adresse puis vérification d'identité · 3 min": "Dirección y verificación de identidad · 3 min",
  "Quelques informations pour créer votre compte. Le reste se complète ensuite dans l'appli.": "Algunos datos para crear su cuenta. El resto se completa después en la app.",
- "{0} requis(e)": "{0} obligatorio"
+ "{0} requis(e)": "{0} obligatorio",
+ "Afficher le mot de passe": "Mostrar la contraseña",
+ "Masquer le mot de passe": "Ocultar la contraseña"
 }

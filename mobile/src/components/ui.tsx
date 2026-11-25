@@ -369,9 +369,12 @@ export function Field({
   onBlur,
   right,
   ref,
+  secureTextEntry,
   ...props
 }: TextInputProps & { label: string; error?: string | null; hint?: string; left?: ReactNode; right?: ReactNode; ref?: Ref<TextInput> }) {
   const [focused, setFocused] = useState(false);
+  // Mot de passe : un œil permet de voir ce que l'on tape (et de vérifier avant de valider).
+  const [shown, setShown] = useState(false);
   return (
     <View style={{ marginBottom: 14 }}>
       <Label>{tr(label)}</Label>
@@ -390,8 +393,20 @@ export function Field({
             setFocused(false);
             onBlur?.(e);
           }}
+          secureTextEntry={secureTextEntry && !shown}
           {...props}
         />
+        {secureTextEntry ? (
+          <Pressable
+            accessibilityRole="button"
+            accessibilityLabel={shown ? tr("Masquer le mot de passe") : tr("Afficher le mot de passe")}
+            onPress={() => setShown((v) => !v)}
+            hitSlop={10}
+            style={{ paddingLeft: 8 }}
+          >
+            <Icon name={shown ? "eyeOff" : "eye"} color={colors.muted} size={20} />
+          </Pressable>
+        ) : null}
         {right}
       </View>
       {error ? <Text style={styles.error}>{error}</Text> : hint ? <Small style={{ marginTop: 4 }}>{tr(hint)}</Small> : null}

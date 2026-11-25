@@ -1091,5 +1091,7 @@
  "Terminez votre inscription": "Finish your sign-up",
  "Adresse puis vérification d'identité · 3 min": "Address, then identity check · 3 min",
  "Quelques informations pour créer votre compte. Le reste se complète ensuite dans l'appli.": "A few details to create your account. The rest is completed in the app afterwards.",
- "{0} requis(e)": "{0} required"
+ "{0} requis(e)": "{0} required",
+ "Afficher le mot de passe": "Show password",
+ "Masquer le mot de passe": "Hide password"
 }
