@@ -149,6 +149,7 @@ export function publicCustomer(c: Customer) {
     kyc: c.kycStatus,
     kycDocument: c.kycDocument,
     kycProvider: c.kycProvider,
+    emailVerified: Boolean(c.emailVerifiedAt),
     kycNote: c.kycStatus === "rejected" ? c.kycNote : null,
     kycVerifiedAt: c.kycStatus === "verified" ? c.kycReviewedAt?.toISOString() ?? null : null,
     mustChangePassword: c.mustChangePassword,

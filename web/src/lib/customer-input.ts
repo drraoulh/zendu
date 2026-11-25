@@ -32,6 +32,8 @@ export const signupSchema = z.object({
   // Longueur et complexité vérifiées par passwordProblem() (message lisible).
   password: z.string().max(200),
   device: optional(120),
+  /** Identifiant du défi de vérification du courriel (réussi) : voir POST /api/auth/signup/email-verify. */
+  emailProof: optional(64),
   ...profileFields,
 });
 

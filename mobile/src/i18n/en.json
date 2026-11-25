@@ -1093,5 +1093,10 @@
  "Quelques informations pour créer votre compte. Le reste se complète ensuite dans l'appli.": "A few details to create your account. The rest is completed in the app afterwards.",
  "{0} requis(e)": "{0} required",
  "Afficher le mot de passe": "Show password",
- "Masquer le mot de passe": "Hide password"
+ "Masquer le mot de passe": "Hide password",
+ "Entrez le code à 6 chiffres reçu par courriel": "Enter the 6-digit code sent to your email",
+ "Confirmez votre courriel": "Confirm your email",
+ "Nous avons envoyé un code à 6 chiffres à {0}. Vérifiez aussi vos courriels indésirables.": "We sent a 6-digit code to {0}. Check your spam folder too.",
+ "Renvoyer le code ({0} s)": "Resend code ({0} s)",
+ "Changer de courriel": "Change email"
 }

@@ -1093,5 +1093,10 @@
  "Quelques informations pour créer votre compte. Le reste se complète ensuite dans l'appli.": "填写几项信息即可创建账户，其余信息稍后在应用内补充。",
  "{0} requis(e)": "请填写{0}",
  "Afficher le mot de passe": "显示密码",
- "Masquer le mot de passe": "隐藏密码"
+ "Masquer le mot de passe": "隐藏密码",
+ "Entrez le code à 6 chiffres reçu par courriel": "请输入邮件中收到的6位验证码",
+ "Confirmez votre courriel": "确认您的邮箱",
+ "Nous avons envoyé un code à 6 chiffres à {0}. Vérifiez aussi vos courriels indésirables.": "我们已向 {0} 发送了6位验证码。请同时检查垃圾邮件文件夹。",
+ "Renvoyer le code ({0} s)": "重新发送验证码（{0} 秒）",
+ "Changer de courriel": "更换邮箱"
 }

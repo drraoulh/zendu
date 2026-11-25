@@ -3,6 +3,7 @@ import { z } from "zod";
 import { createSession, hashPassword, passwordProblem, publicCustomer } from "@/lib/customer-auth";
 import { profileErrorMessage, signupSchema } from "@/lib/customer-input";
 import { prisma } from "@/lib/prisma";
+import { consumeEmailProof, emailVerificationRequired } from "@/lib/email-verify";
 import { clientIp, isDbUnavailable, isUniqueViolation, zodIssues } from "@/lib/requests";
 import { rateLimit } from "@/lib/rate-limit";
 
@@ -19,9 +20,14 @@ export async function POST(request: Request) {
     const data = signupSchema.parse(body);
     const weak = passwordProblem(data.password);
     if (weak) return NextResponse.json({ ok: false, error: weak }, { status: 400 });
-    const { password, device, ...profile } = data;
+    const { password, device, emailProof, ...profile } = data;
+    // Courriel confirmé par un code reçu (preuve à usage unique, liée à ce courriel).
+    const verified = emailProof ? await consumeEmailProof(emailProof, profile.email) : false;
+    if (!verified && emailVerificationRequired()) {
+      return NextResponse.json({ ok: false, code: "email_unverified", error: "Confirmez votre courriel avec le code reçu avant de créer le compte." }, { status: 400 });
+    }
     const customer = await prisma.customer.create({
-      data: { ...profile, passwordHash: await hashPassword(password), passwordChangedAt: new Date() },
+      data: { ...profile, emailVerifiedAt: verified ? new Date() : null, passwordHash: await hashPassword(password), passwordChangedAt: new Date() },
     });
     const { token } = await createSession(customer.id, device);
     return NextResponse.json({ ok: true, token, customer: publicCustomer(customer) }, { status: 201 });

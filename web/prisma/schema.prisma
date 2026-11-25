@@ -193,6 +193,8 @@ model Customer {
   /// Vrai après un mot de passe temporaire donné par l'équipe : changement imposé à la connexion.
   mustChangePassword Boolean           @default(false)
   passwordChangedAt  DateTime?
+  /// Courriel confirmé par un code reçu à l'inscription (null = non vérifié).
+  emailVerifiedAt    DateTime?
   kycStatus          String            @default("none")
   kycDocument        String?
   kycSubmittedAt     DateTime?
@@ -361,4 +363,21 @@ model ComplianceNote {
   note       String
 
   @@index([transferId])
+}
+
+/// Défi de vérification du courriel à l'inscription : seul le HMAC du code à 6 chiffres est stocké.
+model EmailVerification {
+  id         String    @id
+  email      String
+  codeHash   String
+  attempts   Int       @default(0)
+  sends      Int       @default(1)
+  lastSentAt DateTime  @default(now())
+  createdAt  DateTime  @default(now())
+  expiresAt  DateTime
+  verifiedAt DateTime?
+  usedAt     DateTime?
+
+  @@index([email])
+  @@index([expiresAt])
 }

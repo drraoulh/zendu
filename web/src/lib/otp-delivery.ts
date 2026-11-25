@@ -221,3 +221,32 @@ export async function brevoTestEmail(to: string): Promise<{ ok: boolean; status:
     return { ok: false, status: null, detail: `Brevo injoignable : ${err instanceof Error ? err.message : "erreur réseau"}`, sender: b.senderEmail };
   }
 }
+
+/** Code de vérification du courriel à l'inscription (Brevo seulement). */
+export async function deliverSignupEmailCode(to: string, firstName: string, code: string, expiresMinutes: number): Promise<void> {
+  const b = brevo();
+  if (!b || !b.senderEmail) throw new OtpDeliveryError("otp_unavailable", "L'envoi de courriels est momentanément indisponible.");
+  const name = firstName.replace(/[<>&"]/g, "");
+  const html = `<!doctype html><html lang="fr"><body style="margin:0;background:#f5f5f6;font-family:Arial,Helvetica,sans-serif;color:#111">
+<table role="presentation" width="100%" cellpadding="0" cellspacing="0"><tr><td align="center" style="padding:32px 16px">
+<table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="max-width:480px;background:#ffffff;border-radius:16px;padding:32px">
+<tr><td style="font-size:20px;font-weight:600">WorldSoft Transfer</td></tr>
+<tr><td style="padding-top:24px;font-size:16px">Bonjour ${name},</td></tr>
+<tr><td style="padding-top:8px;font-size:15px;color:#555">Voici le code pour confirmer votre adresse courriel :</td></tr>
+<tr><td style="padding:20px 0"><div style="font-size:34px;font-weight:600;letter-spacing:8px;background:#f1f1f2;border-radius:12px;padding:16px;text-align:center">${code}</div></td></tr>
+<tr><td style="font-size:14px;color:#555">Il expire dans ${expiresMinutes} minutes. Si vous n'avez pas demandé ce code, ignorez ce message.</td></tr>
+</table></td></tr></table></body></html>`;
+  await brevoPost(
+    "/smtp/email",
+    b.key,
+    {
+      sender: { email: b.senderEmail, name: b.senderName },
+      to: [{ email: to, name: firstName }],
+      subject: "Confirmez votre courriel WorldSoft Transfer",
+      htmlContent: html,
+      textContent: `Bonjour ${firstName},\n\nVotre code pour confirmer votre courriel : ${code}\nIl expire dans ${expiresMinutes} minutes.`,
+      tags: ["signup-email-code"],
+    },
+    b.base,
+  );
+}

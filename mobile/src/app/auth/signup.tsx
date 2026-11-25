@@ -7,15 +7,17 @@ import { Button, Field, H1, Header, Notice, P, Screen, Small, Steps } from "@/co
 import { COUNTRIES, COUNTRY_CODES, type CountryCode } from "@/lib/corridors";
 import { company } from "@/lib/company";
 import { openSite } from "@/lib/links";
+import { api, ApiError } from "@/lib/api";
 import { storage } from "@/lib/storage";
 import { passwordScore, useSession } from "@/lib/session";
 import { colors, fonts } from "@/lib/theme";
 import { tr } from "@/lib/i18n";
 
 const EMAIL = /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/;
-// Inscription volontairement courte (2 étapes) : le profil (naissance, adresse) et la vérification d'identité
-// se terminent ensuite depuis le bandeau de l'accueil (écran /kyc). Pas de code par SMS à l'inscription.
-const TITLES = [tr("Vous"), tr("Sécurité")];
+// Inscription courte (3 étapes) : vous → courriel confirmé par un code → mot de passe. Le profil (naissance, adresse)
+// et la vérification d'identité se terminent ensuite depuis le bandeau de l'accueil (écran /kyc).
+// L'étape du code est sautée si le courriel ne peut pas partir (la confirmation reste alors à faire plus tard).
+const TITLES = [tr("Vous"), tr("Courriel"), tr("Sécurité")];
 const LAST = TITLES.length;
 const SIGNUP_TOTAL_STEPS = LAST;
 // Brouillon (sans le mot de passe) gardé sur le téléphone : une appli fermée en pleine inscription ne perd rien.
@@ -36,6 +38,12 @@ export default function SignUp() {
   // Le courriel saisi appartient déjà à un compte : on propose de se connecter ou de réinitialiser le mot de passe.
   const [emailTaken, setEmailTaken] = useState(false);
   const [busy, setBusy] = useState(false);
+  // Vérification du courriel : défi en cours, code saisi, courriel déjà confirmé, délai avant renvoi.
+  const [challenge, setChallenge] = useState<string | null>(null);
+  const [code, setCode] = useState("");
+  const [verifiedEmail, setVerifiedEmail] = useState<string | null>(null);
+  const [skippedVerify, setSkippedVerify] = useState(false);
+  const [wait, setWait] = useState(0);
   const c = COUNTRIES[country];
 
   // Reprise du brouillon enregistré (une seule fois), puis sauvegarde à chaque modification.
@@ -58,6 +66,31 @@ export default function SignUp() {
     void storage.set(KEY_DRAFT, { country, email, phone, firstName, lastName });
   }, [country, email, phone, firstName, lastName]);
 
+  useEffect(() => {
+    if (wait <= 0) return;
+    const t = setTimeout(() => setWait((w) => w - 1), 1000);
+    return () => clearTimeout(t);
+  }, [wait]);
+
+  const cleanEmail = email.trim().toLowerCase();
+
+  /** Envoie le code (ou le renvoie). Renvoie false si l'envoi échoue ; `required` = confirmation obligatoire. */
+  async function sendCode(resend: boolean): Promise<{ ok: true } | { ok: false; error: string; code?: string }> {
+    try {
+      const r = await api.emailCode(cleanEmail, firstName.trim() || "client", resend ? (challenge ?? undefined) : undefined);
+      setChallenge(r.challengeId);
+      setWait(r.resendAfter);
+      setCode("");
+      return { ok: true };
+    } catch (e) {
+      if (e instanceof ApiError) {
+        if (e.code === "resend_too_soon") setWait(30);
+        return { ok: false, error: e.message, code: e.code };
+      }
+      return { ok: false, error: tr("Une erreur est survenue.") };
+    }
+  }
+
   /** Numéro sans indicatif ni zéro de tête, même s'il a été collé ou rempli automatiquement avec « +1 », « 237 »… */
   function localPhone(): string {
     let d = phone.replace(/\D/g, "");
@@ -76,6 +109,9 @@ export default function SignUp() {
       if (localPhone().length < (country === "CA" ? 10 : 8)) e.phone = tr("Numéro de téléphone invalide");
     }
     if (step === 2) {
+      if (code.replace(/\D/g, "").length !== 6) e.code = tr("Entrez le code à 6 chiffres reçu par courriel");
+    }
+    if (step === 3) {
       if (passwordScore(password) < 4) e.password = tr("Le mot de passe ne respecte pas toutes les règles");
       if (!accepted) e.accepted = tr("Vous devez accepter les conditions");
     }
@@ -86,7 +122,40 @@ export default function SignUp() {
     const e = validate();
     setErrors(e);
     if (Object.keys(e).length) return;
-    if (step < LAST) return setStep(step + 1);
+    if (step === 1) {
+      // Courriel déjà confirmé (retour en arrière) : on passe directement au mot de passe.
+      if (verifiedEmail === cleanEmail) return setStep(3);
+      setBusy(true);
+      const s = await sendCode(false);
+      setBusy(false);
+      if (s.ok) {
+        setSkippedVerify(false);
+        return setStep(2);
+      }
+      if (s.code === "email_taken") {
+        setEmailTaken(true);
+        return setErrors({ email: tr("Un compte existe déjà avec ce courriel.") });
+      }
+      if (s.code === "rate_limited") return setErrors({ submit: s.error });
+      // Envoi impossible pour le moment : la confirmation n'est pas bloquante, elle se fera plus tard.
+      setSkippedVerify(true);
+      return setStep(3);
+    }
+    if (step === 2) {
+      if (!challenge) return setStep(1);
+      setBusy(true);
+      try {
+        await api.emailVerify(challenge, code.replace(/\D/g, ""));
+        setVerifiedEmail(cleanEmail);
+        setBusy(false);
+        return setStep(3);
+      } catch (err) {
+        setBusy(false);
+        const m = err instanceof ApiError ? err.message : tr("Une erreur est survenue.");
+        if (err instanceof ApiError && (err.code === "expired" || err.code === "too_many")) setCode("");
+        return setErrors({ code: m });
+      }
+    }
     setBusy(true);
     const r = await signUp(
       {
@@ -96,6 +165,7 @@ export default function SignUp() {
         phone: `+${c.dialCode} ${localPhone()}`,
         country,
         marketing,
+        emailProof: verifiedEmail === cleanEmail && challenge ? challenge : undefined,
       },
       password,
     );
@@ -115,7 +185,8 @@ export default function SignUp() {
   }
 
   function back() {
-    if (step > 1) setStep(step - 1);
+    if (step === 3 && (skippedVerify || verifiedEmail === cleanEmail)) setStep(1);
+    else if (step > 1) setStep(step - 1);
     else if (router.canGoBack()) router.back();
     else router.replace("/welcome");
   }
@@ -128,13 +199,13 @@ export default function SignUp() {
     useCallback(() => {
       const sub = BackHandler.addEventListener("hardwareBackPress", () => {
         if (step > 1) {
-          setStep(step - 1);
+          setStep(step === 3 && (skippedVerify || verifiedEmail === cleanEmail) ? 1 : step - 1);
           return true;
         }
         return false;
       });
       return () => sub.remove();
-    }, [step]),
+    }, [step, skippedVerify, verifiedEmail, cleanEmail]),
   );
 
   return (
@@ -178,6 +249,8 @@ export default function SignUp() {
             onChangeText={(v) => {
               setEmail(v);
               setEmailTaken(false);
+              setChallenge(null);
+              setVerifiedEmail(null);
             }}
             placeholder="nom@exemple.com"
             keyboardType="email-address"
@@ -216,6 +289,38 @@ export default function SignUp() {
       ) : null}
 
       {step === 2 ? (
+        <>
+          <H1>{tr("Confirmez votre courriel")}</H1>
+          <P style={{ marginTop: 6, marginBottom: 18 }}>{tr("Nous avons envoyé un code à 6 chiffres à {0}. Vérifiez aussi vos courriels indésirables.", cleanEmail)}</P>
+          <Field
+            label={tr("Code de vérification")}
+            value={code}
+            onChangeText={(v) => setCode(v.replace(/\D/g, "").slice(0, 6))}
+            keyboardType="number-pad"
+            autoComplete="one-time-code"
+            textContentType="oneTimeCode"
+            placeholder="123456"
+            error={errors.code}
+          />
+          <View style={{ gap: 8, marginTop: 4 }}>
+            <Button
+              title={wait > 0 ? tr("Renvoyer le code ({0} s)", String(wait)) : tr("Renvoyer le code")}
+              size="sm"
+              variant="secondary"
+              disabled={wait > 0 || busy}
+              onPress={async () => {
+                setBusy(true);
+                const s = await sendCode(true);
+                setBusy(false);
+                setErrors(s.ok ? {} : { code: s.error });
+              }}
+            />
+            <Button title={tr("Changer de courriel")} size="sm" variant="secondary" onPress={() => setStep(1)} />
+          </View>
+        </>
+      ) : null}
+
+      {step === 3 ? (
         <>
           <H1>{tr("Choisissez un mot de passe")}</H1>
           <P style={{ marginTop: 6, marginBottom: 18 }}>{tr("Il protège votre argent : évitez de réutiliser celui d'un autre service.")}</P>

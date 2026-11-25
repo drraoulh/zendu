@@ -177,6 +177,8 @@ export type Customer = {
 export type SignupInput = Omit<Customer, "id" | "kyc" | "kycDocument" | "kycNote" | "kycVerifiedAt" | "mustChangePassword" | "passwordChangedAt" | "createdAt"> & {
   password: string;
   device?: string;
+  /** Identifiant du défi de vérification du courriel réussi (voir api.emailCode / api.emailVerify). */
+  emailProof?: string;
 };
 
 export type DeviceSession = { id: string; device: string | null; createdAt: string; lastUsedAt: string; current: boolean };
@@ -310,6 +312,15 @@ async function request<T>(path: string, init?: RequestInit & { token?: string | 
 }
 
 export const api = {
+  /** Envoie (ou renvoie, avec challengeId) un code à 6 chiffres au courriel de l'inscription. */
+  emailCode: (email: string, firstName: string, challengeId?: string) =>
+    request<{ ok: true; challengeId: string; resendAfter: number; required: boolean }>("/api/auth/signup/email-code", {
+      method: "POST",
+      body: JSON.stringify({ email, firstName, challengeId }),
+      token: null,
+    }),
+  emailVerify: (challengeId: string, code: string) =>
+    request<{ ok: true }>("/api/auth/signup/email-verify", { method: "POST", body: JSON.stringify({ challengeId, code }), token: null }),
   signup: (input: SignupInput) => request<{ token: string; customer: Customer }>("/api/auth/signup", { method: "POST", body: JSON.stringify(input) }),
   // Code de connexion par courriel d'abord (Brevo) ; le SMS reste au choix sur l'écran de vérification.
   login: (email: string, password: string, device?: string) =>

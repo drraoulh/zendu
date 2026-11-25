@@ -1093,5 +1093,10 @@
  "Quelques informations pour créer votre compte. Le reste se complète ensuite dans l'appli.": "Algunos datos para crear su cuenta. El resto se completa después en la app.",
  "{0} requis(e)": "{0} obligatorio",
  "Afficher le mot de passe": "Mostrar la contraseña",
- "Masquer le mot de passe": "Ocultar la contraseña"
+ "Masquer le mot de passe": "Ocultar la contraseña",
+ "Entrez le code à 6 chiffres reçu par courriel": "Ingresa el código de 6 dígitos recibido por correo",
+ "Confirmez votre courriel": "Confirma tu correo",
+ "Nous avons envoyé un code à 6 chiffres à {0}. Vérifiez aussi vos courriels indésirables.": "Enviamos un código de 6 dígitos a {0}. Revisa también tu carpeta de spam.",
+ "Renvoyer le code ({0} s)": "Reenviar código ({0} s)",
+ "Changer de courriel": "Cambiar correo"
 }
