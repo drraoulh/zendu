@@ -32,18 +32,14 @@ export function SystemScreen({
   const t = useT(systemMessages);
   return (
     <section className="relative overflow-hidden bg-bg">
-      <div
-        aria-hidden
-        className="pointer-events-none absolute -top-32 left-1/2 h-[30rem] w-[30rem] -translate-x-1/2 rounded-full bg-brand/10 blur-3xl"
-      />
       <div className="relative mx-auto flex w-full max-w-3xl flex-col items-center px-4 py-16 text-center sm:px-6 sm:py-24">
         <span className="animate-rise relative inline-flex rounded-3xl bg-white p-3 shadow-card ring-1 ring-line">
           <LogoEmblem className="h-14 w-auto sm:h-16" priority />
         </span>
-        <p className="animate-rise mt-8 font-display text-xs font-bold uppercase tracking-[0.18em] text-brand">
+        <p className="animate-rise mt-8 font-display text-xs font-semibold text-brand">
           {code}
         </p>
-        <h1 className="animate-rise-1 mt-3 max-w-xl font-display text-3xl font-extrabold tracking-tight text-ink sm:text-4xl">
+        <h1 className="animate-rise-1 mt-3 max-w-xl font-display text-3xl font-semibold tracking-tight text-ink sm:text-4xl">
           {title}
         </h1>
         <p className="animate-rise-1 mt-4 max-w-lg text-base leading-relaxed text-muted">{text}</p>
@@ -60,7 +56,7 @@ export function SystemScreen({
                   <Icon name={l.icon} />
                 </span>
                 <span className="min-w-0">
-                  <span className="block font-display text-sm font-bold text-ink">{t(l.title)}</span>
+                  <span className="block font-display text-sm font-semibold text-ink">{t(l.title)}</span>
                   <span className="block text-xs text-muted">{t(l.desc)}</span>
                 </span>
               </Link>

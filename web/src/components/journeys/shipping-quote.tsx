@@ -97,7 +97,7 @@ export function ShippingQuoteJourney() {
       render: ({ values, set, errors, fieldId }) => (
         <>
           <div className="rounded-2xl border border-line p-4 sm:p-5">
-            <p className="mb-4 flex items-center gap-2 font-display text-sm font-bold text-ink">
+            <p className="mb-4 flex items-center gap-2 font-display text-sm font-semibold text-ink">
               <Icon name="maple" className="h-4 w-4 text-maple" />
               {t("originHeading")}
             </p>
@@ -140,7 +140,7 @@ export function ShippingQuoteJourney() {
             </div>
           </div>
           <div className="rounded-2xl border border-line p-4 sm:p-5">
-            <p className="mb-4 flex items-center gap-2 font-display text-sm font-bold text-ink">
+            <p className="mb-4 flex items-center gap-2 font-display text-sm font-semibold text-ink">
               <Icon name="pin" className="h-4 w-4 text-brand" />
               {t("destHeading")}
             </p>

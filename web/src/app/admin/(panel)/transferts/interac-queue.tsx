@@ -24,7 +24,7 @@ export function InteracQueue({ rows, nl, date }: { rows: AdminTransferRow[]; nl:
   const sorted = [...rows].sort((a, b) => Number(!!b.interacDeclaredAt) - Number(!!a.interacDeclaredAt));
   return (
     <section aria-labelledby="admin-interac-queue" className="rounded-3xl border border-brand/25 bg-white p-4 shadow-card sm:p-6">
-      <h2 id="admin-interac-queue" className="flex flex-wrap items-center gap-2 font-display text-lg font-bold text-ink">
+      <h2 id="admin-interac-queue" className="flex flex-wrap items-center gap-2 font-display text-lg font-semibold text-ink">
         <PaymentLogo id="INTERAC" size={24} title="" />
         {t("interacQueueTitle")}
         <Badge tone="brand">{rows.length}</Badge>
@@ -100,7 +100,7 @@ function InteracItem({ row, nl, date }: { row: AdminTransferRow; nl: string; dat
         </div>
         <div className="shrink-0 text-right">
           <p className="text-xs text-muted">{t("interacExpected")}</p>
-          <p className="font-display text-lg font-extrabold text-ink">{expected}</p>
+          <p className="font-display text-lg font-semibold text-ink">{expected}</p>
         </div>
       </div>
 

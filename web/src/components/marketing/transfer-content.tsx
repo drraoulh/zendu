@@ -4,7 +4,6 @@ import Link from "next/link";
 import { useMemo } from "react";
 import { AppDownloadButton } from "@/components/app/app-download-button";
 import { StoreBadges } from "@/components/app/store-badges";
-import { WstLogo } from "@/components/brand/wst-logo";
 import { CountryFlag } from "@/components/country-flag";
 import { useI18n } from "@/components/i18n-provider";
 import {
@@ -76,11 +75,8 @@ export function TransferContent() {
       <Section id="application" className="scroll-mt-20 overflow-hidden bg-white">
         <Container className="xl:max-w-7xl">
           <SectionHeading align="center" eyebrow={t("appEyebrow")} title={t("appTitle")} subtitle={t("appSubtitle")} />
+          <StoreBadges className="mt-8 justify-center" />
           <div className="relative mt-14">
-            <div
-              aria-hidden
-              className="absolute inset-x-0 top-24 -z-0 mx-auto h-72 max-w-3xl rounded-full bg-gradient-to-r from-brand-soft via-sky/20 to-brand-soft blur-3xl"
-            />
             <div className="relative grid gap-14 sm:grid-cols-2 sm:gap-x-6 xl:grid-cols-4 xl:gap-x-5">
               <PhoneShot title={t("shot1Title")} text={t("shot1Text")}>
                 <HomeScreen />
@@ -125,7 +121,7 @@ export function TransferContent() {
                     <Icon name={icon} className="h-5 w-5" />
                   </span>
                   <span>
-                    <span className="block font-display font-bold text-ink">{k(`${key}Title`)}</span>
+                    <span className="block font-display font-semibold text-ink">{k(`${key}Title`)}</span>
                     <span className="mt-1 block text-sm leading-relaxed text-muted">{k(`${key}Text`)}</span>
                   </span>
                 </li>
@@ -134,9 +130,8 @@ export function TransferContent() {
           </div>
           <div className="self-center">
             <div className="bg-navy-gradient relative overflow-hidden rounded-3xl p-6 text-white shadow-float sm:p-8">
-              <div aria-hidden className="bg-grid absolute inset-0 opacity-30" />
               <div className="relative">
-                <p className="font-display text-sm font-bold uppercase tracking-[0.16em] text-sky">{t("etaTitle")}</p>
+                <p className="font-display text-sm font-semibold text-sky">{t("etaTitle")}</p>
                 <dl className="mt-5 divide-y divide-white/10">
                   {(
                     [
@@ -149,7 +144,7 @@ export function TransferContent() {
                         <Icon name={icon} className="h-4 w-4 text-sky" />
                         {t(label)}
                       </dt>
-                      <dd className="text-right font-display text-sm font-bold">{t(value)}</dd>
+                      <dd className="text-right font-display text-sm font-semibold">{t(value)}</dd>
                     </div>
                   ))}
                 </dl>
@@ -216,7 +211,7 @@ export function TransferContent() {
                         <CountryFlag code={d.code} size={28} title="" className="rounded-md" />
                       </span>
                       <span className="min-w-0 flex-1">
-                        <span className="block font-display text-sm font-bold leading-snug text-ink [overflow-wrap:anywhere]">
+                        <span className="block font-display text-sm font-semibold leading-snug text-ink [overflow-wrap:anywhere]">
                           {d.name}
                         </span>
                         <span className="block text-xs text-muted">
@@ -280,49 +275,25 @@ function Hero() {
   ];
   return (
     <section className="bg-navy-gradient relative isolate overflow-hidden text-white">
-      <div
-        aria-hidden
-        className="bg-grid absolute inset-0 -z-10 opacity-40 [mask-image:radial-gradient(80%_70%_at_40%_30%,black,transparent)]"
-      />
-      <div aria-hidden className="absolute -right-32 top-16 -z-10 h-[30rem] w-[30rem] rounded-full bg-brand/30 blur-3xl" />
       <Container className="relative grid grid-cols-1 items-center gap-12 pb-16 pt-12 sm:pt-16 lg:grid-cols-[1.05fr_minmax(0,0.95fr)] lg:gap-14 lg:pb-24 lg:pt-20">
         <div className="animate-rise min-w-0">
-          <WstLogo variant="negative" className="h-9 w-auto sm:h-10" />
-          <p className="mt-6 inline-flex max-w-full items-center gap-2 rounded-full border border-white/15 bg-white/5 px-3 py-1.5 text-[0.7rem] font-semibold uppercase tracking-[0.14em] text-sky backdrop-blur sm:text-xs">
-            <Icon name="maple" className="h-3.5 w-3.5 shrink-0 text-maple" />
-            <span className="min-w-0">{t("heroBadge")}</span>
-          </p>
-          <h1 className="mt-5 font-display text-[2.2rem] font-black leading-[1.06] tracking-tight sm:text-5xl lg:text-[3.4rem]">
-            {t("heroTitleA")}{" "}
-            <span className="bg-gradient-to-r from-sky via-white to-silver bg-clip-text text-transparent">
-              {t("heroTitleB")}
-            </span>
+          <h1 className="font-display text-[2.2rem] font-medium leading-[1.08] tracking-tight sm:text-5xl lg:text-[3.4rem]">
+            {t("heroTitleA")} <span className="text-sky">{t("heroTitleB")}</span>
           </h1>
-          <p className="mt-6 max-w-xl font-display text-lg font-bold text-white sm:text-xl">{t("heroSubtitle")}</p>
-          <p className="mt-3 max-w-xl text-base leading-relaxed text-white/75">{t("heroLead")}</p>
+          <p className="mt-6 max-w-xl text-lg leading-relaxed text-white/75">{t("heroLead")}</p>
           <div className="mt-8 flex flex-col gap-3 sm:flex-row">
             <AppDownloadButton variant="white" size="lg" />
             <ButtonLink href="#simulateur" variant="outline-light" size="lg">
               {t("heroCta2")}
             </ButtonLink>
           </div>
-          <div className="mt-6">
-            <StoreBadges dark />
-          </div>
-          <ul className="mt-8 flex flex-wrap gap-2.5">
+          <p className="mt-8 flex max-w-xl flex-wrap gap-x-5 gap-y-1 text-sm text-white/60">
             {chips.map((c) => (
-              <li
-                key={c.icon}
-                className="inline-flex items-center gap-2 rounded-full border border-white/10 bg-white/[0.06] px-3 py-1.5 text-sm text-white/85"
-              >
-                <Icon name={c.icon} className="h-4 w-4 text-sky" />
-                {c.label}
-              </li>
+              <span key={c.icon}>{c.label}</span>
             ))}
-          </ul>
+          </p>
         </div>
         <div className="animate-rise-2 relative mx-auto w-full max-w-md lg:max-w-none">
-          <div aria-hidden className="absolute -inset-4 -z-10 rounded-[2rem] bg-sky/20 blur-2xl" />
           <TransferCalculator id="simulateur" />
         </div>
       </Container>
@@ -351,7 +322,7 @@ function PayoutCard({
         </span>
         <span className="rounded-full bg-surface-soft px-2.5 py-1 text-xs font-semibold text-muted">{count}</span>
       </div>
-      <h3 className="mt-5 font-display text-lg font-bold text-ink">{title}</h3>
+      <h3 className="mt-5 font-display text-lg font-semibold text-ink">{title}</h3>
       <p className="mt-2 text-sm leading-relaxed text-muted">{text}</p>
       {chips && chips.length > 0 && (
         <ul className="mt-4 flex flex-wrap gap-2">
@@ -375,12 +346,10 @@ function FinalBand() {
   return (
     <section className="px-5 pb-16 sm:px-6 sm:pb-20">
       <div className="bg-navy-gradient relative mx-auto max-w-6xl overflow-hidden rounded-[2rem] px-6 py-12 text-white shadow-float sm:px-12 sm:py-16">
-        <div aria-hidden className="bg-grid absolute inset-0 opacity-30 [mask-image:linear-gradient(to_left,black,transparent)]" />
-        <div aria-hidden className="absolute -right-24 -top-24 h-72 w-72 rounded-full bg-brand/40 blur-3xl" />
         <div className="relative flex flex-col gap-8 lg:flex-row lg:items-center lg:justify-between">
           <div className="max-w-2xl">
             <Eyebrow light>WorldSoft Transfer</Eyebrow>
-            <h2 className="mt-3 font-display text-3xl font-black tracking-tight sm:text-4xl">{t("ctaTitle")}</h2>
+            <h2 className="mt-3 font-display text-3xl font-semibold tracking-tight sm:text-4xl">{t("ctaTitle")}</h2>
             <p className="mt-3 text-lg text-white/80">{t("ctaText")}</p>
             <div className="mt-6">
               <StoreBadges dark />

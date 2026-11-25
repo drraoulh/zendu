@@ -34,7 +34,7 @@ export default async function ReconciliationPage({ searchParams }: Props) {
     <div className="space-y-6">
       <header className="flex flex-wrap items-end justify-between gap-3">
         <div>
-          <h1 className="font-display text-2xl font-extrabold text-ink">Rapprochement</h1>
+          <h1 className="font-display text-2xl font-semibold text-ink">Rapprochement</h1>
           <p className="mt-1 max-w-2xl text-sm text-muted">
             À faire chaque soir : l&apos;argent reçu par Interac doit correspondre aux versements faits. La marge est une <strong>estimation</strong> (frais + marge de change au taux de référence), pas un chiffre comptable.
           </p>
@@ -71,13 +71,13 @@ export default async function ReconciliationPage({ searchParams }: Props) {
             ].map(([label, value]) => (
               <div key={label} className="rounded-2xl border border-line bg-white p-4">
                 <p className="text-xs font-semibold text-muted">{label}</p>
-                <p className="mt-1 font-display text-xl font-extrabold text-ink">{value}</p>
+                <p className="mt-1 font-display text-xl font-semibold text-ink">{value}</p>
               </div>
             ))}
           </section>
 
           <section className="rounded-3xl border border-line bg-white p-4 shadow-card sm:p-6" aria-labelledby="recon-issues">
-            <h2 id="recon-issues" className="font-display text-lg font-bold text-ink">
+            <h2 id="recon-issues" className="font-display text-lg font-semibold text-ink">
               À vérifier {data.issues.length ? `(${data.issues.length})` : ""}
             </h2>
             {data.issues.length ? (
@@ -96,7 +96,7 @@ export default async function ReconciliationPage({ searchParams }: Props) {
           </section>
 
           <section className="overflow-x-auto rounded-3xl border border-line bg-white p-4 shadow-card sm:p-6" aria-labelledby="recon-days">
-            <h2 id="recon-days" className="font-display text-lg font-bold text-ink">Jour par jour (heure de Toronto)</h2>
+            <h2 id="recon-days" className="font-display text-lg font-semibold text-ink">Jour par jour (heure de Toronto)</h2>
             <table className="mt-3 w-full min-w-[640px] text-sm">
               <thead>
                 <tr className="text-left text-xs font-semibold text-muted">

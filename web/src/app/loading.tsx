@@ -13,7 +13,7 @@ export default function Loading() {
             <LogoEmblem className="h-9 w-auto" />
           </span>
         </span>
-        <span className="font-display text-xs font-bold uppercase tracking-[0.2em] text-muted">
+        <span className="font-display text-xs font-semibold text-muted">
           Chargement · Loading
         </span>
       </div>

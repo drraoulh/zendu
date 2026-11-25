@@ -41,7 +41,7 @@ export function HomeHero() {
 
           <div className="animate-rise w-full max-w-3xl px-6 pb-10 pt-40 sm:px-12 sm:pb-14 lg:py-20">
             <p className="text-base font-semibold text-white/85 sm:text-lg">{t("heroTagline")}</p>
-            <h1 className="mt-3 font-display text-[2.6rem] font-bold leading-[1] min-[375px]:text-5xl sm:text-6xl lg:text-7xl">
+            <h1 className="mt-3 font-display text-[2.6rem] font-semibold leading-[1] min-[375px]:text-5xl sm:text-6xl lg:text-7xl">
               {t("heroTitleA")} {t("heroTitleAccent")}
               {t("heroTitleB")}
             </h1>

@@ -22,7 +22,7 @@ export function IssuesQueue({ rows, nl, date }: { rows: AdminTransferRow[]; nl: 
   const t = useT(adminMessages);
   return (
     <section aria-labelledby="admin-issues-queue" className="rounded-3xl border border-danger/25 bg-white p-4 shadow-card sm:p-6">
-      <h2 id="admin-issues-queue" className="flex flex-wrap items-center gap-2 font-display text-lg font-bold text-ink">
+      <h2 id="admin-issues-queue" className="flex flex-wrap items-center gap-2 font-display text-lg font-semibold text-ink">
         <span className="inline-flex h-8 w-8 items-center justify-center rounded-xl bg-danger/10 text-danger">
           <Icon name="info" className="h-4 w-4" />
         </span>
@@ -108,7 +108,7 @@ function IssueItem({ row, nl, date }: { row: AdminTransferRow; nl: string; date:
         </div>
         <div className="shrink-0 text-right">
           <Badge tone="danger">{mismatch ? t("statusMismatch") : t("statusPayoutFailed")}</Badge>
-          <p className="mt-1 text-sm font-bold text-ink">{paid}</p>
+          <p className="mt-1 text-sm font-semibold text-ink">{paid}</p>
           <p className="text-xs text-muted">{receive}</p>
         </div>
       </div>

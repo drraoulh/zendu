@@ -84,7 +84,7 @@ function LegalDocument<K extends string>({
             href={`#${s.id}`}
             className="flex gap-3 rounded-xl px-3 py-2.5 text-muted transition hover:bg-surface-soft hover:text-brand-strong"
           >
-            <span className="w-5 shrink-0 font-display font-bold text-brand">{s.n}.</span>
+            <span className="w-5 shrink-0 font-display font-semibold text-brand">{s.n}.</span>
             <span>{s.title}</span>
           </a>
         </li>
@@ -105,7 +105,7 @@ function LegalDocument<K extends string>({
         <div className="grid gap-10 lg:grid-cols-[17rem_1fr] lg:gap-14">
           <aside className="lg:sticky lg:top-24 lg:self-start">
             <details className="group rounded-3xl border border-line bg-white p-2 shadow-card lg:hidden">
-              <summary className="flex cursor-pointer list-none items-center justify-between px-3 py-2 font-display text-sm font-bold text-ink [&::-webkit-details-marker]:hidden">
+              <summary className="flex cursor-pointer list-none items-center justify-between px-3 py-2 font-display text-sm font-semibold text-ink [&::-webkit-details-marker]:hidden">
                 {l("toc")}
                 <Icon name="chevronDown" className="h-4 w-4 text-brand transition group-open:rotate-180" />
               </summary>
@@ -114,7 +114,7 @@ function LegalDocument<K extends string>({
               </nav>
             </details>
             <nav aria-label={l("toc")} className="hidden rounded-3xl border border-line bg-white p-3 shadow-card lg:block">
-              <p className="px-3 pb-2 pt-1 font-display text-xs font-bold uppercase tracking-[0.16em] text-ink">
+              <p className="px-3 pb-2 pt-1 font-display text-xs font-semibold text-ink">
                 {l("toc")}
               </p>
               {toc}
@@ -129,7 +129,7 @@ function LegalDocument<K extends string>({
             <div className="mt-10 grid gap-10">
               {items.map((s) => (
                 <section key={s.id} id={s.id} className="scroll-mt-24" aria-labelledby={`${s.id}-title`}>
-                    <h2 id={`${s.id}-title`} className="flex items-baseline gap-3 font-display text-xl font-extrabold text-ink sm:text-2xl">
+                    <h2 id={`${s.id}-title`} className="flex items-baseline gap-3 font-display text-xl font-semibold text-ink sm:text-2xl">
                       <span className="text-brand">{s.n}.</span>
                       {s.title}
                     </h2>
@@ -142,7 +142,7 @@ function LegalDocument<K extends string>({
 
             <div className="mt-14 flex flex-col gap-4 rounded-3xl border border-line bg-surface-soft p-6 sm:flex-row sm:items-center sm:justify-between">
               <div>
-                <p className="font-display font-bold text-ink">{l("questions")}</p>
+                <p className="font-display font-semibold text-ink">{l("questions")}</p>
                 <CompanyValue
                   value={emails.contact}
                   href={emails.contact ? `mailto:${emails.contact}` : null}

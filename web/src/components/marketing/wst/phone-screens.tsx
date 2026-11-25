@@ -50,7 +50,7 @@ export function PhoneFrame({ children, className = "" }: { children: ReactNode; 
 
 function StatusBar() {
   return (
-    <div className="relative flex h-9 shrink-0 items-center justify-between px-6 pt-1 text-[11px] font-bold text-ink">
+    <div className="relative flex h-9 shrink-0 items-center justify-between px-6 pt-1 text-[11px] font-semibold text-ink">
       <span>9:41</span>
       {/* Îlot caméra */}
       <span className="absolute left-1/2 top-2 h-[20px] w-[76px] -translate-x-1/2 rounded-full bg-navy-deep" />
@@ -84,7 +84,7 @@ export function PhoneShot({
     <figure className={`flex flex-col items-center ${className}`}>
       <PhoneFrame>{children}</PhoneFrame>
       <figcaption className="mt-7 max-w-[280px] text-center">
-        <span className="block font-display text-lg font-extrabold tracking-tight text-ink">{title}</span>
+        <span className="block font-display text-lg font-semibold tracking-tight text-ink">{title}</span>
         <span className="mt-1.5 block text-sm leading-relaxed text-muted">{text}</span>
       </figcaption>
     </figure>
@@ -137,7 +137,7 @@ function Header({ title, subtitle, close = false }: { title: string; subtitle?: 
     <div className="flex items-center px-3.5 pb-2 pt-1">
       {close ? <span className="w-8" /> : <IconBox d={I.back} />}
       <span className="min-w-0 flex-1 text-center">
-        <span className="block font-display text-[14px] font-extrabold leading-tight">{title}</span>
+        <span className="block font-display text-[14px] font-semibold leading-tight">{title}</span>
         {subtitle && <span className="block text-[10px] text-muted">{subtitle}</span>}
       </span>
       {close ? <IconBox close /> : <span className="w-8" />}
@@ -173,7 +173,7 @@ function Card({ children, className = "" }: { children: ReactNode; className?: s
 function Button({ children, tone = "primary", icon }: { children: ReactNode; tone?: "primary" | "secondary"; icon?: string }) {
   return (
     <span
-      className={`flex h-10 items-center justify-center gap-1 rounded-full border px-2 text-[11px] font-bold ${
+      className={`flex h-10 items-center justify-center gap-1 rounded-full border px-2 text-[11px] font-semibold ${
         tone === "primary" ? "border-ink bg-ink text-white" : "border-ink/20 bg-white text-ink"
       }`}
     >
@@ -187,7 +187,7 @@ function Row({ label, value, strong = false }: { label: string; value: string; s
   return (
     <div className="flex items-center justify-between gap-1.5 py-[4px] text-[10.5px]">
       <span className="shrink-0 text-muted">{label}</span>
-      <span className={`whitespace-nowrap text-right text-ink ${strong ? "font-extrabold" : "font-semibold"}`}>{value}</span>
+      <span className={`whitespace-nowrap text-right text-ink ${strong ? "font-semibold" : "font-semibold"}`}>{value}</span>
     </div>
   );
 }
@@ -195,7 +195,7 @@ function Row({ label, value, strong = false }: { label: string; value: string; s
 function Avatar({ name, size = 40 }: { name: string; size?: number }) {
   return (
     <span
-      className="flex items-center justify-center rounded-full bg-brand-soft font-display font-extrabold text-brand"
+      className="flex items-center justify-center rounded-full bg-brand-soft font-display font-semibold text-brand"
       style={{ width: size, height: size, fontSize: size * 0.36 }}
     >
       {name
@@ -278,7 +278,7 @@ export function HomeScreen({ amount = 200 }: { amount?: number }) {
       <div className="flex-1 overflow-hidden px-3.5">
         <div className="flex items-center gap-2 pb-2.5 pt-0.5">
           <WstLogo variant="symbol" className="h-7 w-7" />
-          <span className="flex-1 truncate font-display text-[17px] font-black text-navy">{t("hello", { name: "Paul" })}</span>
+          <span className="flex-1 truncate font-display text-[17px] font-semibold text-navy">{t("hello", { name: "Paul" })}</span>
           <span className="flex h-8 w-8 items-center justify-center rounded-[10px] border border-line bg-white text-ink">
             <Svg d={I.bell} />
           </span>
@@ -289,7 +289,7 @@ export function HomeScreen({ amount = 200 }: { amount?: number }) {
           <div className="flex items-center gap-2 rounded-[14px] bg-bg px-3 py-1.5">
             <span className="min-w-0 flex-1">
               <span className="block text-[10px] font-semibold text-muted">{t("youSend")}</span>
-              <span className="block font-display text-[20px] font-black leading-tight text-navy">{num(amount)}</span>
+              <span className="block font-display text-[20px] font-semibold leading-tight text-navy">{num(amount)}</span>
             </span>
             <Pill code="CA" unit="CAD" />
           </div>
@@ -298,7 +298,7 @@ export function HomeScreen({ amount = 200 }: { amount?: number }) {
               <Svg d={I.swap} className="h-3.5 w-3.5" />
             </span>
             <span className="min-w-0">
-              <span className="block text-[11px] font-extrabold text-ink">1 CAD = {num(SAMPLE_RATE, 2)} FCFA</span>
+              <span className="block text-[11px] font-semibold text-ink">1 CAD = {num(SAMPLE_RATE, 2)} FCFA</span>
               <span className="block whitespace-nowrap text-[10px] text-muted">
                 <span className="font-semibold text-success">{t("noFee")}</span> · {t("etaMinutes")}
               </span>
@@ -307,18 +307,18 @@ export function HomeScreen({ amount = 200 }: { amount?: number }) {
           <div className="flex items-center gap-2 rounded-[14px] bg-brand-soft px-3 py-1.5">
             <span className="min-w-0 flex-1">
               <span className="block text-[10px] font-semibold text-muted">{t("theyReceive")}</span>
-              <span className="block font-display text-[20px] font-black leading-tight text-brand">{num(receive)}</span>
+              <span className="block font-display text-[20px] font-semibold leading-tight text-brand">{num(receive)}</span>
             </span>
             <Pill code="CM" unit="FCFA" />
           </div>
           <div className="flex items-center justify-between px-1 pb-2 pt-1.5">
             <span className="text-[10px] text-muted">{t("total")}</span>
-            <span className="text-[12px] font-extrabold text-ink">{money(amount, "CAD")}</span>
+            <span className="text-[12px] font-semibold text-ink">{money(amount, "CAD")}</span>
           </div>
           <Button icon={I.send}>{t("send")}</Button>
         </Card>
 
-        <p className="mb-1.5 mt-2.5 font-display text-[13px] font-extrabold">{t("again")}</p>
+        <p className="mb-1.5 mt-2.5 font-display text-[13px] font-semibold">{t("again")}</p>
         <div className="flex gap-3">
           <span className="flex w-10 flex-col items-center gap-1">
             <span className="flex h-9 w-9 items-center justify-center rounded-full border-[1.5px] border-dashed border-brand bg-white text-brand">
@@ -342,7 +342,7 @@ export function HomeScreen({ amount = 200 }: { amount?: number }) {
         </div>
 
         <div className="mb-1.5 mt-2.5 flex items-center justify-between">
-          <p className="font-display text-[13px] font-extrabold">{t("recent")}</p>
+          <p className="font-display text-[13px] font-semibold">{t("recent")}</p>
           <span className="text-[11px] font-semibold text-brand">{t("seeAll")}</span>
         </div>
         <Card className="px-2 py-1.5">
@@ -370,7 +370,7 @@ function Pill({ code, unit }: { code: string; unit: string }) {
   return (
     <span className="flex h-8 shrink-0 items-center gap-1 rounded-full border border-line bg-white px-2">
       <Flag code={code} size={18} />
-      <span className="text-[11px] font-extrabold text-ink">{unit}</span>
+      <span className="text-[11px] font-semibold text-ink">{unit}</span>
       <Svg d={I.chevDown} className="h-3 w-3 text-muted" />
     </span>
   );
@@ -387,7 +387,7 @@ function TransferRow({ name, time, amount }: { name: string; time: string; amoun
       <span className="min-w-0 flex-1">
         <span className="flex items-baseline justify-between gap-2">
           <span className="truncate text-[12px] font-semibold">{name}</span>
-          <span className="shrink-0 text-[10.5px] font-extrabold">{amount}</span>
+          <span className="shrink-0 text-[10.5px] font-semibold">{amount}</span>
         </span>
         <span className="mt-0.5 flex items-center justify-between gap-2">
           <span className="text-[10px] text-muted">{t("today", { time })}</span>
@@ -476,8 +476,8 @@ export function ReviewScreen({ amount = 200 }: { amount?: number }) {
       <Steps current={3} total={3} label={t("stepOf", { n: 3, total: 3, label: t("stepPayment") })} />
       <div className="flex-1 space-y-2 overflow-hidden px-3.5">
         <div className="flex flex-col items-center rounded-[16px] bg-navy px-3 py-2.5 text-center text-white">
-          <span className="text-[9px] font-extrabold tracking-[0.08em] text-silver">{t("receives", { name: RECIPIENT.full.toUpperCase() })}</span>
-          <span className="mt-0.5 font-display text-[21px] font-black leading-tight">{money(receive, "XAF")}</span>
+          <span className="text-[9px] font-semibold text-silver">{t("receives", { name: RECIPIENT.full.toUpperCase() })}</span>
+          <span className="mt-0.5 font-display text-[21px] font-semibold leading-tight">{money(receive, "XAF")}</span>
           <PaymentLogo id="MTN" size={18} title="" className="mt-1.5" />
           <span className="mt-1 text-[10px] leading-snug text-white/75">
             {t("netMtn")} · {RECIPIENT.phone} · {country("CM")}
@@ -491,7 +491,7 @@ export function ReviewScreen({ amount = 200 }: { amount?: number }) {
           <Row label={t("total")} value={money(amount, "CAD")} strong />
           <Row label={t("rowEta")} value={t("etaMinutes")} />
         </Card>
-        <p className="font-display text-[13px] font-extrabold">{t("payWith")}</p>
+        <p className="font-display text-[13px] font-semibold">{t("payWith")}</p>
         <Choice logo="INTERAC" label={t("interac")} hint={t("interacHint")} selected />
       </div>
       <div className="space-y-1.5 px-3.5 pb-4 pt-2">
@@ -521,21 +521,21 @@ export function InteracScreen({ amount = 200 }: { amount?: number }) {
       <div className="flex-1 space-y-2.5 overflow-hidden px-3.5">
         <div className="flex flex-col items-center rounded-[16px] bg-navy px-3 py-3 text-center text-white">
           <PaymentLogo id="INTERAC" size={24} title="" />
-          <span className="mt-2 text-[9px] font-extrabold tracking-[0.08em] text-silver">{t("exactAmount")}</span>
-          <span className="font-display text-[24px] font-black leading-tight">{money(amount, "CAD")}</span>
+          <span className="mt-2 text-[9px] font-semibold text-silver">{t("exactAmount")}</span>
+          <span className="font-display text-[24px] font-semibold leading-tight">{money(amount, "CAD")}</span>
           <span className="text-[10px] text-white/75">{t("nameReceives", { name: RECIPIENT.full, amount: money(receive, "XAF") })}</span>
         </div>
-        <p className="font-display text-[13px] font-extrabold">{t("inBank")}</p>
+        <p className="font-display text-[13px] font-semibold">{t("inBank")}</p>
         <Card className="px-3 py-1">
           {steps.map((s, i) => (
             <div key={s.title} className={`flex gap-2.5 py-2 ${i < steps.length - 1 ? "border-b border-line" : ""}`}>
-              <span className="flex h-5 w-5 shrink-0 items-center justify-center rounded-full bg-brand-soft text-[10px] font-extrabold text-brand">
+              <span className="flex h-5 w-5 shrink-0 items-center justify-center rounded-full bg-brand-soft text-[10px] font-semibold text-brand">
                 {i + 1}
               </span>
               <span className="min-w-0 flex-1">
                 <span className="block text-[11px] font-semibold leading-snug">{s.title}</span>
                 {s.value && (
-                  <span className={`block text-[12px] font-extrabold leading-snug ${s.muted ? "text-muted" : "text-navy"}`}>{s.value}</span>
+                  <span className={`block text-[12px] font-semibold leading-snug ${s.muted ? "text-muted" : "text-navy"}`}>{s.value}</span>
                 )}
                 {s.hint && <span className="block text-[9.5px] leading-snug text-muted">{s.hint}</span>}
               </span>
@@ -594,7 +594,7 @@ export function TrackingScreen({ step = 3, amount = 200 }: { step?: 0 | 1 | 2 | 
             <Svg d="M9 6l6 6-6 6" className="h-3 w-3" />
             <Flag code="CM" size={20} />
           </span>
-          <span className="mt-1 font-display text-[20px] font-black leading-tight text-navy">{receive}</span>
+          <span className="mt-1 font-display text-[20px] font-semibold leading-tight text-navy">{receive}</span>
           <span className="text-[10px] text-muted">{t("forName", { name: RECIPIENT.full })}</span>
           <span className="mt-1.5">
             <Badge label={status[step].label} tone={status[step].tone} />
@@ -640,7 +640,7 @@ export function TrackingScreen({ step = 3, amount = 200 }: { step?: 0 | 1 | 2 | 
               <Icon name={next.tone === "success" ? "check" : "clock"} className="h-4 w-4" strokeWidth={2.2} />
             </span>
             <span className="min-w-0">
-              <span className={`block font-display text-[11px] font-extrabold ${next.tone === "success" ? "text-success" : "text-brand"}`}>{next.title}</span>
+              <span className={`block font-display text-[11px] font-semibold ${next.tone === "success" ? "text-success" : "text-brand"}`}>{next.title}</span>
               <span className="block text-[10px] leading-snug text-ink">{next.text}</span>
             </span>
           </div>

@@ -52,11 +52,11 @@ export function StoreBadges({ dark = false, className = "" }: { dark?: boolean; 
             {b.glyph === "apple" ? <AppleGlyph className="h-7 w-7 shrink-0" /> : <PlayGlyph className="h-6 w-6 shrink-0" />}
             <span className="leading-tight">
               <span className="block text-[0.65rem] font-medium opacity-80">{b.small}</span>
-              <span className="block font-display text-base font-bold">{b.big}</span>
+              <span className="block font-display text-base font-semibold">{b.big}</span>
             </span>
             {!b.href && (
               <span
-                className={`absolute -right-2 -top-2 rounded-full px-2 py-0.5 text-[0.6rem] font-bold uppercase tracking-wide ${
+                className={`absolute -right-2 -top-2 rounded-full px-2 py-0.5 text-[0.6rem] font-semibold ${
                   dark ? "bg-sky text-navy" : "bg-brand text-white"
                 }`}
               >

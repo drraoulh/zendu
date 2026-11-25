@@ -161,7 +161,7 @@ function DateSlotPicker({
           {t("dateHint")}
         </p>
         <div className="rounded-2xl border border-line p-3 sm:p-4">
-          <div className="grid grid-cols-5 gap-1.5 pb-2 text-center text-[0.68rem] font-bold uppercase tracking-wide text-muted sm:gap-2">
+          <div className="grid grid-cols-5 gap-1.5 pb-2 text-center text-[0.68rem] font-semibold text-muted sm:gap-2">
             {weekdayHeaders.map((w) => (
               <span key={w} aria-hidden>
                 {w}
@@ -198,10 +198,10 @@ function DateSlotPicker({
                               : "border-line bg-white text-ink hover:border-brand/50 hover:bg-brand-soft/50"
                         }`}
                       >
-                        <span className="font-display text-base font-extrabold leading-none">
+                        <span className="font-display text-base font-semibold leading-none">
                           {formatDay(d, tag, { day: "numeric" })}
                         </span>
-                        <span className={`mt-1 text-[0.65rem] font-semibold uppercase ${selected ? "text-white/80" : "text-muted"}`}>
+                        <span className={`mt-1 text-[0.65rem] font-semibold ${selected ? "text-white/80" : "text-muted"}`}>
                           {formatDay(d, tag, { month: "short" })}
                         </span>
                       </button>

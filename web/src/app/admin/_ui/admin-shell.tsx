@@ -54,7 +54,6 @@ export function AdminShell({
       )}
 
       <header className="bg-navy-gradient relative overflow-hidden text-white">
-        <div className="bg-grid absolute inset-0 opacity-30 [mask-image:linear-gradient(to_bottom,black,transparent)]" />
         <Container className="relative flex flex-wrap items-center justify-between gap-3 py-4 sm:py-5">
           <Link href="/admin" className="flex min-w-0 items-center gap-3 rounded-2xl focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-white">
             <span className="inline-flex h-10 w-10 shrink-0 items-center justify-center rounded-2xl bg-white/10 ring-1 ring-white/20">
@@ -62,7 +61,7 @@ export function AdminShell({
             </span>
             <span className="min-w-0">
               <Eyebrow light>{t("shellEyebrow")}</Eyebrow>
-              <span className="mt-0.5 block font-display text-xl font-extrabold tracking-tight sm:text-2xl">{t("shellTitle")}</span>
+              <span className="mt-0.5 block font-display text-xl font-semibold tracking-tight sm:text-2xl">{t("shellTitle")}</span>
             </span>
           </Link>
           <div className="flex flex-wrap items-center gap-2">
@@ -118,7 +117,7 @@ export function AdminShell({
                     <span className="flex-1">{t(item.key)}</span>
                     {pending > 0 && (
                       <span
-                        className={`inline-flex min-w-6 items-center justify-center rounded-full px-1.5 py-0.5 text-[11px] font-bold leading-none ${
+                        className={`inline-flex min-w-6 items-center justify-center rounded-full px-1.5 py-0.5 text-[11px] font-semibold leading-none ${
                           active ? "bg-white text-brand" : "bg-warn text-white"
                         }`}
                       >

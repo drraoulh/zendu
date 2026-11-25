@@ -158,7 +158,7 @@ export function HelpCenter({ numbers }: { numbers: HelpNumbers }) {
 
           {results.length === 0 ? (
             <div className="mt-6 rounded-3xl border border-line bg-surface-soft p-8 text-center">
-              <p className="font-display text-lg font-bold text-ink">{t("noResultsTitle")}</p>
+              <p className="font-display text-lg font-semibold text-ink">{t("noResultsTitle")}</p>
               <p className="mt-2 text-sm text-muted">{t("noResultsText")}</p>
               <ButtonLink href="/contact" className="mt-5">
                 {t("contactCta")}
@@ -168,7 +168,7 @@ export function HelpCenter({ numbers }: { numbers: HelpNumbers }) {
             <div className="mt-6 grid gap-10">
               {grouped.map((g) => (
                 <section key={g.c} aria-labelledby={`help-cat-${g.c}`}>
-                  <h2 id={`help-cat-${g.c}`} className="flex items-center gap-3 font-display text-xl font-extrabold text-ink">
+                  <h2 id={`help-cat-${g.c}`} className="flex items-center gap-3 font-display text-xl font-semibold text-ink">
                     <span className="grid h-9 w-9 place-items-center rounded-xl bg-brand-soft text-brand">
                       <Icon name={CAT_ICON[g.c]} className="h-5 w-5" />
                     </span>
@@ -181,7 +181,7 @@ export function HelpCenter({ numbers }: { numbers: HelpNumbers }) {
                           href={`/aide/${r.article.slug}`}
                           className="group flex h-full flex-col rounded-2xl border border-line bg-white p-5 shadow-card transition hover:-translate-y-0.5 hover:border-brand/40 focus:outline-none focus-visible:ring-4 focus-visible:ring-brand/20"
                         >
-                          <span className="font-display text-base font-bold text-ink group-hover:text-brand-strong">{r.q}</span>
+                          <span className="font-display text-base font-semibold text-ink group-hover:text-brand-strong">{r.q}</span>
                           <span className="mt-2 flex-1 text-sm leading-relaxed text-muted">{excerpt(r.a)}</span>
                           <span className="mt-3 inline-flex items-center gap-1.5 text-sm font-semibold text-brand">
                             {t("read")}
@@ -207,10 +207,9 @@ function ContactBox({ title, text, href }: { title: string; text: string; href: 
   const t = useT(helpPage);
   return (
     <div className="bg-navy-gradient relative mt-14 overflow-hidden rounded-3xl p-6 text-white shadow-float sm:p-8">
-      <div aria-hidden className="bg-grid absolute inset-0 opacity-30" />
       <div className="relative flex flex-col gap-5 sm:flex-row sm:items-center sm:justify-between">
         <div>
-          <p className="font-display text-xl font-extrabold">{title}</p>
+          <p className="font-display text-xl font-semibold">{title}</p>
           <p className="mt-1 text-sm text-white/75">{text}</p>
         </div>
         <ButtonLink href={href} variant="white" className="shrink-0">
@@ -253,7 +252,7 @@ function Feedback({ slug }: { slug: string }) {
   return (
     <div className="mt-10 rounded-3xl border border-line bg-surface-soft p-5 sm:p-6">
       <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
-        <p id={`fb-${slug}`} className="font-display font-bold text-ink">
+        <p id={`fb-${slug}`} className="font-display font-semibold text-ink">
           {t("helpfulQ")}
         </p>
         <div className="flex gap-2" role="group" aria-labelledby={`fb-${slug}`}>
@@ -298,7 +297,6 @@ export function HelpArticleView({ slug, numbers }: { slug: string; numbers: Help
   return (
     <>
       <section className="bg-navy-gradient relative overflow-hidden text-white">
-        <div className="bg-grid absolute inset-0 opacity-40 [mask-image:linear-gradient(to_bottom,black,transparent)]" />
         <Container className="relative py-12 sm:py-16">
           <nav aria-label="Breadcrumb" className="text-sm text-white/65">
             <ol className="flex flex-wrap items-center gap-1.5">
@@ -311,7 +309,7 @@ export function HelpArticleView({ slug, numbers }: { slug: string; numbers: Help
               <li>{t(CAT_KEY[article.category])}</li>
             </ol>
           </nav>
-          <h1 className="mt-6 max-w-3xl font-display text-3xl font-extrabold leading-tight tracking-tight sm:text-4xl">
+          <h1 className="mt-6 max-w-3xl font-display text-3xl font-semibold leading-tight tracking-tight sm:text-4xl">
             {fill(txt.q, vars)}
           </h1>
         </Container>
@@ -343,7 +341,7 @@ export function HelpArticleView({ slug, numbers }: { slug: string; numbers: Help
           <aside className="grid content-start gap-6 lg:sticky lg:top-24">
             {related.length > 0 && (
               <nav aria-labelledby="related-title" className="rounded-3xl border border-line bg-white p-5 shadow-card">
-                <p id="related-title" className="font-display text-sm font-bold uppercase tracking-[0.14em] text-ink">
+                <p id="related-title" className="font-display text-sm font-semibold text-ink">
                   {t("related")}
                 </p>
                 <ul className="mt-3 grid gap-1">
@@ -362,7 +360,7 @@ export function HelpArticleView({ slug, numbers }: { slug: string; numbers: Help
               </nav>
             )}
             <div className="rounded-3xl border border-line bg-surface-soft p-5">
-              <p className="font-display font-bold text-ink">{t("stillNeed")}</p>
+              <p className="font-display font-semibold text-ink">{t("stillNeed")}</p>
               <p className="mt-1 text-sm text-muted">{t("stillNeedText")}</p>
               <ButtonLink href={contactHref} size="sm" className="mt-4">
                 <Icon name="mail" className="h-4 w-4" />

@@ -41,7 +41,7 @@ export function AviContent() {
             {COUNTRIES.map((c) => (
               <li key={c} className="rounded-3xl border border-line bg-white p-6 shadow-card">
                 <CountryFlag code={c.toUpperCase()} size={44} title="" className="rounded-lg" />
-                <h3 className="mt-5 font-display text-lg font-bold text-ink">{k(c)}</h3>
+                <h3 className="mt-5 font-display text-lg font-semibold text-ink">{k(c)}</h3>
                 <p className="mt-2 text-sm leading-relaxed text-muted">{k(`${c}Text`)}</p>
               </li>
             ))}
@@ -65,11 +65,11 @@ export function AviContent() {
               <li key={img} className="group">
                 <div className="relative aspect-[4/3] overflow-hidden rounded-3xl bg-surface-soft">
                   <Image src={`/images/avi/${img}.jpg`} alt="" fill sizes="(min-width: 1024px) 400px, (min-width: 640px) 50vw, 100vw" className="zoom-on-hover object-cover" />
-                  <span className="absolute left-4 top-4 grid h-9 w-9 place-items-center rounded-full bg-white font-display text-sm font-bold text-ink">
+                  <span className="absolute left-4 top-4 grid h-9 w-9 place-items-center rounded-full bg-white font-display text-sm font-semibold text-ink">
                     {idx + 1}
                   </span>
                 </div>
-                <p className="mt-4 flex items-start gap-2.5 font-display text-lg font-bold text-ink">
+                <p className="mt-4 flex items-start gap-2.5 font-display text-lg font-semibold text-ink">
                   <Icon name="check" className="mt-1 h-5 w-5 shrink-0 text-brand" strokeWidth={2.4} />
                   {k(`doc${idx + 1}`)}
                 </p>

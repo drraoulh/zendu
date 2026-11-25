@@ -44,7 +44,7 @@ export function ComplianceSection({ reference, flags, notes }: { reference: stri
 
   return (
     <section aria-labelledby="compliance-title" className="mt-6 rounded-3xl border border-line bg-white p-4 shadow-card sm:p-6">
-      <h2 id="compliance-title" className="font-display text-lg font-bold text-ink">Conformité</h2>
+      <h2 id="compliance-title" className="font-display text-lg font-semibold text-ink">Conformité</h2>
       <p className="mt-1 text-sm text-muted">Visible de l&apos;équipe seulement. Notez pourquoi vous libérez, bloquez ou signalez un transfert : ces notes sont conservées avec le dossier.</p>
 
       {flags.length ? (

@@ -78,7 +78,7 @@ export function SiteFooter() {
               {t("basedIn")}
             </p>
 
-            <p className="mt-8 font-display text-sm font-bold uppercase tracking-[0.14em] text-white">{f("contactTitle")}</p>
+            <p className="mt-8 font-display text-sm font-semibold text-white">{f("contactTitle")}</p>
             <ul className="mt-4 grid gap-3 text-sm text-white/70">
               <li className="flex items-center gap-2.5">
                 <Icon name="mail" className="h-4 w-4 shrink-0 text-sky" />
@@ -118,7 +118,7 @@ export function SiteFooter() {
 
             {socials.length > 0 && (
               <div className="mt-6">
-                <p className="text-xs font-semibold uppercase tracking-[0.14em] text-white/55">{f("follow")}</p>
+                <p className="text-xs font-semibold text-white/55">{f("follow")}</p>
                 <ul className="mt-3 flex flex-wrap gap-2">
                   {socials.map((s) => (
                     <li key={s.id}>
@@ -156,7 +156,7 @@ export function SiteFooter() {
 
         <div className="mt-14 flex flex-col gap-6 rounded-3xl border border-white/10 bg-white/5 p-6 sm:p-8 md:flex-row md:items-center md:justify-between">
           <div>
-            <p className="font-display text-xs font-bold uppercase tracking-[0.18em] text-sky">{ta("ourApp")}</p>
+            <p className="font-display text-xs font-semibold text-sky">{ta("ourApp")}</p>
             <Link href={link("/application")} className="mt-3 inline-block" aria-label="WorldSoft Transfer">
               <WstLogo variant="negative" className="h-7 w-auto" />
             </Link>
@@ -189,7 +189,7 @@ export function SiteFooter() {
 function FooterColumn({ title, children }: { title: string; children: ReactNode }) {
   return (
     <div className="min-w-0">
-      <p className="break-words font-display text-xs font-bold uppercase tracking-[0.12em] text-white sm:text-sm sm:tracking-[0.14em] lg:text-xs lg:tracking-[0.12em] xl:text-sm xl:tracking-[0.14em]">{title}</p>
+      <p className="break-words font-display text-xs font-semibold text-white sm:text-sm">{title}</p>
       <div className="mt-4 flex flex-col items-start gap-1 sm:mt-5">{children}</div>
     </div>
   );

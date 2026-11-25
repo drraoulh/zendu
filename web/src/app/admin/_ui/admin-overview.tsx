@@ -115,7 +115,7 @@ export function AdminOverview({
                 <Icon name={k.icon} className="h-4.5 w-4.5" />
               </span>
               <p className="mt-3 text-xs font-medium text-muted">{k.label}</p>
-              <p className="mt-1 font-display text-3xl font-extrabold tracking-tight text-ink">{k.value}</p>
+              <p className="mt-1 font-display text-3xl font-semibold tracking-tight text-ink">{k.value}</p>
             </Link>
           </li>
         ))}
@@ -140,7 +140,7 @@ export function AdminOverview({
               <li key={k.label}>
                 <Link href={k.href} className="block rounded-2xl bg-surface-soft p-4 transition hover:bg-brand-soft">
                   <p className="text-xs font-medium text-muted">{k.label}</p>
-                  <p className="mt-1 font-display text-2xl font-extrabold text-ink">{k.value}</p>
+                  <p className="mt-1 font-display text-2xl font-semibold text-ink">{k.value}</p>
                 </Link>
               </li>
             ))}
@@ -172,7 +172,7 @@ export function AdminOverview({
                     <span className="block truncate text-sm font-semibold text-ink">{label("kind_", k.kind)}</span>
                     {k.fresh > 0 && <span className="text-xs font-medium text-warn">{t("newCount", { n: k.fresh })}</span>}
                   </span>
-                  <span className="font-display text-xl font-extrabold text-ink">{k.total}</span>
+                  <span className="font-display text-xl font-semibold text-ink">{k.total}</span>
                 </Link>
               </li>
             ))}

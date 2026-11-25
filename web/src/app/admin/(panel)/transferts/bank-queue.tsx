@@ -40,7 +40,7 @@ export function BankQueue({
     <section aria-labelledby="admin-bank-queue" className="rounded-3xl border border-warn/30 bg-white p-4 shadow-card sm:p-6">
       <div className="flex flex-wrap items-start justify-between gap-3">
         <div className="min-w-0">
-          <h2 id="admin-bank-queue" className="flex flex-wrap items-center gap-2 font-display text-lg font-bold text-ink">
+          <h2 id="admin-bank-queue" className="flex flex-wrap items-center gap-2 font-display text-lg font-semibold text-ink">
             <span className="inline-flex h-8 w-8 items-center justify-center rounded-xl bg-warn/10 text-warn">
               <Icon name="finance" className="h-4 w-4" />
             </span>
@@ -147,7 +147,7 @@ function BankQueueItem({
           <p className="mt-2 font-medium text-ink">{row.recipientName}</p>
           <p className="text-sm text-muted">{dest}</p>
         </div>
-        <p className="shrink-0 text-right font-display text-lg font-extrabold text-ink">{amount}</p>
+        <p className="shrink-0 text-right font-display text-lg font-semibold text-ink">{amount}</p>
       </div>
 
       {!ready && (

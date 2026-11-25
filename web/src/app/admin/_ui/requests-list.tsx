@@ -82,7 +82,7 @@ export function RequestsList({ data, filters }: { data: Data | null; filters: Re
             <>
               <div className="hidden overflow-hidden rounded-3xl border border-line bg-white shadow-card md:block">
                 <table className="w-full text-left text-sm">
-                  <thead className="bg-surface-soft text-xs uppercase tracking-wider text-muted">
+                  <thead className="bg-surface-soft text-xs text-muted">
                     <tr>
                       <th scope="col" className="px-4 py-3 font-semibold">{t("colReference")}</th>
                       <th scope="col" className="px-4 py-3 font-semibold">{t("colKind")}</th>

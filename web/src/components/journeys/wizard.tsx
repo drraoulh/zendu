@@ -128,7 +128,7 @@ export function Stepper({
           const bubble = (
             <>
               <span
-                className={`grid h-8 w-8 shrink-0 place-items-center rounded-full text-xs font-black transition ${
+                className={`grid h-8 w-8 shrink-0 place-items-center rounded-full text-xs font-semibold transition ${
                   active
                     ? "bg-brand-gradient text-white shadow-[0_6px_16px_-6px_rgba(11,77,255,0.8)]"
                     : done
@@ -189,7 +189,7 @@ export function Summary({ sections, onEdit }: { sections: SummarySection[]; onEd
       {sections.map((s) => (
         <section key={s.title} className="rounded-2xl border border-line bg-surface-soft/60 p-4 sm:p-5">
           <div className="flex items-center justify-between gap-3">
-            <h3 className="font-display text-sm font-bold text-ink">{s.title}</h3>
+            <h3 className="font-display text-sm font-semibold text-ink">{s.title}</h3>
             <button
               type="button"
               onClick={() => onEdit(s.step)}
@@ -487,13 +487,13 @@ export function Wizard<V extends object>({
         <Honeypot value={honeypot} onChange={setHoneypot} />
 
         <div className="mb-6">
-          <p className="text-xs font-bold uppercase tracking-[0.16em] text-brand">
+          <p className="text-xs font-semibold text-brand">
             {t("stepOf", { n: step + 1, total })}
           </p>
           <h2
             ref={headingRef}
             tabIndex={-1}
-            className="mt-1.5 font-display text-2xl font-extrabold tracking-tight text-ink focus:outline-none sm:text-[1.7rem]"
+            className="mt-1.5 font-display text-2xl font-semibold tracking-tight text-ink focus:outline-none sm:text-[1.7rem]"
           >
             {current ? current.title : t("reviewTitle")}
           </h2>

@@ -29,7 +29,6 @@ export function JourneyShell({
   return (
     <>
       <section className="bg-navy-gradient relative overflow-hidden text-white">
-        <div className="bg-grid absolute inset-0 opacity-40 [mask-image:linear-gradient(to_bottom,black,transparent)]" />
         <Container className="relative pb-24 pt-10 sm:pb-28 sm:pt-14">
           <Link
             href={back.href}
@@ -43,8 +42,8 @@ export function JourneyShell({
               <Icon name={icon} className="h-7 w-7 text-white" strokeWidth={1.7} />
             </span>
             <div className="min-w-0">
-              <p className="font-display text-xs font-bold uppercase tracking-[0.18em] text-sky">{eyebrow}</p>
-              <h1 className="mt-2 font-display text-3xl font-extrabold leading-tight tracking-tight sm:text-4xl">{title}</h1>
+              <p className="font-display text-xs font-semibold text-sky">{eyebrow}</p>
+              <h1 className="mt-2 font-display text-3xl font-semibold leading-tight tracking-tight sm:text-4xl">{title}</h1>
               {subtitle && <p className="mt-3 max-w-2xl text-base leading-relaxed text-white/75">{subtitle}</p>}
             </div>
           </div>
@@ -66,11 +65,11 @@ export function JourneyAside({ title, points }: { title: string; points: string[
   return (
     <>
       <div className="rounded-3xl border border-line bg-white p-5 shadow-card sm:p-6">
-        <h2 className="font-display text-base font-bold text-ink">{title}</h2>
+        <h2 className="font-display text-base font-semibold text-ink">{title}</h2>
         <ol className="mt-4 grid gap-3">
           {points.map((p, i) => (
             <li key={p} className="flex items-start gap-3 text-sm leading-relaxed text-muted">
-              <span className="grid h-6 w-6 shrink-0 place-items-center rounded-full bg-brand-soft text-xs font-black text-brand">
+              <span className="grid h-6 w-6 shrink-0 place-items-center rounded-full bg-brand-soft text-xs font-semibold text-brand">
                 {i + 1}
               </span>
               {p}
@@ -79,7 +78,7 @@ export function JourneyAside({ title, points }: { title: string; points: string[
         </ol>
       </div>
       <div className="rounded-3xl bg-surface-soft p-5 sm:p-6">
-        <p className="flex items-center gap-2 font-display text-sm font-bold text-ink">
+        <p className="flex items-center gap-2 font-display text-sm font-semibold text-ink">
           <Icon name="mail" className="h-4 w-4 text-brand" />
           {t("asideHelpTitle")}
         </p>

@@ -39,7 +39,7 @@ export function SuppliersContent() {
             {range(4).map((i) => (
               <li key={i} className="rounded-3xl border border-line bg-white p-6 shadow-card">
                 <CountryFlag code={ZONE_FLAGS[i - 1]} size={44} title="" className="rounded-lg" />
-                <h3 className="mt-5 font-display text-lg font-bold text-ink">{k(`zone${i}Title`)}</h3>
+                <h3 className="mt-5 font-display text-lg font-semibold text-ink">{k(`zone${i}Title`)}</h3>
                 <p className="mt-2 text-sm leading-relaxed text-muted">{k(`zone${i}Text`)}</p>
               </li>
             ))}
@@ -59,7 +59,7 @@ export function SuppliersContent() {
                 <span className={`grid h-14 w-14 place-items-center rounded-2xl ${i === 1 ? "bg-white/10 text-sky" : "bg-brand-soft text-brand"}`}>
                   <Icon name={MODE_ICONS[i - 1]} className="h-7 w-7" />
                 </span>
-                <h3 className={`mt-6 font-display text-xl font-bold ${i === 1 ? "" : "text-ink"}`}>{k(`mode${i}Title`)}</h3>
+                <h3 className={`mt-6 font-display text-xl font-semibold ${i === 1 ? "" : "text-ink"}`}>{k(`mode${i}Title`)}</h3>
                 <p className={`mt-2 text-sm leading-relaxed ${i === 1 ? "text-white/75" : "text-muted"}`}>{k(`mode${i}Text`)}</p>
               </article>
             ))}

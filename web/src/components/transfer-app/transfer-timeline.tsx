@@ -63,12 +63,12 @@ export function TransferTimeline({ transfer }: { transfer: TransferDTO }) {
               ) : state === "current" ? (
                 <span className="h-2.5 w-2.5 animate-pulse rounded-full bg-brand" aria-hidden />
               ) : (
-                <span className="text-xs font-bold">{i + 1}</span>
+                <span className="text-xs font-semibold">{i + 1}</span>
               )}
             </span>
             <div className="min-w-0 pt-0.5">
               <p
-                className={`font-display text-sm font-bold ${
+                className={`font-display text-sm font-semibold ${
                   state === "upcoming" ? "text-muted" : state === "failed" ? "text-danger" : "text-ink"
                 }`}
               >

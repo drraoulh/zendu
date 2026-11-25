@@ -77,9 +77,9 @@ export function FeesContent({ destinations }: { destinations: DestinationInfo[] 
                     <span className="grid h-11 w-11 place-items-center rounded-2xl bg-brand-soft text-brand">
                       <Icon name={item.icon} className="h-5 w-5" />
                     </span>
-                    <span className="font-display text-sm font-black text-brand/40">0{i + 1}</span>
+                    <span className="font-display text-sm font-semibold text-brand/40">0{i + 1}</span>
                   </div>
-                  <h3 className="mt-4 font-display text-lg font-bold text-ink">{item.title}</h3>
+                  <h3 className="mt-4 font-display text-lg font-semibold text-ink">{item.title}</h3>
                   <p className="mt-2 text-sm leading-relaxed text-muted">{item.text}</p>
                 </li>
               ))}
@@ -87,13 +87,12 @@ export function FeesContent({ destinations }: { destinations: DestinationInfo[] 
 
             {sample && q100 && (
               <aside className="bg-navy-gradient relative overflow-hidden rounded-3xl p-6 text-white shadow-float sm:p-8">
-                <div aria-hidden className="bg-grid absolute inset-0 opacity-30" />
                 <div className="relative">
-                  <p className="inline-flex items-center gap-2 font-display text-xs font-bold uppercase tracking-[0.16em] text-sky">
+                  <p className="inline-flex items-center gap-2 font-display text-xs font-semibold text-sky">
                     <CountryFlag code={sample.sourceCode} size={20} title={L.country(sample.sourceCode, sample.sourceName)} />→
                     <CountryFlag code={sample.code} size={20} title={L.country(sample.code, sample.name)} />
                   </p>
-                  <h3 className="mt-3 font-display text-xl font-extrabold">
+                  <h3 className="mt-3 font-display text-xl font-semibold">
                     {t("exampleTitle", { amount: L.money(q100.sendAmount, sendCurrency) })}
                   </h3>
                   <dl className="mt-5 grid gap-3 text-sm">
@@ -135,7 +134,7 @@ export function FeesContent({ destinations }: { destinations: DestinationInfo[] 
                   <div className="flex items-center gap-3">
                     <CountryFlag code={g.code} size={36} title="" className="rounded-md" />
                     <div>
-                      <h3 id={`from-${g.code}`} className="font-display text-xl font-extrabold text-ink sm:text-2xl">
+                      <h3 id={`from-${g.code}`} className="font-display text-xl font-semibold text-ink sm:text-2xl">
                         {sourceName}
                       </h3>
                       <p className="text-sm text-muted">
@@ -149,7 +148,7 @@ export function FeesContent({ destinations }: { destinations: DestinationInfo[] 
                   <div className="mt-5 hidden overflow-hidden rounded-3xl border border-line bg-white shadow-card lg:block">
                     <table className="w-full text-left text-sm">
                       <caption className="sr-only">{sourceName}</caption>
-                      <thead className="bg-surface-soft text-xs font-bold uppercase tracking-wider text-muted">
+                      <thead className="bg-surface-soft text-xs font-semibold text-muted">
                         <tr>
                           <th scope="col" className="px-5 py-4">{t("colRoute")}</th>
                           <th scope="col" className="px-3 py-4">{t("colModes")}</th>
@@ -208,7 +207,7 @@ export function FeesContent({ destinations }: { destinations: DestinationInfo[] 
                         <Link href={`/pays/${d.code.toLowerCase()}`} className="flex items-center gap-3">
                           <CountryFlag code={d.code} size={32} title={L.country(d.code, d.name)} />
                           <span className="min-w-0">
-                            <span className="block font-display font-bold text-ink">{L.country(d.code, d.name)}</span>
+                            <span className="block font-display font-semibold text-ink">{L.country(d.code, d.name)}</span>
                             <span className="block text-xs text-muted">{t("rateLine", { from: d.sendCurrency, rate: d.rate != null ? L.number(d.rate, 4) : "-", to: d.currency })}</span>
                           </span>
                         </Link>
@@ -272,7 +271,7 @@ function Row({ label, value, strong = false }: { label: string; value: string; s
   return (
     <div className="flex items-baseline justify-between gap-4">
       <dt className="text-white/70">{label}</dt>
-      <dd className={`text-right ${strong ? "font-display text-lg font-extrabold text-white" : "font-semibold text-white/90"}`}>{value}</dd>
+      <dd className={`text-right ${strong ? "font-display text-lg font-semibold text-white" : "font-semibold text-white/90"}`}>{value}</dd>
     </div>
   );
 }

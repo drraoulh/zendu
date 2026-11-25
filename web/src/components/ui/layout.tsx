@@ -46,7 +46,7 @@ export function SectionHeading({
     <div className={center ? "mx-auto max-w-2xl text-center" : "max-w-2xl"}>
       {eyebrow && <Eyebrow light={light}>{eyebrow}</Eyebrow>}
       <h2
-        className={`mt-2 break-words font-display text-[2rem] font-bold leading-[1.05] min-[375px]:text-4xl sm:text-5xl ${
+        className={`mt-2 break-words font-display text-[2rem] font-semibold leading-[1.05] min-[375px]:text-4xl sm:text-5xl ${
           light ? "text-white" : "text-ink"
         }`}
       >
@@ -102,7 +102,7 @@ export function PageHero({
   const content = (
     <>
       {eyebrow && <Eyebrow light>{eyebrow}</Eyebrow>}
-      <h1 className="mt-3 max-w-3xl break-words font-display text-[2.25rem] font-bold leading-[1.04] min-[375px]:text-[2.6rem] sm:text-6xl">
+      <h1 className="mt-3 max-w-3xl break-words font-display text-[2.25rem] font-semibold leading-[1.04] min-[375px]:text-[2.6rem] sm:text-6xl">
         {title}
       </h1>
       {subtitle && <p className="mt-5 max-w-2xl text-lg leading-relaxed text-white/80">{subtitle}</p>}

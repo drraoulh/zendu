@@ -111,7 +111,7 @@ function MfaSection({ me }: { me: NonNullable<Me> }) {
           <img src={enroll.qr} alt="QR code" width={220} height={220} className="rounded-xl border border-line" />
           <code className="block break-all rounded-xl bg-surface-soft px-3 py-2 font-mono text-sm text-ink">{enroll.secret}</code>
           <Field id="mfa-code" label={t("mfaCode")}>
-            <input id="mfa-code" name="code" inputMode="numeric" autoComplete="one-time-code" maxLength={7} required className={`${inputClass} font-mono tracking-[0.3em]`} />
+            <input id="mfa-code" name="code" inputMode="numeric" autoComplete="one-time-code" maxLength={7} required className={`${inputClass} font-mono`} />
           </Field>
           <Button type="submit" disabled={busy}>
             {t("mfaConfirm")}

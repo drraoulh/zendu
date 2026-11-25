@@ -44,7 +44,7 @@ export function CopyRow({ label, value, display, strong }: { label: string; valu
     <div className="flex items-center justify-between gap-3 py-2">
       <div className="min-w-0">
         <dt className="text-xs text-muted">{label}</dt>
-        <dd className={`break-all select-all ${strong ? "font-display text-lg font-extrabold text-ink" : "font-mono text-sm font-semibold text-ink"}`}>
+        <dd className={`break-all select-all ${strong ? "font-display text-lg font-semibold text-ink" : "font-mono text-sm font-semibold text-ink"}`}>
           {display ?? value}
         </dd>
       </div>

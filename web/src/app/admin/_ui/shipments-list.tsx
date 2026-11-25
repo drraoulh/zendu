@@ -168,7 +168,7 @@ export function ShipmentsList({ rows, filters }: { rows: AdminShipment[] | null;
                 >
                   <div className="flex items-start justify-between gap-3">
                     <div className="min-w-0">
-                      <p className="font-mono text-sm font-bold text-ink">{s.number}</p>
+                      <p className="font-mono text-sm font-semibold text-ink">{s.number}</p>
                       <p className="mt-0.5 text-xs text-muted">
                         {t("colUpdated")} · {dateTime(s.updatedAt)}
                       </p>

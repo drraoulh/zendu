@@ -428,7 +428,7 @@ function ServicePanelItem({
           href={link(item.href)}
           onClick={onNavigate}
           aria-current={active ? "page" : undefined}
-          className="rounded text-sm font-bold text-ink hover:text-brand focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand/40"
+          className="rounded text-sm font-semibold text-ink hover:text-brand focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand/40"
         >
           {t(item.key)}
         </Link>

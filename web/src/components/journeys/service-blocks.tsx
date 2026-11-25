@@ -37,7 +37,7 @@ export function DetailedOffers({
                 <div className="relative aspect-[4/3] overflow-hidden rounded-3xl bg-surface-soft">
                   <Image src={item.image} alt="" fill sizes="(min-width: 1024px) 400px, (min-width: 640px) 50vw, 100vw" className="zoom-on-hover object-cover" />
                 </div>
-                <h3 className="mt-5 font-display text-2xl font-bold text-ink">{item.title}</h3>
+                <h3 className="mt-5 font-display text-2xl font-semibold text-ink">{item.title}</h3>
                 <p className="mt-2 text-base leading-relaxed text-muted">{item.text}</p>
                 <ul className="mt-4 grid gap-2">
                   {item.points.map((p) => (
@@ -56,7 +56,7 @@ export function DetailedOffers({
               <span className="grid h-12 w-12 place-items-center rounded-2xl bg-brand-soft text-brand transition group-hover:bg-brand group-hover:text-white">
                 <Icon name={item.icon} className="h-6 w-6" />
               </span>
-              <h3 className="mt-5 font-display text-lg font-bold text-ink">{item.title}</h3>
+              <h3 className="mt-5 font-display text-lg font-semibold text-ink">{item.title}</h3>
               <p className="mt-2 text-sm leading-relaxed text-muted">{item.text}</p>
               <ul className="mt-5 grid gap-2 border-t border-line pt-5">
                 {item.points.map((p) => (
@@ -116,12 +116,11 @@ export function TrackBox({ title, text, label, placeholder }: { title: string; t
 
   return (
     <div className="bg-navy-gradient relative overflow-hidden rounded-3xl p-6 text-white shadow-float sm:p-8">
-      <div className="bg-grid absolute inset-0 opacity-30" aria-hidden />
       <div className="relative">
         <span className="grid h-12 w-12 place-items-center rounded-2xl bg-white/10 text-sky">
           <Icon name="pin" className="h-6 w-6" />
         </span>
-        <h3 className="mt-5 font-display text-xl font-extrabold">{title}</h3>
+        <h3 className="mt-5 font-display text-xl font-semibold">{title}</h3>
         <p className="mt-2 text-sm leading-relaxed text-white/75">{text}</p>
         <form noValidate onSubmit={onSubmit} className="mt-5 flex flex-col gap-3 sm:flex-row" role="search">
           <label htmlFor="trackbox-number" className="sr-only">
@@ -140,7 +139,7 @@ export function TrackBox({ title, text, label, placeholder }: { title: string; t
             }}
             aria-invalid={error || undefined}
             aria-describedby={error ? "trackbox-error" : undefined}
-            className={`${inputClass} font-mono uppercase tracking-wider sm:flex-1`}
+            className={`${inputClass} font-mono sm:flex-1`}
           />
           <button
             type="submit"

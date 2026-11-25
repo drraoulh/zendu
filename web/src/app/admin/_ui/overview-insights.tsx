@@ -28,7 +28,7 @@ export function TodoStrip({ counts }: { counts: ActionCounts }) {
 
   return (
     <section aria-labelledby="ov-todo" className="rounded-3xl border border-line bg-white p-5 shadow-card sm:p-6">
-      <h2 id="ov-todo" className="font-display text-base font-bold text-ink sm:text-lg">
+      <h2 id="ov-todo" className="font-display text-base font-semibold text-ink sm:text-lg">
         {t("todoTitle")}
       </h2>
       {pending.length === 0 ? (
@@ -52,7 +52,7 @@ export function TodoStrip({ counts }: { counts: ActionCounts }) {
                     <Icon name={i.icon} className="h-4.5 w-4.5" />
                   </span>
                   <span className="min-w-0 flex-1">
-                    <span className="block font-display text-2xl font-extrabold leading-none text-ink">{n}</span>
+                    <span className="block font-display text-2xl font-semibold leading-none text-ink">{n}</span>
                     <span className="mt-1 block text-xs font-medium leading-snug text-muted">{t(i.key)}</span>
                   </span>
                   {n > 0 && <Icon name="arrowRight" className="h-4 w-4 shrink-0 text-brand" />}
@@ -132,7 +132,7 @@ export function ActivitySection({ insights, period }: { insights: TransferInsigh
   return (
     <section aria-labelledby="ov-activity" className="space-y-4">
       <div className="flex flex-wrap items-center justify-between gap-3">
-        <h2 id="ov-activity" className="font-display text-lg font-bold text-ink sm:text-xl">
+        <h2 id="ov-activity" className="font-display text-lg font-semibold text-ink sm:text-xl">
           {t("activityTitle")}
         </h2>
         {tabs}
@@ -141,23 +141,23 @@ export function ActivitySection({ insights, period }: { insights: TransferInsigh
       <ul className="grid grid-cols-2 gap-3 sm:gap-4 xl:grid-cols-4">
         <li className="rounded-3xl border border-line bg-white p-4 shadow-card sm:p-5">
           <p className="text-xs font-medium text-muted">{t("kpiCreated")}</p>
-          <p className="mt-1 font-display text-3xl font-extrabold tracking-tight text-ink">{insights.created}</p>
+          <p className="mt-1 font-display text-3xl font-semibold tracking-tight text-ink">{insights.created}</p>
           <Delta current={insights.created} previous={insights.createdPrevious} />
         </li>
         <li className="rounded-3xl border border-line bg-white p-4 shadow-card sm:p-5">
           <p className="text-xs font-medium text-muted">{t("kpiSuccess")}</p>
-          <p className="mt-1 font-display text-3xl font-extrabold tracking-tight text-ink">{success}</p>
+          <p className="mt-1 font-display text-3xl font-semibold tracking-tight text-ink">{success}</p>
           <p className="mt-1 text-xs text-muted">{t("kpiSuccessHint")}</p>
         </li>
         <li className="bg-brand-gradient col-span-2 rounded-3xl p-4 text-white shadow-card sm:p-5 xl:col-span-1">
-          <p className="text-xs font-semibold uppercase tracking-[0.14em] text-white/70">{t("kpiVolume")}</p>
-          <p className="mt-1.5 font-display text-xl font-extrabold tracking-tight sm:text-2xl">
+          <p className="text-xs font-semibold text-white/70">{t("kpiVolume")}</p>
+          <p className="mt-1.5 font-display text-xl font-semibold tracking-tight sm:text-2xl">
             <MoneyLines amounts={insights.volume} nl={nl} />
           </p>
         </li>
         <li className="col-span-2 rounded-3xl border border-line bg-white p-4 shadow-card sm:p-5 xl:col-span-1">
           <p className="text-xs font-medium text-muted">{t("kpiFees")}</p>
-          <p className="mt-1.5 font-display text-xl font-extrabold tracking-tight text-ink sm:text-2xl">
+          <p className="mt-1.5 font-display text-xl font-semibold tracking-tight text-ink sm:text-2xl">
             <MoneyLines amounts={insights.fees} nl={nl} />
           </p>
         </li>

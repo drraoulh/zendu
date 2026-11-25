@@ -47,7 +47,7 @@ export function CustomerNew() {
           <Message ok>{t("created_ok", { email: done.customer.email })}</Message>
           {done.temporaryPassword && (
             <div className="mt-4 rounded-2xl border border-brand/30 bg-brand-soft p-4">
-              <p className="font-mono text-base font-bold text-navy">{t("tempPassword", { p: done.temporaryPassword })}</p>
+              <p className="font-mono text-base font-semibold text-navy">{t("tempPassword", { p: done.temporaryPassword })}</p>
               <p className="mt-1 text-xs text-muted">{t("tempPasswordHint")}</p>
             </div>
           )}

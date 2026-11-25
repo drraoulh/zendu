@@ -49,14 +49,14 @@ export function CountriesContent({ countries }: { countries: CountryInfo[] }) {
                   <div className="flex items-center gap-4">
                     <CountryFlag code={c.code} size={52} title="" className="rounded-md" />
                     <div className="min-w-0 flex-1">
-                      <h2 className="font-display text-xl font-extrabold text-ink group-hover:text-brand-strong">
+                      <h2 className="font-display text-xl font-semibold text-ink group-hover:text-brand-strong">
                         {L.country(c.code, c.name)}
                       </h2>
                       <p className="text-sm text-muted">{t("currency", { c: `${c.currency} · ${L.currencyName(c.currency)}` })}</p>
                     </div>
                   </div>
 
-                  <p className="mt-6 text-xs font-bold uppercase tracking-wider text-muted">{t("receiveWith")}</p>
+                  <p className="mt-6 text-xs font-semibold text-muted">{t("receiveWith")}</p>
                   <ul className="mt-2 flex flex-wrap gap-1.5">
                     {c.networks.map((n) => (
                       <li

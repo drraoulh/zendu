@@ -175,7 +175,7 @@ export function RequestDetail({ request }: { request: AdminRequest }) {
               </div>
               <div>
                 <dt className="text-xs font-semibold text-muted">{t("fieldLocale")}</dt>
-                <dd className="mt-0.5 uppercase text-ink">{request.locale ?? "-"}</dd>
+                <dd className="mt-0.5 text-ink">{request.locale ?? "-"}</dd>
               </div>
             </dl>
             <div className="mt-5 flex flex-wrap gap-2">

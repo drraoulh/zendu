@@ -164,7 +164,7 @@ export function TrackingContent({ initialNumber = "" }: { initialNumber?: string
               }}
               aria-invalid={formatError || undefined}
               aria-describedby={formatError ? "track-number-error" : "track-number-hint"}
-              className={`${inputClass} font-mono uppercase tracking-wider sm:flex-1`}
+              className={`${inputClass} font-mono sm:flex-1`}
             />
             <button
               type="submit"
@@ -229,7 +229,7 @@ export function TrackingContent({ initialNumber = "" }: { initialNumber?: string
 
         <div className="flex flex-col items-start gap-3 rounded-3xl bg-surface-soft p-5 sm:flex-row sm:items-center sm:justify-between sm:p-6">
           <div>
-            <p className="font-display text-sm font-bold text-ink">{t("noNumberTitle")}</p>
+            <p className="font-display text-sm font-semibold text-ink">{t("noNumberTitle")}</p>
             <p className="mt-1 text-sm text-muted">{t("noNumberText")}</p>
           </div>
           <ButtonLink href="/shipping/devis" variant="secondary" size="sm" className="shrink-0">
@@ -266,7 +266,7 @@ function EmptyCard({
       <span className={`mx-auto grid h-14 w-14 place-items-center rounded-2xl ${tones[tone]}`}>
         <Icon name={icon} className="h-7 w-7" />
       </span>
-      <h2 className="mt-5 break-words font-display text-lg font-bold text-ink">{title}</h2>
+      <h2 className="mt-5 break-words font-display text-lg font-semibold text-ink">{title}</h2>
       <p className="mx-auto mt-2 max-w-md text-sm leading-relaxed text-muted">{text}</p>
       {contact && (
         <p className="mt-4 text-sm text-muted">
@@ -321,11 +321,11 @@ function ShipmentCard({ shipment, tag }: { shipment: Shipment; tag: string }) {
       <header className="bg-navy-gradient relative p-5 text-white sm:p-7">
         <div className="flex flex-wrap items-start justify-between gap-3">
           <div>
-            <p className="text-xs font-semibold uppercase tracking-[0.16em] text-sky">{t("shipmentLabel")}</p>
-            <h2 className="mt-1 font-mono text-xl font-bold tracking-wider sm:text-2xl">{shipment.number}</h2>
+            <p className="text-xs font-semibold text-sky">{t("shipmentLabel")}</p>
+            <h2 className="mt-1 font-mono text-xl font-semibold sm:text-2xl">{shipment.number}</h2>
           </div>
           <span
-            className={`inline-flex items-center gap-1.5 rounded-full px-3 py-1 text-xs font-bold ${
+            className={`inline-flex items-center gap-1.5 rounded-full px-3 py-1 text-xs font-semibold ${
               exception ? "bg-warn text-navy" : status === "delivered" ? "bg-success text-white" : "bg-white/15 text-white"
             }`}
           >
@@ -336,14 +336,14 @@ function ShipmentCard({ shipment, tag }: { shipment: Shipment; tag: string }) {
 
         <div className="mt-6 grid grid-cols-[1fr_auto_1fr] items-center gap-3">
           <div className="min-w-0">
-            <p className="text-[0.7rem] font-semibold uppercase tracking-wide text-white/60">{t("from")}</p>
+            <p className="text-[0.7rem] font-semibold text-white/60">{t("from")}</p>
             <p className="mt-0.5 break-words text-sm font-semibold sm:text-base">{shipment.origin}</p>
           </div>
           <span className="grid h-10 w-10 place-items-center rounded-full bg-white/10 text-sky" aria-hidden>
             <Icon name={shipment.mode === "sea" ? "ship" : "plane"} className="h-5 w-5" />
           </span>
           <div className="min-w-0 text-right">
-            <p className="text-[0.7rem] font-semibold uppercase tracking-wide text-white/60">{t("to")}</p>
+            <p className="text-[0.7rem] font-semibold text-white/60">{t("to")}</p>
             <p className="mt-0.5 break-words text-sm font-semibold sm:text-base">{shipment.destination}</p>
           </div>
         </div>
@@ -421,7 +421,7 @@ function ShipmentCard({ shipment, tag }: { shipment: Shipment; tag: string }) {
         )}
 
         {/* Chronologie */}
-        <h3 className="mt-8 font-display text-base font-bold text-ink">{t("timelineTitle")}</h3>
+        <h3 className="mt-8 font-display text-base font-semibold text-ink">{t("timelineTitle")}</h3>
         {events.length === 0 ? (
           <p className="mt-3 text-sm text-muted">{t("noEvents")}</p>
         ) : (

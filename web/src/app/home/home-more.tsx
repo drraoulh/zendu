@@ -20,10 +20,9 @@ export function AppSection() {
     <Section className="bg-white">
       <Container>
         <div className="bg-navy-gradient relative grid items-center gap-12 overflow-hidden rounded-3xl px-6 pt-12 text-white sm:px-10 lg:grid-cols-[1.1fr_0.9fr] lg:gap-10 lg:px-14 lg:pt-14">
-          <div aria-hidden className="absolute -right-20 top-10 h-80 w-80 rounded-full bg-brand/30 blur-3xl" />
           <div className="relative pb-0 lg:pb-14">
             <WstLogo variant="negative" className="h-8 w-auto sm:h-9" />
-            <h2 className="mt-6 font-display text-4xl font-bold leading-[1.05] sm:text-5xl">{t("appTitle")}</h2>
+            <h2 className="mt-6 font-display text-4xl font-semibold leading-[1.05] sm:text-5xl">{t("appTitle")}</h2>
             <p className="mt-4 max-w-xl text-base leading-relaxed text-white/75 sm:text-lg">{t("appText")}</p>
             <ul className="mt-6 space-y-2.5">
               {(["appPoint1", "appPoint2", "appPoint3"] as const).map((key) => (
@@ -47,7 +46,6 @@ export function AppSection() {
             </div>
           </div>
           <div className="relative mx-auto -mb-28 w-full max-w-[300px] sm:-mb-24 lg:mb-[-7rem]">
-            <div aria-hidden className="absolute -inset-8 rounded-full bg-sky/25 blur-3xl" />
             <PhoneFrame>
               <HomeScreen />
             </PhoneFrame>
@@ -79,7 +77,7 @@ export function FaqSection() {
         <div className="border-t border-line">
           {([1, 2, 3, 4] as const).map((n) => (
             <details key={n} className="group border-b border-line py-5">
-              <summary className="flex cursor-pointer list-none items-center justify-between gap-4 rounded font-display text-lg font-bold text-ink focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ink/40 [&::-webkit-details-marker]:hidden">
+              <summary className="flex cursor-pointer list-none items-center justify-between gap-4 rounded font-display text-lg font-semibold text-ink focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ink/40 [&::-webkit-details-marker]:hidden">
                 {t(`q${n}` as HomeKey)}
                 <Icon name="chevronDown" className="h-5 w-5 shrink-0 text-ink transition group-open:rotate-180" />
               </summary>
@@ -100,7 +98,7 @@ export function FinalCta() {
       <div className="bg-brand-gradient relative overflow-hidden rounded-3xl px-6 py-12 text-white sm:px-12 sm:py-16">
         <div className="relative flex flex-col gap-8 lg:flex-row lg:items-center lg:justify-between">
           <div className="max-w-2xl">
-            <h2 className="font-display text-4xl font-bold leading-[1.05] sm:text-5xl">{t("ctaTitle")}</h2>
+            <h2 className="font-display text-4xl font-semibold leading-[1.05] sm:text-5xl">{t("ctaTitle")}</h2>
             <p className="mt-3 text-lg text-white/80">{t("ctaSubtitle")}</p>
           </div>
           <div className="flex shrink-0 flex-col gap-3 sm:flex-row lg:flex-col">

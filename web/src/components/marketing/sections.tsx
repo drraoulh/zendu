@@ -130,7 +130,7 @@ export function FeatureGrid({
                 <div className="relative aspect-[4/3] overflow-hidden rounded-3xl bg-surface-soft">
                   <Image src={item.image} alt="" fill sizes="(min-width: 1024px) 400px, (min-width: 640px) 50vw, 100vw" className="zoom-on-hover object-cover" />
                 </div>
-                <h3 className={`mt-5 font-display text-xl font-bold ${dark ? "text-white" : "text-ink"}`}>{item.title}</h3>
+                <h3 className={`mt-5 font-display text-xl font-semibold ${dark ? "text-white" : "text-ink"}`}>{item.title}</h3>
                 <p className={`mt-2 text-base leading-relaxed ${dark ? "text-white/70" : "text-muted"}`}>{item.text}</p>
               </li>
             ) : (
@@ -149,7 +149,7 @@ export function FeatureGrid({
               >
                 <Icon name={item.icon} className="h-6 w-6" />
               </span>
-              <h3 className={`mt-5 font-display text-lg font-bold ${dark ? "text-white" : "text-ink"}`}>{item.title}</h3>
+              <h3 className={`mt-5 font-display text-lg font-semibold ${dark ? "text-white" : "text-ink"}`}>{item.title}</h3>
               <p className={`mt-2 text-sm leading-relaxed ${dark ? "text-white/70" : "text-muted"}`}>{item.text}</p>
             </li>
             ),
@@ -187,10 +187,10 @@ export function Steps({
         <ol className={`relative mt-10 grid gap-5 sm:grid-cols-2 ${cols}`}>
           {steps.map((step, i) => (
             <li key={step.title} className="relative rounded-3xl border border-line bg-white p-6 shadow-card">
-              <span className="bg-brand-gradient inline-grid h-11 w-11 place-items-center rounded-2xl font-display text-base font-black text-white shadow-[0_8px_20px_-8px_rgba(11,77,255,0.7)]">
+              <span className="bg-brand-gradient inline-grid h-11 w-11 place-items-center rounded-2xl font-display text-base font-semibold text-white shadow-[0_8px_20px_-8px_rgba(11,77,255,0.7)]">
                 {String(i + 1).padStart(2, "0")}
               </span>
-              <h3 className="mt-5 font-display text-lg font-bold text-ink">{step.title}</h3>
+              <h3 className="mt-5 font-display text-lg font-semibold text-ink">{step.title}</h3>
               <p className="mt-2 text-sm leading-relaxed text-muted">{step.text}</p>
             </li>
           ))}
@@ -265,7 +265,7 @@ export function Notice({
     <div className={`flex gap-4 rounded-3xl border p-5 sm:p-6 ${styles}`}>
       <Icon name={icon} className="notice-icon mt-0.5 h-6 w-6 shrink-0" />
       <div className="text-sm leading-relaxed">
-        {title && <p className="font-display font-bold text-ink">{title}</p>}
+        {title && <p className="font-display font-semibold text-ink">{title}</p>}
         <div className={title ? "mt-1 text-muted" : "text-muted"}>{children}</div>
       </div>
     </div>
@@ -297,7 +297,7 @@ export function Faq({
           <div className="divide-y divide-line border-y border-line">
             {items.map((item) => (
               <details key={item.q} className="group">
-                <summary className="flex cursor-pointer list-none items-center justify-between gap-4 py-5 font-display text-lg font-bold text-ink [&::-webkit-details-marker]:hidden">
+                <summary className="flex cursor-pointer list-none items-center justify-between gap-4 py-5 font-display text-lg font-semibold text-ink [&::-webkit-details-marker]:hidden">
                   {item.q}
                   <Icon name="chevronDown" className="h-5 w-5 shrink-0 text-ink transition group-open:rotate-180" strokeWidth={2.2} />
                 </summary>
@@ -332,7 +332,7 @@ export function CtaBand({
         <div className="bg-brand-gradient relative overflow-hidden rounded-3xl px-6 py-12 text-white sm:px-12 sm:py-16">
           <div className="relative flex flex-col gap-8 lg:flex-row lg:items-center lg:justify-between">
             <div className="max-w-2xl">
-              <h2 className="font-display text-4xl font-bold leading-[1.05] sm:text-5xl">{title}</h2>
+              <h2 className="font-display text-4xl font-semibold leading-[1.05] sm:text-5xl">{title}</h2>
               {text && <p className="mt-4 text-base leading-relaxed text-white/80 sm:text-lg">{text}</p>}
             </div>
             <div className="flex shrink-0 flex-col gap-3 sm:flex-row">

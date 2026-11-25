@@ -33,14 +33,14 @@ export function LogoWordmark({
       </span>
       <span className="leading-none">
         <span
-          className={`block font-display text-lg font-black tracking-tight sm:text-xl ${
-            light ? "text-white" : "text-gradient-brand"
+          className={`block font-display text-lg font-semibold tracking-tight sm:text-xl ${
+            light ? "text-white" : "text-ink"
           }`}
         >
           {appName}
         </span>
         <span
-          className={`mt-1 hidden max-w-[15rem] text-[0.6rem] font-semibold uppercase leading-snug tracking-[0.14em] sm:block ${compact ? "lg:hidden 2xl:block" : ""} ${
+          className={`mt-1 hidden max-w-[15rem] text-[0.6rem] font-semibold leading-snug sm:block ${compact ? "lg:hidden 2xl:block" : ""} ${
             light ? "text-white/60" : "text-muted"
           }`}
         >

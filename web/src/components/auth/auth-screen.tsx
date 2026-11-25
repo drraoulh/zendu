@@ -89,7 +89,6 @@ export function AuthScreen({ mode }: { mode: Mode }) {
     <div className="bg-bg lg:grid lg:min-h-[calc(100vh-4rem)] lg:grid-cols-[minmax(0,1fr)_minmax(0,1.05fr)]">
       {/* Panneau de marque (desktop) */}
       <aside className="bg-navy-gradient relative hidden overflow-hidden text-white lg:flex lg:flex-col lg:justify-between lg:px-12 lg:py-14 xl:px-16">
-        <div className="bg-grid absolute inset-0 opacity-40 [mask-image:radial-gradient(ellipse_at_top_left,black,transparent_75%)]" />
         <div
           aria-hidden
           className="animate-orbit absolute -right-40 -bottom-40 h-[28rem] w-[28rem] rounded-full border border-white/10"
@@ -101,10 +100,10 @@ export function AuthScreen({ mode }: { mode: Mode }) {
           <div className="w-36 overflow-hidden rounded-3xl bg-white p-2 shadow-float xl:w-40">
             <LogoFull priority className="h-auto w-full rounded-2xl" />
           </div>
-          <p className="mt-10 font-display text-xs font-bold uppercase tracking-[0.18em] text-sky">
+          <p className="mt-10 font-display text-xs font-semibold text-sky">
             {t("brandEyebrow")}
           </p>
-          <h2 className="mt-3 max-w-md font-display text-3xl font-extrabold leading-tight tracking-tight xl:text-4xl">
+          <h2 className="mt-3 max-w-md font-display text-3xl font-semibold leading-tight tracking-tight xl:text-4xl">
             {t("tagline")}
           </h2>
           <p className="mt-4 max-w-md text-white/70">{t("brandIntro")}</p>
@@ -116,7 +115,7 @@ export function AuthScreen({ mode }: { mode: Mode }) {
               <span className="inline-flex h-10 w-10 items-center justify-center rounded-xl bg-brand/30 text-sky ring-1 ring-white/15">
                 <Icon name={p.icon} />
               </span>
-              <p className="mt-3 font-display text-sm font-bold">{t(p.title)}</p>
+              <p className="mt-3 font-display text-sm font-semibold">{t(p.title)}</p>
               <p className="mt-1 text-xs leading-relaxed text-white/60">{t(p.desc)}</p>
             </li>
           ))}
@@ -136,13 +135,13 @@ export function AuthScreen({ mode }: { mode: Mode }) {
               <LogoEmblem className="h-9 w-auto" priority />
             </span>
             <div className="min-w-0">
-              <p className="font-display text-base font-black tracking-tight text-gradient-brand">{appName}</p>
+              <p className="font-display text-base font-semibold tracking-tight text-ink">{appName}</p>
               <p className="truncate text-xs text-muted">{t("tagline")}</p>
             </div>
           </div>
 
           <div className="animate-rise rounded-3xl border border-line bg-white p-6 shadow-card sm:p-8">
-            <h1 className="font-display text-2xl font-extrabold tracking-tight text-ink sm:text-3xl">
+            <h1 className="font-display text-2xl font-semibold tracking-tight text-ink sm:text-3xl">
               {isLogin ? t("loginTitle") : t("signupTitle")}
             </h1>
             <p className="mt-2 text-sm leading-relaxed text-muted">
@@ -251,7 +250,7 @@ export function AuthScreen({ mode }: { mode: Mode }) {
               </Button>
             </form>
 
-            <div className="my-5 flex items-center gap-3 text-xs font-medium uppercase tracking-wider text-muted">
+            <div className="my-5 flex items-center gap-3 text-xs font-medium text-muted">
               <span className="h-px flex-1 bg-line" />
               {t("or")}
               <span className="h-px flex-1 bg-line" />

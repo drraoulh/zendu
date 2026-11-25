@@ -65,7 +65,7 @@ export function TransferDetail({ transfer }: { transfer: AdminTransferDetail | n
           <span className="mx-auto inline-flex h-12 w-12 items-center justify-center rounded-2xl bg-brand-soft text-brand">
             <Icon name="receipt" />
           </span>
-          <h1 className="mt-3 font-display text-xl font-bold text-ink">{t("detailNotFound")}</h1>
+          <h1 className="mt-3 font-display text-xl font-semibold text-ink">{t("detailNotFound")}</h1>
           <p className="mt-1 text-sm text-muted">{t("detailNotFoundText")}</p>
         </div>
       </div>
@@ -83,7 +83,7 @@ export function TransferDetail({ transfer }: { transfer: AdminTransferDetail | n
         <div className="flex flex-wrap items-start justify-between gap-4">
           <div className="min-w-0">
             <div className="flex flex-wrap items-center gap-2">
-              <h1 className="font-mono text-xl font-bold tracking-tight text-ink sm:text-2xl">{transfer.reference}</h1>
+              <h1 className="font-mono text-xl font-semibold tracking-tight text-ink sm:text-2xl">{transfer.reference}</h1>
               <CopyButton value={transfer.reference} label={transfer.reference} />
               <Badge tone={statusTone(transfer.status)}>
                 <span className="h-1.5 w-1.5 rounded-full bg-current" aria-hidden />
@@ -101,7 +101,7 @@ export function TransferDetail({ transfer }: { transfer: AdminTransferDetail | n
           </div>
           <div className="text-left sm:text-right">
             <p className="text-xs font-medium text-muted">{t("detailReceive")}</p>
-            <p className="font-display text-3xl font-extrabold tracking-tight text-ink">{money(transfer.receiveAmount, transfer.receiveCurrency)}</p>
+            <p className="font-display text-3xl font-semibold tracking-tight text-ink">{money(transfer.receiveAmount, transfer.receiveCurrency)}</p>
             <p className="mt-0.5 text-sm text-muted">
               {t("detailTotal")} : <span className="font-semibold text-ink">{money(transfer.total, transfer.sendCurrency)}</span>
             </p>

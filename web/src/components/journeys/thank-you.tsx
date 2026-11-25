@@ -114,15 +114,14 @@ export function ThankYouContent({ reference: rawRef, kind: rawKind }: { referenc
   return (
     <>
       <section className="bg-navy-gradient relative overflow-hidden text-white">
-        <div className="bg-grid absolute inset-0 opacity-40 [mask-image:linear-gradient(to_bottom,black,transparent)]" />
         <Container className="relative pb-28 pt-12 text-center sm:pb-32 sm:pt-16">
           <span className="bg-brand-gradient animate-rise mx-auto grid h-16 w-16 place-items-center rounded-full shadow-float ring-4 ring-white/15">
             <Icon name="check" className="h-8 w-8 text-white" strokeWidth={2.6} />
           </span>
-          <p className="mt-6 font-display text-xs font-bold uppercase tracking-[0.18em] text-sky">
+          <p className="mt-6 font-display text-xs font-semibold text-sky">
             {t(`${k}_eyebrow`)}
           </p>
-          <h1 className="mx-auto mt-3 max-w-2xl font-display text-3xl font-extrabold leading-tight tracking-tight sm:text-4xl">
+          <h1 className="mx-auto mt-3 max-w-2xl font-display text-3xl font-semibold leading-tight tracking-tight sm:text-4xl">
             {t(`${k}_title`)}
           </h1>
           <p className="mx-auto mt-4 max-w-xl text-base leading-relaxed text-white/75">{t(`${k}_text`)}</p>
@@ -136,8 +135,8 @@ export function ThankYouContent({ reference: rawRef, kind: rawKind }: { referenc
             {reference ? (
               <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
                 <div className="min-w-0">
-                  <p className="text-xs font-semibold uppercase tracking-[0.16em] text-muted">{t("refLabel")}</p>
-                  <p className="mt-1 break-all font-mono text-2xl font-bold tracking-wider text-ink sm:text-3xl">
+                  <p className="text-xs font-semibold text-muted">{t("refLabel")}</p>
+                  <p className="mt-1 break-all font-mono text-2xl font-semibold text-ink sm:text-3xl">
                     {reference}
                   </p>
                   <p className="mt-1 text-xs text-muted">{t("refHint")}</p>
@@ -164,14 +163,14 @@ export function ThankYouContent({ reference: rawRef, kind: rawKind }: { referenc
 
             {/* Prochaines étapes */}
             <div className="mt-8 border-t border-line pt-6">
-              <h2 className="flex items-center gap-2 font-display text-base font-bold text-ink">
+              <h2 className="flex items-center gap-2 font-display text-base font-semibold text-ink">
                 <Icon name={KIND_ICON[kind]} className="h-5 w-5 text-brand" />
                 {t("nextTitle")}
               </h2>
               <ol className="mt-4 grid gap-3">
                 {steps.map((s, i) => (
                   <li key={s} className="flex items-start gap-3 text-sm leading-relaxed text-muted">
-                    <span className="grid h-6 w-6 shrink-0 place-items-center rounded-full bg-brand-soft text-xs font-black text-brand">
+                    <span className="grid h-6 w-6 shrink-0 place-items-center rounded-full bg-brand-soft text-xs font-semibold text-brand">
                       {i + 1}
                     </span>
                     {s}
@@ -188,7 +187,7 @@ export function ThankYouContent({ reference: rawRef, kind: rawKind }: { referenc
           {/* Vérifier le statut */}
           {reference && (
             <div className="rounded-3xl border border-line bg-white p-5 shadow-card sm:p-8">
-              <h2 className="font-display text-lg font-bold text-ink">{t("checkTitle")}</h2>
+              <h2 className="font-display text-lg font-semibold text-ink">{t("checkTitle")}</h2>
               <p className="mt-1 text-sm text-muted">{t("checkText")}</p>
               <form noValidate onSubmit={onCheck} className="mt-5 flex flex-col gap-3 sm:flex-row sm:items-start">
                 <div className="min-w-0 flex-1">
@@ -278,7 +277,7 @@ export function ThankYouContent({ reference: rawRef, kind: rawKind }: { referenc
                 <span className="grid h-10 w-10 place-items-center rounded-xl bg-brand-soft text-brand transition group-hover:bg-brand group-hover:text-white">
                   <Icon name={l.icon} className="h-5 w-5" />
                 </span>
-                <p className="mt-4 font-display text-sm font-bold text-ink">{l.title}</p>
+                <p className="mt-4 font-display text-sm font-semibold text-ink">{l.title}</p>
                 <p className="mt-1 text-xs leading-relaxed text-muted">{l.text}</p>
               </Link>
             ))}

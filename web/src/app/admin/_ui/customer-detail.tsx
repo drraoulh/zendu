@@ -179,12 +179,12 @@ export function CustomerDetail({ initial }: { initial: Detail }) {
           <p className="mt-2 text-xs text-muted">{t("resetPasswordHint")}</p>
           {temp && (
             <div role="status" className="mt-3 rounded-2xl border border-brand/30 bg-brand-soft p-4">
-              <p className="font-mono text-base font-bold text-navy">{t("tempPassword", { p: temp })}</p>
+              <p className="font-mono text-base font-semibold text-navy">{t("tempPassword", { p: temp })}</p>
               <p className="mt-1 text-xs text-muted">{t("tempPasswordHint")}</p>
             </div>
           )}
 
-          <h3 className="mt-6 font-display text-sm font-bold text-ink">{t("devices")}</h3>
+          <h3 className="mt-6 font-display text-sm font-semibold text-ink">{t("devices")}</h3>
           {sessions.length ? (
             <ul className="mt-2 divide-y divide-line">
               {sessions.map((s) => (

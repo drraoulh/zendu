@@ -73,7 +73,7 @@ export function WstFooter() {
               <Icon name="arrowRight" className="h-4 w-4" />
             </a>
 
-            <p className="mt-8 font-display text-sm font-bold uppercase tracking-[0.14em] text-white">{f("contactTitle")}</p>
+            <p className="mt-8 font-display text-sm font-semibold text-white">{f("contactTitle")}</p>
             <ul className="mt-4 grid gap-3 text-sm text-white/70">
               <li className="flex items-center gap-2.5">
                 <Icon name="mail" className="h-4 w-4 shrink-0 text-sky" />
@@ -101,7 +101,7 @@ export function WstFooter() {
           <div className="grid grid-cols-2 gap-x-6 gap-y-10 sm:grid-cols-3">
             {COLUMNS.map((col) => (
               <div key={col.title} className="min-w-0">
-                <p className="font-display text-xs font-bold uppercase tracking-[0.14em] text-white sm:text-sm">{f(col.title)}</p>
+                <p className="font-display text-xs font-semibold text-white sm:text-sm">{f(col.title)}</p>
                 <div className="mt-4 flex flex-col items-start gap-1 sm:mt-5">
                   {col.links.map((l) => (
                     <Link key={l.href} href={l.href} className="py-1 text-sm text-white/70 transition hover:text-white">
@@ -116,7 +116,7 @@ export function WstFooter() {
 
         <div className="mt-14 flex flex-col gap-6 rounded-3xl border border-white/10 bg-white/5 p-6 sm:p-8 md:flex-row md:items-center md:justify-between">
           <div>
-            <p className="font-display text-xs font-bold uppercase tracking-[0.18em] text-sky">{ta("ourApp")}</p>
+            <p className="font-display text-xs font-semibold text-sky">{ta("ourApp")}</p>
             <p className="mt-3 max-w-md text-sm text-white/70">{ta("ourAppText")}</p>
           </div>
           <StoreBadges dark />

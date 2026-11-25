@@ -59,7 +59,7 @@ function ContactCard({
         <Icon name={icon} className="h-6 w-6" />
       </span>
       <div className="min-w-0">
-        <p className="font-display text-sm font-bold text-ink">{title}</p>
+        <p className="font-display text-sm font-semibold text-ink">{title}</p>
         <div className="mt-1 text-sm leading-relaxed text-muted">{children}</div>
       </div>
     </li>
@@ -183,10 +183,10 @@ function ContactForm() {
         <span className="mx-auto grid h-14 w-14 place-items-center rounded-full bg-success text-white">
           <Icon name="check" className="h-7 w-7" strokeWidth={2.6} />
         </span>
-        <h3 className="mt-5 font-display text-xl font-bold text-ink">{t("successTitle")}</h3>
+        <h3 className="mt-5 font-display text-xl font-semibold text-ink">{t("successTitle")}</h3>
         <p className="mx-auto mt-2 max-w-md text-sm leading-relaxed text-muted">{t("successText", { email: status.email })}</p>
-        <p className="mt-5 text-xs font-semibold uppercase tracking-[0.16em] text-muted">{t("successRef")}</p>
-        <p className="mt-1 font-display text-2xl font-black tracking-wider text-brand-strong">{status.reference}</p>
+        <p className="mt-5 text-xs font-semibold text-muted">{t("successRef")}</p>
+        <p className="mt-1 font-display text-2xl font-semibold text-brand-strong">{status.reference}</p>
         <div className="mt-6 flex flex-col items-center justify-center gap-3 sm:flex-row">
           <ButtonLink href={merci}>
             {t("successDetails")}
@@ -374,13 +374,12 @@ export function ContactContent() {
                 )}
               </ContactCard>
               <li className="bg-navy-gradient relative overflow-hidden rounded-3xl p-5 text-white shadow-float">
-                <div aria-hidden className="bg-grid absolute inset-0 opacity-30" />
                 <div className="relative flex gap-4">
                   <span className="grid h-12 w-12 shrink-0 place-items-center rounded-2xl bg-white/10">
                     <Icon name="maple" className="h-6 w-6 text-maple" />
                   </span>
                   <div>
-                    <p className="font-display text-sm font-bold">{t("baseTitle")}</p>
+                    <p className="font-display text-sm font-semibold">{t("baseTitle")}</p>
                     <p className="mt-1 text-sm leading-relaxed text-white/75">{t("baseText")}</p>
                   </div>
                 </div>

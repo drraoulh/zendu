@@ -117,7 +117,7 @@ export function ReceiptView({
                 <LogoEmblem className="h-full w-full object-contain" />
               </span>
               <div>
-                <p className="font-display text-lg font-extrabold tracking-tight">{receipt.brand}</p>
+                <p className="font-display text-lg font-semibold tracking-tight">{receipt.brand}</p>
                 <p className="text-sm text-white/70">{t("receiptTitle")}</p>
               </div>
             </div>
@@ -125,8 +125,8 @@ export function ReceiptView({
               <StatusBadge status={receipt.status} />
             </span>
           </div>
-          <p className="mt-6 text-xs font-semibold uppercase tracking-[0.16em] text-sky">{t("received")}</p>
-          <p className="mt-1 font-display text-3xl font-black tracking-tight sm:text-4xl">{receiveFormatted}</p>
+          <p className="mt-6 text-xs font-semibold text-sky">{t("received")}</p>
+          <p className="mt-1 font-display text-3xl font-semibold tracking-tight sm:text-4xl">{receiveFormatted}</p>
           <div className="mt-3 text-sm text-white/80">
             <CorridorPair from={receipt.sourceCountry} to={receipt.destCountry} size={18} showNames />
           </div>
@@ -136,7 +136,7 @@ export function ReceiptView({
           <dl className="grid gap-4 border-b border-line py-5 text-sm sm:grid-cols-2">
             <div>
               <dt className="text-muted">{t("confirmation")}</dt>
-              <dd className="mt-0.5 font-display font-bold tracking-wider text-ink">{receipt.confirmationNumber}</dd>
+              <dd className="mt-0.5 font-display font-semibold text-ink">{receipt.confirmationNumber}</dd>
             </div>
             <div>
               <dt className="text-muted">{t("date")}</dt>
@@ -145,7 +145,7 @@ export function ReceiptView({
           </dl>
 
           <section className="border-b border-line py-5">
-            <h2 className="text-xs font-bold uppercase tracking-[0.16em] text-muted">{t("amounts")}</h2>
+            <h2 className="text-xs font-semibold text-muted">{t("amounts")}</h2>
             <dl className="mt-3">
               <SummaryRow label={t("youSend")} value={money(receipt.sendAmount, send)} />
               <SummaryRow label={t("fee")} value={receipt.fee === 0 ? t("feeFree") : money(receipt.fee, send)} />
@@ -157,7 +157,7 @@ export function ReceiptView({
 
           <section className="grid gap-6 border-b border-line py-5 sm:grid-cols-2">
             <div>
-              <h2 className="text-xs font-bold uppercase tracking-[0.16em] text-muted">{t("sender")}</h2>
+              <h2 className="text-xs font-semibold text-muted">{t("sender")}</h2>
               <p className="mt-2 font-semibold text-ink">{receipt.sender.name}</p>
               <p className="break-all text-sm text-muted">{receipt.sender.email}</p>
               <p className="mt-1 text-sm text-muted">
@@ -165,7 +165,7 @@ export function ReceiptView({
               </p>
             </div>
             <div>
-              <h2 className="text-xs font-bold uppercase tracking-[0.16em] text-muted">{t("recipient")}</h2>
+              <h2 className="text-xs font-semibold text-muted">{t("recipient")}</h2>
               <p className="mt-2 font-semibold text-ink">{receipt.recipient.name}</p>
               {receipt.recipient.bankName && (
                 <p className="text-sm text-muted">
@@ -186,7 +186,7 @@ export function ReceiptView({
           </section>
 
           <section className="py-5">
-            <h2 className="text-xs font-bold uppercase tracking-[0.16em] text-muted">{t("deliveryH")}</h2>
+            <h2 className="text-xs font-semibold text-muted">{t("deliveryH")}</h2>
             <dl className="mt-3">
               <SummaryRow label={t("deliveryMethod")} value={network(receipt.recipient.network)} />
               <SummaryRow label={t("estimate")} value={eta(deliveryEstimate)} />

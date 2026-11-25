@@ -49,14 +49,13 @@ export function ApplicationContent({
   return (
     <>
       <section className="bg-navy-gradient relative overflow-hidden text-white">
-        <div className="bg-grid absolute inset-0 opacity-40 [mask-image:linear-gradient(to_bottom,black,transparent)]" />
         <Container className="relative grid items-center gap-12 pb-28 pt-12 sm:pt-16 lg:grid-cols-[1.15fr_1fr] lg:pb-32">
           <div className="animate-rise">
             <WstLogo variant="negative" priority className="h-7 w-auto sm:h-9" />
             <div className="mt-8">
               <Eyebrow light>{t("heroEyebrow")}</Eyebrow>
             </div>
-            <h1 className="mt-4 max-w-xl font-display text-4xl font-extrabold leading-[1.08] tracking-tight sm:text-5xl">
+            <h1 className="mt-4 max-w-xl font-display text-4xl font-semibold leading-[1.08] tracking-tight sm:text-5xl">
               {t("heroTitle")}
             </h1>
             <p className="mt-5 max-w-xl text-lg leading-relaxed text-white/75">{t("heroSubtitle")}</p>
@@ -65,8 +64,8 @@ export function ApplicationContent({
               <div className="mt-7 inline-flex max-w-full items-center gap-3 rounded-2xl border border-white/15 bg-white/10 px-4 py-3 backdrop-blur">
                 <CountryFlag code={simulation.destCode} size={28} title={destName} />
                 <div className="min-w-0">
-                  <p className="text-xs font-semibold uppercase tracking-wide text-sky">{t("simulationLabel")}</p>
-                  <p className="font-display text-lg font-bold">
+                  <p className="text-xs font-semibold text-sky">{t("simulationLabel")}</p>
+                  <p className="font-display text-lg font-semibold">
                     {t("simulationText", { amount: amountText, currency: simulation.currency, country: destName })}
                   </p>
                 </div>
@@ -78,7 +77,6 @@ export function ApplicationContent({
 
           <div className="animate-rise-1 flex justify-center lg:justify-end">
             <div role="img" aria-label={t("mockPreview")} className="relative">
-              <div className="absolute -inset-10 rounded-full bg-brand/30 blur-3xl" aria-hidden />
               {/* Même maquette que /transfert ; montant simulé repris s'il s'agit d'un envoi Canada → Cameroun. */}
               <PhoneFrame className="ring-white/15">
                 <HomeScreen
@@ -94,7 +92,7 @@ export function ApplicationContent({
         <div className="rounded-3xl border border-line bg-white p-5 shadow-float sm:p-10">
           <div className={`grid gap-10 ${qrSvg ? "md:grid-cols-[1fr_auto]" : ""}`}>
             <div>
-              <h2 className="font-display text-2xl font-extrabold tracking-tight text-ink sm:text-3xl">{t("downloadTitle")}</h2>
+              <h2 className="font-display text-2xl font-semibold tracking-tight text-ink sm:text-3xl">{t("downloadTitle")}</h2>
               <p className="mt-3 text-muted">{t("downloadText")}</p>
 
               {simulation && (
@@ -108,12 +106,12 @@ export function ApplicationContent({
 
               {!available && (
                 <div className="mt-8 rounded-3xl border border-brand/20 bg-surface-soft p-4 min-[375px]:p-5 sm:p-6">
-                  <p className="inline-flex items-center gap-2 font-display text-sm font-bold uppercase tracking-[0.14em] text-brand">
+                  <p className="inline-flex items-center gap-2 font-display text-sm font-semibold text-brand">
                     <span className="live-dot" aria-hidden />
                     {t("comingSoonTitle")}
                   </p>
                   <p className="mt-2 text-sm leading-relaxed text-muted">{t("comingSoonText")}</p>
-                  <h3 className="mt-6 font-display text-lg font-bold text-ink">{t("waitlistTitle")}</h3>
+                  <h3 className="mt-6 font-display text-lg font-semibold text-ink">{t("waitlistTitle")}</h3>
                   <div className="relative mt-4">
                     <WaitlistForm destinations={destinations} defaultCountry={simulation?.destCode} />
                   </div>
@@ -129,7 +127,7 @@ export function ApplicationContent({
                   className="h-52 w-52 rounded-3xl border border-line bg-white p-3 shadow-card [&>svg]:h-full [&>svg]:w-full"
                   dangerouslySetInnerHTML={{ __html: qrSvg }}
                 />
-                <p className="mt-4 font-display font-bold text-ink">{t("scanTitle")}</p>
+                <p className="mt-4 font-display font-semibold text-ink">{t("scanTitle")}</p>
                 <p className="mt-1 text-sm text-muted">{t("scanText")}</p>
               </div>
             )}
@@ -139,7 +137,7 @@ export function ApplicationContent({
 
       <section className="py-16 sm:py-20">
         <Container>
-          <h2 className="text-center font-display text-3xl font-extrabold tracking-tight text-ink sm:text-4xl">
+          <h2 className="text-center font-display text-3xl font-semibold tracking-tight text-ink sm:text-4xl">
             {t("benefitsTitle")}
           </h2>
           <div className="mt-10 grid gap-5 md:grid-cols-3">
@@ -148,7 +146,7 @@ export function ApplicationContent({
                 <span className="inline-flex h-12 w-12 items-center justify-center rounded-2xl bg-brand-soft text-brand">
                   <Icon name={b.icon} className="h-6 w-6" />
                 </span>
-                <h3 className="mt-5 font-display text-lg font-bold text-ink">{b.title}</h3>
+                <h3 className="mt-5 font-display text-lg font-semibold text-ink">{b.title}</h3>
                 <p className="mt-2 text-sm leading-relaxed text-muted">{b.text}</p>
               </div>
             ))}

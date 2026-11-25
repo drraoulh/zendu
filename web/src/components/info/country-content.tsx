@@ -72,7 +72,6 @@ export function CountryContent({ country: c, others }: { country: CountryInfo; o
     <>
       {/* En-tête */}
       <section className="bg-navy-gradient relative overflow-hidden text-white">
-        <div className="bg-grid absolute inset-0 opacity-40 [mask-image:linear-gradient(to_bottom,black,transparent)]" />
         <Container className="relative py-12 sm:py-16">
           <nav aria-label="Breadcrumb" className="text-sm text-white/65">
             <ol className="flex flex-wrap items-center gap-1.5">
@@ -92,7 +91,7 @@ export function CountryContent({ country: c, others }: { country: CountryInfo; o
               <Eyebrow light>{t("eyebrow", { country: name })}</Eyebrow>
               <div className="mt-4 flex items-center gap-4">
                 <CountryFlag code={c.code} size={56} title={name} className="rounded-md ring-2 ring-white/20" />
-                <h1 className="font-display text-3xl font-extrabold leading-tight tracking-tight sm:text-5xl">{t("title", { to })}</h1>
+                <h1 className="font-display text-3xl font-semibold leading-tight tracking-tight sm:text-5xl">{t("title", { to })}</h1>
               </div>
               <p className="mt-5 max-w-2xl text-lg leading-relaxed text-white/75">
                 {t("subtitle", { currency: c.currency, currencyName, modes })}
@@ -116,11 +115,11 @@ export function CountryContent({ country: c, others }: { country: CountryInfo; o
         <dl className="grid gap-3 py-8 sm:grid-cols-2 lg:grid-cols-4">
           {facts.map((f) => (
             <div key={f.label} className="rounded-3xl border border-line bg-white p-5 shadow-card">
-              <dt className="flex items-center gap-2 text-xs font-semibold uppercase tracking-wider text-muted">
+              <dt className="flex items-center gap-2 text-xs font-semibold text-muted">
                 <Icon name={f.icon} className="h-4 w-4 text-brand" />
                 {f.label}
               </dt>
-              <dd className="mt-2 font-display text-base font-bold text-ink">{f.value}</dd>
+              <dd className="mt-2 font-display text-base font-semibold text-ink">{f.value}</dd>
             </div>
           ))}
         </dl>
@@ -134,7 +133,7 @@ export function CountryContent({ country: c, others }: { country: CountryInfo; o
             {c.networks.map((n) => (
               <li key={n.id} className="flex flex-col rounded-3xl border border-line bg-white p-6 shadow-card">
                 <PaymentLogo id={n.id} size={36} title={L.network(n)} />
-                <h3 className="mt-4 font-display text-lg font-bold text-ink">{L.network(n)}</h3>
+                <h3 className="mt-4 font-display text-lg font-semibold text-ink">{L.network(n)}</h3>
                 <p className="mt-3 flex-1 text-sm leading-relaxed text-muted">{modeText(n.id, n.label)}</p>
                 <p className="mt-4 inline-flex items-center gap-1.5 text-xs font-semibold text-ink">
                   <Icon name="clock" className="h-3.5 w-3.5 text-brand" />
@@ -178,7 +177,7 @@ export function CountryContent({ country: c, others }: { country: CountryInfo; o
                     <Icon name="arrowRight" className="h-4 w-4 text-brand" />
                     <CountryFlag code={d.code} size={32} title="" />
                     <span className="min-w-0 flex-1">
-                      <span className="block font-display font-bold text-ink group-hover:text-brand-strong">{L.country(d.code, d.name)}</span>
+                      <span className="block font-display font-semibold text-ink group-hover:text-brand-strong">{L.country(d.code, d.name)}</span>
                       <span className="block text-xs text-muted">
                         {groupByDelivery(d.networks, (n) => L.network(n), L.delivery)}
                       </span>
@@ -199,7 +198,7 @@ export function CountryContent({ country: c, others }: { country: CountryInfo; o
             {hasBank && c.banks.length > 0 && (
               <article className="rounded-3xl border border-line bg-white p-6 shadow-card sm:p-8">
                 <Eyebrow>{t("banksEyebrow")}</Eyebrow>
-                <h2 className="mt-3 font-display text-2xl font-extrabold text-ink">{t("banksTitle", { in: inCountry })}</h2>
+                <h2 className="mt-3 font-display text-2xl font-semibold text-ink">{t("banksTitle", { in: inCountry })}</h2>
                 <p className="mt-3 text-sm leading-relaxed text-muted">{t("banksText")}</p>
                 <ul className="mt-5 flex flex-wrap gap-2">
                   {c.banks.map((b) => (
@@ -211,10 +210,9 @@ export function CountryContent({ country: c, others }: { country: CountryInfo; o
               </article>
             )}
             <article className="bg-navy-gradient relative overflow-hidden rounded-3xl p-6 text-white shadow-float sm:p-8">
-              <div aria-hidden className="bg-grid absolute inset-0 opacity-30" />
               <div className="relative">
                 <Eyebrow light>{t("tipsEyebrow")}</Eyebrow>
-                <h2 className="mt-3 font-display text-2xl font-extrabold">{t("tipsTitle")}</h2>
+                <h2 className="mt-3 font-display text-2xl font-semibold">{t("tipsTitle")}</h2>
                 <ul className="mt-5 grid gap-3">
                   {tips.map((tip) => (
                     <li key={tip} className="flex gap-3 text-sm leading-relaxed text-white/80">
@@ -286,7 +284,7 @@ function FeesCard({ d }: { d: DestinationInfo }) {
   return (
     <div className="overflow-hidden rounded-3xl border border-line bg-white shadow-card">
       <div className="flex items-center justify-between gap-3 border-b border-line px-5 py-4">
-        <p className="flex items-center gap-2 font-display font-bold text-ink">
+        <p className="flex items-center gap-2 font-display font-semibold text-ink">
           <CountryFlag code={d.sourceCode} size={24} title="" />
           {t("fromCountry", { from: capitalize(countryPhrase(L.locale, d.sourceCode, L.country(d.sourceCode, d.sourceName)).from) })}
         </p>
@@ -302,7 +300,7 @@ function FeesCard({ d }: { d: DestinationInfo }) {
         <div className="overflow-x-auto">
         <table className="w-full text-left text-[13px] sm:text-sm">
           <caption className="sr-only">{t("fromCountry", { from: capitalize(countryPhrase(L.locale, d.sourceCode, L.country(d.sourceCode, d.sourceName)).from) })}</caption>
-          <thead className="bg-surface-soft text-xs font-bold uppercase tracking-wider text-muted">
+          <thead className="bg-surface-soft text-xs font-semibold text-muted">
             <tr>
               <th scope="col" className="px-3 py-3 sm:px-5">{t("colSend")}</th>
               <th scope="col" className="px-2 py-3 sm:px-3">{t("colFee")}</th>
@@ -319,7 +317,7 @@ function FeesCard({ d }: { d: DestinationInfo }) {
                   <span className="block whitespace-nowrap text-xs text-muted sm:hidden">= {L.money(q.total, d.sendCurrency)}</span>
                 </td>
                 <td className="hidden px-3 py-4 text-ink sm:table-cell">{L.money(q.total, d.sendCurrency)}</td>
-                <td className="whitespace-nowrap px-3 py-4 text-right font-display font-bold text-brand-strong sm:px-5">{L.money(q.receiveAmount, d.currency)}</td>
+                <td className="whitespace-nowrap px-3 py-4 text-right font-display font-semibold text-brand-strong sm:px-5">{L.money(q.receiveAmount, d.currency)}</td>
               </tr>
             ))}
           </tbody>

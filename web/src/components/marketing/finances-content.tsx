@@ -89,7 +89,7 @@ export function FinancesContent() {
                     <span className="grid h-11 w-11 place-items-center rounded-2xl bg-brand-soft text-brand">
                       <Icon name={f.icon} className="h-5 w-5" />
                     </span>
-                    <h3 className="mt-4 font-display text-base font-bold text-ink">{f.title}</h3>
+                    <h3 className="mt-4 font-display text-base font-semibold text-ink">{f.title}</h3>
                     <p className="mt-1 text-sm leading-relaxed text-muted">{f.text}</p>
                   </li>
                 ))}
@@ -100,7 +100,7 @@ export function FinancesContent() {
               </ButtonLink>
             </div>
             <div className="rounded-3xl bg-surface-soft p-6 sm:p-8">
-              <h3 className="font-display text-lg font-bold text-ink">{t("prepTitle")}</h3>
+              <h3 className="font-display text-lg font-semibold text-ink">{t("prepTitle")}</h3>
               <ul className="mt-5 grid gap-3">
                 {range(4).map((i) => (
                   <li key={i} className="flex items-start gap-3 text-sm leading-relaxed text-ink">

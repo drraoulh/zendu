@@ -74,7 +74,7 @@ export function HistoryView({ transfers, unavailable }: { transfers: HistoryItem
           <Eyebrow>{t("eyebrow")}</Eyebrow>
           <div className="mt-3 flex flex-wrap items-end justify-between gap-4">
             <div>
-              <h1 className="font-display text-3xl font-extrabold tracking-tight text-ink sm:text-4xl">{t("title")}</h1>
+              <h1 className="font-display text-3xl font-semibold tracking-tight text-ink sm:text-4xl">{t("title")}</h1>
               <p className="mt-2 max-w-xl text-muted">{t("subtitle")}</p>
             </div>
             <div className="flex flex-wrap gap-2">
@@ -105,7 +105,7 @@ export function HistoryView({ transfers, unavailable }: { transfers: HistoryItem
               <span className="mx-auto grid h-14 w-14 place-items-center rounded-2xl bg-brand-soft text-brand">
                 <Icon name="transfer" className="h-7 w-7" />
               </span>
-              <h2 className="mt-4 font-display text-xl font-extrabold text-ink">{t("empty")}</h2>
+              <h2 className="mt-4 font-display text-xl font-semibold text-ink">{t("empty")}</h2>
               <p className="mx-auto mt-2 max-w-sm text-sm text-muted">{t("emptyBody")}</p>
               <ButtonLink href="/send" className="mt-6">
                 {t("emptyCta")}
@@ -223,7 +223,7 @@ export function HistoryView({ transfers, unavailable }: { transfers: HistoryItem
                       className="group rounded-3xl border border-line bg-white shadow-card transition hover:border-brand/30"
                     >
                       <Link href={`/transfers/${item.id}`} className="flex items-start gap-4 p-4 sm:items-center sm:p-5">
-                        <span className="hidden h-11 w-11 shrink-0 place-items-center rounded-2xl bg-navy font-display text-base font-bold text-white sm:grid">
+                        <span className="hidden h-11 w-11 shrink-0 place-items-center rounded-2xl bg-navy font-display text-base font-semibold text-white sm:grid">
                           {item.recipientName.trim().charAt(0).toUpperCase()}
                         </span>
                         <div className="min-w-0 flex-1">
@@ -233,13 +233,13 @@ export function HistoryView({ transfers, unavailable }: { transfers: HistoryItem
                           </div>
                           <p className="mt-2 truncate font-semibold text-ink">{item.recipientName}</p>
                           <p className="truncate text-xs text-muted">
-                            <span className="font-display font-bold tracking-wider">{item.reference}</span> ·{" "}
+                            <span className="font-display font-semibold">{item.reference}</span> ·{" "}
                             {L.network(item.network)}
                             {item.accountMasked ? ` ${item.accountMasked}` : ""} · {L.dateTime(item.createdAt)}
                           </p>
                         </div>
                         <div className="shrink-0 text-right">
-                          <p className="font-display text-base font-extrabold text-brand-strong sm:text-lg">
+                          <p className="font-display text-base font-semibold text-brand-strong sm:text-lg">
                             {L.money(item.receiveAmount, item.receiveCurrency)}
                           </p>
                           <p className="text-xs text-muted sm:text-sm">{L.money(item.sendAmount, item.sendCurrency)}</p>

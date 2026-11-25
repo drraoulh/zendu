@@ -102,7 +102,7 @@ export function FormSuccess({
       <span className="mx-auto grid h-14 w-14 place-items-center rounded-full bg-success text-white">
         <Icon name="check" className="h-7 w-7" strokeWidth={2.6} />
       </span>
-      <h3 className="mt-5 font-display text-xl font-bold text-ink">{title}</h3>
+      <h3 className="mt-5 font-display text-xl font-semibold text-ink">{title}</h3>
       <p className="mx-auto mt-2 max-w-md text-sm leading-relaxed text-muted">{text}</p>
       <div className="mt-6 flex flex-col items-center justify-center gap-3 sm:flex-row">
         <a

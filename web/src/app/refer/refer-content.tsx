@@ -46,12 +46,11 @@ export function ReferContent() {
   return (
     <div className="bg-bg pb-20">
       <section className="bg-navy-gradient relative overflow-hidden text-white">
-        <div className="bg-grid absolute inset-0 opacity-40 [mask-image:linear-gradient(to_bottom,black,transparent)]" />
         <Container className="relative pb-28 pt-14 text-center sm:pb-32 sm:pt-20">
           <div className="flex justify-center">
             <Eyebrow light>{t("eyebrow")}</Eyebrow>
           </div>
-          <h1 className="mx-auto mt-4 max-w-2xl font-display text-4xl font-extrabold leading-[1.08] tracking-tight sm:text-5xl">
+          <h1 className="mx-auto mt-4 max-w-2xl font-display text-4xl font-semibold leading-[1.08] tracking-tight sm:text-5xl">
             {t("title")}
           </h1>
           <p className="mx-auto mt-4 max-w-xl text-lg leading-relaxed text-white/75">{t("subtitle")}</p>
@@ -64,7 +63,7 @@ export function ReferContent() {
             <Icon name="gift" className="h-7 w-7" />
           </span>
           <p className="mt-4 text-sm font-semibold text-muted">{t("yourCode")}</p>
-          <p className="mt-2 break-all rounded-2xl border-2 border-dashed border-brand/30 bg-brand-soft/60 px-4 py-4 font-display text-lg font-black tracking-[0.08em] text-navy min-[400px]:text-2xl sm:text-3xl sm:tracking-[0.12em]">
+          <p className="mt-2 break-all rounded-2xl border-2 border-dashed border-brand/30 bg-brand-soft/60 px-4 py-4 font-display text-lg font-semibold text-navy min-[400px]:text-2xl sm:text-3xl sm:tracking-[0.12em]">
             {CODE}
           </p>
           <div className="mt-6 grid gap-2 sm:grid-cols-2">
@@ -80,7 +79,7 @@ export function ReferContent() {
         </div>
 
         <section className="mx-auto mt-14 max-w-4xl">
-          <h2 className="text-center font-display text-2xl font-extrabold tracking-tight text-ink sm:text-3xl">
+          <h2 className="text-center font-display text-2xl font-semibold tracking-tight text-ink sm:text-3xl">
             {t("howTitle")}
           </h2>
           <ol className="mt-8 grid gap-4 sm:grid-cols-3">
@@ -90,9 +89,9 @@ export function ReferContent() {
                   <span className="grid h-11 w-11 place-items-center rounded-2xl bg-brand-soft text-brand">
                     <Icon name={s.icon} className="h-5 w-5" />
                   </span>
-                  <span className="font-display text-3xl font-black text-silver">{i + 1}</span>
+                  <span className="font-display text-3xl font-semibold text-silver">{i + 1}</span>
                 </div>
-                <h3 className="mt-4 font-display text-base font-extrabold text-ink">{s.title}</h3>
+                <h3 className="mt-4 font-display text-base font-semibold text-ink">{s.title}</h3>
                 <p className="mt-1 text-sm leading-relaxed text-muted">{s.body}</p>
               </li>
             ))}

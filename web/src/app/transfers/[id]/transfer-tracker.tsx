@@ -120,7 +120,7 @@ export function TransferTracker({
               <span className="mx-auto grid h-12 w-12 place-items-center rounded-2xl bg-warn/10 text-warn">
                 <Icon name="info" className="h-6 w-6" />
               </span>
-              <p className="mt-4 font-display text-lg font-bold text-ink">{t("loadError")}</p>
+              <p className="mt-4 font-display text-lg font-semibold text-ink">{t("loadError")}</p>
               <div className="mt-6 flex justify-center gap-2">
                 <Button size="sm" onClick={() => void load()}>
                   {t("retry")}
@@ -163,7 +163,6 @@ export function TransferTracker({
     <div className="bg-bg pb-16">
       {/* En-tête du transfert */}
       <section className="bg-navy-gradient relative overflow-hidden text-white">
-        <div className="bg-grid absolute inset-0 opacity-30 [mask-image:linear-gradient(to_bottom,black,transparent)]" />
         <Container className="relative py-8 sm:py-12">
           <div className="flex flex-wrap items-center justify-between gap-3">
             <Link
@@ -188,11 +187,11 @@ export function TransferTracker({
                   <StatusBadge status={status} size="md" />
                 </span>
                 <span className="text-sm text-white/70">
-                  {t("reference")} <span className="font-display font-bold tracking-wider text-white">{transfer.reference}</span>
+                  {t("reference")} <span className="font-display font-semibold text-white">{transfer.reference}</span>
                 </span>
               </div>
-              <p className="mt-5 text-xs font-bold uppercase tracking-[0.16em] text-sky">{t("theyReceive")}</p>
-              <h1 className="mt-1 break-words font-display text-[2.1rem] font-black leading-tight tracking-tight sm:text-5xl">
+              <p className="mt-5 text-xs font-semibold text-sky">{t("theyReceive")}</p>
+              <h1 className="mt-1 break-words font-display text-[2.1rem] font-semibold leading-tight tracking-tight sm:text-5xl">
                 {money(transfer.receiveAmountXaf, recvCur)}
               </h1>
               <p className="mt-2 truncate text-sm text-white/75">
@@ -239,7 +238,7 @@ export function TransferTracker({
                       <div key={key} className="flex items-center justify-between gap-3 py-2.5">
                         <div className="min-w-0">
                           <dt className="text-xs text-muted">{label}</dt>
-                          <dd className="select-all break-all font-display text-base font-bold text-ink">{display}</dd>
+                          <dd className="select-all break-all font-display text-base font-semibold text-ink">{display}</dd>
                         </div>
                         <button
                           type="button"
@@ -345,7 +344,7 @@ export function TransferTracker({
             )}
 
             <section className="rounded-3xl border border-line bg-white p-6 shadow-card">
-              <h2 className="font-display text-lg font-extrabold text-ink">{t("progress")}</h2>
+              <h2 className="font-display text-lg font-semibold text-ink">{t("progress")}</h2>
               <div className="mt-5">
                 <TransferTimeline transfer={transfer} />
               </div>
@@ -353,7 +352,7 @@ export function TransferTracker({
 
             {events.length > 0 && (
               <section className="rounded-3xl border border-line bg-white p-6 shadow-card">
-                <h2 className="font-display text-lg font-extrabold text-ink">{t("activity")}</h2>
+                <h2 className="font-display text-lg font-semibold text-ink">{t("activity")}</h2>
                 <ol className="mt-4 divide-y divide-line">
                   {events.map((event) => (
                     <li key={event.id} className="flex gap-3 py-3 first:pt-0 last:pb-0">
@@ -371,7 +370,7 @@ export function TransferTracker({
           </div>
 
           <aside className="rounded-3xl border border-line bg-white p-6 shadow-card lg:sticky lg:top-24">
-            <h2 className="font-display text-lg font-extrabold text-ink">{t("details")}</h2>
+            <h2 className="font-display text-lg font-semibold text-ink">{t("details")}</h2>
             <dl className="mt-3 border-b border-line pb-3">
               <SummaryRow label={t("youSend")} value={money(transfer.sendAmountCad, sendCur)} />
               <SummaryRow
@@ -435,7 +434,7 @@ function ActionCard({
           <Icon name={icon} className="h-5 w-5" />
         </span>
         <div className="min-w-0 flex-1">
-          <h2 className="font-display text-lg font-extrabold text-ink">{title}</h2>
+          <h2 className="font-display text-lg font-semibold text-ink">{title}</h2>
           <p className="mt-1 text-sm leading-relaxed text-muted">{body}</p>
           {children && <div className="mt-4">{children}</div>}
         </div>

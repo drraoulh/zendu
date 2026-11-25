@@ -399,7 +399,7 @@ export function TransferCalculator({
           compact ? "py-3" : "py-4"
         }`}
       >
-        <h2 className="font-display text-base font-extrabold tracking-tight">{t("title")}</h2>
+        <h2 className="font-display text-base font-semibold tracking-tight">{t("title")}</h2>
         <span className="inline-flex items-center gap-2 rounded-full bg-success/10 px-2.5 py-1 text-xs font-semibold text-success">
           <span className="live-dot" aria-hidden />
           {t("liveRate")}
@@ -661,7 +661,7 @@ function AmountField({
       }`}
     >
       <div className="flex flex-wrap items-center justify-between gap-x-3 gap-y-1.5">
-        <label htmlFor={id} className="text-xs font-semibold uppercase tracking-wider text-muted">
+        <label htmlFor={id} className="text-xs font-medium text-muted">
           {label}
         </label>
         {/* Sélecteur de pays : select natif transparent par-dessus un rendu avec drapeau */}
@@ -692,11 +692,11 @@ function AmountField({
           value={value}
           placeholder={placeholder}
           onChange={(e) => onChange(e.target.value)}
-          className={`min-w-0 flex-1 bg-transparent font-display font-extrabold ${compact ? "text-3xl" : "text-3xl sm:text-4xl"} tracking-tight outline-none transition placeholder:text-silver ${
+          className={`min-w-0 flex-1 bg-transparent font-display font-semibold ${compact ? "text-3xl" : "text-3xl sm:text-4xl"} tracking-tight outline-none transition placeholder:text-silver ${
             highlight ? "text-brand-strong" : "text-ink"
           } ${muted ? "opacity-50" : ""}`}
         />
-        <span className="shrink-0 font-display text-base font-bold text-muted">{currency}</span>
+        <span className="shrink-0 font-display text-base font-semibold text-muted">{currency}</span>
       </div>
     </div>
   );
@@ -714,7 +714,7 @@ function Row({
   return (
     <div className={`flex items-center justify-between gap-3 ${strong ? "border-t border-line pt-2" : ""}`}>
       <dt className={strong ? "font-semibold text-ink" : "text-muted"}>{label}</dt>
-      <dd className={`text-right ${strong ? "font-display text-base font-extrabold text-ink" : "font-medium text-ink"}`}>
+      <dd className={`text-right ${strong ? "font-display text-base font-semibold text-ink" : "font-medium text-ink"}`}>
         {value ?? <span className="inline-block h-3.5 w-16 animate-pulse rounded bg-silver/50 align-middle" />}
       </dd>
     </div>

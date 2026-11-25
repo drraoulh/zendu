@@ -50,13 +50,13 @@ export function ServicesSection() {
                 >
                   <Image src={p.image} alt="" fill sizes="(min-width: 1024px) 400px, (min-width: 640px) 50vw, 100vw" className="zoom-on-hover object-cover" />
                   {p.n === 1 && (
-                    <span className="absolute left-4 top-4 inline-flex items-center gap-1.5 rounded-full bg-white px-3 py-1.5 text-xs font-bold text-ink">
+                    <span className="absolute left-4 top-4 inline-flex items-center gap-1.5 rounded-full bg-white px-3 py-1.5 text-xs font-semibold text-ink">
                       <WstLogo variant="symbol" className="h-4 w-4" />
                       {t("s1Brand")}
                     </span>
                   )}
                 </Link>
-                <h3 className="mt-6 font-display text-2xl font-bold text-ink sm:text-[1.75rem]">
+                <h3 className="mt-6 font-display text-2xl font-semibold text-ink sm:text-[1.75rem]">
                   <Link href={link(p.href)} className="hover:underline hover:decoration-2 hover:underline-offset-4">
                     {t(k("Title"))}
                   </Link>
@@ -64,7 +64,7 @@ export function ServicesSection() {
                 <p className="mt-2 flex-1 text-base leading-relaxed text-muted">{t(k("Pitch"))}</p>
                 <div className="mt-5 flex flex-wrap items-center gap-x-5 gap-y-3">
                   <ButtonLink href={link(p.primary.href)}>{t(p.primary.key)}</ButtonLink>
-                  <Link href={link(p.more.href)} className="inline-flex items-center gap-1.5 text-sm font-bold text-ink underline decoration-ink/30 underline-offset-4 hover:decoration-ink">
+                  <Link href={link(p.more.href)} className="inline-flex items-center gap-1.5 text-sm font-semibold text-ink underline decoration-ink/30 underline-offset-4 hover:decoration-ink">
                     {t(p.more.key)}
                   </Link>
                 </div>
@@ -96,7 +96,7 @@ export function ValuesSection() {
           {VALUES.map((v) => (
             <li key={v.n}>
               <Icon name={v.icon} className="h-8 w-8 text-ink" strokeWidth={1.6} />
-              <h3 className="mt-4 font-display text-lg font-bold text-ink">{t(`v${v.n}Title` as HomeKey)}</h3>
+              <h3 className="mt-4 font-display text-lg font-semibold text-ink">{t(`v${v.n}Title` as HomeKey)}</h3>
               <p className="mt-2 text-sm leading-relaxed text-muted">{t(`v${v.n}Text` as HomeKey)}</p>
             </li>
           ))}

@@ -12,7 +12,7 @@ export function SummaryRow({
 }) {
   const valueClass =
     emphasis === "highlight"
-      ? "font-display text-base font-extrabold text-brand-strong"
+      ? "font-display text-base font-semibold text-brand-strong"
       : emphasis === "strong"
         ? "font-semibold text-ink"
         : "font-medium text-ink";

@@ -42,7 +42,6 @@ export function LoginView({
 
   return (
     <div className="bg-navy-gradient relative overflow-hidden">
-      <div className="bg-grid absolute inset-0 opacity-40 [mask-image:linear-gradient(to_bottom,black,transparent)]" />
       <Container className="relative flex min-h-[70vh] items-center justify-center py-14">
         <div className="w-full max-w-md rounded-3xl border border-line bg-white p-6 shadow-float sm:p-8">
           <span className="inline-flex h-12 w-12 items-center justify-center rounded-2xl bg-brand-soft text-brand">
@@ -54,7 +53,7 @@ export function LoginView({
 
           {mode === "locked" ? (
             <>
-              <h1 className="mt-2 font-display text-2xl font-extrabold tracking-tight text-ink">{t("lockedTitle")}</h1>
+              <h1 className="mt-2 font-display text-2xl font-semibold tracking-tight text-ink">{t("lockedTitle")}</h1>
               <p className="mt-2 text-sm leading-relaxed text-muted">{t("lockedText")}</p>
               <code className="mt-4 block break-all rounded-xl bg-surface-soft px-3 py-2 font-mono text-xs text-ink">
                 ADMIN_PASSWORD=… · ADMIN_SESSION_SECRET=…
@@ -62,7 +61,7 @@ export function LoginView({
             </>
           ) : mode === "dev-open" ? (
             <>
-              <h1 className="mt-2 font-display text-2xl font-extrabold tracking-tight text-ink">{t("devOpenTitle")}</h1>
+              <h1 className="mt-2 font-display text-2xl font-semibold tracking-tight text-ink">{t("devOpenTitle")}</h1>
               <p className="mt-2 text-sm leading-relaxed text-muted">{t("devOpenText")}</p>
               <ButtonLink href="/admin" className="mt-5 w-full">
                 {t("goToAdmin")}
@@ -71,7 +70,7 @@ export function LoginView({
             </>
           ) : (
             <>
-              <h1 className="mt-2 font-display text-2xl font-extrabold tracking-tight text-ink">{t("loginTitle")}</h1>
+              <h1 className="mt-2 font-display text-2xl font-semibold tracking-tight text-ink">{t("loginTitle")}</h1>
               <p className="mt-2 text-sm leading-relaxed text-muted">{t("loginSubtitle")}</p>
               {loggedOut && !state.error && (
                 <div className="mt-4">
@@ -97,7 +96,7 @@ export function LoginView({
                       autoFocus
                       autoComplete="one-time-code"
                       aria-describedby="admin-code2-hint"
-                      className={`${inputClass} mt-1.5 font-mono tracking-[0.3em]`}
+                      className={`${inputClass} mt-1.5 font-mono`}
                     />
                     <p id="admin-code2-hint" className="mt-1 text-xs text-muted">
                       {t("codeHint")}
@@ -163,7 +162,7 @@ export function LoginView({
                         required
                         autoComplete="one-time-code"
                         aria-describedby="admin-code-hint"
-                        className={`${inputClass} mt-1.5 font-mono tracking-[0.3em]`}
+                        className={`${inputClass} mt-1.5 font-mono`}
                       />
                       <p id="admin-code-hint" className="mt-1 text-xs text-muted">
                         {t("codeHint")}

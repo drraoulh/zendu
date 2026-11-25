@@ -85,7 +85,7 @@ export function PageTitle({ title, subtitle, actions }: { title: string; subtitl
   return (
     <div className="flex flex-wrap items-end justify-between gap-4">
       <div className="min-w-0">
-        <h1 className="font-display text-2xl font-extrabold tracking-tight text-ink sm:text-3xl">{title}</h1>
+        <h1 className="font-display text-2xl font-semibold tracking-tight text-ink sm:text-3xl">{title}</h1>
         {subtitle && <p className="mt-1.5 max-w-2xl text-sm leading-relaxed text-muted sm:text-base">{subtitle}</p>}
       </div>
       {actions && <div className="flex flex-wrap gap-2">{actions}</div>}
@@ -101,7 +101,7 @@ export function DbError() {
         <Icon name="info" />
       </span>
       <div className="mt-3 flex-1 sm:mt-0">
-        <h2 className="font-display text-lg font-bold text-ink">{t("dbErrorTitle")}</h2>
+        <h2 className="font-display text-lg font-semibold text-ink">{t("dbErrorTitle")}</h2>
         <p className="mt-1 text-sm leading-relaxed text-muted">{t("dbErrorText")}</p>
         <Button className="mt-4" size="sm" variant="secondary" onClick={() => window.location.reload()}>
           {t("reload")}
@@ -129,7 +129,7 @@ export function Panel({
       {(title || actions) && (
         <div className="mb-4 flex flex-wrap items-center justify-between gap-2">
           {title && (
-            <h2 id={id} className="font-display text-base font-bold text-ink sm:text-lg">
+            <h2 id={id} className="font-display text-base font-semibold text-ink sm:text-lg">
               {title}
             </h2>
           )}

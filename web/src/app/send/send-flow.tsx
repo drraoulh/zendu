@@ -307,7 +307,7 @@ export function SendFlow({ live = false }: { live?: boolean }) {
           <Eyebrow>{t("eyebrow")}</Eyebrow>
           <div className="mt-3 flex flex-wrap items-end justify-between gap-4">
             <div>
-              <h1 className="font-display text-3xl font-extrabold tracking-tight text-ink sm:text-4xl">{t("title")}</h1>
+              <h1 className="font-display text-3xl font-semibold tracking-tight text-ink sm:text-4xl">{t("title")}</h1>
               <p className="mt-2 max-w-xl text-muted">{t("subtitle")}</p>
             </div>
             <p className="text-sm font-semibold text-brand">{t("stepOf", { n: step + 1, total: steps.length })}</p>
@@ -333,7 +333,7 @@ export function SendFlow({ live = false }: { live?: boolean }) {
                       className="flex w-full items-center gap-2 text-left"
                     >
                       <span
-                        className={`grid h-7 w-7 shrink-0 place-items-center rounded-full text-xs font-bold transition ${
+                        className={`grid h-7 w-7 shrink-0 place-items-center rounded-full text-xs font-semibold transition ${
                           done
                             ? "bg-brand text-white"
                             : current
@@ -394,7 +394,7 @@ export function SendFlow({ live = false }: { live?: boolean }) {
 
                 <div className="rounded-3xl border border-line bg-surface-soft/60 p-1.5">
                   <div className="rounded-[1.25rem] bg-white p-4 ring-1 ring-line focus-within:ring-2 focus-within:ring-brand">
-                    <label htmlFor="send-amount" className="text-xs font-bold uppercase tracking-[0.14em] text-muted">
+                    <label htmlFor="send-amount" className="text-xs font-semibold text-muted">
                       {t("youSend")}
                     </label>
                     <div className="mt-1 flex items-center gap-3">
@@ -406,7 +406,7 @@ export function SendFlow({ live = false }: { live?: boolean }) {
                         onChange={(e) => setAmountInput(e.target.value.replace(/[^\d.,\s]/g, ""))}
                         aria-invalid={!!amountError}
                         aria-describedby="send-amount-help"
-                        className="w-full min-w-0 bg-transparent font-display text-4xl font-black tracking-tight text-ink outline-none sm:text-5xl"
+                        className="w-full min-w-0 bg-transparent font-display text-4xl font-semibold tracking-tight text-ink outline-none sm:text-5xl"
                       />
                       <CurrencyPill code={source.code} currency={source.currency} />
                     </div>
@@ -439,10 +439,10 @@ export function SendFlow({ live = false }: { live?: boolean }) {
                   </div>
 
                   <div className="rounded-[1.25rem] bg-white p-4 ring-1 ring-line">
-                    <p className="text-xs font-bold uppercase tracking-[0.14em] text-muted">{t("theyReceive")}</p>
+                    <p className="text-xs font-semibold text-muted">{t("theyReceive")}</p>
                     <div className="mt-1 flex items-center gap-3">
                       <p
-                        className={`w-full min-w-0 truncate font-display text-4xl font-black tracking-tight sm:text-5xl ${
+                        className={`w-full min-w-0 truncate font-display text-4xl font-semibold tracking-tight sm:text-5xl ${
                           currentQuote ? "text-brand-strong" : "text-silver"
                         }`}
                         aria-live="polite"
@@ -481,7 +481,7 @@ export function SendFlow({ live = false }: { live?: boolean }) {
             {step === 1 && (
               <div key="recipient" className="animate-rise space-y-6">
                 <fieldset>
-                  <legend className="font-display text-base font-extrabold text-ink">{t("deliveryMethod")}</legend>
+                  <legend className="font-display text-base font-semibold text-ink">{t("deliveryMethod")}</legend>
                   <div className="mt-3 grid grid-cols-2 gap-2 sm:grid-cols-3">
                     {networks.map((n) => {
                       const active = n.id === activeNetwork;
@@ -558,7 +558,7 @@ export function SendFlow({ live = false }: { live?: boolean }) {
                               selected ? "border-brand bg-brand-soft" : "border-line bg-white hover:border-brand/40"
                             }`}
                           >
-                            <span className="grid h-9 w-9 shrink-0 place-items-center rounded-full bg-navy font-display text-sm font-bold text-white">
+                            <span className="grid h-9 w-9 shrink-0 place-items-center rounded-full bg-navy font-display text-sm font-semibold text-white">
                               {b.fullName.trim().charAt(0).toUpperCase()}
                             </span>
                             <span className="min-w-0">
@@ -577,7 +577,7 @@ export function SendFlow({ live = false }: { live?: boolean }) {
                 )}
 
                 <fieldset className="space-y-4">
-                  <legend className="font-display text-base font-extrabold text-ink">{t("recipientSection")}</legend>
+                  <legend className="font-display text-base font-semibold text-ink">{t("recipientSection")}</legend>
                   <Field
                     id="recipient-name"
                     label={t("recipientName")}
@@ -613,7 +613,7 @@ export function SendFlow({ live = false }: { live?: boolean }) {
                           <p className="mb-1.5 text-sm font-medium text-muted">{t("accountNumber")}</p>
                           <div className="flex items-center justify-between gap-3 rounded-2xl border border-line bg-surface-soft px-3.5 py-3">
                             <span className="min-w-0">
-                              <span className="block text-[11px] font-semibold uppercase tracking-[0.12em] text-muted">
+                              <span className="block text-[11px] font-semibold text-muted">
                                 {t("savedAccount")}
                               </span>
                               <span className="block font-mono font-semibold text-ink">{savedBank.accountMasked}</span>
@@ -681,7 +681,7 @@ export function SendFlow({ live = false }: { live?: boolean }) {
                 </fieldset>
 
                 <fieldset className="space-y-4">
-                  <legend className="font-display text-base font-extrabold text-ink">{t("senderSection")}</legend>
+                  <legend className="font-display text-base font-semibold text-ink">{t("senderSection")}</legend>
                   <div className="grid gap-4 sm:grid-cols-2">
                     <Field
                       id="sender-name"
@@ -727,13 +727,13 @@ export function SendFlow({ live = false }: { live?: boolean }) {
             {step === 2 && currentQuote && (
               <div key="review" className="animate-rise space-y-5">
                 <div>
-                  <h2 className="font-display text-xl font-extrabold text-ink">{t("reviewTitle")}</h2>
+                  <h2 className="font-display text-xl font-semibold text-ink">{t("reviewTitle")}</h2>
                   <p className="mt-1 text-sm text-muted">{t("reviewHint")}</p>
                 </div>
 
                 <div className="bg-navy-gradient rounded-3xl p-5 text-white">
-                  <p className="text-xs font-bold uppercase tracking-[0.16em] text-sky">{t("theyReceive")}</p>
-                  <p className="mt-1 font-display text-3xl font-black tracking-tight sm:text-4xl">
+                  <p className="text-xs font-semibold text-sky">{t("theyReceive")}</p>
+                  <p className="mt-1 font-display text-3xl font-semibold tracking-tight sm:text-4xl">
                     {L.money(currentQuote.receiveAmount, currentQuote.receiveCurrency)}
                   </p>
                   <p className="mt-2 text-sm text-white/75">
@@ -832,7 +832,7 @@ export function SendFlow({ live = false }: { live?: boolean }) {
           {/* Récapitulatif (collant sur ordinateur, empilé sur mobile) */}
           <aside className="rounded-3xl border border-line bg-white p-5 shadow-card sm:p-6 lg:sticky lg:top-24">
             <div className="flex items-center justify-between gap-3">
-              <h2 className="font-display text-base font-extrabold text-ink">{t("summary")}</h2>
+              <h2 className="font-display text-base font-semibold text-ink">{t("summary")}</h2>
               <span className="inline-flex items-center gap-1.5 text-xs font-semibold text-success">
                 <span className="live-dot" aria-hidden />
                 {t("rateLive")}
@@ -878,7 +878,7 @@ export function SendFlow({ live = false }: { live?: boolean }) {
             )}
             {step >= 1 && fullName.trim() && (
               <div className="mt-4 flex items-center gap-3 border-t border-line pt-4">
-                <span className="grid h-9 w-9 shrink-0 place-items-center rounded-full bg-navy font-display text-sm font-bold text-white">
+                <span className="grid h-9 w-9 shrink-0 place-items-center rounded-full bg-navy font-display text-sm font-semibold text-white">
                   {fullName.trim().charAt(0).toUpperCase()}
                 </span>
                 <div className="min-w-0">
@@ -952,7 +952,7 @@ function CountrySelect({
 
 function CurrencyPill({ code, currency }: { code: string; currency: string }) {
   return (
-    <span className="inline-flex shrink-0 items-center gap-2 rounded-full bg-surface-soft px-3 py-2 font-display text-sm font-bold text-ink ring-1 ring-line">
+    <span className="inline-flex shrink-0 items-center gap-2 rounded-full bg-surface-soft px-3 py-2 font-display text-sm font-semibold text-ink ring-1 ring-line">
       <CountryFlag code={code} size={20} />
       {currency}
     </span>
@@ -1052,7 +1052,7 @@ function ReviewBlock({
   return (
     <section className="rounded-2xl border border-line p-4">
       <div className="mb-2 flex items-center justify-between gap-3">
-        <h3 className="text-xs font-bold uppercase tracking-[0.14em] text-muted">{title}</h3>
+        <h3 className="text-xs font-semibold text-muted">{title}</h3>
         <button type="button" onClick={onEdit} className="text-sm font-semibold text-brand hover:text-brand-strong">
           {editLabel}
         </button>

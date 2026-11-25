@@ -175,12 +175,12 @@ export function AdminDashboard({
     <div>
       <div className="flex flex-wrap items-end justify-between gap-4">
         <div className="min-w-0">
-          <h1 className="font-display text-2xl font-extrabold tracking-tight text-ink sm:text-3xl">{t("title")}</h1>
+          <h1 className="font-display text-2xl font-semibold tracking-tight text-ink sm:text-3xl">{t("title")}</h1>
           <p className="mt-1.5 max-w-2xl text-sm leading-relaxed text-muted sm:text-base">{t("subtitle")}</p>
         </div>
         <div className="flex flex-wrap gap-2">
           <span
-            className={`inline-flex items-center gap-2 rounded-full px-3 py-1.5 text-xs font-bold ${live ? "bg-success/10 text-success" : "bg-warn/15 text-ink"}`}
+            className={`inline-flex items-center gap-2 rounded-full px-3 py-1.5 text-xs font-semibold ${live ? "bg-success/10 text-success" : "bg-warn/15 text-ink"}`}
           >
             <span className={`h-2 w-2 rounded-full ${live ? "bg-success" : "bg-warn"}`} aria-hidden />
             {live ? t("appModeLive") : t("appModeDemo")}
@@ -200,7 +200,7 @@ export function AdminDashboard({
               <Icon name="info" />
             </span>
             <div className="mt-3 flex-1 sm:mt-0">
-              <h2 className="font-display text-lg font-bold text-ink">{t("dbErrorTitle")}</h2>
+              <h2 className="font-display text-lg font-semibold text-ink">{t("dbErrorTitle")}</h2>
               <p className="mt-1 text-sm leading-relaxed text-muted">{t("dbErrorText")}</p>
               <Button className="mt-4" size="sm" variant="secondary" onClick={() => window.location.reload()}>
                 {t("reload")}
@@ -217,13 +217,13 @@ export function AdminDashboard({
                     <Icon name={k.icon} className="h-4.5 w-4.5" />
                   </span>
                   <p className="mt-3 text-xs font-medium text-muted">{t(k.label)}</p>
-                  <p className="mt-1 font-display text-3xl font-extrabold tracking-tight text-ink">{k.value}</p>
+                  <p className="mt-1 font-display text-3xl font-semibold tracking-tight text-ink">{k.value}</p>
                 </li>
               ))}
               <li className="bg-brand-gradient col-span-2 rounded-3xl p-4 text-white shadow-card sm:p-5 xl:col-span-5 sm:flex sm:items-center sm:justify-between">
-                <p className="text-xs font-semibold uppercase tracking-[0.14em] text-white/70">{t("kpiVolume")}</p>
+                <p className="text-xs font-semibold text-white/70">{t("kpiVolume")}</p>
                 {/* Un montant par devise, jamais coupé au milieu ; les devises passent à la ligne sur mobile. */}
-                <p className="mt-1 flex flex-wrap gap-x-3 gap-y-0.5 font-display text-xl font-extrabold tracking-tight min-[375px]:text-2xl sm:mt-0 sm:justify-end">
+                <p className="mt-1 flex flex-wrap gap-x-3 gap-y-0.5 font-display text-xl font-semibold tracking-tight min-[375px]:text-2xl sm:mt-0 sm:justify-end">
                   {volume.map((v, i) => (
                     <span key={i} className="whitespace-nowrap">
                       {i > 0 && <span aria-hidden className="mr-3 text-white/50">·</span>}
@@ -246,7 +246,7 @@ export function AdminDashboard({
                   </div>
                 )}
 
-                <h2 id="admin-recent" className={`font-display text-xl font-bold text-ink ${hasQueues ? "mt-8" : ""}`}>
+                <h2 id="admin-recent" className={`font-display text-xl font-semibold text-ink ${hasQueues ? "mt-8" : ""}`}>
                   {filtering ? tf("resultsTitle") : t("recent")}
                 </h2>
 
@@ -306,7 +306,7 @@ export function AdminDashboard({
                     {/* Tableau (≥ md) */}
                     <div className="mt-4 hidden overflow-hidden rounded-3xl border border-line bg-white shadow-card md:block">
                       <table className="w-full text-left text-sm">
-                        <thead className="bg-surface-soft text-xs uppercase tracking-wider text-muted">
+                        <thead className="bg-surface-soft text-xs text-muted">
                           <tr>
                             <th scope="col" className="px-4 py-3 font-semibold">{t("colRef")}</th>
                             <th scope="col" className="px-4 py-3 font-semibold">{t("colStatus")}</th>
@@ -377,7 +377,7 @@ export function AdminDashboard({
                                 </p>
                               </div>
                               <div className="shrink-0 text-right">
-                                <p className="text-sm font-bold text-ink">
+                                <p className="text-sm font-semibold text-ink">
                                   {formatMoney(r.totalCad, r.sendCurrency, nl)}
                                 </p>
                                 <p className="text-xs text-muted">
@@ -396,7 +396,7 @@ export function AdminDashboard({
               {/* Colonne latérale */}
               <aside className="space-y-6">
                 <section aria-labelledby="admin-status" className="rounded-3xl border border-line bg-white p-5 shadow-card">
-                  <h2 id="admin-status" className="font-display text-base font-bold text-ink">
+                  <h2 id="admin-status" className="font-display text-base font-semibold text-ink">
                     {t("byStatus")}
                   </h2>
                   {counts.length === 0 ? (
@@ -422,7 +422,7 @@ export function AdminDashboard({
                 </section>
 
                 <section aria-labelledby="admin-links" className="rounded-3xl border border-line bg-white p-5 shadow-card">
-                  <h2 id="admin-links" className="font-display text-base font-bold text-ink">
+                  <h2 id="admin-links" className="font-display text-base font-semibold text-ink">
                     {t("links")}
                   </h2>
                   <ul className="mt-4 space-y-3 text-sm">

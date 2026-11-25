@@ -5,7 +5,7 @@ type Variant = "primary" | "secondary" | "ghost" | "white" | "outline-light" | "
 type Size = "sm" | "md" | "lg";
 
 const base =
-  "inline-flex items-center justify-center gap-2 rounded-full font-bold transition disabled:cursor-not-allowed disabled:opacity-55";
+  "inline-flex items-center justify-center gap-2 rounded-full font-semibold transition disabled:cursor-not-allowed disabled:opacity-55";
 
 /** Boutons « pilule » noirs ou blancs, à la manière de logitech.com. */
 const variants: Record<Variant, string> = {

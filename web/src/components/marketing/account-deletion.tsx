@@ -51,7 +51,7 @@ export function AccountDeletionContent() {
       <Container className="py-12 sm:py-16">
         <div className="max-w-3xl space-y-10 text-ink">
           <section>
-            <h2 className="font-display text-2xl font-bold">{t("inAppTitle")}</h2>
+            <h2 className="font-display text-2xl font-semibold">{t("inAppTitle")}</h2>
             <ol className="mt-4 list-decimal space-y-2 pl-6 text-base leading-relaxed text-muted">
               <li>{t("inApp1")}</li>
               <li>{t("inApp2")}</li>
@@ -60,7 +60,7 @@ export function AccountDeletionContent() {
             <p className="mt-3 text-sm text-muted">{t("inAppNote")}</p>
           </section>
           <section>
-            <h2 className="font-display text-2xl font-bold">{t("mailTitle")}</h2>
+            <h2 className="font-display text-2xl font-semibold">{t("mailTitle")}</h2>
             <p className="mt-4 text-base leading-relaxed text-muted">{t("mailText")}</p>
             <p className="mt-3">
               <a href={`mailto:${email}?subject=Suppression%20de%20compte`} className="font-semibold text-brand hover:underline">
@@ -69,7 +69,7 @@ export function AccountDeletionContent() {
             </p>
           </section>
           <section>
-            <h2 className="font-display text-2xl font-bold">{t("whatTitle")}</h2>
+            <h2 className="font-display text-2xl font-semibold">{t("whatTitle")}</h2>
             <ul className="mt-4 list-disc space-y-2 pl-6 text-base leading-relaxed text-muted">
               <li>{t("deleted")}</li>
               <li>{t("kept")}</li>

@@ -91,7 +91,7 @@ export function AboutContent() {
                 <p>{t("story2")}</p>
                 <p>{t("story3")}</p>
               </div>
-              <p className="mt-8 border-l-4 border-brand pl-4 font-display text-lg font-bold italic text-ink">
+              <p className="mt-8 border-l-4 border-brand pl-4 font-display text-lg font-semibold italic text-ink">
                 « {c("tagline")} »
               </p>
             </div>
@@ -104,12 +104,11 @@ export function AboutContent() {
         <Container>
           <div className="grid gap-5 md:grid-cols-2">
             <article className="bg-navy-gradient relative overflow-hidden rounded-3xl p-8 text-white shadow-float sm:p-10">
-              <div aria-hidden className="bg-grid absolute inset-0 opacity-40" />
               <div className="relative">
                 <span className="grid h-12 w-12 place-items-center rounded-2xl bg-white/10 text-sky">
                   <Icon name="globe" className="h-6 w-6" />
                 </span>
-                <h2 className="mt-6 font-display text-2xl font-extrabold sm:text-3xl">{t("missionTitle")}</h2>
+                <h2 className="mt-6 font-display text-2xl font-semibold sm:text-3xl">{t("missionTitle")}</h2>
                 <p className="mt-4 leading-relaxed text-white/75">{t("missionText")}</p>
               </div>
             </article>
@@ -117,7 +116,7 @@ export function AboutContent() {
               <span className="grid h-12 w-12 place-items-center rounded-2xl bg-brand-soft text-brand">
                 <Icon name="star" className="h-6 w-6" />
               </span>
-              <h2 className="mt-6 font-display text-2xl font-extrabold text-ink sm:text-3xl">{t("visionTitle")}</h2>
+              <h2 className="mt-6 font-display text-2xl font-semibold text-ink sm:text-3xl">{t("visionTitle")}</h2>
               <p className="mt-4 leading-relaxed text-muted">{t("visionText")}</p>
             </article>
           </div>
@@ -151,7 +150,7 @@ export function AboutContent() {
                     <span className="bg-brand-gradient grid h-12 w-12 place-items-center rounded-2xl text-white ring-1 ring-white/20">
                       <Icon name={pole.icon} className="h-6 w-6" />
                     </span>
-                    <h3 className="mt-5 font-display text-lg font-bold">{k(`pole${i}Title`)}</h3>
+                    <h3 className="mt-5 font-display text-lg font-semibold">{k(`pole${i}Title`)}</h3>
                     <p className="mt-2 flex-1 text-sm leading-relaxed text-white/70">{k(`pole${i}Text`)}</p>
                     <span className="mt-5 inline-flex items-center gap-1.5 text-sm font-semibold text-sky transition group-hover:text-white">
                       {t("discover")}
@@ -213,8 +212,8 @@ export function AboutContent() {
               <span className="grid h-12 w-12 place-items-center rounded-2xl bg-brand-soft text-brand">
                 <Icon name="shield" className="h-6 w-6" />
               </span>
-              <p className="mt-6 font-display text-xs font-bold uppercase tracking-[0.18em] text-brand">{t("complianceEyebrow")}</p>
-              <h2 className="mt-2 font-display text-2xl font-extrabold text-ink">{t("complianceTitle")}</h2>
+              <p className="mt-6 font-display text-xs font-semibold text-brand">{t("complianceEyebrow")}</p>
+              <h2 className="mt-2 font-display text-2xl font-semibold text-ink">{t("complianceTitle")}</h2>
               <div className="mt-4 grid gap-3 text-sm leading-relaxed text-muted">
                 <p>{t("complianceText1")}</p>
                 <p>{t("complianceText2")}</p>
@@ -240,8 +239,8 @@ export function AboutContent() {
               <span className="grid h-12 w-12 place-items-center rounded-2xl bg-brand-soft text-brand">
                 <Icon name="info" className="h-6 w-6" />
               </span>
-              <p className="mt-6 font-display text-xs font-bold uppercase tracking-[0.18em] text-brand">{t("factsEyebrow")}</p>
-              <h2 className="mt-2 font-display text-2xl font-extrabold text-ink">{t("factsTitle")}</h2>
+              <p className="mt-6 font-display text-xs font-semibold text-brand">{t("factsEyebrow")}</p>
+              <h2 className="mt-2 font-display text-2xl font-semibold text-ink">{t("factsTitle")}</h2>
               <dl className="mt-5 divide-y divide-line text-sm">
                 {facts.map((f) => (
                   <div key={f.label} className="flex flex-col gap-0.5 py-3 sm:flex-row sm:justify-between sm:gap-4">
