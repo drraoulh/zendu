@@ -21,7 +21,7 @@ export default function Referral() {
       <H1>{tr("Parrainez vos proches")}</H1>
       <P style={{ marginTop: 6, marginBottom: 18 }}>{tr("Partagez votre code avec votre famille et vos amis pour qu'ils rejoignent WorldSoft Transfer.")}</P>
       <Card style={{ alignItems: "center", gap: 10, marginBottom: 18 }}>
-        <Small>{tr("VOTRE CODE")}</Small>
+        <Small>{tr("Votre code")}</Small>
         <Text style={{ fontFamily: fonts.display, fontSize: 30, color: colors.brand, letterSpacing: 1 }}>{code}</Text>
         <View style={{ flexDirection: "row", gap: 8, alignSelf: "stretch" }}>
           <Button

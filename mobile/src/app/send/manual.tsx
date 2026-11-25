@@ -136,7 +136,7 @@ export default function ManualPayment() {
       <Header title={tr("Paiement manuel")} subtitle={tr("Réf. {0}", transfer.reference)} onBack={leave} />
 
       <Card style={s.hero}>
-                <Text style={s.heroLabel}>{tr("MONTANT EXACT À ENVOYER")}</Text>
+                <Text style={s.heroLabel}>{tr("Montant exact à envoyer")}</Text>
         <Text style={s.heroAmount} numberOfLines={1} adjustsFontSizeToFit>
           {amount}
         </Text>
@@ -238,7 +238,7 @@ function Step({
 
 const s = StyleSheet.create({
   hero: { alignItems: "center", gap: 6, marginBottom: 18, backgroundColor: colors.soft, borderColor: colors.line, paddingVertical: 20 },
-  heroLabel: { color: colors.muted, fontFamily: fonts.medium, fontSize: 12, letterSpacing: 0.6, marginTop: 6 },
+  heroLabel: { color: colors.muted, fontFamily: fonts.medium, fontSize: 12, letterSpacing: 0, marginTop: 6 },
   heroAmount: { color: colors.ink, fontFamily: fonts.display, fontSize: 34 },
   section: { fontFamily: fonts.heading, fontSize: 16, color: colors.ink, marginBottom: 10 },
   step: { flexDirection: "row", alignItems: "center", gap: 12, paddingVertical: 12 },

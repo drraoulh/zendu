@@ -353,6 +353,6 @@ const f = StyleSheet.create({
   otpBox: { width: 46, height: 56, borderRadius: radius.sm, borderWidth: 1.5, borderColor: colors.line, backgroundColor: colors.white, alignItems: "center", justifyContent: "center" },
   otpText: { fontFamily: fonts.display, fontSize: 24, color: colors.navy },
   otpHidden: { position: "absolute", opacity: 0, width: 1, height: 1 },
-  section: { fontFamily: fonts.heading, fontSize: 12, letterSpacing: 0.8, color: colors.muted, marginTop: 18, marginBottom: 8 },
+  section: { fontFamily: fonts.heading, fontSize: 12, letterSpacing: 0, color: colors.muted, marginTop: 18, marginBottom: 8 },
   num: { width: 30, height: 30, borderRadius: 15, backgroundColor: colors.brandSoft, alignItems: "center", justifyContent: "center" },
 });

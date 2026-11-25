@@ -227,7 +227,7 @@ const r = StyleSheet.create({
   amount: { color: colors.white, fontFamily: fonts.display, fontSize: 32, marginTop: 2 },
   headMeta: { fontFamily: fonts.regular, color: "rgba(255,255,255,0.6)", fontSize: 12, marginTop: 4 },
   body: { padding: 20 },
-  section: { fontFamily: fonts.heading, fontSize: 11, letterSpacing: 0.8, color: colors.muted, marginBottom: 2 },
+  section: { fontFamily: fonts.heading, fontSize: 11, letterSpacing: 0, color: colors.muted, marginBottom: 2 },
   name: { fontFamily: fonts.semibold, fontSize: 15, color: colors.ink },
   sep: { height: 1, backgroundColor: colors.line, marginVertical: 8, borderStyle: "dashed" },
   line: { flexDirection: "row", justifyContent: "space-between", gap: 12, paddingVertical: 6 },

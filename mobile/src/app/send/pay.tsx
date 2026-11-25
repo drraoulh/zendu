@@ -49,7 +49,7 @@ export default function Pay() {
     >
       <Header title={tr("Paiement par carte")} />
       <Card style={{ marginBottom: 16 }}>
-        <Small>{tr("TOTAL À PAYER")}</Small>
+        <Small>{tr("Total à payer")}</Small>
         <Text style={{ fontFamily: fonts.display, fontSize: 26, color: colors.navy }} numberOfLines={1} adjustsFontSizeToFit minimumFontScale={0.7}>
           {money(quote.total, quote.sendCurrency)}
         </Text>

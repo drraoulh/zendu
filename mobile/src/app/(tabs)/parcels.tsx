@@ -90,7 +90,7 @@ export default function Parcels() {
 
       {!shipment && recent.length ? (
         <Card style={{ paddingVertical: 4, marginTop: 16 }}>
-          <Small style={{ paddingHorizontal: 4, paddingTop: 8 }}>{tr("RECHERCHES RÉCENTES")}</Small>
+          <Small style={{ paddingHorizontal: 4, paddingTop: 8 }}>{tr("Recherches récentes")}</Small>
           {recent.map((n) => (
             <ListItem key={n} icon="ship" title={n} onPress={() => search(n)} />
           ))}
@@ -112,7 +112,7 @@ export default function Parcels() {
           <Card style={{ marginTop: 16, marginBottom: 12 }}>
             <View style={{ flexDirection: "row", justifyContent: "space-between", alignItems: "center", gap: 10 }}>
               <View style={{ flexShrink: 1 }}>
-                <Small>{tr("N° DE SUIVI")}</Small>
+                <Small>{tr("N° de suivi")}</Small>
                 <Text style={{ fontFamily: fonts.display, fontSize: 20, color: colors.navy }} numberOfLines={1} adjustsFontSizeToFit>
                   {shipment.number}
                 </Text>

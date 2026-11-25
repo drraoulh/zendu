@@ -411,7 +411,7 @@ export default function Kyc() {
           </View>
         ) : null}
       </View>
-      <Small style={{ fontFamily: fonts.heading, letterSpacing: 0.8, marginTop: 20, marginBottom: 8 }}>{tr("ENSUITE, VOUS POURREZ")}</Small>
+      <Small style={{ fontFamily: fonts.heading, letterSpacing: 0, marginTop: 20, marginBottom: 8 }}>{tr("Ensuite, vous pourrez")}</Small>
       <Card style={{ paddingVertical: 6 }}>
         <ListItem icon="send" title={tr("Envoyer de l'argent")} subtitle={tr("Mobile Money, virement bancaire, Interac, Alipay, WeChat Pay")} />
         <ListItem icon="user" title={tr("Enregistrer vos destinataires")} subtitle={tr("Vos proches, en un geste")} />

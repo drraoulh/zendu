@@ -84,7 +84,7 @@ export default function Review() {
 
       {/* Ce qui compte : combien je paie, combien il reçoit, puis les détails. */}
       <Card style={{ alignItems: "center", marginBottom: 14, backgroundColor: colors.soft, borderColor: colors.line, paddingVertical: 22 }}>
-        <Text style={{ color: colors.muted, fontFamily: fonts.medium, fontSize: 12, letterSpacing: 0.6 }}>{tr("VOUS PAYEZ")}</Text>
+        <Text style={{ color: colors.muted, fontFamily: fonts.medium, fontSize: 12, letterSpacing: 0 }}>{tr("Vous payez")}</Text>
         <Text style={{ color: colors.ink, fontFamily: fonts.display, fontSize: 36, letterSpacing: -0.8, marginTop: 4 }} numberOfLines={1} adjustsFontSizeToFit>
           {quote ? money(quote.total, quote.sendCurrency) : "…"}
         </Text>
