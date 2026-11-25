@@ -108,7 +108,7 @@ export default function Receipt() {
       footer={
         mode === "recipient" ? (
           <View style={{ gap: 6 }}>
-            <Button title={copied ? tr("Message copié") : tr("Envoyer à {0}", first)} icon={copied ? "check" : "send"} onPress={share} />
+            <Button title={copied ? tr("Message copié") : tr("Envoyer à {0}", first)} onPress={share} />
             <Small style={{ textAlign: "center" }}>{tr("Par WhatsApp, SMS ou courriel · sans frais ni données de paiement")}</Small>
           </View>
         ) : (
@@ -116,7 +116,7 @@ export default function Receipt() {
             {pdfError ? <Notice tone="danger" icon="alert" text={pdfError} /> : null}
             <View style={{ flexDirection: "row", gap: 8 }}>
               <Button title={tr("Reçu PDF")} icon="download" variant="secondary" loading={pdfBusy} style={{ flex: 1 }} onPress={sharePdf} />
-              <Button title={copied ? tr("Copié") : tr("Image")} icon={copied ? "check" : "send"} style={{ flex: 1 }} onPress={share} />
+              <Button title={copied ? tr("Copié") : tr("Image")} style={{ flex: 1 }} onPress={share} />
             </View>
           </View>
         )
@@ -192,7 +192,7 @@ function Party({ label, name, line, logo }: { label: string; name: string; line:
   return (
     <View style={{ marginBottom: 12, flexDirection: "row", gap: 12, alignItems: "center" }}>
       <View style={{ flex: 1 }}>
-        <Text style={r.section}>{label.toUpperCase()}</Text>
+        <Text style={r.section}>{label}</Text>
         <Text style={r.name}>{name}</Text>
         <Small>{line}</Small>
       </View>

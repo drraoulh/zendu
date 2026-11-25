@@ -44,7 +44,7 @@ export default function Login() {
       <View style={{ paddingTop: 24, marginBottom: 24 }}>
         <WstWordmark size={34} />
       </View>
-      <H1>{tr("Bon retour parmi nous")}</H1>
+      <H1>{tr("Connexion")}</H1>
       <P style={{ marginTop: 6, marginBottom: 22 }}>{tr("Connectez-vous à WorldSoft Transfer pour envoyer et suivre vos transferts.")}</P>
       <Field
         label={tr("Courriel")}

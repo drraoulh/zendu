@@ -285,7 +285,7 @@ export function Avatar({ name, size = 44, tone = "brand" }: { name: string; size
 }
 
 export function SectionTitle({ children }: { children: string }) {
-  return <Text style={f.section}>{children.toUpperCase()}</Text>;
+  return <Text style={f.section}>{children}</Text>;
 }
 
 export function Checkbox({ checked, onChange, children }: { checked: boolean; onChange: (v: boolean) => void; children: ReactNode }) {

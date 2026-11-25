@@ -38,7 +38,6 @@ export default function Referral() {
           />
           <Button
             title={tr(sharer.label)}
-            icon={sharer.copied ? "check" : "send"}
             size="sm"
             style={{ flex: 1 }}
             onPress={() => sharer.share(tr("Rejoins-moi sur WorldSoft Transfer (une solution PWFINTECH) pour envoyer de l'argent entre le Canada, le Cameroun et la Chine. Mon code : {0}", code))}

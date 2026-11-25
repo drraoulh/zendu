@@ -217,7 +217,7 @@ function Step({
       <View style={{ flex: 1, minWidth: 0 }}>
         <Text style={s.stepTitle}>{tr(title)}</Text>
         {value ? (
-          <Text style={[s.value, muted && { color: colors.muted, fontFamily: fonts.semibold, fontSize: 14 }]} selectable>
+          <Text style={[s.value, (muted || (value?.length ?? 0) > 18) && { fontSize: 14 }, muted && { color: colors.muted, fontFamily: fonts.semibold }]} selectable numberOfLines={2} adjustsFontSizeToFit minimumFontScale={0.8}>
             {value}
           </Text>
         ) : null}

@@ -277,7 +277,6 @@ export default function TransferScreen() {
           {transfer.status === "delivered" ? (
             <Button
               title={tr("Prévenir {0}", first)}
-              icon="send"
               variant="secondary"
               onPress={() => router.push({ pathname: "/receipt/[id]", params: { id: transfer.id, mode: "recipient" } })}
             />

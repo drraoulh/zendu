@@ -4,7 +4,7 @@ import { Pressable, StyleSheet, Text, View, useWindowDimensions } from "react-na
 import { SafeAreaView } from "react-native-safe-area-context";
 import { PoweredBy, WstSymbol, WstWordmark } from "@/components/brand";
 import { Flag } from "@/components/flag";
-import { Icon, type IconName } from "@/components/icons";
+import { type IconName } from "@/components/icons";
 import { Button } from "@/components/ui";
 import { useSession } from "@/lib/session";
 import { colors, fonts } from "@/lib/theme";
@@ -75,11 +75,6 @@ export default function Welcome() {
       <View style={st.sheet}>
         {/* Tablette : contenu centré sur 640 px au lieu de boutons étirés sur toute la largeur. */}
         <View style={st.sheetInner}>
-          {short ? null : (
-            <View style={st.iconWrap}>
-              <Icon name={slide.icon} color={colors.ink} size={22} />
-            </View>
-          )}
           <Text style={[st.title, compact && { fontSize: 21, lineHeight: 26 }]} accessibilityRole="header">{tr(slide.title)}</Text>
           <Text style={st.text}>{tr(slide.text)}</Text>
 
@@ -115,7 +110,6 @@ const st = StyleSheet.create({
   flagPill: { padding: 6, borderRadius: 12, backgroundColor: colors.soft },
   sheet: { backgroundColor: colors.white, padding: 24, paddingBottom: 20 },
   sheetInner: { width: "100%", maxWidth: 640, alignSelf: "center" },
-  iconWrap: { width: 44, height: 44, borderRadius: 22, backgroundColor: colors.soft, alignItems: "center", justifyContent: "center", marginBottom: 14 },
   title: { fontFamily: fonts.display, fontSize: 24, lineHeight: 30, color: colors.ink, letterSpacing: -0.4 },
   text: { fontFamily: fonts.regular, fontSize: 15, lineHeight: 22, color: colors.muted, marginTop: 8 },
   dots: { flexDirection: "row", gap: 6, marginVertical: 20 },
