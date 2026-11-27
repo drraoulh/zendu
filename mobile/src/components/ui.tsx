@@ -16,14 +16,14 @@ import {
 } from "react-native";
 import { KeyboardAvoidingView, KeyboardAwareScrollView, KeyboardStickyView } from "react-native-keyboard-controller";
 import { SafeAreaView, useSafeAreaInsets, type Edge } from "react-native-safe-area-context";
-import { colors, fonts, radius } from "@/lib/theme";
+import { colors, fonts, radius, tabular } from "@/lib/theme";
 import { Icon, type IconName } from "./icons";
 import { tr } from "@/lib/i18n";
 
 type Tone = "brand" | "success" | "warn" | "danger" | "neutral";
 
 const TONE_COLORS: Record<Tone, { fg: string; bg: string }> = {
-  brand: { fg: colors.ink, bg: colors.soft },
+  brand: { fg: colors.brand, bg: colors.brandSoft },
   success: { fg: colors.success, bg: colors.successSoft },
   warn: { fg: colors.warn, bg: colors.warnSoft },
   danger: { fg: colors.danger, bg: colors.dangerSoft },
@@ -143,7 +143,7 @@ export function Steps({ current, total, label, names }: { current: number; total
     <View style={{ marginBottom: 18 }} accessibilityLabel={tr("Étape {0} sur {1}{2}", current, total, label ? ` : ${label}` : "")}>
       <View style={{ flexDirection: "row", gap: 4 }}>
         {Array.from({ length: total }, (_, i) => (
-          <View key={i} style={{ flex: 1, height: 3, borderRadius: 2, backgroundColor: i < current ? colors.ink : colors.line }} />
+          <View key={i} style={{ flex: 1, height: 3, borderRadius: 2, backgroundColor: i < current ? colors.brand : colors.line }} />
         ))}
       </View>
       {names ? (
@@ -208,8 +208,8 @@ export function Button({
   style?: StyleProp<ViewStyle>;
 }) {
   const v = {
-    // Boutons pilule noirs et blancs, comme sur le site.
-    primary: { bg: colors.ink, fg: colors.white, border: colors.ink },
+    // Action principale en bleu de la marque ; le reste reste sobre (blanc, noir).
+    primary: { bg: colors.brand, fg: colors.white, border: colors.brand },
     secondary: { bg: colors.white, fg: colors.ink, border: "rgba(27,27,27,0.2)" },
     ghost: { bg: "transparent", fg: colors.ink, border: "transparent" },
     danger: { bg: colors.dangerSoft, fg: colors.danger, border: colors.dangerSoft },
@@ -485,7 +485,7 @@ export const styles = StyleSheet.create({
   row: { flexDirection: "row", justifyContent: "space-between", alignItems: "center", paddingVertical: 7, gap: 12 },
   // Libellé court (« Délai estimé ») sur une ligne : c'est la valeur qui passe à la ligne si besoin (320 px).
   rowLabel: { fontFamily: fonts.regular, fontSize: 14, color: colors.muted, flexShrink: 0, maxWidth: "50%" },
-  rowValue: { fontFamily: fonts.semibold, fontSize: 14, color: colors.ink, textAlign: "right", flexShrink: 1 },
+  rowValue: { fontFamily: fonts.semibold, fontSize: 14, color: colors.ink, textAlign: "right", flexShrink: 1, ...tabular },
   listItem: { flexDirection: "row", alignItems: "center", gap: 12, paddingVertical: 12, paddingHorizontal: 4, borderRadius: radius.sm },
   listIcon: { width: 40, height: 40, borderRadius: 20, alignItems: "center", justifyContent: "center" },
   listTitle: { fontFamily: fonts.semibold, fontSize: 15, color: colors.ink },

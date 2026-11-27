@@ -27,7 +27,7 @@ export default function Recipients() {
           list.map((r) => (
             <ListItem
               key={r.id}
-              leading={<Avatar name={r.fullName} tone="soft" size={42} />}
+              leading={<Avatar name={r.fullName} tone="soft" size={42} country={r.country} />}
               title={r.fullName}
               subtitle={`${networkLabel(r.network)} · ${countryName(r.country)}\n${recipientDetail(r)}`}
               onPress={() => router.push({ pathname: "/recipients/[id]", params: { id: r.id } })}

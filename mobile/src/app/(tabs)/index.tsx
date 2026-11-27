@@ -144,7 +144,7 @@ export default function Home() {
               style={st.person}
             >
               <View style={[st.avatarRing, on && { borderColor: colors.ink }]}>
-                <Avatar name={r.fullName} size={52} tone={on ? "brand" : "soft"} />
+                <Avatar name={r.fullName} size={52} tone={on ? "brand" : "soft"} country={r.country} />
                 <View style={st.flagDot}>
                   <Flag code={r.country} size={16} />
                 </View>

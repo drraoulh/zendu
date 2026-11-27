@@ -1,7 +1,7 @@
 import { useRef, useState, type ReactNode } from "react";
 import { Modal, Platform, Pressable, ScrollView, StyleSheet, Switch, Text, TextInput, View, useWindowDimensions } from "react-native";
 import { PASSWORD_RULES } from "@/lib/session";
-import { colors, fonts, radius } from "@/lib/theme";
+import { colors, fonts, radius, countryTone } from "@/lib/theme";
 import { Icon, type IconName } from "./icons";
 import { Button, Label, Small } from "./ui";
 import { tr } from "@/lib/i18n";
@@ -261,7 +261,8 @@ export function PasswordChecklist({ value }: { value: string }) {
 
 /* ---------- Divers ---------- */
 
-export function Avatar({ name, size = 44, tone = "brand" }: { name: string; size?: number; tone?: "brand" | "soft" }) {
+export function Avatar({ name, size = 44, tone = "brand", country }: { name: string; size?: number; tone?: "brand" | "soft"; country?: string | null }) {
+  const ct = countryTone(country);
   const initials = name
     .split(/\s+/)
     .filter(Boolean)
@@ -274,12 +275,12 @@ export function Avatar({ name, size = 44, tone = "brand" }: { name: string; size
         width: size,
         height: size,
         borderRadius: size / 2.6,
-        backgroundColor: tone === "brand" ? colors.brand : colors.brandSoft,
+        backgroundColor: ct ? ct.bg : tone === "brand" ? colors.brand : colors.brandSoft,
         alignItems: "center",
         justifyContent: "center",
       }}
     >
-      <Text style={{ fontFamily: fonts.display, fontSize: size * 0.36, color: tone === "brand" ? colors.white : colors.brand }}>{initials || "?"}</Text>
+      <Text style={{ fontFamily: fonts.display, fontSize: size * 0.36, color: ct ? ct.fg : tone === "brand" ? colors.white : colors.brand }}>{initials || "?"}</Text>
     </View>
   );
 }

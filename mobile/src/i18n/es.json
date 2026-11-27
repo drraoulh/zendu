@@ -1102,5 +1102,10 @@
  "pour {0}": "para {0}",
  "Partager le reçu PDF": "Compartir recibo PDF",
  "Avis de réception {0}": "Aviso de recepción {0}",
- "Avis PDF · par WhatsApp, SMS ou courriel · sans frais ni données de paiement": "Aviso PDF · por WhatsApp, SMS o correo · sin comisiones ni datos de pago"
+ "Avis PDF · par WhatsApp, SMS ou courriel · sans frais ni données de paiement": "Aviso PDF · por WhatsApp, SMS o correo · sin comisiones ni datos de pago",
+ "Taux et frais bloqués dès la création du transfert": "Tipo de cambio y comisiones fijados al crear el envío",
+ "Remboursé en entier si le versement ne peut pas aboutir": "Reembolso total si el pago no puede completarse",
+ "Reçu envoyé par courriel après le paiement": "Recibo enviado por correo tras el pago",
+ "{0} recevra": "{0} recibirá",
+ "via {0}": "vía {0}"
 }

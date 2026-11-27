@@ -1,11 +1,12 @@
 /**
- * Palette WorldSoft Transfer, version minimaliste : fond blanc, texte presque noir, gris très doux,
- * bordures fines. « brand » est donc noir ; le bleu n'existe plus que dans le logo.
+ * Palette WorldSoft Transfer : fond blanc, texte presque noir, gris très doux, bordures fines.
+ * Le bleu de la marque ne sert qu'à deux choses : l'action principale et l'argent reçu par le proche.
+ * Une teinte discrète par pays de destination (vert Cameroun, rouge Chine) aide à reconnaître un bénéficiaire.
  */
 export const colors = {
-  brand: "#0d0d0d",
-  brandStrong: "#000000",
-  brandSoft: "#f4f4f5",
+  brand: "#0b4dff",
+  brandStrong: "#0a3fd1",
+  brandSoft: "#eaf0ff",
   navy: "#0d0d0d",
   navyDeep: "#000000",
   sky: "#3fa0ff",
@@ -38,3 +39,13 @@ export const fonts = {
 export const radius = { sm: 10, md: 14, lg: 18, xl: 22, pill: 999 };
 
 export const space = (n: number) => n * 4;
+
+/** Chiffres de même largeur : les montants s'alignent et ne « dansent » pas pendant la saisie. */
+export const tabular = { fontVariant: ["tabular-nums" as const] };
+
+/** Teinte d'un bénéficiaire selon son pays de réception. */
+export function countryTone(code?: string | null): { bg: string; fg: string } | null {
+  if (code === "CM") return { bg: colors.successSoft, fg: colors.success };
+  if (code === "CN") return { bg: colors.dangerSoft, fg: colors.danger };
+  return null;
+}

@@ -1102,5 +1102,10 @@
  "pour {0}": "给 {0}",
  "Partager le reçu PDF": "分享 PDF 收据",
  "Avis de réception {0}": "收款通知 {0}",
- "Avis PDF · par WhatsApp, SMS ou courriel · sans frais ni données de paiement": "PDF 通知 · 通过 WhatsApp、短信或邮件发送 · 不含费用和支付信息"
+ "Avis PDF · par WhatsApp, SMS ou courriel · sans frais ni données de paiement": "PDF 通知 · 通过 WhatsApp、短信或邮件发送 · 不含费用和支付信息",
+ "Taux et frais bloqués dès la création du transfert": "汇率和费用在创建转账时即锁定",
+ "Remboursé en entier si le versement ne peut pas aboutir": "若无法完成收款，将全额退款",
+ "Reçu envoyé par courriel après le paiement": "付款后通过邮件发送收据",
+ "{0} recevra": "{0} 将收到",
+ "via {0}": "通过 {0}"
 }

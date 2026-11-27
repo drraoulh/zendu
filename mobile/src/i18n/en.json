@@ -1102,5 +1102,10 @@
  "pour {0}": "for {0}",
  "Partager le reçu PDF": "Share PDF receipt",
  "Avis de réception {0}": "Notice of receipt {0}",
- "Avis PDF · par WhatsApp, SMS ou courriel · sans frais ni données de paiement": "PDF notice · by WhatsApp, SMS or email · no fees or payment details"
+ "Avis PDF · par WhatsApp, SMS ou courriel · sans frais ni données de paiement": "PDF notice · by WhatsApp, SMS or email · no fees or payment details",
+ "Taux et frais bloqués dès la création du transfert": "Rate and fees locked when the transfer is created",
+ "Remboursé en entier si le versement ne peut pas aboutir": "Fully refunded if the payout can't go through",
+ "Reçu envoyé par courriel après le paiement": "Receipt emailed after payment",
+ "{0} recevra": "{0} will receive",
+ "via {0}": "via {0}"
 }

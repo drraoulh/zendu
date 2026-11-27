@@ -1,6 +1,6 @@
 import { router, useLocalSearchParams } from "expo-router";
 import { useEffect, useState } from "react";
-import { ActivityIndicator, Text, View, useWindowDimensions } from "react-native";
+import { AccessibilityInfo, ActivityIndicator, Animated, View, useWindowDimensions } from "react-native";
 import { WstWordmark } from "@/components/brand";
 import { Icon } from "@/components/icons";
 import { Button, Card, H1, P, Screen, Small, SummaryRow } from "@/components/ui";
@@ -8,7 +8,7 @@ import { api, type Transfer } from "@/lib/api";
 import { findCorridor, useCorridors } from "@/lib/corridors";
 import { deliveryEstimate, etaLabel, money, networkLabel } from "@/lib/format";
 import { useStore } from "@/lib/store";
-import { colors, fonts } from "@/lib/theme";
+import { colors, fonts, tabular } from "@/lib/theme";
 import { PaymentLogo } from "@/components/payment-logo";
 import { tr } from "@/lib/i18n";
 
@@ -21,6 +21,22 @@ export default function Success() {
   // Écran court (568 px) : trois rangées de boutons masquaient la moitié du récapitulatif ;
   // « Retour à l'accueil » passe alors sous le contenu.
   const short = useWindowDimensions().height < 640;
+
+  // Un seul mouvement dans toute l'appli : à la confirmation, la coche puis le montant se posent une fois.
+  const [pop] = useState(() => new Animated.Value(0));
+  const shown = Boolean(t);
+  useEffect(() => {
+    if (!shown) return;
+    let alive = true;
+    void AccessibilityInfo.isReduceMotionEnabled().then((reduce) => {
+      if (!alive) return;
+      if (reduce) pop.setValue(1);
+      else Animated.spring(pop, { toValue: 1, friction: 7, tension: 70, useNativeDriver: true }).start();
+    });
+    return () => {
+      alive = false;
+    };
+  }, [shown, pop]);
 
   useEffect(() => {
     resetDraft();
@@ -83,15 +99,33 @@ export default function Success() {
         <View style={{ marginBottom: short ? 4 : 14 }}>
           <WstWordmark size={short ? 22 : 26} />
         </View>
-        <View style={{ width: 84, height: 84, borderRadius: 28, backgroundColor: colors.successSoft, alignItems: "center", justifyContent: "center" }}>
+        <Animated.View
+          style={{
+            width: 84,
+            height: 84,
+            borderRadius: 28,
+            backgroundColor: colors.successSoft,
+            alignItems: "center",
+            justifyContent: "center",
+            opacity: pop,
+            transform: [{ scale: pop.interpolate({ inputRange: [0, 1], outputRange: [0.6, 1] }) }],
+          }}
+        >
           <Icon name="check" color={colors.success} size={42} strokeWidth={2.4} />
-        </View>
+        </Animated.View>
         <H1 style={{ textAlign: "center" }}>{tr("Paiement réussi")}</H1>
-        <P style={{ textAlign: "center" }}>{t.beneficiary.fullName} recevra</P>
-        <Text style={{ fontFamily: fonts.display, fontSize: 32, color: colors.brand }}>{money(t.receiveAmountXaf, t.receiveCurrency)}</Text>
+        <P style={{ textAlign: "center" }}>{tr("{0} recevra", t.beneficiary.fullName)}</P>
+        <Animated.Text
+          style={[
+            { fontFamily: fonts.display, fontSize: 40, letterSpacing: -0.8, color: colors.brand, ...tabular },
+            { opacity: pop, transform: [{ translateY: pop.interpolate({ inputRange: [0, 1], outputRange: [8, 0] }) }] },
+          ]}
+        >
+          {money(t.receiveAmountXaf, t.receiveCurrency)}
+        </Animated.Text>
         <View style={{ flexDirection: "row", alignItems: "center", gap: 8 }}>
           <PaymentLogo id={t.beneficiary.network} size={22} />
-          <Small>via {networkLabel(t.beneficiary.network)}</Small>
+          <Small>{tr("via {0}", networkLabel(t.beneficiary.network))}</Small>
         </View>
       </View>
       <Card style={{ marginTop: 20 }}>

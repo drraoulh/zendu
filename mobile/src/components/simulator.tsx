@@ -3,7 +3,7 @@ import { ActivityIndicator, Modal, Platform, Pressable, StyleSheet, Text, TextIn
 import { api, type CorridorMeta, type Quote } from "@/lib/api";
 import { COUNTRIES, SAMPLE_AMOUNT, findCorridor, useCorridors, type CountryCode } from "@/lib/corridors";
 import { countryName, etaLabel, money, parseAmount, rateLine, unit } from "@/lib/format";
-import { colors, fonts, radius } from "@/lib/theme";
+import { colors, fonts, radius, tabular } from "@/lib/theme";
 import { Flag } from "./flag";
 import { Icon } from "./icons";
 import { Button } from "./ui";
@@ -303,7 +303,7 @@ const s = StyleSheet.create({
   amountCol: { flex: 1, minWidth: 0 },
   fieldLabel: { fontFamily: fonts.semibold, fontSize: 12, color: colors.muted },
   // minWidth 0 : sans lui, sur le web, le champ garde la largeur par défaut d'un <input> et pousse la pastille hors du cadre.
-  amountInput: { minWidth: 0, fontFamily: fonts.display, fontSize: 30, color: colors.navy, paddingVertical: 4, ...(Platform.OS === "web" ? { outlineStyle: "none" as never } : null) },
+  amountInput: { minWidth: 0, fontFamily: fonts.display, fontSize: 30, color: colors.navy, paddingVertical: 4, ...tabular, ...(Platform.OS === "web" ? { outlineStyle: "none" as never } : null) },
   pill: { flexDirection: "row", alignItems: "center", gap: 6, backgroundColor: colors.white, borderRadius: radius.pill, paddingHorizontal: 10, minHeight: 44, borderWidth: 1, borderColor: colors.line },
   pillText: { fontFamily: fonts.heading, fontSize: 15, color: colors.ink },
   middle: { flexDirection: "row", alignItems: "center", gap: 12, paddingVertical: 10, paddingHorizontal: 6 },

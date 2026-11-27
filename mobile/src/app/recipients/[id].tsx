@@ -55,7 +55,7 @@ export default function RecipientDetail() {
     >
       <Header title={tr("Destinataire")} />
       <View style={{ alignItems: "center", gap: 8, marginBottom: 16 }}>
-        <Avatar name={r.fullName} size={72} />
+        <Avatar name={r.fullName} size={72} country={r.country} />
         <Text style={{ fontFamily: fonts.display, fontSize: 22, color: colors.navy }}>{r.fullName}</Text>
         <View style={{ flexDirection: "row", gap: 6, alignItems: "center" }}>
           <Flag code={r.country} size={18} />

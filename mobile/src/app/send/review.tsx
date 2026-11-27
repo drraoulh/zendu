@@ -1,6 +1,7 @@
 import { Redirect, router, useFocusEffect } from "expo-router";
 import { useCallback, useEffect, useRef, useState } from "react";
 import { Text, View } from "react-native";
+import { Icon } from "@/components/icons";
 import { Button, Card, Choice, H1, Header, Notice, Screen, Small, SEND_STEPS, Steps, SummaryRow } from "@/components/ui";
 import { api, type Quote } from "@/lib/api";
 import { deliveryEstimate, etaLabel, feeLabel, money, networkLabel, phone, rateLine } from "@/lib/format";
@@ -155,13 +156,18 @@ export default function Review() {
           <Button title={tr("Réessayer")} variant="secondary" onPress={() => setTryN((n) => n + 1)} />
         </View>
       ) : null}
-      <View style={{ marginTop: 14 }}>
-        <Notice
-          tone="brand"
-          icon="shield"
-          title={tr("Votre argent est protégé")}
-          text={tr("Taux et frais sont bloqués dès la création du transfert. Si le versement ne peut pas aboutir, nous annulons le transfert et vous remboursons votre virement.")}
-        />
+      <View style={{ marginTop: 14, gap: 10, padding: 14, borderRadius: 14, backgroundColor: colors.brandSoft }}>
+        <Text style={{ fontFamily: fonts.heading, fontSize: 14, color: colors.brand }}>{tr("Votre argent est protégé")}</Text>
+        {[
+          tr("Taux et frais bloqués dès la création du transfert"),
+          tr("Remboursé en entier si le versement ne peut pas aboutir"),
+          tr("Reçu envoyé par courriel après le paiement"),
+        ].map((line) => (
+          <View key={line} style={{ flexDirection: "row", alignItems: "flex-start", gap: 10 }}>
+            <Icon name="check" color={colors.brand} size={16} strokeWidth={2.4} />
+            <Text style={{ flex: 1, fontFamily: fonts.regular, fontSize: 13, lineHeight: 18, color: colors.ink }}>{line}</Text>
+          </View>
+        ))}
       </View>
     </Screen>
   );
