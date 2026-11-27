@@ -1098,5 +1098,6 @@
  "Confirmez votre courriel": "Confirm your email",
  "Nous avons envoyé un code à 6 chiffres à {0}. Vérifiez aussi vos courriels indésirables.": "We sent a 6-digit code to {0}. Check your spam folder too.",
  "Renvoyer le code ({0} s)": "Resend code ({0} s)",
- "Changer de courriel": "Change email"
+ "Changer de courriel": "Change email",
+ "pour {0}": "for {0}"
 }

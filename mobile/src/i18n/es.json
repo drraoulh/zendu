@@ -1098,5 +1098,6 @@
  "Confirmez votre courriel": "Confirma tu correo",
  "Nous avons envoyé un code à 6 chiffres à {0}. Vérifiez aussi vos courriels indésirables.": "Enviamos un código de 6 dígitos a {0}. Revisa también tu carpeta de spam.",
  "Renvoyer le code ({0} s)": "Reenviar código ({0} s)",
- "Changer de courriel": "Cambiar correo"
+ "Changer de courriel": "Cambiar correo",
+ "pour {0}": "para {0}"
 }

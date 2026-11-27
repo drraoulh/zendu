@@ -215,7 +215,7 @@ export default function TransferScreen() {
           <Flag code={transfer.destCountry} size={22} />
         </View>
         <Text style={st.amount}>{money(transfer.receiveAmountXaf, transfer.receiveCurrency)}</Text>
-        <Small>pour {transfer.beneficiary.fullName}</Small>
+        <Small>{tr("pour {0}", transfer.beneficiary.fullName)}</Small>
         <View style={{ marginTop: 10 }}>
           <Badge label={tr(info.label)} tone={info.tone} />
         </View>
