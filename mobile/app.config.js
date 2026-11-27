@@ -12,7 +12,11 @@ module.exports = ({ config }) => {
   // eslint-disable-next-line no-undef
   const hasGoogleServices = fs.existsSync(path.resolve(__dirname, googleServices));
   const plugins = [...(config.plugins ?? [])];
-  if (process.env.APK_ARM64_ONLY === "1") plugins.push(["expo-build-properties", { android: { buildArchs: ["arm64-v8a"] } }]);
+  // iOS 27 ferme au démarrage toute appli qui n'adopte pas le cycle de vie « scène » d'UIKit (UIApplicationSceneManifest).
+  // Expo SDK 57 l'ajoute sur demande (SDK 58 et suivants l'incluent d'office).
+  const buildProperties = { ios: { enableSceneSupport: true } };
+  if (process.env.APK_ARM64_ONLY === "1") buildProperties.android = { buildArchs: ["arm64-v8a"] };
+  plugins.push(["expo-build-properties", buildProperties]);
   return {
     ...config,
     plugins,
