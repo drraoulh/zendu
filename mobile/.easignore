@@ -48,3 +48,7 @@ dist-agent/
 # Firebase (notifications Android) : fourni à la construction
 
 # google-services.json est volontairement envoyé à EAS (fichier écrit pendant la construction).
+
+# Captures et textes de la fiche App Store : inutiles à la construction.
+store-ios/
+store-app-store-fiche.md

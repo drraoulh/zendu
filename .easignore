@@ -1,0 +1,16 @@
+# Dépôt « monorepo » : EAS envoie tout le dépôt. L'appli n'a besoin que du dossier mobile/.
+/web
+/video
+/supabase
+/scripts
+/.claude
+/.github
+/mobile/store-ios
+/mobile/store-app-store-fiche.md
+node_modules/
+.DS_Store
+*.p8
+*.p12
+*.key
+*.pem
+*.mobileprovision
