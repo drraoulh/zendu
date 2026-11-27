@@ -3,5 +3,13 @@
   "framework": "nextjs",
   "installCommand": "npm install",
   "buildCommand": "npx prisma generate && next build",
-  "crons": [{ "path": "/api/cron/expire", "schedule": "17 6 * * *" }]
+  "crons": [
+    {
+      "path": "/api/cron/expire",
+      "schedule": "17 6 * * *"
+    }
+  ],
+  "regions": [
+    "lhr1"
+  ]
 }
