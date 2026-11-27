@@ -1099,5 +1099,8 @@
  "Nous avons envoyé un code à 6 chiffres à {0}. Vérifiez aussi vos courriels indésirables.": "Enviamos un código de 6 dígitos a {0}. Revisa también tu carpeta de spam.",
  "Renvoyer le code ({0} s)": "Reenviar código ({0} s)",
  "Changer de courriel": "Cambiar correo",
- "pour {0}": "para {0}"
+ "pour {0}": "para {0}",
+ "Partager le reçu PDF": "Compartir recibo PDF",
+ "Avis de réception {0}": "Aviso de recepción {0}",
+ "Avis PDF · par WhatsApp, SMS ou courriel · sans frais ni données de paiement": "Aviso PDF · por WhatsApp, SMS o correo · sin comisiones ni datos de pago"
 }

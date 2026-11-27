@@ -1099,5 +1099,8 @@
  "Nous avons envoyé un code à 6 chiffres à {0}. Vérifiez aussi vos courriels indésirables.": "We sent a 6-digit code to {0}. Check your spam folder too.",
  "Renvoyer le code ({0} s)": "Resend code ({0} s)",
  "Changer de courriel": "Change email",
- "pour {0}": "for {0}"
+ "pour {0}": "for {0}",
+ "Partager le reçu PDF": "Share PDF receipt",
+ "Avis de réception {0}": "Notice of receipt {0}",
+ "Avis PDF · par WhatsApp, SMS ou courriel · sans frais ni données de paiement": "PDF notice · by WhatsApp, SMS or email · no fees or payment details"
 }

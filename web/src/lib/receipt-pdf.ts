@@ -42,6 +42,10 @@ const L = {
     keep: "Conservez ce reçu. Pour toute question, contactez-nous en citant le numéro de confirmation.",
     generated: "Document généré électroniquement le",
     page: "Reçu",
+    noticeTitle: "Avis de réception",
+    noticeLead: "Vous avez reçu de l'argent",
+    from: "De la part de",
+    noticeNote: "Cet avis ne contient ni frais ni données de paiement.",
     statuses: {
       draft: "Brouillon",
       quoted: "Devis",
@@ -86,6 +90,10 @@ const L = {
     keep: "Keep this receipt for your records. If you have any questions, contact us quoting the confirmation number.",
     generated: "Electronically generated on",
     page: "Receipt",
+    noticeTitle: "Notice of receipt",
+    noticeLead: "You have received money",
+    from: "From",
+    noticeNote: "This notice contains no fees or payment details.",
     statuses: {
       draft: "Draft",
       quoted: "Quoted",
@@ -130,6 +138,10 @@ const L = {
     keep: "Conserve este recibo. Si tiene alguna pregunta, contáctenos indicando el número de confirmación.",
     generated: "Documento generado electrónicamente el",
     page: "Recibo",
+    noticeTitle: "Aviso de recepción",
+    noticeLead: "Ha recibido dinero",
+    from: "De parte de",
+    noticeNote: "Este aviso no contiene comisiones ni datos de pago.",
     statuses: {
       draft: "Borrador",
       quoted: "Cotizado",
@@ -214,13 +226,17 @@ export type ReceiptPdfOptions = {
   lang: ReceiptPdfLang;
   /** Accès public par lien : coordonnées déjà masquées en amont. */
   limited?: boolean;
+  /** « recipient » : avis de réception pour le bénéficiaire (ni frais, ni paiement, ni courriel de l'expéditeur). */
+  variant?: "receipt" | "recipient";
 };
 
 /** Reçu de transfert en PDF A4 (logo, montants, référence de versement, contact du service client). */
-export async function renderReceiptPdf(receipt: ReceiptData, { lang }: ReceiptPdfOptions): Promise<Uint8Array> {
+export async function renderReceiptPdf(receipt: ReceiptData, { lang, variant = "receipt" }: ReceiptPdfOptions): Promise<Uint8Array> {
   const t = L[lang];
+  const notice = variant === "recipient";
+  const docTitle = notice ? t.noticeTitle : t.title;
   const doc = await PDFDocument.create();
-  doc.setTitle(`${t.title} ${receipt.reference}`);
+  doc.setTitle(`${docTitle} ${receipt.reference}`);
   doc.setAuthor("PWFINTECH");
   doc.setCreator("WorldSoft Transfer");
   doc.setProducer("WorldSoft Transfer");
@@ -254,7 +270,7 @@ export async function renderReceiptPdf(receipt: ReceiptData, { lang }: ReceiptPd
   } else {
     text(page, "WorldSoft Transfer", M, y - 20, 18, bold, NAVY);
   }
-  right(t.title, y - 12, 14, bold, NAVY);
+  right(docTitle, y - 12, 14, bold, NAVY);
   right(t.solution, y - 28, 9, regular, MUTED);
   y -= 50;
   page.drawLine({ start: { x: M, y }, end: { x: M + W, y }, thickness: 1, color: LINE });
@@ -262,8 +278,8 @@ export async function renderReceiptPdf(receipt: ReceiptData, { lang }: ReceiptPd
 
   // Bloc principal : montant reçu + référence + statut.
   const status = (t.statuses as Record<string, string>)[receipt.status] ?? receipt.statusLabel;
-  page.drawRectangle({ x: M, y: y - 74, width: W, height: 86, color: SOFT });
-  text(page, t.received, M + 16, y - 8, 9, regular, MUTED);
+  page.drawRectangle({ x: M, y: y - 74, width: W, height: 86, color: SOFT, borderColor: LINE, borderWidth: 0.75 });
+  text(page, notice ? t.noticeLead : t.received, M + 16, y - 8, 9, regular, MUTED);
   text(page, formatMoney(receipt.receiveAmount, receipt.receiveCurrency, t.locale), M + 16, y - 34, 24, bold, NAVY);
   text(page, `${receipt.sourceCountryName} – ${receipt.destCountryName}`, M + 16, y - 56, 10, regular, MUTED);
   right(t.reference, y - 8, 9, regular, MUTED, M + W - 16);
@@ -272,10 +288,10 @@ export async function renderReceiptPdf(receipt: ReceiptData, { lang }: ReceiptPd
   y -= 104;
 
   const section = (title: string) => {
-    text(page, title.toUpperCase(), M, y, 9, bold, MUTED);
-    y -= 8;
+    text(page, title, M, y, 11, bold, NAVY);
+    y -= 9;
     page.drawLine({ start: { x: M, y }, end: { x: M + W, y }, thickness: 0.75, color: LINE });
-    y -= 18;
+    y -= 19;
   };
   const row = (label: string, value: string | null | undefined, strong = false) => {
     if (!value) return;
@@ -285,46 +301,75 @@ export async function renderReceiptPdf(receipt: ReceiptData, { lang }: ReceiptPd
     y -= 13 * lines.length + 7;
   };
 
-  section(t.amounts);
-  row(t.sent, formatMoney(receipt.sendAmount, receipt.sendCurrency, t.locale));
-  row(t.fee, formatMoney(receipt.fee, receipt.sendCurrency, t.locale));
-  row(t.total, formatMoney(receipt.total, receipt.sendCurrency, t.locale), true);
-  row(t.rate, `1 ${receipt.sendCurrency} = ${receipt.rate.toLocaleString(t.locale, { minimumFractionDigits: 2, maximumFractionDigits: 4 })} ${receipt.receiveCurrency}`);
-  row(t.received, formatMoney(receipt.receiveAmount, receipt.receiveCurrency, t.locale), true);
-  y -= 10;
+  if (notice) {
+    section(t.from);
+    row(t.sender, receipt.sender.name.split(" ")[0]);
+    row(t.country, receipt.sourceCountryName);
+    y -= 10;
 
-  section(t.sender);
-  row(t.sender, receipt.sender.name);
-  row("Email", receipt.sender.email);
-  row(t.country, receipt.sourceCountryName);
-  y -= 10;
+    section(t.recipient);
+    row(t.recipient, receipt.recipient.name);
+    row(t.method, (t.methods as Record<string, string>)[receipt.deliveryMethod] ?? receipt.deliveryMethod);
+    if (receipt.recipient.bankName) row(t.bank, receipt.recipient.bankName);
+    if (receipt.recipient.accountMasked) row(t.account, receipt.recipient.accountMasked);
+    else row(t.phone, receipt.recipient.phone);
+    row(t.country, receipt.destCountryName);
+    y -= 10;
 
-  section(t.recipient);
-  row(t.recipient, receipt.recipient.name);
-  row(t.method, (t.methods as Record<string, string>)[receipt.deliveryMethod] ?? receipt.deliveryMethod);
-  if (receipt.recipient.bankName) row(t.bank, receipt.recipient.bankName);
-  if (receipt.recipient.accountMasked) row(t.account, receipt.recipient.accountMasked);
-  else row(t.phone, receipt.recipient.phone);
-  row(t.country, receipt.destCountryName);
-  y -= 10;
+    section(t.status);
+    row(t.created, dateText(receipt.createdAt, t.locale));
+    row(t.delivered, dateText(receipt.deliveredAt, t.locale));
+    y -= 6;
+    for (const l of wrap(regular, safe(regular, t.noticeNote), 9, W)) {
+      text(page, l, M, y, 9, regular, MUTED);
+      y -= 12;
+    }
+    y -= 12;
+  } else {
+    section(t.amounts);
+    row(t.sent, formatMoney(receipt.sendAmount, receipt.sendCurrency, t.locale));
+    row(t.fee, formatMoney(receipt.fee, receipt.sendCurrency, t.locale));
+    row(t.total, formatMoney(receipt.total, receipt.sendCurrency, t.locale), true);
+    row(t.rate, `1 ${receipt.sendCurrency} = ${receipt.rate.toLocaleString(t.locale, { minimumFractionDigits: 2, maximumFractionDigits: 4 })} ${receipt.receiveCurrency}`);
+    row(t.received, formatMoney(receipt.receiveAmount, receipt.receiveCurrency, t.locale), true);
+    y -= 10;
 
-  section(t.status);
-  row(t.created, dateText(receipt.createdAt, t.locale));
-  row(t.paid, dateText(receipt.paidAt, t.locale));
-  row(t.delivered, dateText(receipt.deliveredAt, t.locale));
-  const inProgress = ["awaiting_payment", "payment_detected", "payout_queued", "payout_sent"].includes(receipt.status);
-  if (inProgress) row(t.eta, (t.etas as Record<string, string>)[receipt.deliveryEstimate] ?? receipt.deliveryEstimate);
-  row(t.payoutRef, receipt.payoutRef);
-  y -= 10;
+    section(t.sender);
+    row(t.sender, receipt.sender.name);
+    row("Email", receipt.sender.email);
+    row(t.country, receipt.sourceCountryName);
+    y -= 10;
+
+    section(t.recipient);
+    row(t.recipient, receipt.recipient.name);
+    row(t.method, (t.methods as Record<string, string>)[receipt.deliveryMethod] ?? receipt.deliveryMethod);
+    if (receipt.recipient.bankName) row(t.bank, receipt.recipient.bankName);
+    if (receipt.recipient.accountMasked) row(t.account, receipt.recipient.accountMasked);
+    else row(t.phone, receipt.recipient.phone);
+    row(t.country, receipt.destCountryName);
+    y -= 10;
+
+    section(t.status);
+    row(t.created, dateText(receipt.createdAt, t.locale));
+    row(t.paid, dateText(receipt.paidAt, t.locale));
+    row(t.delivered, dateText(receipt.deliveredAt, t.locale));
+    const inProgress = ["awaiting_payment", "payment_detected", "payout_queued", "payout_sent"].includes(receipt.status);
+    if (inProgress) row(t.eta, (t.etas as Record<string, string>)[receipt.deliveryEstimate] ?? receipt.deliveryEstimate);
+    row(t.payoutRef, receipt.payoutRef);
+    y -= 10;
+
+  }
 
   // Service client.
   section(t.support);
   const supportBits = [contact.email, company.phone, company.whatsapp ? `WhatsApp ${company.whatsapp}` : null].filter(Boolean).join("  ·  ");
   text(page, supportBits, M, y, 10, regular, INK);
   y -= 18;
-  for (const l of wrap(regular, safe(regular, t.keep), 9, W)) {
-    text(page, l, M, y, 9, regular, MUTED);
-    y -= 12;
+  if (!notice) {
+    for (const l of wrap(regular, safe(regular, t.keep), 9, W)) {
+      text(page, l, M, y, 9, regular, MUTED);
+      y -= 12;
+    }
   }
 
   // Pied de page : mention légale (uniquement des informations réelles : rien n'est inventé).

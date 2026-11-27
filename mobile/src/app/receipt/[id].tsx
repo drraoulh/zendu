@@ -1,13 +1,12 @@
 import { useLocalSearchParams } from "expo-router";
-import { useCallback, useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { ActivityIndicator, Pressable, StyleSheet, Text, View } from "react-native";
 import { PoweredBy, WstWordmark } from "@/components/brand";
-import { RecipientNotice, recipientMessage } from "@/components/recipient-notice";
+import { RecipientNotice } from "@/components/recipient-notice";
 import { Button, Header, Notice, Screen, Small } from "@/components/ui";
 import { api, type Transfer } from "@/lib/api";
 import { countryName, dateTime, feeLabel, money, networkLabel, phone, rateLine, statusInfo } from "@/lib/format";
 import { shareReceiptPdf } from "@/lib/receipt-pdf";
-import { shareViewAsImage } from "@/lib/share-image";
 import { colors, fonts, radius } from "@/lib/theme";
 import { cardLogoId, PaymentLogo } from "@/components/payment-logo";
 import { tr } from "@/lib/i18n";
@@ -19,11 +18,8 @@ export default function Receipt() {
   const [t, setT] = useState<Transfer | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [mode, setMode] = useState<Mode>(params.mode === "recipient" ? "recipient" : "mine");
-  const [copied, setCopied] = useState(false);
   const [pdfBusy, setPdfBusy] = useState(false);
   const [pdfError, setPdfError] = useState<string | null>(null);
-  const mineRef = useRef<View>(null);
-  const noticeRef = useRef<View>(null);
 
   const fetchTransfer = useCallback(() => api.transfer(params.id).then(setT).catch((e: Error) => setError(e.message)), [params.id]);
   useEffect(() => {
@@ -59,47 +55,16 @@ export default function Receipt() {
   // Espaces insécables : le numéro ne se coupe pas en fin de ligne (« +237 670 000 / 000 »).
   const benLine = [networkLabel(ben.network), ben.accountMasked ?? (ben.phone ? phone(ben.phone).replace(/ /g, "\u00a0") : null)].filter(Boolean).join(" · ");
 
-  function receiptText() {
-    if (!t) return "";
-    return [
-      tr("Reçu WorldSoft Transfer, une solution PWFINTECH"),
-      tr("Référence : {0}", t.reference),
-      tr("Date : {0}", dateTime(t.createdAt)),
-      tr("Statut : {0}", tr(info.label)),
-      tr("Expéditeur : {0} ({1})", t.senderName, countryName(t.sourceCountry)),
-      tr("Destinataire : {0}, {1} ({2})", ben.fullName, benLine, countryName(t.destCountry)),
-      tr("Montant envoyé : {0}", money(t.sendAmountCad, t.sendCurrency)),
-      tr("Frais : {0}", feeLabel(t.feeCad, t.sendCurrency)),
-      tr("Total payé : {0}", money(t.totalCad, t.sendCurrency)),
-      tr("Taux : {0}", rateLine(t.rate, t.sendCurrency, t.receiveCurrency)),
-      tr("Montant reçu : {0}", money(t.receiveAmountXaf, t.receiveCurrency)),
-      ...(paidWith ? [tr("Payé avec : {0}", paidWith)] : []),
-      ...(deliveredAt ? [tr("Livré le : {0}", dateTime(deliveredAt))] : []),
-    ].join("\n");
-  }
-
-  async function sharePdf() {
+  async function sharePdf(variant: "receipt" | "recipient") {
     if (!t || pdfBusy) return;
     setPdfBusy(true);
     setPdfError(null);
     try {
-      await shareReceiptPdf(t.id, t.reference);
+      await shareReceiptPdf(t.id, t.reference, variant);
     } catch (e) {
       setPdfError(e instanceof Error ? e.message : tr("Reçu indisponible pour le moment."));
     } finally {
       setPdfBusy(false);
-    }
-  }
-
-  async function share() {
-    if (!t) return;
-    const r =
-      mode === "recipient"
-        ? await shareViewAsImage(noticeRef, recipientMessage(t), tr("Prévenir {0}", first))
-        : await shareViewAsImage(mineRef, receiptText(), tr("Reçu WorldSoft Transfer"));
-    if (r === "copied") {
-      setCopied(true);
-      setTimeout(() => setCopied(false), 2000);
     }
   }
 
@@ -108,16 +73,14 @@ export default function Receipt() {
       footer={
         mode === "recipient" ? (
           <View style={{ gap: 6 }}>
-            <Button title={copied ? tr("Message copié") : tr("Envoyer à {0}", first)} onPress={share} />
-            <Small style={{ textAlign: "center" }}>{tr("Par WhatsApp, SMS ou courriel · sans frais ni données de paiement")}</Small>
+            {pdfError ? <Notice tone="danger" icon="alert" text={pdfError} /> : null}
+            <Button title={tr("Envoyer à {0}", first)} icon="download" loading={pdfBusy} onPress={() => sharePdf("recipient")} />
+            <Small style={{ textAlign: "center" }}>{tr("Avis PDF · par WhatsApp, SMS ou courriel · sans frais ni données de paiement")}</Small>
           </View>
         ) : (
           <View style={{ gap: 8 }}>
             {pdfError ? <Notice tone="danger" icon="alert" text={pdfError} /> : null}
-            <View style={{ flexDirection: "row", gap: 8 }}>
-              <Button title={tr("Reçu PDF")} icon="download" variant="secondary" loading={pdfBusy} style={{ flex: 1 }} onPress={sharePdf} />
-              <Button title={copied ? tr("Copié") : tr("Image")} style={{ flex: 1 }} onPress={share} />
-            </View>
+            <Button title={tr("Partager le reçu PDF")} icon="download" loading={pdfBusy} onPress={() => sharePdf("receipt")} />
           </View>
         )
       }
@@ -147,12 +110,12 @@ export default function Receipt() {
           <Small style={{ marginBottom: 12 }}>
             {tr("Envoyez cet avis à {0} pour l'informer de votre envoi. Il ne contient ni vos frais ni votre moyen de paiement.", first)}
           </Small>
-          <View ref={noticeRef} collapsable={false}>
+          <View>
             <RecipientNotice transfer={t} />
           </View>
         </>
       ) : (
-        <View ref={mineRef} collapsable={false} style={r.card}>
+        <View style={r.card}>
           <View style={r.head}>
             <View style={r.headTop}>
               <WstWordmark size={22} negative />

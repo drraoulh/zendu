@@ -34,8 +34,9 @@ export async function GET(request: Request, { params }: Params) {
 
   const url = new URL(request.url);
   const lang = receiptPdfLang(url.searchParams.get("lang") ?? request.headers.get("accept-language"));
-  const pdf = await renderReceiptPdf(receipt, { lang });
-  const filename = `recu-${receipt.reference}.pdf`.replace(/[^\w.-]/g, "");
+  const variant = url.searchParams.get("variant") === "recipient" ? "recipient" : "receipt";
+  const pdf = await renderReceiptPdf(receipt, { lang, variant });
+  const filename = `${variant === "recipient" ? "avis" : "recu"}-${receipt.reference}.pdf`.replace(/[^\w.-]/g, "");
   return new NextResponse(Buffer.from(pdf), {
     headers: {
       "Content-Type": "application/pdf",
